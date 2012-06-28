@@ -39,7 +39,8 @@ passport.use(new SamlStrategy(
   {
     path: '/login/callback',
     entryPoint: 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
-    issuer: 'passport-saml'
+    issuer: 'passport-saml',
+    protocol: 'http://'
   },
   function(profile, done) {
     if (!profile.email) {
