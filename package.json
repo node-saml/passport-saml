@@ -1,0 +1,23 @@
+{
+  "name": "passport-saml",
+  "version": "0.0.1",
+  "description": "SAML 2.0 authentication strategy for Passport",
+  "author": {
+    "name": "Henri Bergius",
+    "email": "henri.bergius@iki.fi",
+    "url": "http://bergie.iki.fi"
+  },
+  "main": "./lib/passport-saml",
+  "dependencies": {
+    "passport": "0.1.x",
+    "zlib": "1.0.x",
+    "xml2js": "0.1.x"
+  },
+  "devDependencies": {
+    "express": "2.5.x",
+    "ejs": "0.7.x"
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  }
+}
