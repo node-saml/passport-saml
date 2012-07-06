@@ -1,10 +1,11 @@
 {
   "name": "passport-saml",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "licenses": [{
     "type": "MIT",
     "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
   }],
+  "keywords": ["saml", "adfs", "sso", "shibboleth"],
   "description": "SAML 2.0 authentication strategy for Passport",
   "author": {
     "name": "Henri Bergius",

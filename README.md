@@ -3,7 +3,9 @@ Passport-SAML
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
-The code is based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library.
+The code was originally based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library.
+
+Passport-SAML has been tested to work with both [SimpleSAMLphp](http://simplesamlphp.org/) based Identity Providers, and with [Active Directory Federation Services](http://en.wikipedia.org/wiki/Active_Directory_Federation_Services).
 
 ## Installation
 
@@ -59,4 +61,20 @@ app.get('/login',
     res.redirect('/');
   }
 );
+```
+
+## Security and signatures
+
+Passport-SAML uses the HTTP Redirect Binding for its `AuthnRequest`s, and expects to receive the messages back via the HTTP POST binding.
+
+Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key. For example:
+
+```javascript
+    privateCert: fs.readFileSync('./cert.pem', 'utf-8')
+```
+
+It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's certificate using the `cert` confguration key:
+
+```javascript
+    cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
 ```
