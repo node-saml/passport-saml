@@ -78,3 +78,19 @@ It is a good idea to validate the incoming SAML Responses. For this, you can pro
 ```javascript
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
 ```
+
+## Usage with Active Directory Federation Services
+
+Here is a configuration that has been proven to work with ADFS:
+
+```javascript
+  {
+    entryPoint: 'https://ad.example.net/adfs/ls/',
+    issuer: 'https://your-app.example.net/login/callback',
+    callbackUrl: 'https://your-app.example.net/login/callback',
+    cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
+    identifierFormat: null
+  }
+```
+
+Please note that ADFS needs to have a trust established to your service in order for this to work.
