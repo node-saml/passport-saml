@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "express": "2.5.x",
-    "ejs": "0.7.x"
+    "ejs": "0.7.x",
+    "jshint": "*"
   },
   "engines": {
     "node": ">= 0.6.0"
