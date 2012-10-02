@@ -20,7 +20,7 @@
     "passport": "0.1.x",
     "zlib": "1.0.x",
     "xml2js": "0.1.x",
-    "xml-crypto": "git+http://pulsehub.corp.neudesic.net/jess-sheneberger/xml-crypto.git",
+    "xml-crypto": "0.0.x",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
