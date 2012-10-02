@@ -19,7 +19,7 @@
   "dependencies": {
     "passport": "0.1.x",
     "zlib": "1.0.x",
-    "xml2js": "0.1.x",
+    "xml2js": "0.2.0",
     "xml-crypto": "0.0.x",
     "xmldom": "0.1.x"
   },
