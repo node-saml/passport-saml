@@ -132,6 +132,9 @@ The following configuration has been tested with the [Test Shibboleth IdP](http:
 // Your public certificate
 'publicCert': 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
 
+// The subject name you used in your certificate (CN)
+'publicCertSubjectName': 'oae.cam.ac.uk',
+
 // Your private certificate
 'privateCert': 'MIvjVG3NaSG6 ... 32ea+',
 'identifierFormat': null
