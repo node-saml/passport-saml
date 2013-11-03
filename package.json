@@ -1,9 +1,9 @@
 {
-  "name": "passport-saml",
-  "version": "0.0.4",
+  "name": "passport-saml-too",
+  "version": "0.0.5",
   "licenses": [{
     "type": "MIT",
-    "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
+    "url": "https://github.com/herby/passport-saml/raw/master/LICENSE"
   }],
   "keywords": ["saml", "adfs", "sso", "shibboleth"],
   "description": "SAML 2.0 authentication strategy for Passport",
@@ -13,7 +13,8 @@
     "url": "http://bergie.iki.fi"
   },
   "contributors" : [
-    "Michael Bosworth"
+    "Michael Bosworth",
+    "Herbert Vojčík"
   ],
   "main": "./lib/passport-saml",
   "dependencies": {
