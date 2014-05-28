@@ -24,11 +24,16 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "express": "2.5.x",
+    "express": "4.x",
     "ejs": "0.7.x",
-    "jshint": "*"
+    "jshint": "*",
+    "request": "*",
+    "should": "*"
   },
   "engines": {
     "node": ">= 0.6.0"
+  },
+  "scripts" : {
+    "test": "mocha"
   }
 }
