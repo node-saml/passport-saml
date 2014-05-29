@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "express": "3.x",
+    "body-parser": "*",
     "ejs": "0.7.x",
     "jshint": "*",
     "request": "*",
