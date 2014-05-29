@@ -25,11 +25,12 @@
     "xmlbuilder": "~2.2"
   },
   "devDependencies": {
-    "express": "4.x",
+    "express": "3.x",
     "ejs": "0.7.x",
     "jshint": "*",
     "request": "*",
-    "should": "*"
+    "should": "*",
+    "mocha": "*"
   },
   "engines": {
     "node": ">= 0.8.0"
