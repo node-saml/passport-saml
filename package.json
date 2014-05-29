@@ -17,6 +17,10 @@
     "Herbert Vojčík",
     "Peter Loer"
   ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/bergie/passport-saml.git"
+  },
   "main": "./lib/passport-saml",
   "dependencies": {
     "passport": "0.2.x",
