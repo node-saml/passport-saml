@@ -1,6 +1,6 @@
 {
   "name": "passport-saml",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "licenses": [{
     "type": "MIT",
     "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
@@ -13,21 +13,36 @@
     "url": "http://bergie.iki.fi"
   },
   "contributors" : [
-    "Michael Bosworth"
+    "Michael Bosworth",
+    "Herbert Vojčík",
+    "Peter Loer"
   ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/bergie/passport-saml.git"
+  },
   "main": "./lib/passport-saml",
   "dependencies": {
-    "passport": "0.1.x",
-    "xml2js": "0.2.0",
+    "passport": "0.2.x",
+    "xml2js": "0.4.x",
     "xml-crypto": "0.0.x",
-    "xmldom": "0.1.x"
+    "xmldom": "0.1.x",
+    "xmlbuilder": "~2.2"
   },
   "devDependencies": {
-    "express": "2.5.x",
+    "express": "3.x",
+    "body-parser": "*",
     "ejs": "0.7.x",
-    "jshint": "*"
+    "jshint": "*",
+    "request": "*",
+    "should": "*",
+    "mocha": "*"
   },
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 0.8.0"
+  },
+  "scripts" : {
+    "test": "mocha",
+    "jshint": "./node_modules/.bin/jshint lib"
   }
 }
