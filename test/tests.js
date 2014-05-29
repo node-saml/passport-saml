@@ -8,6 +8,7 @@ var should       = require( 'should' );
 var zlib         = require( 'zlib' );
 var querystring  = require( 'querystring' );
 var parseString  = require( 'xml2js' ).parseString;
+var SAML         = require( '../lib/passport-saml/saml.js' ).SAML;
 
 describe( 'passport-saml /', function() {
   describe( 'captured saml responses /', function() {
@@ -226,6 +227,61 @@ describe( 'passport-saml /', function() {
 
     afterEach( function( done ) {
       server.close( done );
+    });
+  });
+
+  describe( 'saml.js / ', function() {
+    it( 'generateLogoutRequest', function( done ) {
+      var expectedRequest = { 
+        'samlp:LogoutRequest': 
+         { '$': 
+            { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+              'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+              //ID: '_85ba0a112df1ffb57805',
+              Version: '2.0',
+              //IssueInstant: '2014-05-29T03:32:23Z',
+              Destination: 'foo' },
+           'saml:Issuer': 
+            [ { _: 'onelogin_saml',
+                '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
+           'saml:NameID': [ { _: 'bar', '$': { Format: 'foo' } } ] } };
+
+      var samlObj = new SAML( { entryPoint: "foo" } );
+      var logoutRequest = samlObj.generateLogoutRequest({
+        user: {
+          nameIDFormat: 'foo',
+          nameID: 'bar'
+        }
+      });
+      parseString( logoutRequest, function( err, doc ) {
+        delete doc['samlp:LogoutRequest']['$']["ID"];
+        delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
+        doc.should.eql( expectedRequest );
+        done();
+      });
+    });
+
+    it( 'generateLogoutResponse', function( done ) {
+      var expectedResponse =  { 
+        'samlp:LogoutResponse': 
+         { '$': 
+            { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+              'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+              //ID: '_d11b3c5e085b2417f4aa',
+              Version: '2.0',
+              //IssueInstant: '2014-05-29T01:11:32Z',
+              InResponseTo: 'quux' },
+           'saml:Issuer': [ 'onelogin_saml' ],
+           'samlp:Status': [ { 'samlp:StatusCode': [ { '$': { Value: 'urn:oasis:names:tc:SAML:2.0:status:Success' } } ] } ] } };
+
+      var samlObj = new SAML( {} );
+      var logoutRequest = samlObj.generateLogoutResponse({}, { ID: "quux" });
+      parseString( logoutRequest, function( err, doc ) {
+        delete doc['samlp:LogoutResponse']['$']["ID"];
+        delete doc['samlp:LogoutResponse']['$']["IssueInstant"];
+        doc.should.eql( expectedResponse );
+        done();
+      });
     });
   });
 });
