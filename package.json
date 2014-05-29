@@ -1,6 +1,6 @@
 {
-  "name": "passport-saml-too",
-  "version": "0.0.6",
+  "name": "passport-saml",
+  "version": "0.0.7",
   "licenses": [{
     "type": "MIT",
     "url": "https://github.com/herby/passport-saml/raw/master/LICENSE"
