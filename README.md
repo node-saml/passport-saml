@@ -37,6 +37,16 @@ passport.use(new SamlStrategy(
 ));
 ```
 
+Config parameter details:
+* `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
+* `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `https://`)
+* `callbackUrl`: full callbackUrl (overrides path if supplied)
+* `entryPoint`: identity provider entrypoint
+* `issuer`: issuer string to supply to identity provider
+* `cert`: see 'security and signatures'
+* `privateCert`: see 'security and signatures'
+* `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
+
 ### Provide the authentication callback
 
 You need to provide a route corresponding to the `path` configuration parameter given to the strategy:
@@ -62,6 +72,9 @@ app.get('/login',
   }
 );
 ```
+
+Additional config values allowed:
+* `samlFallback`: if set to `getAuthorizeUrl`, will initiate a redirect to identity provider on authentication failure
 
 ## Security and signatures
 
