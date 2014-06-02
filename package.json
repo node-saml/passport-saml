@@ -28,7 +28,7 @@
     "xml-crypto": "0.0.x",
     "xmldom": "0.1.x",
     "xmlbuilder": "~2.2",
-    "xmlencryption": "~0.7"
+    "xml-encryption": "~0.7"
   },
   "devDependencies": {
     "express": "3.x",
