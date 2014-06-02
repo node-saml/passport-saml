@@ -45,6 +45,7 @@ Config parameter details:
 * `issuer`: issuer string to supply to identity provider
 * `cert`: see 'security and signatures'
 * `privateCert`: see 'security and signatures'
+* `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
 * `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
 
 ### Provide the authentication callback
