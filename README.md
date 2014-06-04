@@ -108,3 +108,15 @@ Here is a configuration that has been proven to work with ADFS:
 ```
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.
+
+## Subjection confirmation validation
+
+When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated.
+Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
+
+Also note that `InResponseTo` is validated as an attribute of the top level `Response` element in the SAML response, as well
+as part of the `SubjectConfirmation` element.
+
+Previous request id's generated for SAML requests will eventually expire.  This is controlled with the `requestIdExpirationPeriodMs` option
+passed into the Passport-SAML config.  The default is 28,800,000 ms (8 hours).  Once expired, a subsequent SAML response
+received with an `InResponseTo` equal to the expired id will not validate and an error will be returned.
