@@ -313,6 +313,11 @@ describe( 'passport-saml /', function() {
       var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata.xml', 'utf-8');
       // splits are to get a nice diff if they don't match for some reason
       metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
+
+      // verify that we are exposed through Strategy as well
+      var strategy = new SamlStrategy( samlConfig, function() {} );
+      metadata = strategy.generateServiceProviderMetadata( decryptionCert );
+      metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
       done();
     });
 
