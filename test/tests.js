@@ -299,6 +299,23 @@ describe( 'passport-saml /', function() {
       });
     });
 
+    it( 'generateServiceProviderMetadata', function( done ) {
+      var samlConfig = {
+        issuer: 'http://example.serviceprovider.com',
+        callbackUrl: 'http://example.serviceprovider.com/saml/callback',
+        identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+        decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem')
+      };
+
+      var samlObj = new SAML( samlConfig );
+      var decryptionCert = fs.readFileSync(__dirname + '/static/testshib encryption cert.pem', 'utf-8');
+      var metadata = samlObj.generateServiceProviderMetadata( decryptionCert );
+      var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata.xml', 'utf-8');
+      // splits are to get a nice diff if they don't match for some reason
+      metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
+      done();
+    });
+
     describe( 'xml signature checks /', function() {
       var samlConfig = {
         entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
