@@ -48,6 +48,9 @@ Config parameter details:
 * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
 * `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
 * `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
+* `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
+* `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
+* `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
 
 ### Provide the authentication callback
 
@@ -125,3 +128,42 @@ differences between the clock time on the client (Node server with Passport-SAML
 
 `NotBefore` and `NotOnOrAfter` can be part of either the `SubjectConfirmation` element, or within in the `Assertion/Conditions` element
 in the SAML response.
+## Subjection confirmation validation
+
+When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated.
+Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
+
+Also note that `InResponseTo` is validated as an attribute of the top level `Response` element in the SAML response, as well
+as part of the `SubjectConfirmation` element.
+
+Previous request id's generated for SAML requests will eventually expire.  This is controlled with the `requestIdExpirationPeriodMs` option
+passed into the Passport-SAML config.  The default is 28,800,000 ms (8 hours).  Once expired, a subsequent SAML response
+received with an `InResponseTo` equal to the expired id will not validate and an error will be returned.
+
+## Cache Provider
+
+When `InResponseTo` validation is turned on, Passport-SAML will store generated request ids used in SAML requests to the IdP.  The implementation
+of how things are stored, checked to see if they exist, and eventually removed is from the Cache Provider used by Passport-SAML.
+
+The default implementation is a simple in-memory cache provider.  For multiple server/process scenarios, this will not be sufficient as
+the server/process that generated the request id and stored in memory could be different than the server/process handling the
+SAML response.  The `InResponseTo` could fail in this case erroneously.
+
+To support this scenario you can provide an implementation for a cache provider by providing an object with following functions:
+
+```javascript
+{
+    save: function(key, value){
+
+      // save the key with the optional value
+    },
+    exists: function(key){
+      // returns true/false if the key exists or not
+    },
+    remove: function(key){
+      // removes the key from the cache
+    }
+}
+```
+
+Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.
