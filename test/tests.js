@@ -403,12 +403,12 @@ describe( 'passport-saml /', function() {
             var samlObj = new SAML( samlConfig );
 
             // Mock the SAML request being passed through Passport-SAML
-            samlObj.saveAuthnRequestId(requestId);
+            samlObj.cacheProvider.save(requestId);
 
             samlObj.validatePostResponse( container, function( err, profile, logout ) {
                 should.not.exist( err );
                 profile.nameID.should.startWith( 'ploer' );
-                should(samlObj.doesAuthnRequestIdExist(requestId)).equal(false);
+                should(samlObj.cacheProvider.exists(requestId)).equal(false);
                 done();
             });
         });
@@ -451,12 +451,12 @@ describe( 'passport-saml /', function() {
             var samlObj = new SAML( samlConfig );
 
             // Mock the SAML request being passed through Passport-SAML
-            samlObj.saveAuthnRequestId(requestId);
+            samlObj.cacheProvider.save(requestId);
 
             samlObj.validatePostResponse( container, function( err, profile, logout ) {
                 should.not.exist( err );
                 profile.nameID.should.startWith( 'UIS/jochen-work' );
-                should(samlObj.doesAuthnRequestIdExist(requestId)).equal(false);
+                should(samlObj.cacheProvider.exists(requestId)).equal(false);
                 done();
             });
         });
@@ -474,10 +474,10 @@ describe( 'passport-saml /', function() {
                 var samlObj = new SAML( samlConfig );
 
                 // Mock the SAML request being passed through Passport-SAML
-                samlObj.saveAuthnRequestId(requestId);
+                samlObj.cacheProvider.save(requestId);
 
                 setTimeout(function(){
-                    should(samlObj.doesAuthnRequestIdExist(requestId)).equal(false);
+                    should(samlObj.cacheProvider.exists(requestId)).equal(false);
                     done();
                 }, 300);
             });
@@ -494,20 +494,20 @@ describe( 'passport-saml /', function() {
                 };
                 var samlObj = new SAML( samlConfig );
 
-                samlObj.saveAuthnRequestId(expiredRequestId1);
-                samlObj.saveAuthnRequestId(expiredRequestId2);
+                samlObj.cacheProvider.save(expiredRequestId1);
+                samlObj.cacheProvider.save(expiredRequestId2);
 
                 setTimeout(function(){
                     // Add one more that should'nt expire
-                    samlObj.saveAuthnRequestId(requestId);
+                    samlObj.cacheProvider.save(requestId);
 
-                    should(samlObj.doesAuthnRequestIdExist(expiredRequestId1)).equal(false);
-                    should(samlObj.doesAuthnRequestIdExist(expiredRequestId2)).equal(false);
-                    should(samlObj.doesAuthnRequestIdExist(requestId)).equal(true);
+                    should(samlObj.cacheProvider.exists(expiredRequestId1)).equal(false);
+                    should(samlObj.cacheProvider.exists(expiredRequestId2)).equal(false);
+                    should(samlObj.cacheProvider.exists(requestId)).equal(true);
 
                     // Let the expiration timer run again and we should have no more cached
                     setTimeout(function(){
-                        should(samlObj.doesAuthnRequestIdExist(requestId)).equal(false);
+                        should(samlObj.cacheProvider.exists(requestId)).equal(false);
                         done();
                     }, 300)
 
