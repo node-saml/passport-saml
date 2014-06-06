@@ -117,8 +117,11 @@ Here is a configuration that has been proven to work with ADFS:
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.
 
-## Assertion Conditions - NotBefore and NotOnOrAfter
+## SAML Response Validation - NotBefore and NotOnOrAfter
 
 If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML response, Passport-SAML will validate them
 against the current time +/- a configurable clock skew value.  The default for the skew is 0s.  This is to account for
 differences between the clock time on the client (Node server with Passport-SAML) and the server (Identity provider).
+
+`NotBefore` and `NotOnOrAfter` can be part of either the `SubjectConfirmation` element, or within in the `Assertion/Conditions` element
+in the SAML response.
