@@ -1,10 +1,10 @@
 {
   "name": "passport-saml",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "licenses": [
     {
-      "type": "MIT",
-      "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
+    "type": "MIT",
+    "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
     }
   ],
   "keywords": [
@@ -19,14 +19,14 @@
     "email": "henri.bergius@iki.fi",
     "url": "http://bergie.iki.fi"
   },
-  "contributors": [
+  "contributors" : [
     "Michael Bosworth",
     "Herbert Vojčík",
     "Peter Loer"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bergie/passport-saml.git"
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/bergie/passport-saml.git"
   },
   "main": "./lib/passport-saml",
   "dependencies": {
@@ -50,7 +50,7 @@
   "engines": {
     "node": ">= 0.8.0"
   },
-  "scripts": {
+  "scripts" : {
     "test": "mocha",
     "jshint": "./node_modules/.bin/jshint lib"
   }

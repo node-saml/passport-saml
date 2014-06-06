@@ -47,7 +47,7 @@ Config parameter details:
 * `privateCert`: see 'security and signatures'
 * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
 * `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
-* `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Default is `60,000 ms`.
+* `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
 
 ### Provide the authentication callback
 
@@ -77,6 +77,13 @@ app.get('/login',
 
 Additional config values supported:
 * `samlFallback`: if set to `getAuthorizeUrl`, will initiate a redirect to identity provider on authentication failure
+
+### generateServiceProviderMetadata( decryptionCert )
+
+As a convenience, the strategy object exposes a `generateServiceProviderMetadata` method which will generate a service provider metadata document suitable for supplying to an identity provider.  This method will only work on strategies which are configured with a `callbackUrl` (since the relative path for the callback is not sufficient information to generate a complete metadata document).
+
+The `decryptionCert` argument should be a certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
+
 
 ## Security and signatures
 
@@ -113,5 +120,5 @@ Please note that ADFS needs to have a trust established to your service in order
 ## Assertion Conditions - NotBefore and NotOnOrAfter
 
 If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML response, Passport-SAML will validate them
-against the current time +/- a configurable clock skew value.  The default for the skew is 60s.  This is to account for
+against the current time +/- a configurable clock skew value.  The default for the skew is 0s.  This is to account for
 differences between the clock time on the client (Node server with Passport-SAML) and the server (Identity provider).
