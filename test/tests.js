@@ -608,6 +608,7 @@ describe( 'passport-saml /', function() {
             samlObj.validatePostResponse( container, function( err, profile, logout ) {
                 should.exist( err );
                 err.message.should.match( 'InResponseTo is not valid' );
+                should(samlObj.cacheProvider.exists(requestId)).equal(false);
                 done();
             });
         });
