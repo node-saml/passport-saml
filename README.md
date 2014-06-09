@@ -79,7 +79,7 @@ app.get('/login',
 ```
 
 Additional config values supported:
-* `samlFallback`: if set to `getAuthorizeUrl`, will initiate a redirect to identity provider on authentication failure
+* `samlFallback`: if set to `login-request`, will initiate a redirect to identity provider on authentication failure
 
 ### generateServiceProviderMetadata( decryptionCert )
 
