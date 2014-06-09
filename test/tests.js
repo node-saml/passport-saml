@@ -337,7 +337,7 @@ describe( 'passport-saml /', function() {
 
         var fakeClock;
         beforeEach(function(){
-            fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
+            fakeClock = sinon.useFakeTimers(Date.UTC(2014, 4, 28, 0, 13, 9));
         });
         afterEach(function(){
             fakeClock.restore();
@@ -431,9 +431,7 @@ describe( 'passport-saml /', function() {
           };
 
           var fakeClock;
-          beforeEach(function(){
-            //  fakeClock = sinon.useFakeTimers(Date.UTC('2014-05-28T00:13:09Z UTC'));
-          });
+
           afterEach(function(){
               fakeClock.restore();
           });
@@ -501,7 +499,7 @@ describe( 'passport-saml /', function() {
               var samlObj = new SAML( samlConfig );
 
               // Fake the current date to be after the valid time range
-              fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:19:08Z'));
+              fakeClock = sinon.useFakeTimers(Date.UTC(2014, 4, 28, 0, 19, 8));
 
               samlObj.validatePostResponse( container, function( err, profile, logout ) {
                   should.exist( err );
@@ -519,7 +517,7 @@ describe( 'passport-saml /', function() {
               var samlObj = new SAML( samlConfig );
 
               // Fake the current date to be after the valid time range
-              fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:19:09Z'));
+              fakeClock = sinon.useFakeTimers(Date.UTC(2014, 5, 28, 0, 19, 9));
 
               samlObj.validatePostResponse( container, function( err, profile, logout ) {
                   should.exist( err );
