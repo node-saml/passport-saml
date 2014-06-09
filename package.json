@@ -1,25 +1,32 @@
 {
   "name": "passport-saml",
-  "version": "0.2.0",
-  "licenses": [{
-    "type": "MIT",
-    "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
-  }],
-  "keywords": ["saml", "adfs", "sso", "shibboleth"],
+  "version": "0.2.1",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/bergie/passport-saml/raw/master/LICENSE"
+    }
+  ],
+  "keywords": [
+    "saml",
+    "adfs",
+    "sso",
+    "shibboleth"
+  ],
   "description": "SAML 2.0 authentication strategy for Passport",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi",
     "url": "http://bergie.iki.fi"
   },
-  "contributors" : [
+  "contributors": [
     "Michael Bosworth",
     "Herbert Vojčík",
     "Peter Loer"
   ],
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/bergie/passport-saml.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bergie/passport-saml.git"
   },
   "main": "./lib/passport-saml",
   "dependencies": {
@@ -31,18 +38,19 @@
     "xml-encryption": "~0.7"
   },
   "devDependencies": {
-    "express": "3.x",
     "body-parser": "*",
     "ejs": "0.7.x",
+    "express": "3.x",
     "jshint": "*",
+    "mocha": "*",
     "request": "*",
     "should": "*",
-    "mocha": "*"
+    "sinon": "^1.10.2"
   },
   "engines": {
     "node": ">= 0.8.0"
   },
-  "scripts" : {
+  "scripts": {
     "test": "mocha",
     "jshint": "./node_modules/.bin/jshint lib"
   }

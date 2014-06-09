@@ -50,6 +50,7 @@ Config parameter details:
 * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
 * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
 * `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
+* `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
 
 ### Provide the authentication callback
 
@@ -79,6 +80,13 @@ app.get('/login',
 
 Additional config values supported:
 * `samlFallback`: if set to `getAuthorizeUrl`, will initiate a redirect to identity provider on authentication failure
+
+### generateServiceProviderMetadata( decryptionCert )
+
+As a convenience, the strategy object exposes a `generateServiceProviderMetadata` method which will generate a service provider metadata document suitable for supplying to an identity provider.  This method will only work on strategies which are configured with a `callbackUrl` (since the relative path for the callback is not sufficient information to generate a complete metadata document).
+
+The `decryptionCert` argument should be a certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
+
 
 ## Security and signatures
 
@@ -112,7 +120,9 @@ Here is a configuration that has been proven to work with ADFS:
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.
 
-## Subjection confirmation validation
+## SAML Response Validation Features
+
+## Subjection confirmation
 
 When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated.
 Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
@@ -123,6 +133,15 @@ as part of the `SubjectConfirmation` element.
 Previous request id's generated for SAML requests will eventually expire.  This is controlled with the `requestIdExpirationPeriodMs` option
 passed into the Passport-SAML config.  The default is 28,800,000 ms (8 hours).  Once expired, a subsequent SAML response
 received with an `InResponseTo` equal to the expired id will not validate and an error will be returned.
+
+### SAML Response Validation - NotBefore and NotOnOrAfter
+
+If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML response, Passport-SAML will validate them
+against the current time +/- a configurable clock skew value.  The default for the skew is 0s.  This is to account for
+differences between the clock time on the client (Node server with Passport-SAML) and the server (Identity provider).
+
+`NotBefore` and `NotOnOrAfter` can be part of either the `SubjectConfirmation` element, or within in the `Assertion/Conditions` element
+in the SAML response.
 
 ## Cache Provider
 
@@ -151,3 +170,4 @@ To support this scenario you can provide an implementation for a cache provider 
 ```
 
 Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.
+
