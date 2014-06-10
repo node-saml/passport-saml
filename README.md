@@ -153,14 +153,13 @@ To support this scenario you can provide an implementation for a cache provider 
 
 ```javascript
 {
-    save: function(key, value){
-
+    save: function(key, value) {
       // save the key with the optional value
     },
-    exists: function(key){
-      // returns true/false if the key exists or not
+    get: function(key) {
+      // returns the value of the key if it exists, otherwise null
     },
-    remove: function(key){
+    remove: function(key) {
       // removes the key from the cache
     }
 }
