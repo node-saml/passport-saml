@@ -71,22 +71,29 @@ describe( 'passport-saml /', function() {
 
     function testForCheck(check) {
       return function (done) {
+        var pp = new passport.Authenticator();
         var app = express();
         app.use(bodyParser.urlencoded());
-        app.use(passport.initialize());
+        app.use(pp.initialize());
         var config = check.config;
         config.callbackUrl = 'http://localhost:3033/login';
         var profile = null;
-        passport.use(new SamlStrategy(config, function (_profile, done) {
+        pp.use(new SamlStrategy(config, function (_profile, done) {
             profile = _profile;
             done(null, { id: profile.nameID });
           })
         );
 
+        var userSerialized = false;
+        pp.serializeUser(function(user, done) {
+          userSerialized = true;
+          done(null, user);
+        });
+
         fakeClock = sinon.useFakeTimers(Date.parse(check.mockDate));
 
         app.post('/login',
-          passport.authenticate("saml", { session: false }),
+          pp.authenticate("saml"),
           function (req, res) {
             res.send(200, "200 OK");
           });
@@ -107,6 +114,7 @@ describe( 'passport-saml /', function() {
             should.not.exist(err);
             response.statusCode.should.equal(check.expectedStatusCode);
             if (response.statusCode == 200) {
+              userSerialized.should.be.true;
               if (check.expectedNameIDStartsWith)
                 profile.nameID.should.startWith(check.expectedNameIDStartsWith);
             }
