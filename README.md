@@ -78,9 +78,6 @@ app.get('/login',
 );
 ```
 
-Additional config values supported:
-* `samlFallback`: if set to `login-request`, will initiate a redirect to identity provider on authentication failure
-
 ### generateServiceProviderMetadata( decryptionCert )
 
 As a convenience, the strategy object exposes a `generateServiceProviderMetadata` method which will generate a service provider metadata document suitable for supplying to an identity provider.  This method will only work on strategies which are configured with a `callbackUrl` (since the relative path for the callback is not sufficient information to generate a complete metadata document).
