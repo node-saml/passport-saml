@@ -168,7 +168,8 @@ describe( 'passport-saml /', function() {
         config: {
           issuer: 'http://exampleSp.com/saml',
           identifierFormat: 'alternateIdentifier',
-          passive: true
+          passive: true,
+          attributeConsumingServiceIndex: 123
         },
         result: { 
           'samlp:AuthnRequest': 
@@ -177,6 +178,7 @@ describe( 'passport-saml /', function() {
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
                 AssertionConsumerServiceURL: 'http://localhost:3033/login',
+                AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
                 IsPassive: 'true' },
              'saml:Issuer': 
