@@ -150,15 +150,24 @@ To support this scenario you can provide an implementation for a cache provider 
 
 ```javascript
 {
-    save: function(key, value) {
-      // save the key with the optional value
+    save: function(key, value, callback) {
+      // save the key with the optional value, invokes the callback with the value saves
     },
-    get: function(key) {
-      // returns the value of the key if it exists, otherwise null
+    get: function(key, callback) {
+      // invokes 'callback' and passes the value if found, null otherwise
     },
-    remove: function(key) {
-      // removes the key from the cache
+    remove: function(key, callback) {
+      // removes the key from the cache, invokes `callback` with the
+      // key removed, null if no key is removed
     }
+}
+```
+
+The `callback` argument is a function in the style of normal Node callbacks:
+```
+function callback(err, result)
+{
+
 }
 ```
 
