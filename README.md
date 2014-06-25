@@ -41,7 +41,7 @@ Config parameter details:
 * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
 * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `https://`)
 * `callbackUrl`: full callbackUrl (overrides path if supplied)
-* `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest
+* `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
 * `entryPoint`: identity provider entrypoint
 * `issuer`: issuer string to supply to identity provider
 * `cert`: see 'security and signatures'
