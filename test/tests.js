@@ -477,13 +477,16 @@ describe( 'passport-saml /', function() {
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString());
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function(){});
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
           should.not.exist( err );
           profile.nameID.should.startWith( 'ploer' );
-          should.not.exist(samlObj.cacheProvider.get(requestId));
-          done();
+          samlObj.cacheProvider.get(requestId, function(err, value){
+              should.not.exist(value);
+              done();
+          });
+
         });
       });
 
@@ -525,13 +528,15 @@ describe( 'passport-saml /', function() {
         fakeClock = sinon.useFakeTimers(Date.parse('2014-06-05T12:07:07.662Z'));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString());
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function(){});
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
           should.not.exist( err );
           profile.nameID.should.startWith( 'UIS/jochen-work' );
-          should.not.exist(samlObj.cacheProvider.get(requestId));
-          done();
+          samlObj.cacheProvider.get(requestId, function(err, value){
+              should.not.exist(value);
+              done();
+          });
         });
       });
 
@@ -546,11 +551,13 @@ describe( 'passport-saml /', function() {
           var samlObj = new SAML( samlConfig );
 
           // Mock the SAML request being passed through Passport-SAML
-          samlObj.cacheProvider.save(requestId, new Date().toISOString());
+          samlObj.cacheProvider.save(requestId, new Date().toISOString(), function(){});
 
           setTimeout(function(){
-            should.not.exist(samlObj.cacheProvider.get(requestId));
-            done();
+            samlObj.cacheProvider.get(requestId, function(err, value){
+              should.not.exist(value);
+              done();
+            });
           }, 300);
         });
 
@@ -565,21 +572,29 @@ describe( 'passport-saml /', function() {
           };
           var samlObj = new SAML( samlConfig );
 
-          samlObj.cacheProvider.save(expiredRequestId1, new Date().toISOString());
-          samlObj.cacheProvider.save(expiredRequestId2, new Date().toISOString());
+          samlObj.cacheProvider.save(expiredRequestId1, new Date().toISOString(), function(){});
+          samlObj.cacheProvider.save(expiredRequestId2, new Date().toISOString(), function(){});
 
           setTimeout(function(){
-            // Add one more that should'nt expire
-            samlObj.cacheProvider.save(requestId, new Date().toISOString());
+            // Add one more that shouldn't expire
+            samlObj.cacheProvider.save(requestId, new Date().toISOString(), function(){});
 
-            should.not.exist(samlObj.cacheProvider.get(expiredRequestId1));
-            should.not.exist(samlObj.cacheProvider.get(expiredRequestId2));
-            samlObj.cacheProvider.get(requestId).should.exist;
+            samlObj.cacheProvider.get(expiredRequestId1, function(err, value){
+              should.not.exist(value);
+            });
+            samlObj.cacheProvider.get(expiredRequestId2, function(err, value){
+              should.not.exist(value);
+            });
+            samlObj.cacheProvider.get(requestId, function(err, value){
+              should.exist(value);
+            });
 
             // Let the expiration timer run again and we should have no more cached
             setTimeout(function(){
-              should.not.exist(samlObj.cacheProvider.get(requestId));
-              done();
+                samlObj.cacheProvider.get(requestId, function(err, value){
+                    should.not.exist(value);
+                    done();
+                });
             }, 300)
           }, 300);
         });
