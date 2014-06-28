@@ -223,7 +223,7 @@ describe( 'passport-saml /', function() {
           });
 
         app.use( function( err, req, res, next ) {
-          //console.log( err.stack );
+          console.log( err.stack );
           res.send( 500, '500 Internal Server Error' );
         });
 
@@ -360,13 +360,13 @@ describe( 'passport-saml /', function() {
 
     describe( 'xml signature checks /', function() {
 
-        var fakeClock;
-        beforeEach(function(){
-            fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
-        });
-        afterEach(function(){
-            fakeClock.restore();
-        });
+      var fakeClock;
+      beforeEach(function(){
+          fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
+      });
+      afterEach(function(){
+          fakeClock.restore();
+      });
 
       var samlConfig = {
         entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
@@ -504,6 +504,8 @@ describe( 'passport-saml /', function() {
           validateInResponseTo: true
         };
         var samlObj = new SAML( samlConfig );
+
+        fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
           should.exist( err );
