@@ -358,6 +358,34 @@ describe( 'passport-saml /', function() {
       }
     });
 
+    it('response with error status message should generate appropriate error', function(done) {
+      var xml = '<?xml version="1.0" encoding="UTF-8"?><saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" Destination="http://localhost/browserSamlLogin" ID="_6a377272c8662561acf1056274ef3f81" InResponseTo="_4324fb0d00661146f7dc" IssueInstant="2014-07-02T18:16:31.278Z" Version="2.0"><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://idp.testshib.org/idp/shibboleth</saml2:Issuer><saml2p:Status><saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder"><saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy"/></saml2p:StatusCode><saml2p:StatusMessage>Required NameID format not supported</saml2p:StatusMessage></saml2p:Status></saml2p:Response>';
+      var base64xml = new Buffer( xml ).toString('base64');
+      var container = { SAMLResponse: base64xml };
+      var samlObj = new SAML( {} );
+      samlObj.validatePostResponse( container, function( err, profile, logout ) {
+        should.exist( err );
+        err.message.should.match( /Responder/ );
+        err.message.should.match( /Required NameID format not supported/ );
+        should.exist( err.statusXml );
+        done();
+      });
+    });
+
+    it('response with error status code should generate appropriate error', function(done) {
+      var xml = '<?xml version="1.0" encoding="UTF-8"?><saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" Destination="http://localhost/browserSamlLogin" ID="_6a377272c8662561acf1056274ef3f81" InResponseTo="_4324fb0d00661146f7dc" IssueInstant="2014-07-02T18:16:31.278Z" Version="2.0"><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://idp.testshib.org/idp/shibboleth</saml2:Issuer><saml2p:Status><saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder"><saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy"/></saml2p:StatusCode></saml2p:Status></saml2p:Response>';
+      var base64xml = new Buffer( xml ).toString('base64');
+      var container = { SAMLResponse: base64xml };
+      var samlObj = new SAML( {} );
+      samlObj.validatePostResponse( container, function( err, profile, logout ) {
+        should.exist( err );
+        err.message.should.match( /Responder/ );
+        err.message.should.match( /InvalidNameIDPolicy/ );
+        should.exist( err.statusXml );
+        done();
+      });
+    });
+
     describe( 'xml signature checks /', function() {
 
       var fakeClock;
