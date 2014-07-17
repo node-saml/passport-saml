@@ -164,12 +164,46 @@ describe( 'passport-saml /', function() {
                    [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       },
-    { name: "Config #2",
+      { name: "Config #2",
         config: {
           issuer: 'http://exampleSp.com/saml',
           identifierFormat: 'alternateIdentifier',
           passive: true,
           attributeConsumingServiceIndex: 123
+        },
+        result: { 
+          'samlp:AuthnRequest': 
+           { '$': 
+              { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                Version: '2.0',
+                ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                AssertionConsumerServiceURL: 'http://localhost:3033/login',
+                AttributeConsumingServiceIndex: '123',
+                Destination: 'https://wwwexampleIdp.com/saml',
+                IsPassive: 'true' },
+             'saml:Issuer': 
+              [ { _: 'http://exampleSp.com/saml',
+                  '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
+             'samlp:NameIDPolicy': 
+              [ { '$': 
+                   { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                     Format: 'alternateIdentifier',
+                     AllowCreate: 'true' } } ],
+             'samlp:RequestedAuthnContext': 
+              [ { '$': 
+                   { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                     Comparison: 'exact' },
+                  'saml:AuthnContextClassRef': 
+                   [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
+                       '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
+      },
+      { name: "Uncompressed config #2",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          passive: true,
+          attributeConsumingServiceIndex: 123,
+          skipRequestCompression: true
         },
         result: { 
           'samlp:AuthnRequest': 
@@ -240,7 +274,12 @@ describe( 'passport-saml /', function() {
             var query = response.headers.location.match( /^[^\?]*\?(.*)$/ )[1];
             var encodedSamlRequest = querystring.parse( query ).SAMLRequest;
             var buffer = new Buffer(encodedSamlRequest, 'base64')
-            zlib.inflateRaw( buffer, function(err, samlRequest) {
+            if (check.config.skipRequestCompression)
+              helper(null, buffer);
+            else
+              zlib.inflateRaw( buffer, helper );
+
+            function helper(err, samlRequest) {
               should.not.exist( err );
               parseString( samlRequest.toString(), function( err, doc ) {
                 should.not.exist( err );
@@ -249,7 +288,7 @@ describe( 'passport-saml /', function() {
                 doc.should.eql( check.result );
                 done();
               });
-            });
+            }
           });
         });
       };
