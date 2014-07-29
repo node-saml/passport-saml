@@ -379,15 +379,6 @@ describe( 'saml.js / ', function() {
       entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
       cert: 'MIIEFzCCAv+gAwIBAgIUFJsUjPM7AmWvNtEvULSHlTTMiLQwDQYJKoZIhvcNAQEFBQAwWDELMAkGA1UEBhMCVVMxETAPBgNVBAoMCFN1YnNwYWNlMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgNDIzNDkwHhcNMTQwNTEzMTgwNjEyWhcNMTkwNTE0MTgwNjEyWjBYMQswCQYDVQQGEwJVUzERMA8GA1UECgwIU3Vic3BhY2UxFTATBgNVBAsMDE9uZUxvZ2luIElkUDEfMB0GA1UEAwwWT25lTG9naW4gQWNjb3VudCA0MjM0OTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKrAzJdY9FzFLt5blArJfPzgi87EnFGlTfcV5T1TUDwLBlDkY/0ZGKnMOpf3D7ie2C4pPFOImOogcM5kpDDL7qxTXZ1ewXVyjBdMu29NG2C6NzWeQTUMUji01EcHkC8o+Pts8ANiNOYcjxEeyhEyzJKgEizblYzMMKzdrOET6QuqWo3C83K+5+5dsjDn1ooKGRwj3HvgsYcFrQl9NojgQFjoobwsiE/7A+OJhLpBcy/nSVgnoJaMfrO+JsnukZPztbntLvOl56+Vra0N8n5NAYhaSayPiv/ayhjVgjfXd1tjMVTOiDknUOwizZuJ1Y3QH94vUtBgp0WBpBSs/xMyTs8CAwEAAaOB2DCB1TAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBRQO4WpM5fWwxib49WTuJkfYDbxODCBlQYDVR0jBIGNMIGKgBRQO4WpM5fWwxib49WTuJkfYDbxOKFcpFowWDELMAkGA1UEBhMCVVMxETAPBgNVBAoMCFN1YnNwYWNlMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgNDIzNDmCFBSbFIzzOwJlrzbRL1C0h5U0zIi0MA4GA1UdDwEB/wQEAwIHgDANBgkqhkiG9w0BAQUFAAOCAQEACdDAAoaZFCEY5pmfwbKuKrXtO5iE8lWtiCPjCZEUuT6bXRNcqrdnuV/EAfX9WQoXjalPi0eM78zKmbvRGSTUHwWw49RHjFfeJUKvHNeNnFgTXDjEPNhMvh69kHm453lFRmB+kk6yjtXRZaQEwS8Uuo2Ot+krgNbl6oTBZJ0AHH1MtZECDloms1Km7zsK8wAi5i8TVIKkVr5b2VlhrLgFMvzZ5ViAxIMGB6w47yY4QGQB/5Q8ya9hBs9vkn+wubA+yr4j14JXZ7blVKDSTYva65Ea+PqHyrp+Wnmnbw2ObS7iWexiTy1jD3G0R2avDBFjM8Fj5DbfufsE1b0U10RTtg=='
     };
-    var fakeClock;
-
-    beforeEach(function() {
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
-    });
-
-    afterEach(function() {
-      fakeClock.restore();
-    });
 
     it( 'onelogin xml document with current time after NotBefore time should validate', function( done ) {
       var xml = '<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="R689b0733bccca22a137e3654830312332940b1be" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>' +
@@ -395,10 +386,10 @@ describe( 'saml.js / ', function() {
           '</samlp:Response>';
       var base64xml = new Buffer( xml ).toString('base64');
       var container = { SAMLResponse: base64xml };
+      samlConfig.nowInMs = function() {
+        return new Date('2014-05-28T00:13:09Z').getTime();
+      }
       var samlObj = new SAML( samlConfig );
-
-      // Fake the current date to be within the valid time range
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
 
       samlObj.validatePostResponse( container, function( err, profile, logout ) {
         should.not.exist( err );
@@ -413,10 +404,10 @@ describe( 'saml.js / ', function() {
           '</samlp:Response>';
       var base64xml = new Buffer( xml ).toString('base64');
       var container = { SAMLResponse: base64xml };
+      samlConfig.nowInMs = function() {
+        return new Date('2014-05-28T00:13:08Z').getTime();
+      }
       var samlObj = new SAML( samlConfig );
-
-      // Fake the current date to be within the valid time range
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:08Z'));
 
       samlObj.validatePostResponse( container, function( err, profile, logout ) {
           should.not.exist( err );
@@ -431,10 +422,11 @@ describe( 'saml.js / ', function() {
           '</samlp:Response>';
       var base64xml = new Buffer( xml ).toString('base64');
       var container = { SAMLResponse: base64xml };
-      var samlObj = new SAML( samlConfig );
 
-      // Fake the current date to be after the valid time range
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:07Z'));
+      samlConfig.nowInMs = function() {
+        return new Date('2014-05-28T00:13:07Z').getTime();
+      }
+      var samlObj = new SAML( samlConfig );
 
       samlObj.validatePostResponse( container, function( err, profile, logout ) {
         should.exist( err );
@@ -449,10 +441,10 @@ describe( 'saml.js / ', function() {
           '</samlp:Response>';
       var base64xml = new Buffer( xml ).toString('base64');
       var container = { SAMLResponse: base64xml };
+      samlConfig.nowInMs = function() {
+        return new Date('2014-05-28T00:19:08Z').getTime();
+      }
       var samlObj = new SAML( samlConfig );
-
-      // Fake the current date to be after the valid time range
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:19:08Z'));
 
       samlObj.validatePostResponse( container, function( err, profile, logout ) {
         should.exist( err );
@@ -467,10 +459,10 @@ describe( 'saml.js / ', function() {
           '</samlp:Response>';
       var base64xml = new Buffer( xml ).toString('base64');
       var container = { SAMLResponse: base64xml };
+      samlConfig.nowInMs = function() {
+        return new Date('2014-05-28T00:19:09Z').getTime();
+      }
       var samlObj = new SAML( samlConfig );
-
-      // Fake the current date to be after the valid time range
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:19:09Z'));
 
       samlObj.validatePostResponse( container, function( err, profile, logout ) {
         should.exist( err );
@@ -489,12 +481,12 @@ describe( 'saml.js / ', function() {
       var samlConfig = {
         entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
         cert: 'MIIEFzCCAv+gAwIBAgIUFJsUjPM7AmWvNtEvULSHlTTMiLQwDQYJKoZIhvcNAQEFBQAwWDELMAkGA1UEBhMCVVMxETAPBgNVBAoMCFN1YnNwYWNlMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgNDIzNDkwHhcNMTQwNTEzMTgwNjEyWhcNMTkwNTE0MTgwNjEyWjBYMQswCQYDVQQGEwJVUzERMA8GA1UECgwIU3Vic3BhY2UxFTATBgNVBAsMDE9uZUxvZ2luIElkUDEfMB0GA1UEAwwWT25lTG9naW4gQWNjb3VudCA0MjM0OTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKrAzJdY9FzFLt5blArJfPzgi87EnFGlTfcV5T1TUDwLBlDkY/0ZGKnMOpf3D7ie2C4pPFOImOogcM5kpDDL7qxTXZ1ewXVyjBdMu29NG2C6NzWeQTUMUji01EcHkC8o+Pts8ANiNOYcjxEeyhEyzJKgEizblYzMMKzdrOET6QuqWo3C83K+5+5dsjDn1ooKGRwj3HvgsYcFrQl9NojgQFjoobwsiE/7A+OJhLpBcy/nSVgnoJaMfrO+JsnukZPztbntLvOl56+Vra0N8n5NAYhaSayPiv/ayhjVgjfXd1tjMVTOiDknUOwizZuJ1Y3QH94vUtBgp0WBpBSs/xMyTs8CAwEAAaOB2DCB1TAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBRQO4WpM5fWwxib49WTuJkfYDbxODCBlQYDVR0jBIGNMIGKgBRQO4WpM5fWwxib49WTuJkfYDbxOKFcpFowWDELMAkGA1UEBhMCVVMxETAPBgNVBAoMCFN1YnNwYWNlMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgNDIzNDmCFBSbFIzzOwJlrzbRL1C0h5U0zIi0MA4GA1UdDwEB/wQEAwIHgDANBgkqhkiG9w0BAQUFAAOCAQEACdDAAoaZFCEY5pmfwbKuKrXtO5iE8lWtiCPjCZEUuT6bXRNcqrdnuV/EAfX9WQoXjalPi0eM78zKmbvRGSTUHwWw49RHjFfeJUKvHNeNnFgTXDjEPNhMvh69kHm453lFRmB+kk6yjtXRZaQEwS8Uuo2Ot+krgNbl6oTBZJ0AHH1MtZECDloms1Km7zsK8wAi5i8TVIKkVr5b2VlhrLgFMvzZ5ViAxIMGB6w47yY4QGQB/5Q8ya9hBs9vkn+wubA+yr4j14JXZ7blVKDSTYva65Ea+PqHyrp+Wnmnbw2ObS7iWexiTy1jD3G0R2avDBFjM8Fj5DbfufsE1b0U10RTtg==',
-        acceptedClockSkewMs: -1
+        acceptedClockSkewMs: -1,
+        nowInMs: function() {
+          return new Date('2014-05-28T00:20:09Z').getTime();
+        }
       };
       var samlObj = new SAML( samlConfig );
-
-      // Fake the current date to be after the valid time range
-      fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:20:09Z'));
 
       samlObj.validatePostResponse( container, function( err, profile, logout ) {
         should.not.exist( err );
