@@ -1,10 +1,5 @@
 'use strict';
-var express      = require( 'express' );
-var bodyParser   = require( 'body-parser' );
-var request      = require( 'request' );
 var should       = require( 'should' );
-var zlib         = require( 'zlib' );
-var querystring  = require( 'querystring' );
 var parseString  = require( 'xml2js' ).parseString;
 var SAML         = require( '../lib/saml.js' );
 var fs           = require( 'fs' );
