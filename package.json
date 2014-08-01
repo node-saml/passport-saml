@@ -30,7 +30,6 @@
   },
   "main": "./lib/saml.js",
   "dependencies": {
-    "memcaching": "^0.4.1",
     "q": "1.0.x",
     "xml-crypto": "0.1.x",
     "xml-encryption": "~0.7",
@@ -41,6 +40,7 @@
   "devDependencies": {
     "ejs": "0.7.x",
     "jshint": "*",
+    "memcaching": "^0.4.1",
     "mocha": "*",
     "should": "*",
     "sinon": "^1.10.2"
