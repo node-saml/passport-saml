@@ -21,7 +21,8 @@ var _runTestsWithCacheProvider = function(cacheProviderName) {
       switch (cacheProvider) {
         case MemcacheCacheProvider:
           return new cacheProvider(memcacheClient, {
-            keyExpirationPeriodMs: expirationPeriod
+            keyExpirationPeriodMs: expirationPeriod,
+            prefix: process.env.TRAVIS ? process.env.TRAVIS_JOB_ID : "saml_test"
           });
         case InMemoryCacheProvider:
           return new cacheProvider({ keyExpirationPeriodMs: expirationPeriod });
