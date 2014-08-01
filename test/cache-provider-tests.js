@@ -31,10 +31,13 @@ var _runTestsWithCacheProvider = function(cacheProviderName) {
     };
 
     if (cacheProvider === MemcacheCacheProvider) {
-      // Set up memcache server and client for use in memcache provider tests.
-      var memcacheServer = new MemcacheServer();
+      // If we're not on travis, then try to start a memcache server.
+      if (!process.env.TRAVIS) {
+        var memcacheServer = new MemcacheServer();
+      }
+      var memcachePort = memcacheServer ? memcacheServer.port : 11211;
       var memcacheClient = new MemcacheClient({ unref: false });
-      memcacheClient.addServer('127.0.0.1:' + memcacheServer.port);
+      memcacheClient.addServer('127.0.0.1:' + memcachePort);
     }
 
     afterEach(function () {
@@ -198,7 +201,9 @@ var _runTestsWithCacheProvider = function(cacheProviderName) {
 
               if (cacheProvider == MemcacheCacheProvider) {
                 memcacheClient.end();
-                memcacheServer.end();
+                if (!process.env.TRAVIS) {
+                  memcacheServer.end();
+                }
               }
               done();
             });

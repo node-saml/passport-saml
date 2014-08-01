@@ -4,6 +4,9 @@ node_js:
   - "0.10"
   - "0.11"
 
+services:
+  - memcached
+
 before_install:
   - npm install -g npm
 
