@@ -138,7 +138,7 @@ var _runTestsWithCacheProvider = function(cacheProviderName) {
 
     describe('InResponseTo server cache expiration tests /', function () {
       it('should expire a cached request id after the time', function (done) {
-        this.timeout(6000);
+        this.timeout(8000);
 
         var requestId = '_dfab47d5d46374cd4b71';
 
@@ -158,11 +158,11 @@ var _runTestsWithCacheProvider = function(cacheProviderName) {
             should.not.exist(value);
             done();
           });
-        }, 2000);
+        }, 3000);
       });
 
       it('should expire many cached request ids after the time', function (done) {
-        this.timeout(6000);
+        this.timeout(8000);
 
         var expiredRequestId1 = '_dfab47d5d46374cd4b71';
         var expiredRequestId2 = '_dfab47d5d46374cd4b72';
@@ -208,8 +208,8 @@ var _runTestsWithCacheProvider = function(cacheProviderName) {
               }
               done();
             });
-          }, 2000)
-        }, 2000);
+          }, 3000)
+        }, 3000);
       });
     });
   });
