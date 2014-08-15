@@ -31,7 +31,7 @@
   "main": "./lib/saml.js",
   "dependencies": {
     "q": "1.0.x",
-    "xml-crypto": "git+https://github.com/Asana/xml-crypto.git#safer-array-iteration",
+    "xml-crypto": "^0.1.25",
     "xml-encryption": "~0.7",
     "xml2js": "0.4.x",
     "xmlbuilder": "~2.2",
