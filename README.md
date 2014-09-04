@@ -173,3 +173,10 @@ function callback(err, result)
 ```
 
 Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.
+
+## FAQ
+
+### What if I have multiple SAML providers that my users may be connecting to?
+
+A single instance of passport-saml will only authenticate users against a single identity provider.  If you have a use case where different logins need to be routed to different identity providers, you can create multiple instances of passport-saml, and either dispatch to them with your own routing code, or use a library like https://www.npmjs.org/package/passports.
+
