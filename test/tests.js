@@ -73,7 +73,7 @@ describe( 'passport-saml /', function() {
       return function (done) {
         var pp = new passport.Authenticator();
         var app = express();
-        app.use(bodyParser.urlencoded());
+        app.use(bodyParser.urlencoded({extended: false}));
         app.use(pp.initialize());
         var config = check.config;
         config.callbackUrl = 'http://localhost:3033/login';
@@ -95,12 +95,12 @@ describe( 'passport-saml /', function() {
         app.post('/login',
           pp.authenticate("saml"),
           function (req, res) {
-            res.send(200, "200 OK");
+            res.status(200).send("200 OK");
           });
 
         app.use(function (err, req, res, next) {
           // console.log( err.stack );
-          res.send(500, '500 Internal Server Error');
+          res.status(500).send('500 Internal Server Error');
         });
 
         server = app.listen(3033, function () {
@@ -266,7 +266,7 @@ describe( 'passport-saml /', function() {
     function testForCheck( check ) {
       return function( done ) {
         var app = express();
-        app.use( bodyParser.urlencoded() );
+        app.use( bodyParser.urlencoded({extended: false}) );
         app.use( passport.initialize() );
         var config = check.config;
         config.callbackUrl = 'http://localhost:3033/login';
@@ -281,12 +281,12 @@ describe( 'passport-saml /', function() {
         app.get( '/login', 
           passport.authenticate( "saml", { samlFallback: 'login-request', session: false } ),
           function(req, res) {
-            res.send( 200, "200 OK" );
+            res.status(200).send("200 OK");
           });
 
         app.use( function( err, req, res, next ) {
           console.log( err.stack );
-          res.send( 500, '500 Internal Server Error' );
+          res.status(500).send('500 Internal Server Error');
         });
 
         server = app.listen( 3033, function() {

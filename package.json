@@ -35,13 +35,13 @@
     "xml2js": "0.4.x",
     "xml-crypto": "0.1.x",
     "xmldom": "0.1.x",
-    "xmlbuilder": "~2.2",
+    "xmlbuilder": "~2.4",
     "xml-encryption": "~0.7"
   },
   "devDependencies": {
-    "body-parser": "1.2.x",
-    "ejs": "0.7.x",
-    "express": "3.x",
+    "body-parser": "1.8.x",
+    "ejs": "1.0.x",
+    "express": "4.x",
     "jshint": "*",
     "mocha": "*",
     "request": "*",
