@@ -34,7 +34,7 @@ passport.use(new SamlStrategy(
       return done(null, user);
     });
   })
-));
+);
 ```
 
 Config parameter details:
