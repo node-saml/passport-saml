@@ -180,3 +180,6 @@ Provide an instance of an object which has these functions passed to the `cacheP
 
 A single instance of passport-saml will only authenticate users against a single identity provider.  If you have a use case where different logins need to be routed to different identity providers, you can create multiple instances of passport-saml, and either dispatch to them with your own routing code, or use a library like https://www.npmjs.org/package/passports.
 
+### Is there an example I can look at?
+
+Gerard Braad has provided an example app at https://github.com/gbraad/passport-saml-example/
