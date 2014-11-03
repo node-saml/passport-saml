@@ -42,6 +42,9 @@ Config parameter details:
 * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `https://`)
 * `callbackUrl`: full callbackUrl (overrides path if supplied)
 * `entryPoint`: identity provider entrypoint
+* `additionalParams`: dictionary of additional query params to add to all requests
+* `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
+* `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 * `issuer`: issuer string to supply to identity provider
 * `cert`: see 'security and signatures'
 * `privateCert`: see 'security and signatures'
