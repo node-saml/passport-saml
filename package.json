@@ -31,7 +31,7 @@
   "main": "./lib/passport-saml",
   "dependencies": {
     "passport": "0.2.x",
-    "q": "1.0.x",
+    "q": "1.1.x",
     "xml2js": "0.4.x",
     "xml-crypto": "0.1.x",
     "xmldom": "0.1.x",
@@ -39,7 +39,7 @@
     "xml-encryption": "~0.7"
   },
   "devDependencies": {
-    "body-parser": "1.8.x",
+    "body-parser": "1.9.x",
     "ejs": "1.0.x",
     "express": "4.x",
     "jshint": "*",
