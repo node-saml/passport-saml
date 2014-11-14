@@ -546,6 +546,162 @@ describe( 'passport-saml /', function() {
       });
     });
 
+    describe( 'getAdditionalParams checks /', function() {
+      it ( 'should not pass any additional params by default', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+        };
+        var samlObj = new SAML( samlConfig );
+
+        ['logout', 'authorize'].forEach( function( operation ) {
+          var additionalParams = samlObj.getAdditionalParams({}, operation);
+          additionalParams.should.be.empty
+        });
+
+        done();
+      });
+
+      it ( 'should not pass any additional params by default apart from the RelayState in request query', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+        };
+        var samlObj = new SAML( samlConfig );
+
+        ['logout', 'authorize'].forEach( function( operation ) {
+          var additionalParams = samlObj.getAdditionalParams({query:{RelayState: "test"}}, operation);
+
+          Object.keys(additionalParams).should.have.length(1);
+          additionalParams.should.containEql({'RelayState': 'test'});
+        });
+
+        done();
+      });
+
+      it ( 'should not pass any additional params by default apart from the RelayState in request body', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+        };
+        var samlObj = new SAML( samlConfig );
+
+        ['logout', 'authorize'].forEach( function( operation ) {
+          var additionalParams = samlObj.getAdditionalParams({body:{RelayState: "test"}}, operation);
+
+          Object.keys(additionalParams).should.have.length(1);
+          additionalParams.should.containEql({'RelayState': 'test'});
+        });
+
+        done();
+      });
+
+      it ( 'should pass additional params with all operations if set in additionalParams', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalParams: {
+            'queryParam': 'queryParamValue'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+
+        ['logout', 'authorize'].forEach( function( operation ) {
+          var additionalParams = samlObj.getAdditionalParams({}, operation);
+          Object.keys(additionalParams).should.have.length(1);
+          additionalParams.should.containEql({'queryParam': 'queryParamValue'});
+        });
+
+        done();
+      });
+
+      it ( 'should pass additional params with "authorize" operations if set in additionalAuthorizeParams', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalAuthorizeParams: {
+            'queryParam': 'queryParamValue'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, 'authorize');
+        Object.keys(additionalAuthorizeParams).should.have.length(1);
+        additionalAuthorizeParams.should.containEql({'queryParam': 'queryParamValue'});
+
+        var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout');
+        additionalLogoutParams.should.be.empty;
+
+        done();
+      });
+
+      it ( 'should pass additional params with "logout" operations if set in additionalLogoutParams', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalLogoutParams: {
+            'queryParam': 'queryParamValue'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, 'authorize');
+        additionalAuthorizeParams.should.be.empty;
+
+        var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout');
+        Object.keys(additionalLogoutParams).should.have.length(1);
+        additionalLogoutParams.should.containEql({'queryParam': 'queryParamValue'});
+
+        done();
+      });
+
+      it ( 'should merge additionalLogoutParams and additionalAuthorizeParams with additionalParams', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalParams: {
+            'queryParam1': 'queryParamValue'
+          },
+          additionalAuthorizeParams: {
+            'queryParam2': 'queryParamValueAuthorize'
+          },
+          additionalLogoutParams: {
+            'queryParam2': 'queryParamValueLogout'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, 'authorize');
+        Object.keys(additionalAuthorizeParams).should.have.length(2);
+        additionalAuthorizeParams.should.containEql({'queryParam1': 'queryParamValue', 'queryParam2': 'queryParamValueAuthorize'});
+
+        var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout');
+        Object.keys(additionalLogoutParams).should.have.length(2);
+        additionalLogoutParams.should.containEql({'queryParam1': 'queryParamValue', 'queryParam2': 'queryParamValueLogout'});
+
+        done();
+      });
+
+      it ( 'should prioritize additionalLogoutParams and additionalAuthorizeParams over additionalParams', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalParams: {
+            'queryParam': 'queryParamValue'
+          },
+          additionalAuthorizeParams: {
+            'queryParam': 'queryParamValueAuthorize'
+          },
+          additionalLogoutParams: {
+            'queryParam': 'queryParamValueLogout'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, 'authorize');
+        Object.keys(additionalAuthorizeParams).should.have.length(1);
+        additionalAuthorizeParams.should.containEql({'queryParam': 'queryParamValueAuthorize'});
+
+        var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout');
+        Object.keys(additionalLogoutParams).should.have.length(1);
+        additionalLogoutParams.should.containEql({'queryParam': 'queryParamValueLogout'});
+
+        done();
+      });
+    });
+
     describe( 'InResponseTo validation checks /', function(){
       var fakeClock = null;
 
