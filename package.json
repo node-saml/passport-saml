@@ -20,9 +20,15 @@
     "url": "http://bergie.iki.fi"
   },
   "contributors": [
-    "Michael Bosworth",
-    "Herbert Vojčík",
-    "Peter Loer"
+    {
+      "name": "Michael Bosworth"
+    },
+    {
+      "name": "Herbert Vojčík"
+    },
+    {
+      "name": "Peter Loer"
+    }
   ],
   "repository": {
     "type": "git",
@@ -50,6 +56,16 @@
   },
   "scripts": {
     "test": "mocha",
-    "jshint": "./node_modules/.bin/jshint lib"
-  }
+    "jshint": "jshint lib"
+  },
+  "readme": "SAML [![Build Status](https://travis-ci.org/Asana/node-saml-lib.svg?branch=master)](https://travis-ci.org/Asana/node-saml-lib)\n=============\n\nThis is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) library based on [passport-saml](https://github.com/bergie/passport-saml).\n\n## Installation\n\n    $ npm install saml-lib\n\n## Usage\n\n**TODO**\n",
+  "readmeFilename": "README.md",
+  "gitHead": "be0ae4552c1bfd85405d077a04b13d34afc46a29",
+  "bugs": {
+    "url": "https://github.com/Asana/node-saml-lib/issues"
+  },
+  "homepage": "https://github.com/Asana/node-saml-lib",
+  "_id": "saml-lib@0.1.11",
+  "_shasum": "c6f775e8acfca4d60f9a375845ffaaab5c8fe76f",
+  "_from": "saml-lib@0.1.11"
 }
