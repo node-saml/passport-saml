@@ -124,9 +124,61 @@ describe( 'passport-saml /', function() {
       };
     }
 
+    function testPassReqToCallback(check) {
+      return function (done) {
+        var pp = new passport.Authenticator();
+        var app = express();
+        app.use(bodyParser.urlencoded({extended: false}));
+        app.use(pp.initialize());
+        var config = check.config;
+        config.callbackUrl = 'http://localhost:3033/login';
+        config.passReqToCallback = true;
+        var passedRequest = null;
+        pp.use(new SamlStrategy(config, function (req, _profile, done) {
+            passedRequest = req;
+            done(null, { id: _profile.nameID });
+          })
+        );
+        pp.serializeUser(function(user, done) {
+          done(null, user);
+        });
+        fakeClock = sinon.useFakeTimers(Date.parse(check.mockDate));
+        app.post('/login',
+          pp.authenticate("saml"),
+          function (req, res) {
+            res.status(200).send("200 OK");
+          });
+        app.use(function (err, req, res, next) {
+          // console.log( err.stack );
+          res.status(500).send('500 Internal Server Error');
+        });
+        server = app.listen(3033, function () {
+          var requestOpts = {
+            url: 'http://localhost:3033/login',
+            method: 'POST',
+            form: check.samlResponse
+          };
+          request(requestOpts, function (err, response, body) {
+            should.not.exist(err);
+            response.statusCode.should.equal(check.expectedStatusCode);
+            if (response.statusCode == 200) {
+              should.exist(passedRequest);
+              passedRequest.url.should.eql('/login');
+              passedRequest.method.should.eql('POST');
+              passedRequest.body.should.eql(check.samlResponse);
+            } else {
+              should.not.exist(passedRequest);
+            }
+            done();
+          });
+        });
+      };
+    }
+
     for( var i = 0; i < capturedChecks.length; i++ ) {
       var check = capturedChecks[i];
       it(check.name, testForCheck(check));
+      it(check.name + ' passReqToCallback', testPassReqToCallback(check));
     }
 
     afterEach(function (done) {

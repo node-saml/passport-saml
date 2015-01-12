@@ -57,6 +57,7 @@ Config parameter details:
 * `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
 * `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
 * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
+* `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
 
 ### Provide the authentication callback
 
