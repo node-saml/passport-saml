@@ -1,6 +1,6 @@
 {
   "name": "saml-lib",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "licenses": [
     {
       "type": "MIT",
@@ -28,6 +28,24 @@
     },
     {
       "name": "Peter Loer"
+    }
+  ],
+  "maintainers": [
+    {
+      "name": "Greg Slovacek",
+      "email": "greg@asana.com"
+    },
+    {
+      "name": "Isaac Wolkerstorfer",
+      "email": "isaac@asana.com"
+    },
+    {
+      "name": "Eric Pelz",
+      "email": "eric@asana.com"
+    },
+    {
+      "name": "Saagar Deshpande",
+      "email": "saagar@asana.com"
     }
   ],
   "repository": {
