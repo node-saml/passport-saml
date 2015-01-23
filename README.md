@@ -58,6 +58,7 @@ Config parameter details:
 * `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
 * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
 * `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
+* `logoutUrl`: base address to call with logout requrests (default: `entryPoint`)
 
 ### Provide the authentication callback
 
