@@ -139,7 +139,8 @@ differences between the clock time on the client (Node server with Passport-SAML
 
 `NotBefore` and `NotOnOrAfter` can be part of either the `SubjectConfirmation` element, or within in the `Assertion/Conditions` element
 in the SAML response.
-## Subjection confirmation validation
+
+## Subject confirmation validation
 
 When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated.
 Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
