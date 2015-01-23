@@ -38,27 +38,32 @@ passport.use(new SamlStrategy(
 ```
 
 Config parameter details:
-* `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
-* `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `https://`)
-* `callbackUrl`: full callbackUrl (overrides path if supplied)
-* `entryPoint`: identity provider entrypoint
-* `additionalParams`: dictionary of additional query params to add to all requests
-* `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
-* `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
-* `issuer`: issuer string to supply to identity provider
-* `cert`: see 'security and signatures'
-* `privateCert`: see 'security and signatures'
-* `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
-* `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
-* `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
-* `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
-* `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
-* `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
-* `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
-* `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
-* `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
-* `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
-* `logoutUrl`: base address to call with logout requrests (default: `entryPoint`)
+* Core
+ * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
+ * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `https://`)
+ * `callbackUrl`: full callbackUrl (overrides path if supplied)
+ * `entryPoint`: identity provider entrypoint
+ * `issuer`: issuer string to supply to identity provider
+ * `cert`: see 'security and signatures'
+ * `privateCert`: see 'security and signatures'
+ * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
+* Additional SAML behaviors
+ * `additionalParams`: dictionary of additional query params to add to all requests
+ * `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
+ * `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
+ * `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
+ * `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
+ * `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
+ * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
+* ResponseTo
+ * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
+ * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
+ * `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
+* Passport
+ * `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
+* Logout
+ * `logoutUrl`: base address to call with logout requrests (default: `entryPoint`)
+ * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 
 ### Provide the authentication callback
 
