@@ -55,7 +55,7 @@ Config parameter details:
  * `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
  * `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
  * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
-* ResponseTo
+* InResponseTo Validation
  * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
  * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
  * `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
