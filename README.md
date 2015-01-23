@@ -62,7 +62,7 @@ Config parameter details:
 * Passport
  * `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
 * Logout
- * `logoutUrl`: base address to call with logout requrests (default: `entryPoint`)
+ * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
  * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 
 ### Provide the authentication callback
