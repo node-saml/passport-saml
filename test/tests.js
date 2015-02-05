@@ -199,8 +199,7 @@ describe( 'passport-saml /', function() {
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
                 AssertionConsumerServiceURL: 'http://localhost:3033/login',
-                Destination: 'https://wwwexampleIdp.com/saml',
-                ForceAuthn: 'false' },
+                Destination: 'https://wwwexampleIdp.com/saml'},
              'saml:Issuer': 
               [ { _: 'onelogin_saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
@@ -234,8 +233,7 @@ describe( 'passport-saml /', function() {
                 AssertionConsumerServiceURL: 'http://localhost:3033/login',
                 AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
-                IsPassive: 'true',
-                ForceAuthn: 'false' },
+                IsPassive: 'true'},
              'saml:Issuer': 
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
@@ -269,8 +267,7 @@ describe( 'passport-saml /', function() {
                 AssertionConsumerServiceURL: 'http://localhost:3033/login',
                 AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
-                IsPassive: 'true',
-                ForceAuthn: 'false' },
+                IsPassive: 'true' },
              'saml:Issuer': 
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
@@ -334,8 +331,7 @@ describe( 'passport-saml /', function() {
                 AssertionConsumerServiceURL: 'http://localhost:3033/login',
                 AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
-                IsPassive: 'true',
-                ForceAuthn: 'false' },
+                IsPassive: 'true'},
              'saml:Issuer': 
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
