@@ -461,11 +461,12 @@ describe( 'passport-saml /', function() {
               //ID: '_d11b3c5e085b2417f4aa',
               Version: '2.0',
               //IssueInstant: '2014-05-29T01:11:32Z',
+              Destination: 'foo',
               InResponseTo: 'quux' },
            'saml:Issuer': [ 'onelogin_saml' ],
            'samlp:Status': [ { 'samlp:StatusCode': [ { '$': { Value: 'urn:oasis:names:tc:SAML:2.0:status:Success' } } ] } ] } };
 
-      var samlObj = new SAML( {} );
+      var samlObj = new SAML( { entryPoint: "foo" } );
       var logoutRequest = samlObj.generateLogoutResponse({}, { ID: "quux" });
       parseString( logoutRequest, function( err, doc ) {
         delete doc['samlp:LogoutResponse']['$']["ID"];
