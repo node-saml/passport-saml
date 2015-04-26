@@ -20,6 +20,8 @@ This example utilizes the [Feide OpenIdp identity provider](https://openidp.feid
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
 ```javascript
+var SamlStrategy = require('passport-saml').Strategy;
+
 passport.use(new SamlStrategy(
   {
     path: '/login/callback',
