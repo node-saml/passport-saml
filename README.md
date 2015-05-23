@@ -43,7 +43,7 @@ passport.use(new SamlStrategy(
 Config parameter details:
 * Core
  * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
- * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `https://`)
+ * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `http://`)
  * `callbackUrl`: full callbackUrl (overrides path if supplied)
  * `entryPoint`: identity provider entrypoint
  * `issuer`: issuer string to supply to identity provider
