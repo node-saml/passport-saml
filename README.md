@@ -67,6 +67,7 @@ Config parameter details:
  * `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
 * Logout
  * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
+ * `logoutCallbackUrl`: logout redirect callback URL (default: `/saml/callback`)
  * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 
 ### Provide the authentication callback
