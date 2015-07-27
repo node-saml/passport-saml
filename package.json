@@ -1,6 +1,6 @@
 {
   "name": "saml-lib",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "licenses": [
     {
       "type": "MIT",
@@ -55,7 +55,7 @@
   "main": "./lib/saml.js",
   "dependencies": {
     "q": "1.0.x",
-    "xml-crypto": "^0.1.25",
+    "xml-crypto": "^0.5.27",
     "xml-encryption": "~0.7",
     "xml2js": "0.4.x",
     "xmlbuilder": "~2.2",
