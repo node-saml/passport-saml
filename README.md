@@ -68,6 +68,7 @@ Config parameter details:
 * Logout
  * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
  * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
+ * `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
 
 ### Provide the authentication callback
 
