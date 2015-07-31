@@ -510,27 +510,45 @@ describe( 'passport-saml /', function() {
       });
     });
 
-    it( 'generateServiceProviderMetadata', function( done ) {
-      var samlConfig = {
-        issuer: 'http://example.serviceprovider.com',
-        callbackUrl: 'http://example.serviceprovider.com/saml/callback',
-        identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
-        decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem')
-      };
+    describe( 'generateServiceProviderMetadata tests /', function() {
+      function testMetadata( samlConfig, expectedMetadata ) {
+        var samlObj = new SAML( samlConfig );
+        var decryptionCert = fs.readFileSync(__dirname + '/static/testshib encryption cert.pem', 'utf-8');
+        var metadata = samlObj.generateServiceProviderMetadata( decryptionCert );
+        // splits are to get a nice diff if they don't match for some reason
+        metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
 
-      var samlObj = new SAML( samlConfig );
-      var decryptionCert = fs.readFileSync(__dirname + '/static/testshib encryption cert.pem', 'utf-8');
-      var metadata = samlObj.generateServiceProviderMetadata( decryptionCert );
-      var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata.xml', 'utf-8');
-      // splits are to get a nice diff if they don't match for some reason
-      metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
+        // verify that we are exposed through Strategy as well
+        var strategy = new SamlStrategy( samlConfig, function() {} );
+        metadata = strategy.generateServiceProviderMetadata( decryptionCert );
+        metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
+      }
 
-      // verify that we are exposed through Strategy as well
-      var strategy = new SamlStrategy( samlConfig, function() {} );
-      metadata = strategy.generateServiceProviderMetadata( decryptionCert );
-      metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
-      done();
-    });
+      it( 'metadata with description key should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          callbackUrl: 'http://example.serviceprovider.com/saml/callback',
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+          decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem')
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata.xml', 'utf-8');
+
+        testMetadata( samlConfig, expectedMetadata );
+        done();
+      });
+
+      it( 'metadata without description key should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          callbackUrl: 'http://example.serviceprovider.com/saml/callback',
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata without key.xml', 'utf-8');
+
+        testMetadata( samlConfig, expectedMetadata );
+        done();
+      });
+  });
 
     it('#certToPEM should generate valid certificate', function(done){
       var samlConfig = {
