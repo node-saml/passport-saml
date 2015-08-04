@@ -33,7 +33,7 @@
     "passport": "0.2.x",
     "q": "1.1.x",
     "xml2js": "0.4.x",
-    "xml-crypto": "0.3.x",
+    "xml-crypto": "0.6.x",
     "xmldom": "0.1.x",
     "xmlbuilder": "2.5.x",
     "xml-encryption": "~0.7"
