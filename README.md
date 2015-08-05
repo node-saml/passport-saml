@@ -45,6 +45,7 @@ Config parameter details:
  * `callbackUrl`: full callbackUrl (overrides path/protocol if supplied)
  * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
  * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `http://`)
+ * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
  * `entryPoint`: identity provider entrypoint
  * `issuer`: issuer string to supply to identity provider
  * `cert`: see 'security and signatures'

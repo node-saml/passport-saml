@@ -524,7 +524,7 @@ describe( 'passport-saml /', function() {
         metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
       }
 
-      it( 'metadata with description key should pass', function( done ) {
+      it( 'config with callbackUrl and decryptionPvk should pass', function( done ) {
         var samlConfig = {
           issuer: 'http://example.serviceprovider.com',
           callbackUrl: 'http://example.serviceprovider.com/saml/callback',
@@ -537,11 +537,40 @@ describe( 'passport-saml /', function() {
         done();
       });
 
-      it( 'metadata without description key should pass', function( done ) {
+      it( 'config with callbackUrl should pass', function( done ) {
         var samlConfig = {
           issuer: 'http://example.serviceprovider.com',
           callbackUrl: 'http://example.serviceprovider.com/saml/callback',
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata without key.xml', 'utf-8');
+
+        testMetadata( samlConfig, expectedMetadata );
+        done();
+      });
+
+      it( 'config with protocol, path, host, and decryptionPvk should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          protocol: 'http://',
+          host: 'example.serviceprovider.com',
+          path: '/saml/callback',
           identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+          decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem')
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata.xml', 'utf-8');
+
+        testMetadata( samlConfig, expectedMetadata );
+        done();
+      });
+
+      it( 'config with protocol, path, and host should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          protocol: 'http://',
+          host: 'example.serviceprovider.com',
+          path: '/saml/callback',
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
         };
         var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata without key.xml', 'utf-8');
 
