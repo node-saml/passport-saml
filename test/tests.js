@@ -1128,4 +1128,63 @@ describe( 'passport-saml /', function() {
       });
     });
   });
+  describe('validatePostRequest()', function() {
+    var samlObj;
+    beforeEach(function() {
+      samlObj = new SAML({
+        cert: fs.readFileSync(__dirname + '/static/cert.pem', 'ascii')
+      });
+    });
+
+    it('errors if bad xml', function(done) {
+      var body = {
+        SAMLRequest: "asdf"
+      };
+      samlObj.validatePostRequest(body, function(err) {
+        should.exist(err);
+        done();
+      });
+    });
+    it('errors if bad signature', function(done) {
+      var body = {
+        SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_bad_signature.xml', 'base64')
+      };
+      samlObj.validatePostRequest(body, function(err) {
+        should.exist(err);
+        err.should.eql(new Error('Invalid signature'));
+        done();
+      });
+    });
+    it('returns profile for valid signature', function(done) {
+      var body = {
+        SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_good_signature.xml', 'base64')
+      };
+      samlObj.validatePostRequest(body, function(err, profile) {
+        should.not.exist(err);
+        profile.should.eql({
+          ID: 'pfxd4d369e8-9ea1-780c-aff8-a1d11a9862a1',
+          issuer: 'http://sp.example.com/demo1/metadata.php',
+          nameID: 'ONELOGIN_f92cc1834efc0f73e9c09f482fce80037a6251e7',
+          nameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        });
+        done();
+      });
+    });
+    it('returns profile for valid signature including session index', function(done) {
+      var body = {
+        SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_session_index.xml', 'base64')
+      };
+      samlObj.validatePostRequest(body, function(err, profile) {
+        should.not.exist(err);
+        profile.should.eql({
+          ID: 'pfxd4d369e8-9ea1-780c-aff8-a1d11a9862a1',
+          issuer: 'http://sp.example.com/demo1/metadata.php',
+          nameID: 'ONELOGIN_f92cc1834efc0f73e9c09f482fce80037a6251e7',
+          nameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+          sessionIndex: '1'
+        });
+        done();
+      });
+    });
+  });
 });
