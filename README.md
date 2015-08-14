@@ -51,6 +51,7 @@ Config parameter details:
  * `cert`: see 'security and signatures'
  * `privateCert`: see 'security and signatures'
  * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
+ * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default) or 'sha256'
 * Additional SAML behaviors
  * `additionalParams`: dictionary of additional query params to add to all requests
  * `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
