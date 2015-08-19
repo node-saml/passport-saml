@@ -137,6 +137,8 @@ Here is a configuration that has been proven to work with ADFS:
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.
 
+For more detailed instructions, see [this document from Tim Brody](docs/adfs/README.md).
+
 ## SAML Response Validation - NotBefore and NotOnOrAfter
 
 If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML response, Passport-SAML will validate them
