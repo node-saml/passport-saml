@@ -30,7 +30,7 @@
   },
   "main": "./lib/passport-saml",
   "dependencies": {
-    "passport": "0.2.x",
+    "passport": "0.3.x",
     "q": "1.1.x",
     "xml2js": "0.4.x",
     "xml-crypto": "0.6.x",
