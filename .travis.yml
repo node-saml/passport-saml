@@ -1,13 +1,13 @@
 language: node_js
 node_js:
-  - "0.8"
   - "0.10"
   - "0.12"
   - iojs
+  - "4.0"
 
 before_install:
   - npm install -g npm
 
-script: 
+script:
   - npm test
   - ./node_modules/.bin/jshint lib
