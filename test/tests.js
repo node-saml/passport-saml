@@ -1043,7 +1043,6 @@ describe( 'passport-saml /', function() {
           profile['vz::org'].should.equal( 'testorg' );
           profile['vz::name'].should.equal( 'Test User' );
           profile['net::ip'].should.equal( '::1' );
-          profile.nameID.should.startWith( 'UIS/jochen-work' );
           samlObj.cacheProvider.get(requestId, function(err, value){
               should.not.exist(value);
               done();
