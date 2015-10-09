@@ -626,6 +626,35 @@ describe( 'passport-saml /', function() {
       });
     });
 
+    describe( 'my test',function() {
+      var fakeClock;
+      before(function(){
+          fakeClock = sinon.useFakeTimers(Date.parse('2015-08-31T08:55:00+00:00'));
+      });
+      after(function(){
+          fakeClock.restore();
+      });
+
+      it('accept response with an attributeStatement element without attributeValue', function(done) {
+          var container = { 
+              SAMLResponse : fs.readFileSync(
+                  __dirname + '/static/response-with-uncomplete-attribute.xml'
+              ).toString('base64')
+          };
+          var samlObj = new SAML();
+
+          samlObj.validatePostResponse(container, function(err, profile) {
+            should.not.exist(err);
+            profile.issuer.should.eql("https://evil-corp.com");
+            profile.nameID.should.eql("vincent.vega@evil-corp.com");
+            should(profile).have.property("evil-corp.egroupid").eql("vincent.vega@evil-corp.com");
+            // attributes without attributeValue child should be ignored
+            should(profile).not.have.property("evilcorp.roles");
+            done();
+          });
+      });
+    });
+
     describe( 'request signature checks /', function() {
       var fakeClock;
       beforeEach(function(){
