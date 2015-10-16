@@ -21,7 +21,7 @@ lHpOX1rt1R+UiTEIhTSXPNt/</ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
     </KeyDescriptor>
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://acme_tools.com/adfs/postResponse/logout"/>
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://acme_tools.com/adfs/postResponse/logout"/>
     <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://acme_tools.com/adfs/postResponse/postResponse" index="0"/>
   </SPSSODescriptor>
 </EntityDescriptor>
