@@ -689,7 +689,10 @@ describe( 'passport-saml /', function() {
           privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
-          signatureAlgorithm: 'sha256'
+          signatureAlgorithm: 'sha256',
+          additionalParams: {
+            customQueryStringParam: 'CustomQueryStringParamValue'
+          }
         };
         var samlObj = new SAML( samlConfig );
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
@@ -697,6 +700,7 @@ describe( 'passport-saml /', function() {
           var qry = require('querystring').parse(require('url').parse(url).query);
           qry.SigAlg.should.match('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256');
           qry.Signature.should.match('SL85w0h6Pt7ejplGrR4OOTh4Zo9zs/MQHZep27kSzs4+U/0QdQi7hg5T0TKqCSRBZpVtspMpw+i6F0tZrFot0dIJgeCgkvMA2Tllwt6K0DbKWOiNXW5S2M9tUZktdJVfjr2D5e0SG4jQIwa4PVONgNQEKFxydIqwxVh9NGYeDeMUGq5/4QpMDLgYOvLfShyvhlzmqeUs7LBlZbKJLCeXZi/Z5bnF+QOAugtKuh0G6kFOS0CmKVLIW/4XicLHmggUBDlt0VJaskxUx2amHSNUoYe3Z9/9TeZqc7IswNUOEiq/oy0DLhokLnBEj+dBRMlgkAHp/gaWcc1Vp/1jSlVAvg==');
+          qry.customQueryStringParam.should.match('CustomQueryStringParamValue');
           done();
         });
       });
@@ -709,7 +713,10 @@ describe( 'passport-saml /', function() {
           privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
-          signatureAlgorithm: 'sha1'
+          signatureAlgorithm: 'sha1',
+          additionalParams: {
+            customQueryStringParam: 'CustomQueryStringParamValue'
+          }
         };
         var samlObj = new SAML( samlConfig );
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
@@ -717,6 +724,7 @@ describe( 'passport-saml /', function() {
           var qry = require('querystring').parse(require('url').parse(url).query);
           qry.SigAlg.should.match('http://www.w3.org/2000/09/xmldsig#rsa-sha1');
           qry.Signature.should.match('VnYOXVDiIaio+Vt8D2XXVwdyvwhDcdvgrQSkeq85G+MfU31yK9fvYEPFARK5pF1uJakMsYrKzVBv7HLCFcYuztpuIZloMFvFkado0MxFK4A/QFZn+EYDJE8ddLSvrW3iyuoxyVBSnH0+KLzDiI81B28YZNU3NFJIKCKzQSGIllJ7Vgw6KjH/BmE5DY0eSeUCEe6OygHgazjSrNIWQQjww5nSGIqAQl94OVanZtQBrYIUtik+d1lAhnginG0UnPccstenxEMAun2uMGp9hVqroWQvWRbX/xspRpjPOrIkvv63FzEgmRObXVNqpzDICJRUSlhTLdXAm2hb+ScYocO6EQ==');
+          qry.customQueryStringParam.should.match('CustomQueryStringParamValue');
           done();
         });
       });
