@@ -579,6 +579,23 @@ describe( 'passport-saml /', function() {
       });
   });
 
+    it('generateServiceProviderMetadata contains logout callback url', function (done) {
+      var samlConfig = {
+        issuer: 'http://example.serviceprovider.com',
+        callbackUrl: 'http://example.serviceprovider.com/saml/callback',
+        identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+        decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem'),
+        logoutCallbackUrl: 'http://example.serviceprovider.com/logout'
+      };
+
+      var samlObj = new SAML(samlConfig);
+      var decryptionCert = fs.readFileSync(__dirname + '/static/testshib encryption cert.pem', 'utf-8');
+      var metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
+      metadata.should.containEql('SingleLogoutService');
+      metadata.should.containEql(samlConfig.logoutCallbackUrl);
+      done();
+    });
+
     it('#certToPEM should generate valid certificate', function(done){
       var samlConfig = {
         entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
