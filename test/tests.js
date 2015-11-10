@@ -452,6 +452,40 @@ describe( 'passport-saml /', function() {
       });
     });
 
+    it( 'generateLogoutRequest adds the NameQualifier and SPNameQualifier to the saml request', function( done ) {
+      var expectedRequest = { 
+        'samlp:LogoutRequest': 
+         { '$': 
+            { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+              'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+              //ID: '_85ba0a112df1ffb57805',
+              Version: '2.0',
+              //IssueInstant: '2014-05-29T03:32:23Z',
+              Destination: 'foo' },
+           'saml:Issuer': 
+            [ { _: 'onelogin_saml',
+                '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
+           'saml:NameID': [ { _: 'bar', '$': { Format: 'foo',
+                                               SPNameQualifier: 'Service Provider',
+                                               NameQualifier: 'Identity Provider' } } ] } };
+
+      var samlObj = new SAML( { entryPoint: "foo" } );
+      var logoutRequest = samlObj.generateLogoutRequest({
+        user: {
+          nameIDFormat: 'foo',
+          nameID: 'bar',
+          nameQualifier: 'Identity Provider',
+          spNameQualifier: 'Service Provider'
+        }
+      });
+      parseString( logoutRequest, function( err, doc ) {
+        delete doc['samlp:LogoutRequest']['$']["ID"];
+        delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
+        doc.should.eql( expectedRequest );
+        done();
+      });
+    });
+
     it( 'generateLogoutResponse', function( done ) {
       var expectedResponse =  { 
         'samlp:LogoutResponse': 
