@@ -461,7 +461,7 @@ describe( 'passport-saml /', function() {
         var config = check.config;
         config.callbackUrl = 'http://localhost:3033/login';
         config.entryPoint = 'https://wwwexampleIdp.com/saml';
-        config.samlBinding = 'HTTP-POST';
+        config.authnRequestBinding = 'HTTP-POST';
         var profile = null;
         passport.use( new SamlStrategy( config, function(_profile, done) {
             profile = _profile;
@@ -470,7 +470,7 @@ describe( 'passport-saml /', function() {
         );
 
         app.get( '/login', 
-          passport.authenticate( "saml", { samlFallback: 'login-request', samlBinding: "HTTP-POST", session: false } ),
+          passport.authenticate( "saml", { samlFallback: 'login-request',  session: false } ),
           function(req, res) {
             res.status(200).send("200 OK");
           });

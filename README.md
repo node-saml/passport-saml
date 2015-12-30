@@ -62,6 +62,7 @@ Config parameter details:
  * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
  * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
  * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
+ * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
 * InResponseTo Validation
  * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
  * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
