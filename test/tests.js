@@ -421,6 +421,108 @@ describe( 'passport-saml /', function() {
     });
   });
 
+  describe( 'captured SAML HTTP-POST requests /', function() {
+    var capturedChecks = [
+      { name: "Empty Config",
+        config: {},
+        result: {
+          'samlp:AuthnRequest': 
+           { '$': 
+              { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                Version: '2.0',
+                ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                AssertionConsumerServiceURL: 'http://localhost:3033/login',
+                Destination: 'https://wwwexampleIdp.com/saml'},
+             'saml:Issuer': 
+              [ { _: 'onelogin_saml',
+                  '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
+             'samlp:NameIDPolicy': 
+              [ { '$': 
+                   { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                     Format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+                     AllowCreate: 'true' } } ],
+             'samlp:RequestedAuthnContext': 
+              [ { '$': 
+                   { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                     Comparison: 'exact' },
+                  'saml:AuthnContextClassRef': 
+                   [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
+                       '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
+      }
+    ];
+
+    var server;
+
+    function testForCheck( check ) {
+      return function( done ) {
+        var app = express();
+        app.use( bodyParser.urlencoded({extended: false}) );
+        app.use( passport.initialize() );
+        var config = check.config;
+        config.callbackUrl = 'http://localhost:3033/login';
+        config.entryPoint = 'https://wwwexampleIdp.com/saml';
+        config.samlBinding = 'HTTP-POST';
+        var profile = null;
+        passport.use( new SamlStrategy( config, function(_profile, done) {
+            profile = _profile;
+            done(null, { id: profile.nameID } );
+          })
+        );
+
+        app.get( '/login', 
+          passport.authenticate( "saml", { samlFallback: 'login-request', samlBinding: "HTTP-POST", session: false } ),
+          function(req, res) {
+            res.status(200).send("200 OK");
+          });
+
+        app.use( function( err, req, res, next ) {
+          console.log( err.stack );
+          res.status(500).send('500 Internal Server Error');
+        });
+
+        server = app.listen( 3033, function() {
+          var requestOpts = {
+            url: 'http://localhost:3033/login',
+            method: 'get',
+            followRedirect: false
+          };
+
+          request(requestOpts, function(err, response, body) {
+            should.not.exist(err);
+            response.statusCode.should.equal(200);
+            body.should.match(/<!DOCTYPE html>[^]*<input.*name="SAMLRequest"[^]*<\/html>/);
+            var encodedSamlRequest = body.match( /<input.*name="SAMLRequest" value="([^"]*)"/ )[1];
+            var buffer = new Buffer(encodedSamlRequest, 'base64')
+            if (check.config.skipRequestCompression)
+              helper(null, buffer);
+            else
+              zlib.inflateRaw( buffer, helper );
+
+            function helper(err, samlRequest) {
+              should.not.exist( err );
+              parseString( samlRequest.toString(), function( err, doc ) {
+                should.not.exist( err );
+                delete doc['samlp:AuthnRequest']['$']["ID"];
+                delete doc['samlp:AuthnRequest']['$']["IssueInstant"];
+                doc.should.eql( check.result );
+                done();
+              });
+            }
+          });
+        });
+      };
+    }
+
+    for( var i = 0; i < capturedChecks.length; i++ ) {
+      var check = capturedChecks[i];
+      it( check.name, testForCheck( check ) );
+    }
+
+    afterEach( function( done ) {
+      server.close( done );
+    });
+  });
+
   describe( 'saml.js / ', function() {
     it( 'generateLogoutRequest', function( done ) {
       var expectedRequest = { 
