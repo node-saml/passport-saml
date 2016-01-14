@@ -117,11 +117,17 @@ Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To s
     privateCert: fs.readFileSync('./cert.pem', 'utf-8')
 ```
 
-It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's certificate using the `cert` confguration key:
+It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's PEM-encoded X.509 certificate using the `cert` confguration key. The "BEGIN CERTIFICATE" and "END CERTIFICATE" lines should be stripped out. 
 
 ```javascript
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
 ```
+
+If you have a certificate in the binary DER encoding, you can convert it to the necessary PEM encoding like this:
+
+```bash
+     openssl x509 -inform der -in my_certificate.cer -out my_certificate.pem
+````
 
 ## Usage with Active Directory Federation Services
 
