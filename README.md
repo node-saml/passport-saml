@@ -63,6 +63,7 @@ Config parameter details:
  * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
  * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
  * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
+ * `authnRequestPostForm`: if `HTTP-POST` is used for `authnRequestBinding`, you can use this to customize the form which will be posted. Pass a function which processes an array of name/value objects and returns your custom form as a string.
 * InResponseTo Validation
  * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
  * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
