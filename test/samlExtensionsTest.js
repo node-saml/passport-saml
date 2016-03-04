@@ -73,4 +73,49 @@ describe('SAML.js Extensions', function() {
     });
 
 
+    it('makes xml with dinamic "Extensions"', function(done) {
+
+        var extraReqOptions = {
+
+            extensions: [
+                {
+                    xmlns: {
+                        name: 'dinamic',
+                        urn: 'http://www.udinamic.com'
+                    },
+                    values: {
+                        'Dinamic1': Math.random(),
+                        'Dinamic2': new Date().toString()
+                    }
+                }
+            ]
+        }
+
+        saml.generateAuthorizeRequest(req, true, extraReqOptions, function(err, xml) {
+
+            should.not.exist(err);
+
+            var doc = new xmldom.DOMParser().parseFromString(xml);
+            var root = doc.getElementsByTagNameNS('urn:oasis:names:tc:SAML:2.0:protocol', 'AuthnRequest').item(0);
+
+            var extensions = doc.getElementsByTagNameNS('urn:oasis:names:tc:SAML:2.0:protocol', 'Extensions');
+            should.exist(extensions);
+
+            extensions = extensions.item(0);
+            should.exist(extensions);
+
+            should.exist(extensions.childNodes);
+            extensions.childNodes.length.should.be.equal(6);
+
+            //extra1:ExtraSAML
+            var item = extensions.childNodes.item(0)
+
+            item.nodeName.should.be.equal('dinamic:Dinamic1');
+            item.childNodes.length.should.be.equal(1);
+
+            done();
+        });
+    });
+
+
 });
