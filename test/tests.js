@@ -741,6 +741,118 @@ describe( 'passport-saml /', function() {
       });
     });
 
+      describe( 'redirect response checks /', function() {
+          var fakeClock;
+          beforeEach(function(){
+              fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
+          });
+          afterEach(function(){
+              fakeClock.restore();
+          });
+
+          var samlConfig = {
+              privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8')
+          };
+
+        it( 'valid deflate response', function( done ) {
+          var container = {
+            SAMLResponse:"rVRba9swFP4rRu+OZSuxHZGYdQ2DQG8kpZS9DFk+bjxiyUgKCZT+9x3nYpI2zcrYk61z/c53LiMr6mXDZ2AbrSx4m3qpLG+FY7IyimthK8uVqMFyJ/n86vaGRz3KhbVgXKUVOXJpLvs0Rjst9ZJ408mYzOJ0mNOEsVxKKaJIhCwBFg/6KaMsjBiLhn2ahzkQ7wmMxVRjglHQ2doVTJV1QjkU0bDv04EfpY+U8jDmNP1JvAlYVynhtl6vBmTVVKDcG3qrQ62Pekx+ibiU/TiHtA8hMFkyOaAkG7XV8G0iky2caywPAtE0Pa1gqV8q1ZO6DlqjoAYnCuFEwJIwGQxGwbHraMfu3Am3sqeva12A9ySWK7hMmt1a8/lKSrCWBNkuw2lQfnVox74bGzsmLW6EvV6ve2vW0+YliCgNg+fbm7lcQC1IZ1v93divtoTLj93AVjblhuUxk0kOfglp7MdRWfipzAd+GIs8jhIGpRBfat3/5R55y3+DdPvXHdI7nXg/tKmFu8x7K6kKv9yacmeEsu0EkaxZajDf7Cq3jcCWrFs4+8y78KeZr7UqqzZG25xbcAtdXE4sa56DMGDI54EmWLR3p929ujdXpQPzgczhbg9mh8n/hy04jNo5AO9Ue6RoUVSt2rbgvgOSBx+QsR2yL6A/zPaqQNQSELEzldylP9Fkr2L/97bH1WnevU9iBO9Ad1HdQrXbBTWS5W2fF2Y2wWLmuJoY4ZOahseXaW86VQVskHlGRV+UA+rLNMp9GrLQL1PcmwSfuD/YF9ybY2AI18HGnRFdL/Eoz6DMLt5tyWVrh+IH/Ky1KR7wLGMPoXhsh7zRxnWknQl+Rnci64jrpIfT1F2uw+hlfwA=",
+            RelayState: "PhDO2zsrzwIrmSgKL0WrvzzDlcYP4g9QKjpNYRm99av5zWe1Sk5m6B9uLnSoMxQ6Y8tjhPf5tcL3uirRmUs4pAo6UjiyzKGuFqL6F6kcgAFHlCdLFuX6YbOcdd97W7XS",
+            SigAlg: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+            Signature: "OtwqQdEo1PemF2nR3ep7SnS46Niv63s9in6D3MasLEuhmD0wOOYbJt3U3URe0w3xE6YrDVF1UB68PcRlOnGDPTcrwbxQcp5OzRRJvEgrCDBvjk5J4uovo9RmISS6YCZmM+43SnX7hLiFtGpsZm2ReArXgOxoJ8RpZEeFKKfywm4iYfZR4kjSCbbpGwN1qbfTCrq1STDXDOdYUF20/NzRs7+KMs6jQc1VB7D10td3Qm9FItIs6rwq/JtLzhG/jA46kIFlVe+aw9Jqj6WKvBfnxmlIOirRXQl7XiKlCNrNDdnjec2BUJTuUPGFXcdlwGpSQADm7j1CoeM39OFiKWxZAA=="
+          };
+
+          var samlObj = new SAML( samlConfig );
+          samlObj.validateGetResponse(container, function( err, profile, logout ) {
+            should.not.exist( err );
+            profile.nameID.should.startWith( 'ploer' );
+            done();
+          });
+        });
+
+
+          it( 'invalid deflate response', function( done ) {
+              var container = { SAMLResponse: "PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIElEPSJSNjg5YjA3MzNiY2NjYTIyYTEzN2UzNjU0ODMwMzEyMzMyOTQwYjFiZSIgVmVyc2lvbj0iMi4wIiBJc3N1ZUluc3RhbnQ9IjIwMTQtMDUtMjhUMDA6MTY6MDhaIiBEZXN0aW5hdGlvbj0ie3JlY2lwaWVudH0iIEluUmVzcG9uc2VUbz0iX2E2ZmM0NmJlODRlMWUzY2YzYzUwIj48c2FtbDpJc3N1ZXI+aHR0cHM6Ly9hcHAub25lbG9naW4uY29tL3NhbWwvbWV0YWRhdGEvMzcxNzU1PC9zYW1sOklzc3Vlcj48c2FtbHA6U3RhdHVzPjxzYW1scDpTdGF0dXNDb2RlIFZhbHVlPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6c3RhdHVzOlN1Y2Nlc3MiLz48L3NhbWxwOlN0YXR1cz48c2FtbDpBc3NlcnRpb24geG1sbnM6eHM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIiBWZXJzaW9uPSIyLjAiIElEPSJwZngzYjYzYzdiZS1mZTg2LTYyZmQtOGNiNS0xNmFiNjI3M2VmYWEiIElzc3VlSW5zdGFudD0iMjAxNC0wNS0yOFQwMDoxNjowOFoiPjxzYW1sOklzc3Vlcj5odHRwczovL2FwcC5vbmVsb2dpbi5jb20vc2FtbC9tZXRhZGF0YS8zNzE3NTU8L3NhbWw6SXNzdWVyPjxzYW1sOlN1YmplY3Q+PHNhbWw6TmFtZUlEIEZvcm1hdD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOm5hbWVpZC1mb3JtYXQ6dHJhbnNpZW50Ij5wbG9lckBzdWJzcGFjZXN3LmNvbTwvc2FtbDpOYW1lSUQ+PHNhbWw6U3ViamVjdENvbmZpcm1hdGlvbiBNZXRob2Q9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpjbTpiZWFyZXIiPjxzYW1sOlN1YmplY3RDb25maXJtYXRpb25EYXRhIE5vdE9uT3JBZnRlcj0iMjAxNC0wNS0yOFQwMDoxOTowOFoiIFJlY2lwaWVudD0ie3JlY2lwaWVudH0iIEluUmVzcG9uc2VUbz0iX2E2ZmM0NmJlODRlMWUzY2YzYzUwIi8+PC9zYW1sOlN1YmplY3RDb25maXJtYXRpb24+PC9zYW1sOlN1YmplY3Q+PHNhbWw6Q29uZGl0aW9ucyBOb3RCZWZvcmU9IjIwMTQtMDUtMjhUMDA6MTM6MDhaIiBOb3RPbk9yQWZ0ZXI9IjIwMTQtMDUtMjhUMDA6MTk6MDhaIj48c2FtbDpBdWRpZW5jZVJlc3RyaWN0aW9uPjxzYW1sOkF1ZGllbmNlPnthdWRpZW5jZX08L3NhbWw6QXVkaWVuY2U+PC9zYW1sOkF1ZGllbmNlUmVzdHJpY3Rpb24+PC9zYW1sOkNvbmRpdGlvbnM+PHNhbWw6QXV0aG5TdGF0ZW1lbnQgQXV0aG5JbnN0YW50PSIyMDE0LTA1LTI4VDAwOjE2OjA3WiIgU2Vzc2lvbk5vdE9uT3JBZnRlcj0iMjAxNC0wNS0yOVQwMDoxNjowOFoiIFNlc3Npb25JbmRleD0iXzMwYTRhZjUwLWM4MmItMDEzMS1mOGI1LTc4MmJjYjU2ZmNhYSI+PHNhbWw6QXV0aG5Db250ZXh0PjxzYW1sOkF1dGhuQ29udGV4dENsYXNzUmVmPnVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphYzpjbGFzc2VzOlBhc3N3b3JkUHJvdGVjdGVkVHJhbnNwb3J0PC9zYW1sOkF1dGhuQ29udGV4dENsYXNzUmVmPjwvc2FtbDpBdXRobkNvbnRleHQ+PC9zYW1sOkF1dGhuU3RhdGVtZW50Pjwvc2FtbDpBc3NlcnRpb24+PC9zYW1scDpSZXNwb25zZT4=",
+                RelayState: "PhDO2zsrzwIrmSgKL0WrvzzDlcYP4g9QKjpNYRm99av5zWe1Sk5m6B9uLnSoMxQ6Y8tjhPf5tcL3uirRmUs4pAo6UjiyzKGuFqL6F6kcgAFHlCdLFuX6YbOcdd97W7XS",
+                SigAlg: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+                Signature: "OtwqQdEo1PemF2nR3ep7SnS46Niv63s9in6D3MasLEuhmD0wOOYbJt3U3URe0w3xE6YrDVF1UB68PcRlOnGDPTcrwbxQcp5OzRRJvEgrCDBvjk5J4uovo9RmISS6YCZmM+43SnX7hLiFtGpsZm2ReArXgOxoJ8RpZEeFKKfywm4iYfZR4kjSCbbpGwN1qbfTCrq1STDXDOdYUF20/NzRs7+KMs6jQc1VB7D10td3Qm9FItIs6rwq/JtLzhG/jA46kIFlVe+aw9Jqj6WKvBfnxmlIOirRXQl7XiKlCNrNDdnjec2BUJTuUPGFXcdlwGpSQADm7j1CoeM39OFiKWxZAA=="
+              };
+
+              var samlObj = new SAML( samlConfig );
+              samlObj.validateGetResponse(container, function( err, profile, logout ) {
+                  err.should.have.property('code', 'Z_DATA_ERROR');
+                  should.not.exists(profile);
+                  done();
+              });
+          });
+
+        it( 'missing response signature', function( done ) {
+          var container = {
+            SAMLResponse:"rVRba9swFP4rRu+OZSuxHZGYdQ2DQG8kpZS9DFk+bjxiyUgKCZT+9x3nYpI2zcrYk61z/c53LiMr6mXDZ2AbrSx4m3qpLG+FY7IyimthK8uVqMFyJ/n86vaGRz3KhbVgXKUVOXJpLvs0Rjst9ZJ408mYzOJ0mNOEsVxKKaJIhCwBFg/6KaMsjBiLhn2ahzkQ7wmMxVRjglHQ2doVTJV1QjkU0bDv04EfpY+U8jDmNP1JvAlYVynhtl6vBmTVVKDcG3qrQ62Pekx+ibiU/TiHtA8hMFkyOaAkG7XV8G0iky2caywPAtE0Pa1gqV8q1ZO6DlqjoAYnCuFEwJIwGQxGwbHraMfu3Am3sqeva12A9ySWK7hMmt1a8/lKSrCWBNkuw2lQfnVox74bGzsmLW6EvV6ve2vW0+YliCgNg+fbm7lcQC1IZ1v93divtoTLj93AVjblhuUxk0kOfglp7MdRWfipzAd+GIs8jhIGpRBfat3/5R55y3+DdPvXHdI7nXg/tKmFu8x7K6kKv9yacmeEsu0EkaxZajDf7Cq3jcCWrFs4+8y78KeZr7UqqzZG25xbcAtdXE4sa56DMGDI54EmWLR3p929ujdXpQPzgczhbg9mh8n/hy04jNo5AO9Ue6RoUVSt2rbgvgOSBx+QsR2yL6A/zPaqQNQSELEzldylP9Fkr2L/97bH1WnevU9iBO9Ad1HdQrXbBTWS5W2fF2Y2wWLmuJoY4ZOahseXaW86VQVskHlGRV+UA+rLNMp9GrLQL1PcmwSfuD/YF9ybY2AI18HGnRFdL/Eoz6DMLt5tyWVrh+IH/Ky1KR7wLGMPoXhsh7zRxnWknQl+Rnci64jrpIfT1F2uw+hlfwA="
+          };
+
+          var samlObj = new SAML( samlConfig );
+          samlObj.validateGetResponse(container, function( err, profile, logout ) {
+            should.not.exist( profile );
+            err.should.have.property('message', 'Missing signature.');
+            done();
+          });
+        });
+
+
+        it( 'valid not required response signature', function( done ) {
+          var container = {
+            SAMLResponse:"rVRba9swFP4rRu+OZSuxHZGYdQ2DQG8kpZS9DFk+bjxiyUgKCZT+9x3nYpI2zcrYk61z/c53LiMr6mXDZ2AbrSx4m3qpLG+FY7IyimthK8uVqMFyJ/n86vaGRz3KhbVgXKUVOXJpLvs0Rjst9ZJ408mYzOJ0mNOEsVxKKaJIhCwBFg/6KaMsjBiLhn2ahzkQ7wmMxVRjglHQ2doVTJV1QjkU0bDv04EfpY+U8jDmNP1JvAlYVynhtl6vBmTVVKDcG3qrQ62Pekx+ibiU/TiHtA8hMFkyOaAkG7XV8G0iky2caywPAtE0Pa1gqV8q1ZO6DlqjoAYnCuFEwJIwGQxGwbHraMfu3Am3sqeva12A9ySWK7hMmt1a8/lKSrCWBNkuw2lQfnVox74bGzsmLW6EvV6ve2vW0+YliCgNg+fbm7lcQC1IZ1v93divtoTLj93AVjblhuUxk0kOfglp7MdRWfipzAd+GIs8jhIGpRBfat3/5R55y3+DdPvXHdI7nXg/tKmFu8x7K6kKv9yacmeEsu0EkaxZajDf7Cq3jcCWrFs4+8y78KeZr7UqqzZG25xbcAtdXE4sa56DMGDI54EmWLR3p929ujdXpQPzgczhbg9mh8n/hy04jNo5AO9Ue6RoUVSt2rbgvgOSBx+QsR2yL6A/zPaqQNQSELEzldylP9Fkr2L/97bH1WnevU9iBO9Ad1HdQrXbBTWS5W2fF2Y2wWLmuJoY4ZOahseXaW86VQVskHlGRV+UA+rLNMp9GrLQL1PcmwSfuD/YF9ybY2AI18HGnRFdL/Eoz6DMLt5tyWVrh+IH/Ky1KR7wLGMPoXhsh7zRxnWknQl+Rnci64jrpIfT1F2uw+hlfwA="
+          };
+
+          var samlObj = new SAML( {} );
+          samlObj.validateGetResponse(container, function( err, profile, logout ) {
+            should.not.exist( err );
+            profile.nameID.should.startWith( 'ploer' );
+            done();
+          });
+        });
+
+          it( 'valid response signature', function( done ) {
+              var container = {
+                  SAMLResponse:"rVRba9swFP4rRu+OZSuxHZGYdQ2DQG8kpZS9DFk+bjxiyUgKCZT+9x3nYpI2zcrYk61z/c53LiMr6mXDZ2AbrSx4m3qpLG+FY7IyimthK8uVqMFyJ/n86vaGRz3KhbVgXKUVOXJpLvs0Rjst9ZJ408mYzOJ0mNOEsVxKKaJIhCwBFg/6KaMsjBiLhn2ahzkQ7wmMxVRjglHQ2doVTJV1QjkU0bDv04EfpY+U8jDmNP1JvAlYVynhtl6vBmTVVKDcG3qrQ62Pekx+ibiU/TiHtA8hMFkyOaAkG7XV8G0iky2caywPAtE0Pa1gqV8q1ZO6DlqjoAYnCuFEwJIwGQxGwbHraMfu3Am3sqeva12A9ySWK7hMmt1a8/lKSrCWBNkuw2lQfnVox74bGzsmLW6EvV6ve2vW0+YliCgNg+fbm7lcQC1IZ1v93divtoTLj93AVjblhuUxk0kOfglp7MdRWfipzAd+GIs8jhIGpRBfat3/5R55y3+DdPvXHdI7nXg/tKmFu8x7K6kKv9yacmeEsu0EkaxZajDf7Cq3jcCWrFs4+8y78KeZr7UqqzZG25xbcAtdXE4sa56DMGDI54EmWLR3p929ujdXpQPzgczhbg9mh8n/hy04jNo5AO9Ue6RoUVSt2rbgvgOSBx+QsR2yL6A/zPaqQNQSELEzldylP9Fkr2L/97bH1WnevU9iBO9Ad1HdQrXbBTWS5W2fF2Y2wWLmuJoY4ZOahseXaW86VQVskHlGRV+UA+rLNMp9GrLQL1PcmwSfuD/YF9ybY2AI18HGnRFdL/Eoz6DMLt5tyWVrh+IH/Ky1KR7wLGMPoXhsh7zRxnWknQl+Rnci64jrpIfT1F2uw+hlfwA=",
+                  RelayState: "PhDO2zsrzwIrmSgKL0WrvzzDlcYP4g9QKjpNYRm99av5zWe1Sk5m6B9uLnSoMxQ6Y8tjhPf5tcL3uirRmUs4pAo6UjiyzKGuFqL6F6kcgAFHlCdLFuX6YbOcdd97W7XS",
+                  SigAlg: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+                  Signature: "OtwqQdEo1PemF2nR3ep7SnS46Niv63s9in6D3MasLEuhmD0wOOYbJt3U3URe0w3xE6YrDVF1UB68PcRlOnGDPTcrwbxQcp5OzRRJvEgrCDBvjk5J4uovo9RmISS6YCZmM+43SnX7hLiFtGpsZm2ReArXgOxoJ8RpZEeFKKfywm4iYfZR4kjSCbbpGwN1qbfTCrq1STDXDOdYUF20/NzRs7+KMs6jQc1VB7D10td3Qm9FItIs6rwq/JtLzhG/jA46kIFlVe+aw9Jqj6WKvBfnxmlIOirRXQl7XiKlCNrNDdnjec2BUJTuUPGFXcdlwGpSQADm7j1CoeM39OFiKWxZAA=="
+              };
+
+              var samlObj = new SAML( samlConfig );
+              samlObj.validateRedirectSignature(container)
+                  .then(function (valid) {
+                      should.equal(valid, true);
+                      done();
+                  })
+                  .catch(done);
+          });
+
+
+          it( 'invalid response signature', function( done ) {
+              var container = {
+                  SAMLResponse:"rVRba9swFP4rRu+OZSuxHZGYdQ2DQG8kpZS9DFk+bjxiyUgKCZT+9x3nYpI2zcrYk61z/c53LiMr6mXDZ2AbrSx4m3qpLG+FY7IyimthK8uVqMFyJ/n86vaGRz3KhbVgXKUVOXJpLvs0Rjst9ZJ408mYzOJ0mNOEsVxKKaJIhCwBFg/6KaMsjBiLhn2ahzkQ7wmMxVRjglHQ2doVTJV1QjkU0bDv04EfpY+U8jDmNP1JvAlYVynhtl6vBmTVVKDcG3qrQ62Pekx+ibiU/TiHtA8hMFkyOaAkG7XV8G0iky2caywPAtE0Pa1gqV8q1ZO6DlqjoAYnCuFEwJIwGQxGwbHraMfu3Am3sqeva12A9ySWK7hMmt1a8/lKSrCWBNkuw2lQfnVox74bGzsmLW6EvV6ve2vW0+YliCgNg+fbm7lcQC1IZ1v93divtoTLj93AVjblhuUxk0kOfglp7MdRWfipzAd+GIs8jhIGpRBfat3/5R55y3+DdPvXHdI7nXg/tKmFu8x7K6kKv9yacmeEsu0EkaxZajDf7Cq3jcCWrFs4+8y78KeZr7UqqzZG25xbcAtdXE4sa56DMGDI54EmWLR3p929ujdXpQPzgczhbg9mh8n/hy04jNo5AO9Ue6RoUVSt2rbgvgOSBx+QsR2yL6A/zPaqQNQSELEzldylP9Fkr2L/97bH1WnevU9iBO9Ad1HdQrXbBTWS5W2fF2Y2wWLmuJoY4ZOahseXaW86VQVskHlGRV+UA+rLNMp9GrLQL1PcmwSfuD/YF9ybY2AI18HGnRFdL/Eoz6DMLt5tyWVrh+IH/Ky1KR7wLGMPoXhsh7zRxnWknQl+Rnci64jrpIfT1F2uw+hlfwA=",
+                  RelayState: "PhDO2zsrzwIrmSgKL0WrvzzDlcYP4g9QKjpNYRm99av5zWe1Sk5m6B9uLnSoMxQ6Y8tjhPf5tcL3uirRmUs4pAo6UjiyzKGuFqL6F6kcgAFHlCdLFuX6YbOcdd97W7XS",
+                  SigAlg: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+                  Signature: "invalid signature"
+              };
+
+              var samlObj = new SAML( samlConfig );
+              samlObj.validateRedirectSignature(container)
+                  .then(function (valid) {
+                      should.not.exists(valid);
+                      done();
+                  })
+                  .catch(function (err) {
+                      err.should.have.property('message', 'Unable to validate signature on query string.');
+                      done();
+                  });
+          });
+
+      });
+
     describe( 'request signature checks /', function() {
       var fakeClock;
       beforeEach(function(){
