@@ -15,7 +15,7 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 
 ### Configure strategy
 
-This example utilizes the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
+This example utilizes the [Feide OpenIdp identity provider](https://openidp.feide.no/). Because the OpenIdP has been shut down, it is no longer possible to use it to test your SAML Service Provider. This is a code example only, not a working demo.
 
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
@@ -117,7 +117,7 @@ Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To s
     privateCert: fs.readFileSync('./cert.pem', 'utf-8')
 ```
 
-It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's certificate using the `cert` confguration key:
+It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's certificate using the `cert` configuration key:
 
 ```javascript
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
