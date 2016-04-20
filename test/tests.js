@@ -750,8 +750,8 @@ describe( 'passport-saml /', function() {
               fakeClock.restore();
           });
 
-          var samlConfig = {
-              privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8')
+          var configSaml = {
+              cert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8')
           };
 
         it( 'valid deflate response', function( done ) {
@@ -762,7 +762,7 @@ describe( 'passport-saml /', function() {
             Signature: "OtwqQdEo1PemF2nR3ep7SnS46Niv63s9in6D3MasLEuhmD0wOOYbJt3U3URe0w3xE6YrDVF1UB68PcRlOnGDPTcrwbxQcp5OzRRJvEgrCDBvjk5J4uovo9RmISS6YCZmM+43SnX7hLiFtGpsZm2ReArXgOxoJ8RpZEeFKKfywm4iYfZR4kjSCbbpGwN1qbfTCrq1STDXDOdYUF20/NzRs7+KMs6jQc1VB7D10td3Qm9FItIs6rwq/JtLzhG/jA46kIFlVe+aw9Jqj6WKvBfnxmlIOirRXQl7XiKlCNrNDdnjec2BUJTuUPGFXcdlwGpSQADm7j1CoeM39OFiKWxZAA=="
           };
 
-          var samlObj = new SAML( samlConfig );
+          var samlObj = new SAML( configSaml );
           samlObj.validateGetResponse(container, function( err, profile, logout ) {
             should.not.exist( err );
             profile.nameID.should.startWith( 'ploer' );
@@ -778,7 +778,7 @@ describe( 'passport-saml /', function() {
                 Signature: "OtwqQdEo1PemF2nR3ep7SnS46Niv63s9in6D3MasLEuhmD0wOOYbJt3U3URe0w3xE6YrDVF1UB68PcRlOnGDPTcrwbxQcp5OzRRJvEgrCDBvjk5J4uovo9RmISS6YCZmM+43SnX7hLiFtGpsZm2ReArXgOxoJ8RpZEeFKKfywm4iYfZR4kjSCbbpGwN1qbfTCrq1STDXDOdYUF20/NzRs7+KMs6jQc1VB7D10td3Qm9FItIs6rwq/JtLzhG/jA46kIFlVe+aw9Jqj6WKvBfnxmlIOirRXQl7XiKlCNrNDdnjec2BUJTuUPGFXcdlwGpSQADm7j1CoeM39OFiKWxZAA=="
               };
 
-              var samlObj = new SAML( samlConfig );
+              var samlObj = new SAML( configSaml );
               samlObj.validateGetResponse(container, function( err, profile, logout ) {
                   err.should.have.property('code', 'Z_DATA_ERROR');
                   should.not.exists(profile);
@@ -791,7 +791,7 @@ describe( 'passport-saml /', function() {
             SAMLResponse:"rVRba9swFP4rRu+OZSuxHZGYdQ2DQG8kpZS9DFk+bjxiyUgKCZT+9x3nYpI2zcrYk61z/c53LiMr6mXDZ2AbrSx4m3qpLG+FY7IyimthK8uVqMFyJ/n86vaGRz3KhbVgXKUVOXJpLvs0Rjst9ZJ408mYzOJ0mNOEsVxKKaJIhCwBFg/6KaMsjBiLhn2ahzkQ7wmMxVRjglHQ2doVTJV1QjkU0bDv04EfpY+U8jDmNP1JvAlYVynhtl6vBmTVVKDcG3qrQ62Pekx+ibiU/TiHtA8hMFkyOaAkG7XV8G0iky2caywPAtE0Pa1gqV8q1ZO6DlqjoAYnCuFEwJIwGQxGwbHraMfu3Am3sqeva12A9ySWK7hMmt1a8/lKSrCWBNkuw2lQfnVox74bGzsmLW6EvV6ve2vW0+YliCgNg+fbm7lcQC1IZ1v93divtoTLj93AVjblhuUxk0kOfglp7MdRWfipzAd+GIs8jhIGpRBfat3/5R55y3+DdPvXHdI7nXg/tKmFu8x7K6kKv9yacmeEsu0EkaxZajDf7Cq3jcCWrFs4+8y78KeZr7UqqzZG25xbcAtdXE4sa56DMGDI54EmWLR3p929ujdXpQPzgczhbg9mh8n/hy04jNo5AO9Ue6RoUVSt2rbgvgOSBx+QsR2yL6A/zPaqQNQSELEzldylP9Fkr2L/97bH1WnevU9iBO9Ad1HdQrXbBTWS5W2fF2Y2wWLmuJoY4ZOahseXaW86VQVskHlGRV+UA+rLNMp9GrLQL1PcmwSfuD/YF9ybY2AI18HGnRFdL/Eoz6DMLt5tyWVrh+IH/Ky1KR7wLGMPoXhsh7zRxnWknQl+Rnci64jrpIfT1F2uw+hlfwA="
           };
 
-          var samlObj = new SAML( samlConfig );
+          var samlObj = new SAML( configSaml );
           samlObj.validateGetResponse(container, function( err, profile, logout ) {
             should.not.exist( profile );
             err.should.have.property('message', 'Missing signature.');
@@ -821,8 +821,8 @@ describe( 'passport-saml /', function() {
                   Signature: "OtwqQdEo1PemF2nR3ep7SnS46Niv63s9in6D3MasLEuhmD0wOOYbJt3U3URe0w3xE6YrDVF1UB68PcRlOnGDPTcrwbxQcp5OzRRJvEgrCDBvjk5J4uovo9RmISS6YCZmM+43SnX7hLiFtGpsZm2ReArXgOxoJ8RpZEeFKKfywm4iYfZR4kjSCbbpGwN1qbfTCrq1STDXDOdYUF20/NzRs7+KMs6jQc1VB7D10td3Qm9FItIs6rwq/JtLzhG/jA46kIFlVe+aw9Jqj6WKvBfnxmlIOirRXQl7XiKlCNrNDdnjec2BUJTuUPGFXcdlwGpSQADm7j1CoeM39OFiKWxZAA=="
               };
 
-              var samlObj = new SAML( samlConfig );
-              samlObj.validateRedirectSignature(container)
+              var samlObj = new SAML( configSaml );
+              samlObj.validateRedirectSignature(container, configSaml.cert)
                   .then(function (valid) {
                       should.equal(valid, true);
                       done();
@@ -839,8 +839,8 @@ describe( 'passport-saml /', function() {
                   Signature: "invalid signature"
               };
 
-              var samlObj = new SAML( samlConfig );
-              samlObj.validateRedirectSignature(container)
+              var samlObj = new SAML( configSaml );
+              samlObj.validateRedirectSignature(container, configSaml.cert)
                   .then(function (valid) {
                       should.not.exists(valid);
                       done();
