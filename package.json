@@ -1,6 +1,6 @@
 {
-  "name": "passport-saml",
-  "version": "0.15.0",
+  "name": "passport-saml-with-xml-encryption-upgrade",
+  "version": "0.15.1",
   "licenses": [
     {
       "type": "MIT",
@@ -13,11 +13,11 @@
     "sso",
     "shibboleth"
   ],
-  "description": "SAML 2.0 authentication strategy for Passport",
+  "description": "SAML 2.0 authentication strategy for Passport with xml-encryption version upgrade",
   "author": {
-    "name": "Henri Bergius",
-    "email": "henri.bergius@iki.fi",
-    "url": "http://bergie.iki.fi"
+    "name": "Eric So",
+    "email": "4ossible@gmail.com",
+    "url": ""
   },
   "contributors": [
     "Michael Bosworth",
@@ -36,7 +36,7 @@
     "xml-crypto": "0.8.x",
     "xmldom": "0.1.x",
     "xmlbuilder": "2.5.x",
-    "xml-encryption": "^0.9.x"
+    "xml-encryption": "^0.9.0"
   },
   "devDependencies": {
     "body-parser": "1.9.x",

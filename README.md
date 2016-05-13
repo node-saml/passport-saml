@@ -1,3 +1,10 @@
+For those who said the following issue
+======================================
+I created this library to fix the issue:
+https://github.com/bergie/passport-saml/pull/155
+
+If anyone is seeing "TypeError: Cannot read property 'search' of undefined" using this passport-saml, this is the solution to resolve this issue. This npm module will be deprecated once the original author of passport-saml module merge the pull-request above.
+
 Passport-SAML
 =============
 
