@@ -48,6 +48,8 @@ Config parameter details:
  * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
  * `entryPoint`: identity provider entrypoint
  * `issuer`: issuer string to supply to identity provider
+ * `providerName`: optional ProviderName string to supply to identity provider (Specifies the human-readable name of the requester for use by the presenter's user agent or the
+identity provider.)
  * `cert`: see 'security and signatures'
  * `privateCert`: see 'security and signatures'
  * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
