@@ -45,7 +45,7 @@ describe('SAML.js', function() {
     // NOTE: This test only tests existence of the assertion, not the correctness
     it('calls callback with saml request object', function(done) {
       saml.getAuthorizeUrl(req, function(err, target) {
-        url.parse(target, true).query.should.have.property('SAMLRequest');
+        should(url.parse(target, true).query).have.property('SAMLRequest');
         done();
       });
     });
