@@ -542,6 +542,12 @@ describe( 'passport-saml /', function() {
   });
 
   describe( 'saml.js / ', function() {
+    it( 'should throw an error if cert property is provided to saml constructor but is empty', function() {
+      should(function() {
+        new SAML( { cert: null } );
+      }).throw('Invalid property: cert must not be empty');
+    });
+
     it( 'generateUniqueID should generate 20 char IDs', function( done ) {
       var samlObj = new SAML( { entryPoint: "foo" } );
       for(var i = 0; i < 200; i++){
