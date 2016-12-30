@@ -1801,6 +1801,19 @@ describe( 'passport-saml /', function() {
         done();
       });
     });
+    it('errors if empty signature certificate is provided', function(done) {
+      var body = {
+        SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_bad_signature.xml', 'base64')
+      };
+      var samlInstance = new SAML({
+        cert: ''
+      });
+      samlInstance.validatePostRequest(body, function(err) {
+        should.exist(err);
+        err.should.eql(new Error('Invalid signature'));
+        done();
+      });
+    });
     it('returns profile for valid signature', function(done) {
       var body = {
         SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_good_signature.xml', 'base64')
