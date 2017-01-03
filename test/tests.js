@@ -163,16 +163,10 @@ describe( 'passport-saml /', function() {
             response.statusCode.should.equal(check.expectedStatusCode);
               
             if (response.statusCode == 200) {
-              console.log(passedRequest.url, "passedRequest.url")
-              console.log(passedRequest.method, "passedRequest.method")
-              console.log(passedRequest.body, "passedRequest.body")
-              console.log(check.samlResponse, "check.samlResponse")
-              console.log((passedRequest.body == check.samlResponse), "is it same")
-              
               should.exist(passedRequest);
               passedRequest.url.should.eql('/login');
               passedRequest.method.should.eql('POST');
-              passedRequest.body.should.eql(check.samlResponse);
+              should(passedRequest.body).match(check.samlResponse);
             } else {
               should.not.exist(passedRequest);
             }
