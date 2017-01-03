@@ -168,7 +168,7 @@ describe( 'passport-saml /', function() {
               should.exist(passedRequest);
               passedRequest.url.should.eql('/login');
               passedRequest.method.should.eql('POST');
-              passedRequest.body.should.eql(check.samlResponse);
+              passedRequest.body.should.eql?(check.samlResponse);
             } else {
               should.not.exist(passedRequest);
             }
