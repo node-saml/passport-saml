@@ -36,7 +36,7 @@
     "xml-crypto": "0.8.x",
     "xmldom": "0.1.x",
     "xmlbuilder": "2.5.x",
-    "xml-encryption": "~0.9"
+    "xml-encryption": "~0.10"
   },
   "devDependencies": {
     "body-parser": "1.9.x",
