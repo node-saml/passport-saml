@@ -165,7 +165,8 @@ describe( 'passport-saml /', function() {
               should.exist(passedRequest);
               passedRequest.url.should.eql('/login');
               passedRequest.method.should.eql('POST');
-              passedRequest.body.should.eql(check.samlResponse);
+              should.config.checkProtoEql = false;
+              should(passedRequest.body).eql(check.samlResponse);
             } else {
               should.not.exist(passedRequest);
             }
@@ -183,6 +184,7 @@ describe( 'passport-saml /', function() {
 
     afterEach(function (done) {
       fakeClock.restore();
+      should.config.checkProtoEql = true;
       server.close(done);
     });
   });
