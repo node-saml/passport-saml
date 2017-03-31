@@ -161,11 +161,12 @@ describe( 'passport-saml /', function() {
           request(requestOpts, function (err, response, body) {
             should.not.exist(err);
             response.statusCode.should.equal(check.expectedStatusCode);
+              
             if (response.statusCode == 200) {
               should.exist(passedRequest);
               passedRequest.url.should.eql('/login');
               passedRequest.method.should.eql('POST');
-              passedRequest.body.should.eql(check.samlResponse);
+              should(passedRequest.body).match(check.samlResponse);
             } else {
               should.not.exist(passedRequest);
             }
