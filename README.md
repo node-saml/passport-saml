@@ -117,7 +117,7 @@ Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To s
     privateCert: fs.readFileSync('./cert.pem', 'utf-8')
 ```
 
-It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's certificate using the `cert` confguration key:
+It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's public signing certificate using the `cert` configuration key:
 
 ```javascript
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
