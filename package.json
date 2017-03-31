@@ -40,7 +40,6 @@
   },
   "devDependencies": {
     "body-parser": "1.9.x",
-    "ejs": "1.0.x",
     "express": "4.x",
     "jshint": "*",
     "mocha": "*",
