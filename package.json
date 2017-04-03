@@ -1,6 +1,6 @@
 {
-  "name": "passport-saml",
-  "version": "0.15.0",
+  "name": "@itprotv/passport-saml",
+  "version": "0.0.1",
   "licenses": [
     {
       "type": "MIT",
@@ -22,11 +22,12 @@
   "contributors": [
     "Michael Bosworth",
     "Herbert Vojčík",
-    "Peter Loer"
+    "Peter Loer",
+    "Cameron Gera"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/bergie/passport-saml.git"
+    "url": "https://github.com/EdutainmentLIVE/passport-saml"
   },
   "main": "./lib/passport-saml",
   "dependencies": {
