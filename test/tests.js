@@ -52,6 +52,19 @@ describe( 'passport-saml /', function() {
         expectedNameIDStartsWith: 'ploer',
         mockDate: '2014-05-28T00:16:08Z'
       },
+      { name: 'Onelogin -- alternate cert should succeed',
+        samlResponse: {
+          SAMLResponse: 'PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0\r\nYzpTQU1MOjIuMDphc3NlcnRpb24iIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6\r\nbmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIElEPSJSNjg5YjA3MzNiY2Nj\r\nYTIyYTEzN2UzNjU0ODMwMzEyMzMyOTQwYjFiZSIgVmVyc2lvbj0iMi4wIiBJ\r\nc3N1ZUluc3RhbnQ9IjIwMTQtMDUtMjhUMDA6MTY6MDhaIiBEZXN0aW5hdGlv\r\nbj0ie3JlY2lwaWVudH0iIEluUmVzcG9uc2VUbz0iX2E2ZmM0NmJlODRlMWUz\r\nY2YzYzUwIj48c2FtbDpJc3N1ZXI+aHR0cHM6Ly9hcHAub25lbG9naW4uY29t\r\nL3NhbWwvbWV0YWRhdGEvMzcxNzU1PC9zYW1sOklzc3Vlcj48c2FtbHA6U3Rh\r\ndHVzPjxzYW1scDpTdGF0dXNDb2RlIFZhbHVlPSJ1cm46b2FzaXM6bmFtZXM6\r\ndGM6U0FNTDoyLjA6c3RhdHVzOlN1Y2Nlc3MiLz48L3NhbWxwOlN0YXR1cz48\r\nc2FtbDpBc3NlcnRpb24geG1sbnM6eHM9Imh0dHA6Ly93d3cudzMub3JnLzIw\r\nMDEvWE1MU2NoZW1hIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIw\r\nMDEvWE1MU2NoZW1hLWluc3RhbmNlIiBWZXJzaW9uPSIyLjAiIElEPSJwZngz\r\nYjYzYzdiZS1mZTg2LTYyZmQtOGNiNS0xNmFiNjI3M2VmYWEiIElzc3VlSW5z\r\ndGFudD0iMjAxNC0wNS0yOFQwMDoxNjowOFoiPjxzYW1sOklzc3Vlcj5odHRw\r\nczovL2FwcC5vbmVsb2dpbi5jb20vc2FtbC9tZXRhZGF0YS8zNzE3NTU8L3Nh\r\nbWw6SXNzdWVyPjxkczpTaWduYXR1cmUgeG1sbnM6ZHM9Imh0dHA6Ly93d3cu\r\ndzMub3JnLzIwMDAvMDkveG1sZHNpZyMiPjxkczpTaWduZWRJbmZvPjxkczpD\r\nYW5vbmljYWxpemF0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53\r\nMy5vcmcvMjAwMS8xMC94bWwtZXhjLWMxNG4jIi8+PGRzOlNpZ25hdHVyZU1l\r\ndGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1s\r\nZHNpZyNyc2Etc2hhMSIvPjxkczpSZWZlcmVuY2UgVVJJPSIjcGZ4M2I2M2M3\r\nYmUtZmU4Ni02MmZkLThjYjUtMTZhYjYyNzNlZmFhIj48ZHM6VHJhbnNmb3Jt\r\ncz48ZHM6VHJhbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcv\r\nMjAwMC8wOS94bWxkc2lnI2VudmVsb3BlZC1zaWduYXR1cmUiLz48ZHM6VHJh\r\nbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8xMC94\r\nbWwtZXhjLWMxNG4jIi8+PC9kczpUcmFuc2Zvcm1zPjxkczpEaWdlc3RNZXRo\r\nb2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRz\r\naWcjc2hhMSIvPjxkczpEaWdlc3RWYWx1ZT5EQ25QVFFZQmIxaEtzcGJlNmZn\r\nMVUzcTh4bjQ9PC9kczpEaWdlc3RWYWx1ZT48L2RzOlJlZmVyZW5jZT48L2Rz\r\nOlNpZ25lZEluZm8+PGRzOlNpZ25hdHVyZVZhbHVlPmUwK2FGb21BMCtKQVkw\r\nZjl0S3F6SXVxSVZTU3c3TGlGVXNuZUVES1BCV2RpVHoxc01kZ3IvMnkxZTkr\r\ncmphUzJtUm1DaS92U1FMWTN6VFl6MGhwNm5KTlUxOStUV29YbzlrSFF5V1Q0\r\nS2tlUUw0WHMvZ1ovQW9LQzIwaUhWS3RwUHBzMElRME1sL3FSb291U2l0dDZT\r\nZi9XRHoyTFYvcFdjSDJoeDV0djN4U3czNmhLMk5RYzdxdzdyMW1FWG52Y2pY\r\nUmVZbzhyclZmN1hIR0d4Tm9SSUVJQ1VJaTExMHV2c1dlbVNYZjBaMGR5YjBG\r\nVllPV3VTc1FNRGx6TnBoZUFEQmlmRk80VVRmU0VoRlp2bjhrVkNHWlVJd3Ji\r\nT2haMmQvK1lFdGd5dVRnK3F0c2xnZnk0ZHdkNFR2RWNmdVJ6UVRhemVlZnBy\r\nU0Z5aVFja0FYT2pjdz09PC9kczpTaWduYXR1cmVWYWx1ZT48ZHM6S2V5SW5m\r\nbz48ZHM6WDUwOURhdGE+PGRzOlg1MDlDZXJ0aWZpY2F0ZT5NSUlFRnpDQ0F2\r\nK2dBd0lCQWdJVUZKc1VqUE03QW1Xdk50RXZVTFNIbFRUTWlMUXdEUVlKS29a\r\nSWh2Y05BUUVGQlFBd1dERUxNQWtHQTFVRUJoTUNWVk14RVRBUEJnTlZCQW9N\r\nQ0ZOMVluTndZV05sTVJVd0V3WURWUVFMREF4UGJtVk1iMmRwYmlCSlpGQXhI\r\nekFkQmdOVkJBTU1Gazl1WlV4dloybHVJRUZqWTI5MWJuUWdOREl6TkRrd0ho\r\nY05NVFF3TlRFek1UZ3dOakV5V2hjTk1Ua3dOVEUwTVRnd05qRXlXakJZTVFz\r\nd0NRWURWUVFHRXdKVlV6RVJNQThHQTFVRUNnd0lVM1ZpYzNCaFkyVXhGVEFU\r\nQmdOVkJBc01ERTl1WlV4dloybHVJRWxrVURFZk1CMEdBMVVFQXd3V1QyNWxU\r\nRzluYVc0Z1FXTmpiM1Z1ZENBME1qTTBPVENDQVNJd0RRWUpLb1pJaHZjTkFR\r\nRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFLckF6SmRZOUZ6Rkx0NWJsQXJKZlB6\r\nZ2k4N0VuRkdsVGZjVjVUMVRVRHdMQmxEa1kvMFpHS25NT3BmM0Q3aWUyQzRw\r\nUEZPSW1Pb2djTTVrcERETDdxeFRYWjFld1hWeWpCZE11MjlORzJDNk56V2VR\r\nVFVNVWppMDFFY0hrQzhvK1B0czhBTmlOT1ljanhFZXloRXl6SktnRWl6YmxZ\r\nek1NS3pkck9FVDZRdXFXbzNDODNLKzUrNWRzakRuMW9vS0dSd2ozSHZnc1lj\r\nRnJRbDlOb2pnUUZqb29id3NpRS83QStPSmhMcEJjeS9uU1Znbm9KYU1mck8r\r\nSnNudWtaUHp0Ym50THZPbDU2K1ZyYTBOOG41TkFZaGFTYXlQaXYvYXloalZn\r\namZYZDF0ak1WVE9pRGtuVU93aXpadUoxWTNRSDk0dlV0QmdwMFdCcEJTcy94\r\nTXlUczhDQXdFQUFhT0IyRENCMVRBTUJnTlZIUk1CQWY4RUFqQUFNQjBHQTFV\r\nZERnUVdCQlJRTzRXcE01Zld3eGliNDlXVHVKa2ZZRGJ4T0RDQmxRWURWUjBq\r\nQklHTk1JR0tnQlJRTzRXcE01Zld3eGliNDlXVHVKa2ZZRGJ4T0tGY3BGb3dX\r\nREVMTUFrR0ExVUVCaE1DVlZNeEVUQVBCZ05WQkFvTUNGTjFZbk53WVdObE1S\r\nVXdFd1lEVlFRTERBeFBibVZNYjJkcGJpQkpaRkF4SHpBZEJnTlZCQU1NRms5\r\ndVpVeHZaMmx1SUVGalkyOTFiblFnTkRJek5EbUNGQlNiRkl6ek93SmxyemJS\r\nTDFDMGg1VTB6SWkwTUE0R0ExVWREd0VCL3dRRUF3SUhnREFOQmdrcWhraUc5\r\ndzBCQVFVRkFBT0NBUUVBQ2REQUFvYVpGQ0VZNXBtZndiS3VLclh0TzVpRThs\r\nV3RpQ1BqQ1pFVXVUNmJYUk5jcXJkbnVWL0VBZlg5V1FvWGphbFBpMGVNNzh6\r\nS21idlJHU1RVSHdXdzQ5UkhqRmZlSlVLdkhOZU5uRmdUWERqRVBOaE12aDY5\r\na0htNDUzbEZSbUIra2s2eWp0WFJaYVFFd1M4VXVvMk90K2tyZ05ibDZvVEJa\r\nSjBBSEgxTXRaRUNEbG9tczFLbTd6c0s4d0FpNWk4VFZJS2tWcjViMlZsaHJM\r\nZ0ZNdnpaNVZpQXhJTUdCNnc0N3lZNFFHUUIvNVE4eWE5aEJzOXZrbit3dWJB\r\nK3lyNGoxNEpYWjdibFZLRFNUWXZhNjVFYStQcUh5cnArV25tbmJ3Mk9iUzdp\r\nV2V4aVR5MWpEM0cwUjJhdkRCRmpNOEZqNURiZnVmc0UxYjBVMTBSVHRnPT08\r\nL2RzOlg1MDlDZXJ0aWZpY2F0ZT48L2RzOlg1MDlEYXRhPjwvZHM6S2V5SW5m\r\nbz48L2RzOlNpZ25hdHVyZT48c2FtbDpTdWJqZWN0PjxzYW1sOk5hbWVJRCBG\r\nb3JtYXQ9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpuYW1laWQtZm9y\r\nbWF0OnRyYW5zaWVudCI+cGxvZXJAc3Vic3BhY2Vzdy5jb208L3NhbWw6TmFt\r\nZUlEPjxzYW1sOlN1YmplY3RDb25maXJtYXRpb24gTWV0aG9kPSJ1cm46b2Fz\r\naXM6bmFtZXM6dGM6U0FNTDoyLjA6Y206YmVhcmVyIj48c2FtbDpTdWJqZWN0\r\nQ29uZmlybWF0aW9uRGF0YSBOb3RPbk9yQWZ0ZXI9IjIwMTQtMDUtMjhUMDA6\r\nMTk6MDhaIiBSZWNpcGllbnQ9IntyZWNpcGllbnR9IiBJblJlc3BvbnNlVG89\r\nIl9hNmZjNDZiZTg0ZTFlM2NmM2M1MCIvPjwvc2FtbDpTdWJqZWN0Q29uZmly\r\nbWF0aW9uPjwvc2FtbDpTdWJqZWN0PjxzYW1sOkNvbmRpdGlvbnMgTm90QmVm\r\nb3JlPSIyMDE0LTA1LTI4VDAwOjEzOjA4WiIgTm90T25PckFmdGVyPSIyMDE0\r\nLTA1LTI4VDAwOjE5OjA4WiI+PHNhbWw6QXVkaWVuY2VSZXN0cmljdGlvbj48\r\nc2FtbDpBdWRpZW5jZT57YXVkaWVuY2V9PC9zYW1sOkF1ZGllbmNlPjwvc2Ft\r\nbDpBdWRpZW5jZVJlc3RyaWN0aW9uPjwvc2FtbDpDb25kaXRpb25zPjxzYW1s\r\nOkF1dGhuU3RhdGVtZW50IEF1dGhuSW5zdGFudD0iMjAxNC0wNS0yOFQwMDox\r\nNjowN1oiIFNlc3Npb25Ob3RPbk9yQWZ0ZXI9IjIwMTQtMDUtMjlUMDA6MTY6\r\nMDhaIiBTZXNzaW9uSW5kZXg9Il8zMGE0YWY1MC1jODJiLTAxMzEtZjhiNS03\r\nODJiY2I1NmZjYWEiPjxzYW1sOkF1dGhuQ29udGV4dD48c2FtbDpBdXRobkNv\r\nbnRleHRDbGFzc1JlZj51cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YWM6\r\nY2xhc3NlczpQYXNzd29yZFByb3RlY3RlZFRyYW5zcG9ydDwvc2FtbDpBdXRo\r\nbkNvbnRleHRDbGFzc1JlZj48L3NhbWw6QXV0aG5Db250ZXh0Pjwvc2FtbDpB\r\ndXRoblN0YXRlbWVudD48L3NhbWw6QXNzZXJ0aW9uPjwvc2FtbHA6UmVzcG9u\r\nc2U+Cgo=\r\n'
+        },
+        config: {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          cert: 'MIICoTCCAgqgAwIBAgIGAUY8zVPYMA0GCSqGSIb3DQEBBQUAMIGTMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxFDASBgNVBAMMC3N1YnNwYWNlc3cxMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE0MDUyNzA4MjkyN1oXDTQ0MDUyNzA4MzAyN1owgZMxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjEUMBIGA1UEAwwLc3Vic3BhY2VzdzExHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKYX/UdV9HLXbNKv0yc6YJBtzdWNuGTPIXWVPCb0OsRvR54lq+0SLPQGJS39flWKiqtUiEusuih6GdLfNvFAVLGPqBTWQ4Lc7r5+zD5qnH6LiTM1KCbaF3uu2P+T+utsGqFUZawA9FEVNLkICe36X1yE40X+/jMygyieQPMeJABvAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAHSWPG4y1bNyJySgbFqDcS/6MUNIrSfkQYIxzIGQ37qy5qAW15YkBUiW9TsGJRcrgusVrZIia18eYz84Zn7FyUZNMFo24L7l6BS0WCitIQScBCKB4QWA/b1szqs7EtpOcPP01TYNq2ras+VqR3aWAXLX2oKfClV/SUwszRf5U85Y=',
+          alt_cert: 'MIIEFzCCAv+gAwIBAgIUFJsUjPM7AmWvNtEvULSHlTTMiLQwDQYJKoZIhvcNAQEFBQAwWDELMAkGA1UEBhMCVVMxETAPBgNVBAoMCFN1YnNwYWNlMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgNDIzNDkwHhcNMTQwNTEzMTgwNjEyWhcNMTkwNTE0MTgwNjEyWjBYMQswCQYDVQQGEwJVUzERMA8GA1UECgwIU3Vic3BhY2UxFTATBgNVBAsMDE9uZUxvZ2luIElkUDEfMB0GA1UEAwwWT25lTG9naW4gQWNjb3VudCA0MjM0OTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKrAzJdY9FzFLt5blArJfPzgi87EnFGlTfcV5T1TUDwLBlDkY/0ZGKnMOpf3D7ie2C4pPFOImOogcM5kpDDL7qxTXZ1ewXVyjBdMu29NG2C6NzWeQTUMUji01EcHkC8o+Pts8ANiNOYcjxEeyhEyzJKgEizblYzMMKzdrOET6QuqWo3C83K+5+5dsjDn1ooKGRwj3HvgsYcFrQl9NojgQFjoobwsiE/7A+OJhLpBcy/nSVgnoJaMfrO+JsnukZPztbntLvOl56+Vra0N8n5NAYhaSayPiv/ayhjVgjfXd1tjMVTOiDknUOwizZuJ1Y3QH94vUtBgp0WBpBSs/xMyTs8CAwEAAaOB2DCB1TAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBRQO4WpM5fWwxib49WTuJkfYDbxODCBlQYDVR0jBIGNMIGKgBRQO4WpM5fWwxib49WTuJkfYDbxOKFcpFowWDELMAkGA1UEBhMCVVMxETAPBgNVBAoMCFN1YnNwYWNlMRUwEwYDVQQLDAxPbmVMb2dpbiBJZFAxHzAdBgNVBAMMFk9uZUxvZ2luIEFjY291bnQgNDIzNDmCFBSbFIzzOwJlrzbRL1C0h5U0zIi0MA4GA1UdDwEB/wQEAwIHgDANBgkqhkiG9w0BAQUFAAOCAQEACdDAAoaZFCEY5pmfwbKuKrXtO5iE8lWtiCPjCZEUuT6bXRNcqrdnuV/EAfX9WQoXjalPi0eM78zKmbvRGSTUHwWw49RHjFfeJUKvHNeNnFgTXDjEPNhMvh69kHm453lFRmB+kk6yjtXRZaQEwS8Uuo2Ot+krgNbl6oTBZJ0AHH1MtZECDloms1Km7zsK8wAi5i8TVIKkVr5b2VlhrLgFMvzZ5ViAxIMGB6w47yY4QGQB/5Q8ya9hBs9vkn+wubA+yr4j14JXZ7blVKDSTYva65Ea+PqHyrp+Wnmnbw2ObS7iWexiTy1jD3G0R2avDBFjM8Fj5DbfufsE1b0U10RTtg=='
+        },
+        expectedStatusCode: 200,
+        expectedNameIDStartsWith: 'ploer',
+        mockDate: '2014-05-28T00:16:08Z'
+      },
       { name: 'Testshib -- valid encrypted response should succeed',
         samlResponse: {
           SAMLResponse: 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c2FtbDJwOlJlc3BvbnNlIHhtbG5zOnNhbWwycD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIiBEZXN0aW5hdGlvbj0iaHR0cDovL2xvY2FsaG9zdC9icm93c2VyU2FtbExvZ2luIiBJRD0iXzdmOWU5NWM3MTE2NTRhYTQxYjMyNmY4Yjg0N2Y3YTEzIiBJblJlc3BvbnNlVG89Il8zMTM4ZDY3NWQ2ZWQ0MTZkNDNkNiIgSXNzdWVJbnN0YW50PSIyMDE0LTA2LTAyVDE3OjQ4OjU2LjgyMFoiIFZlcnNpb249IjIuMCI+PHNhbWwyOklzc3VlciB4bWxuczpzYW1sMj0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiIgRm9ybWF0PSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6bmFtZWlkLWZvcm1hdDplbnRpdHkiPmh0dHBzOi8vaWRwLnRlc3RzaGliLm9yZy9pZHAvc2hpYmJvbGV0aDwvc2FtbDI6SXNzdWVyPjxzYW1sMnA6U3RhdHVzPjxzYW1sMnA6U3RhdHVzQ29kZSBWYWx1ZT0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnN0YXR1czpTdWNjZXNzIi8+PC9zYW1sMnA6U3RhdHVzPjxzYW1sMjpFbmNyeXB0ZWRBc3NlcnRpb24geG1sbnM6c2FtbDI9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphc3NlcnRpb24iPjx4ZW5jOkVuY3J5cHRlZERhdGEgeG1sbnM6eGVuYz0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxlbmMjIiBJZD0iX2ZiYjE0NzQzNTEwYTYyOTJmODc1MGVmZGUzOWJhNzI2IiBUeXBlPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyNFbGVtZW50Ij48eGVuYzpFbmNyeXB0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxlbmMjYWVzMTI4LWNiYyIgeG1sbnM6eGVuYz0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxlbmMjIi8+PGRzOktleUluZm8geG1sbnM6ZHM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyMiPjx4ZW5jOkVuY3J5cHRlZEtleSBJZD0iXzQ0YTEwOTk0MDVkYzgxMDJlYTFmZmM3Zjk0YzJhZjkyIiB4bWxuczp4ZW5jPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyMiPjx4ZW5jOkVuY3J5cHRpb25NZXRob2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyNyc2Etb2FlcC1tZ2YxcCIgeG1sbnM6eGVuYz0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxlbmMjIj48ZHM6RGlnZXN0TWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnI3NoYTEiIHhtbG5zOmRzPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRzaWcjIi8+PC94ZW5jOkVuY3J5cHRpb25NZXRob2Q+PGRzOktleUluZm8+PGRzOlg1MDlEYXRhPjxkczpYNTA5Q2VydGlmaWNhdGU+TUlJRXNEQ0NBcGlnQXdJQkFnSUJBREFOQmdrcWhraUc5dzBCQVFVRkFEQVRNUkV3RHdZRFZRUURFd2d4TUM0d0xqRXVOREFlRncweApOREExTURnd01EVTBNVGxhRncweE5EQTFNRGd3TURVME1UbGFNQk14RVRBUEJnTlZCQU1UQ0RFd0xqQXVNUzQwTUlJQ0lqQU5CZ2txCmhraUc5dzBCQVFFRkFBT0NBZzhBTUlJQ0NnS0NBZ0VBNWhxamFyb0pwQithUjhGTUU3aFE5bk1WMGg3TXBLdG1nRkxjSzN2d1A2N2YKZUFLK3hkdDE3aThSeVVoeGlsOUZDRlI1SzA4V2p3bzNOaUhacUhxRUtpdHcrSUpTbmRqTFNzb05nS0VJYWlGU3VnMmVWMW9ZRWx6MAo2REJYVHhjOGlxL0xhem5kcVRVb201MU9kZTl5STlBR2E4OGNETTVpT3FxOW1odUd1dnd1THRveVU3OExkK3MxRWE2TWdmN0w4TTdmClpWTzdOY3UrRmdJekk2R3QwMzVvaFlDTEJtT29NN28wdWo3RGNNRXZLT01Geml3RjQwd1lteXAzaENMbHEzcXdrTTlwVFZKbHR1ejAKQnQxdnFEZHJxM2tUaGVBOUpITWF5UnozSS9CWnhBVjNpUmQ0aHpMS1RrZWdEOFRvVEdVMTBHbWUrWkFyMXcvZXJjNWhWck0wL1hCbQpIUWxuSTVkMzFHVS9tZklrbTBYUFRHUlNwUHk3RStkVXZqOWRqdm0vVnFEZG9qZjN1dXdpckdlTE1SbE85UC9sQ2VyVGt0VzNnMjdTClY4Z24zRVRtMk1tN3JrTnFmMjRLSnBEdjB0S0Rvc2diZGFIcjJJRVlENFJwcXlTcDhrZDI1Qmh6dXNocUtSa1M4WHU1dDdIQWxWU0gKd2lGaHVMcXJyNGRVZmtCOGtaZU0veWNmWkxDbjdvTlVERmRnakdZU1ZNcGFrTDk3c0M5c2xBVzQvOFV0WFhaeExxY3lxL1l4ZHBDeQpzUFlQMWhzQXArVmdQQzdHSTZDeWlOb2pLUE9wdE1xTFpSWW5WaUt4bE9pV0JKQnpVQlJVVnVhYzhMWHJNaUR3OGJ0V0dhMUdoNXZUCmh1RlVLc3ZtUm9ldWs3ZXlYRU45SjdqNitmVFlqbnNDQXdFQUFhTVBNQTB3Q3dZRFZSMFBCQVFEQWdUd01BMEdDU3FHU0liM0RRRUIKQlFVQUE0SUNBUURBUEZVbzBQZ2E3dkI0SWp5OXUzcXBXTFFTQ2Q0eGZ3OGw5MmlxM0pxTFZYQng4R2Y5WFZ5Nkd6YlhXSWU2cG1RSQp6bW9tL0NXUXZoNm83a2MwRjR5NGZ0c1dmcW5xM2swK0hjWDRIZXUxUE4ySFNuVVVQTnNrNUFkZ2dkMzEyOU1ISWRmYUtiOGJTdUxKCnZTTWVNYXljcm1zYitnRUY2SkZQOGtHV09QNHhRWWpBVk9EY0ZiT3lBZkV1VkFodWp3MGJxbExIVCtFbDR2bGZCcnRkVStNWnp0SXEKUWtHRFc3Y21tODZaR2lCci9nYTk3QkNuT0NyZ1pYbHJnbWlhOFNtRjdSZmE0OC9Yemg3YkRtUGZnbUhnbEw1SnhocFJYMklvUFk1WApJdG1SOElhWUtoT0JPck8vcWVyY0o2WjNyUTZmSXJzOEhyWWdlVE8vdUU5d3c2V1JXQ1dEYUNSNG9XRFZ3akt6R2ZQMW9KdEFJUStVCk5qT2RkSDVvdERhd1hKUmxRV3ByNzJxVDcrV09LL3l6SmhOMHhtWERrbXQ1cHNNWS9DRG40a1hNTTB4YVJwZllPbjVTYzFvZWxRK2gKSW04L3JIVksvMGtyaENET25pcWorTC9uZTJTb3lvWFlnUzZvME5sa05odFRIbWpqb3NFN0hWNkpmQVVncTJEOWRxMDBKTzk2N0kzUAowVkY2RjhsY2RhcTB0b3ZKaEtXUmpycmlnWWQ3NTYvM2FUMkI4M0pXQTFSQTluaVhtclhmbkFQWnJOQ2ZXdmorWDJhbFVOL2l6ZElxClJ0czBVcFdUb1ZVcjBveldnbWJtcDVaT0dZT1FoK2xOY0FwM1Y5bE9yZGJaVlNJVE00N1JZR0JaYVpOREEyUGJEekMxM01TL0VqVEUKdlNrb253dGxDZz09PC9kczpYNTA5Q2VydGlmaWNhdGU+PC9kczpYNTA5RGF0YT48L2RzOktleUluZm8+PHhlbmM6Q2lwaGVyRGF0YSB4bWxuczp4ZW5jPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGVuYyMiPjx4ZW5jOkNpcGhlclZhbHVlPlFPVExoZmlOQ1NoNkduNWRQWmQ1QjB3SEJFUE1nSGxpV3h6TEp2eDlRTWxjelNXdWpnaUp3d2x3N2M4UHZTTUtNZXUxaDhhbTd0ZEUwcnAyd1JpSUJjenpHTlhUbm5xaFM1NzFzMFBLb2hRN0h4ZVRXZ0YxSTJidFcyWTBzSUJsNlYvanV4blBVQjF3SUhQcXdMYVlvdkN6enlWeWVrQnlZamI2WUp1eENPR0xGL3U5MTA1L1NjSXQxd1hja0NrTUlOcWY0dUdaT0FNOGZKQTFzQW9ldzZDcnJ1UG5OakVDWmNhcVNBZjZFUC94MGIwaXUvelZRT09ZMHRZMVRRQmpMRDFROVFoS282TWhCL2dYTS9waW54SnUzeFFxQTVIWEtzVGdWSml3SVlCQldwcHFzb1ZWUWRGUXErYlkyOVpHWDlzTSswc2tnbGJWQm50czhDQnFNdHRISkxTNTRNRnJ4aTJ0Y0x1OHVzek5rNGF6ajVOdmxZMlFmaTJTTGdvbDNaTS9DNGIwRERGS0xXc2Y4K1lkaEZoNnlPb1lkN2NmZ3hkZTlqK0YrVHI2U3pzeXlybjczTnVPd0hJWHV2N2ExZHduS3pIM29oV2ZBSjN1a3JTbWZqRWNrRURkNmkxQWRiajBYZUhYMENsZmlNK0IrRzl3aENhV0VIeFRiL3RjeHVXMTdJY3B4cTJIakZCUmM0bkVIaFRLOVRwcHJKOFFPYkJTZ2puZWxINjN6MmxSSVFWc3lYUDZmV2Q4Z3FhNG1kQ3VaUGs3YWppdDU2dlBxclBZUk1yRzU1N0VaUjkyVm42ZWZya2dDbGtoUnE0VmpPbE1GTWZYNkNKVXBzSW5HVHlISnRqdFgvR1U1NWRib1dqVEt0bmRxeEMyNTZLbTJlM3NWT2ZUOUpzPTwveGVuYzpDaXBoZXJWYWx1ZT48L3hlbmM6Q2lwaGVyRGF0YT48L3hlbmM6RW5jcnlwdGVkS2V5PjwvZHM6S2V5SW5mbz48eGVuYzpDaXBoZXJEYXRhIHhtbG5zOnhlbmM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMDQveG1sZW5jIyI+PHhlbmM6Q2lwaGVyVmFsdWU+dytwQjNXTlcxcUV1YmhDQ0tPUmtkc1ZNYTUzOVB5czJMSmR1dGlzN1RuMlhwdm5xREdZUG9YblZqSCtTdTQrTVRQdi9nZ0FnUlJnUW84NE1SUVJHZUs2OE1pcDhMLzRhQ3Y2ZmZUM0czVEpPdGc5Y3BhQVI4RkpyMXp6NFZhbi9UWGtScmpVRWRIUVlJTmhkR3ZUYVdSWUx3dDA2SExRckVoNlgxekJLbHFHanNEenk3Zm5LT1E5SEJqY01INnNGSTNENVZnOUtoc085QmFTNG9aL1J1LytUdC84SWg2VUhDcURTM0VUcnVqTUdCdDNRMFhaMWxCOHpWSUVIVXhoemlhZkF4aGlzZ1B3QWxYcTR6T0hteSt6YnJxekFQVjhhQ3JBT2RtbkZwYlA1VUV4MnRNcWJ5aU9jZVJ0R3doaUV5R3ozT1pyM0dtMXR3ZTJtNW05S05OZmt4eW56N0hVQndqS3hkcTNQTmFiMFNhOWVmNWRESHhiNHdFVDVJYUtSRGF6TDVlQWVkUnljL1FlbG1aNFhUQWljVGtySGRpR1VxeUhQdm9Jd2VmU3hhK3pyQTNoRjl1ODlLMmdQQTlGTHljWUJMc3AzVU5HMC90RkxkRnFhK01CVGNRZTRYSWJodlJsTVI1TU1zUHNPbm9Fclp4ckVXNjdvUzBpakJsaUlrY2VCcE1HaWJ6VUZtUDJsRFcxeDRjTEprTFlxWmVua1hSVURvbmVicXVjdXNIdFNOenNTK0g2MU8rNTI3NFhOM3FvRzZpdEZLVEUybjVQRTU0M0hMOG5Ib1dmWjdBTG1VeUdZSzAxTnVjWjF0L3B5SytCNkFhT3RSY1lvMWlwcTVWNzU5cmNUTGFVdFoxeVdCNVlZSVdtMUkvNGt4WEw0bGpPcng5V1BiMUJGTnJVZ0FBQTV5Qzd1T2s1MXh4S1RiaGZoakpra3AwcEU5WWF3cTdBY2lrb2VadDRJcDFpQ0JoZjZCdjB6RCs3c0tyeE5XQUxzNXVYOU40ZDgxekZBamU0eGlHMDFZUzBjOWtEWk5zU1E3ZDI2alE5ait0YVBYa2Z6aFVRZithdnczMXVDbk0vNFBHckc1UGlPeFhrVmcrUnVrZGVaUjU1VEEzZXBmamhSbEM1UmFnWGlGeURLOEcrK0dDSEJvVUtBN0pNcmtacmlZczdDNE9SNVdDQVNrOUhTTEIrc0VicnJTcnF1aGpKZUNTR0ZyQmpGckw3OGx3QnI2QWxhN2Z6bzhmNnNmL25nSUNxNDNmL1FzYXpwWHpyZzlYN3NTWTBONDJJaUtIN2FiSzhSTXpvbmpETzhFb1p1U0tLT00vN3VVSGxMalVXbjh1V0dBa21zV01qN2lUa3hQRkxRNVFKM3VzZHl6U1FndUZRMERVVmF3ZmJlb2NtMk90cjNTdC8wT3VVOHBzdHZodHdTWnVJc2s2NFk5MGFGZ01kRHcvdWJNS3lzQUh0aXowdUhGenpDMW9iTmFaY3BLS0tVUml5ZkYvNkY0dmhNbDErRC9ubWpUQTdRVm9yQURDS0lpUnFlNXRzdG1tcHJIbWRibFpmaGI5cGcxcDJBMVZPTStzRldoRG9QWXk4dWRaKzBQSGRmTkh6bDNLVHNIVjhUSmR4bTBXTTJiWURsYi9TSTBsZVBRUytSWUlsODJ0V2ZqUzIwT2VuZ1RoZjdHWUFLUGJUaUtnWHdJazMzbE5pa2cxSWdRMGhPcnFlZUV1MHBvb05NV1pOMlJBVkZpY1hmUkRhQ21lOFFFWUdWY0ZaOTFGWkY5MWRPZ3Z1cXY5NHVCcUlsUWtVWWl0SUh2cEFWc2RuU1VjQk4xN3JPMWFQVUcvemlUNFc5K1RsWFVTMmxjcXRKR2xwTjFCejd4Wm5GOXZBQjRDNy9xRC9XcFhZUlJUQ2VuUTJZbStMeHcxNXJMQThadURaTU1qdWxyMXErN016K0h0dXBtalV1eVJJRjNMZmtRVkFMa1YwUTl1bGw3djgyOVRHN2ZhSE00ZjJOR20xVHdXTkw0aXVJVHBsTy9LTHJBR08ydHRQdE1rZ1RXdzV5WWVTd0pSQ1B4SFhTa0pVQ01EblcxU05KZHZSNUJ6RXNZakpTQ0Q0dkpqTVJTM015ZHJldzBzdFNHZkwzajdScjgvUlVXbDlXTWlQOEFyU1d4S3JFRCtBNzJua3hlNnFtRFZtNm91YWpiSk9rYVY4cDZMNW1XWUZ3MnBobVpQRElvTndCUzY3K1lGc28yOXJTL1dOZUJRQ1RTVWR1VW9tbk4yRFNib0x5eTVzM0o3M2xyNXBrZktQODgvL2dDQUxQbG0zQ1E3VktiK0RIUDd0VUxpaFVkTmJYV29YL2IzZXk0QzdDRmhtclhYRTViQ25sWnQ2TFlIZlhNSjJvRmxDOHJyOTBSY0VZWjlnNjVRdktOVDFabVJVR3JveVBYbjdHTThhU1N5RGZLeDhCQ0V1d3FYL1VzN2tWWkxDczhyMW1xQUl1eTlMb09oVlIrMEJ4TDZhTTRLMEpvLzhIUy9mNE80c1BRd2JGMWp4UU1ZYVlabHBLdzBzL0o4UGtLSnBBUzlyM1RtajZFVlNqb3dscmtmT1hpUVhaWkY3dXVwdlNvOUwrVnVXZ1Vuckg4dXpmMUhlQVhUMXlYRDAyT0dTR2JyUnF2alJZWFhTVFFpTnZxQXo3UzBKOHJSNTE5WUFiQk5KdzlwUExXRjVMZWZ2VVc0NnpYcDVZdE9LTWlENnk5dmJMaTlJbHRzM0MydUxJY0ZIbXRRMmZ1RlBwbzIzeTI5YXV4U2IxdXQ2Si9BK2tyTFRKWWFjNEczS3B3ZVFnVEs2dXBHeGdZM2p3c2FzTjMyWGs3eC9rUzZsVThBM0FjNElmQTh3VlMyVFF4S0FaZnNJNHFrZVJqNVkvUWlkTmM0TTlWWUZCeXo1aHNJdmxObjFtMy9oV1dvdDRDVzhlNzFENGN4UnUvQTJjVGwwSHBybWZ2cVFmTVhmMU5kZ0Fya0kwSVIydkMwUWZCYm9FS0tDYno3RThJTWJJbjdWK1BmdGdoOG4zOXMvU2F5c21TMXMzdzRHdFFvZHdRMTdmK2gyRVR0RVZOMkh2VWZMRENoQy82dGVhaU9hd3dJWXFvUGlaczlOZDFrZUZ3YlFOSGpkbUE4ZW43UHYzdXhIRTFLcmduUXNqci9yZ3c1ZEdwNjdmSFpkcUpuZHgyVVNPV2tnZmdLRHZ0SlNXSWZtT2I3WnluUGpxZ3ZLYzV5RWFQUXQ2TUNXVXF0WEEvVTJ5WG9wWGhDYVN3cXFIZlYzVGRrb3JkcURucW9jYTJKdDRGaUdTQWhEclY0VVNSblVvUWoxblArS1F3RktDVDcvME5Rb3Q0VWhWWndVNlAxUFRUSExBNkEva1JoMkFsaGZZMTlzOUh0SVl0SHpMTm9nbWFkT3pxR3NCNHFSQko2blZ2N3lXVER2ejhtVVdMTjNmVlBzdnUxZS9YYTlKUWQzK3pKUXRVSXhQWjBPaW9jbWh2M0U1TzFRSzNodVgvdTdWaXAwbFBEcHNvMkRmTDNqNU50blBhQWt4TUEzVDN2ek56WFcyV3ZyeE5HYjkvRDdESEpuZ3NqdUF4OWw4VTl1RHJPNzVmaDJiREc3RzhFUUNBRktQMkJjZWxybkREY1B3d0wwQS9wSW1zaEdwUlFzMzgzeERDZGxVa0toTUJnbDI1cXJmWGJCQVJOQmFtV0hFNGZQem1iYk9MYWtRUVg3VFJJRFNWTGNiTTQrdU1idlROL0R2TUFXZlA2ZW9YU1pHWGQxME9ET2FPVzZJVzNITG9seUg4QzU0cUwxN2dVeFJRMElNdjNGc2tHYmZ5enBvWi9GRmdBa2I2Qjg4eW9EOW5SbTB2czJmYlRrd1ZLNDNENE5iN1JuOHZtL1lCZGkwVytXTUdMdU9lb1d5RGl6NVk2YnZNR3kySjI5V2pwaFgwaGphWGVySlVKdFpRT0tLclAybUdCWjVNSHlmMUtFSVdraFdtemlOYTZXbmFzSU8xM2o2TkRqYnptbkF1QTU1VzBFQlhVMHRYTE1pckJvd29iR3lzVXZMOVBvTTV0TDBuOUVYTGtwbHhCS0gxVmZtNG1MR2M2cGNVVU5sK0dWc3daaHdZVVNtV3hNQU10M25YemkrSlFWOUIwRGhCU3gweGZ2bEZkSmUvSkcrTmM1ZmprcTlSbkFWMHNweXlwTnZacnZ4NXZ3T3d3Q3hCc0VNSWV3RDlNOHQzM2VGRnRYRnRBeDF2Zlo0SzlQV2VRblV0Rm9yR05ZYjF5cVFnbHIxMGxGeVpXWWdpMHJSUXlqTHFmdWxSODRmTkpUYjNabnNIeWNuK1I3WXBsM3k2WWlvRUF1bThtYlRmRVZCNUVoTXptaVB1Tjc1V2NxY1JTZDdlYnprY0JBL2JYNGZYMEVRWSs5cE41dUt6WE1USzU0OTZPM09KV2R4ZXllQXQrN0cwZVNkREo4OXEvbGp6T1g5OVFZU01zQ0NISWwrdElYdG9aMjFqb2dZVnEzc1RtUGhscThHVHZmeElPSTI2WnM3cm1FOWJFTGs2U1NYeFFoNy9KSUEyZXVSY0RUWDlSM1FXalMrUFRnTUJObEZXYTlEOERycVJPVWVyT0V6eFMwYS9oTXJyUHZub1o3US9mTDgzQ1JhanM4RTBwYndGZnNuSVF6MVoxNWlXeklBVlFFRnBOZXZ3eVkzSmlYSndkRTM1dVIzbVRYdXRkNzRrLzNuTXYrQmszVjZYRnpkMVp5dDg2Nkd2Vmd1alMrSWFqNllRNmZGckc0NW1lekU3d3VJWDBWMlZVU1Rjam9tcndaNThXclhvM2M1MHdRNHNlV0tkNnV2WCt5dlNBWnlxclhTbkdhWDNZUHlBemVhMFFWa2JLWGhCWHVLYUpGMzNMS1RFWGt6eVJvOThLRko2Z1dPSExWQm5mRTdrWlFKUEkzNEpTSnZzZTExbmlmYkMzZ1lpK3MzSlVSOGQwSmI1c1JkcU5Fc1l2d1lIM0xQcGRYRkxOUXBNM2ViYm1UUGdKR2J5bFJTUDFWelJVRURsbXgwbjRVUGs5SGFZNksvZkZWSEt0ek0vVnpJUm5IK1VRRnFXN1RSMkxFdXI5dmNKcytGaGFieG8xUHc3VlV0R1lZVkJMMjVZbC9aQmR2THFBY3hLN0xVTFk4Yk80V2lCKzcwMlUxZERQRENaQWNYWnlid0duNDQxRE1rcHJrck5DOHVxbkFQRHA0ekNMTnBENWM4NXg2Q2pDMDlJei9TYnorbkxLcXgyRnY3MVBCcmh6RXlvbHNVNWpEZVVtSGcrTFplVzk0dlVNQ2lZalY5b09ma0ZIa2RHbk10NGl6dmJPd3FETG5JSFhCWU9MYUNuNmUwd005Ums4NjhtRWpoYXRBUXRvRm1lKzMxL0M2clJ1cW1NbSszNVNKY0ROejZuWEFVWWVVOFZjVkorNU5IWE56MUF1UXh3cWo2VlNsMHRmSmZUaDk0V1gxNHlzSXlBZnlTeTlDTXNHMW9aNDZ2djJkNEZETjFyMWwvN3hEYWtBYmZLUGNPK0F3U0dGWkxCQ09DaFR4dkVlQTdvWlhJVFRLTVdPUlJZVXVkb3JOQ2FOKy9IMktzcHo4eTMzUm54OHJaTUd2cnlPUm5nME5LSnBrT1oyOGlDczVGQmJPa2UvZWROeVFibm90b3hCUjJIbHcydVY0SWRsd1c1NVZkcHNtaWJ5alArS0NaSFNGOWV2WTFHci9VdDVYL0l1S21NbTBiWGQ2UFp0VjcyWWxkbDg3NHB2YSt3Y0NsOTBwcTRIU2x1T0JFQm9haUt1cXQyUCtHY1BZa2tRSitEUVBYdktYYlFWanZWbCtXS3FPL1VZbmRTMlR4b3dINk5ZMWNuVE5INGtWR3RmaHNSc3FCQzlSRjRsSGxRK2w4UnZaTmZMcHliWjJ0T3RwSmZaUXQyNTNnZE4zZGdzUEsxVTVISEZKd2RwYzA2QlY4YTNueWZvNWh4aEorOXVaTisxdDdGYUtpdng5QWhscE8xTytMcGIxenovM1VucVBRR3FwbEJVemtINko0VmVSTFdHNDd0SkVZNVRZbmxrZHpvTGF3dUdjM3ZwMWhZUjZZVEg0Y0I5bGlsMUs5cHgvUFI5UGRhM2R4T25zelZ5ZG13RWw3QjZHb3VrK3hXMWF5NG1iT0hDa3JwdEVoa3NEcjY4WWE3b05GUXVZMnNEUmdla0VidHo2RFZFako1b0hkUmVvSFZMRm1TM3pSZ3lwNFJRZ3YxMG9wUWNpTU1hNER1OGh4dVpVN3JYMVNGYm5uQ2owaWZoZDUyd2JyOVEyWisyYnNKaTEvczZkV05JS3ZDaDhxUE9YU21IL21YMFpETkFDbDV4K0phTTNOTGl4dEFlZFVxcjV6dDlza0t4Qzd5cURUbVhMRkIzRjJNRm15UzBtMFVRcDdDb2daUVI0MjI4TlR5WFpSK3FYZExhMUlaU1owOC9BOGUwMzRJZ0FzS0YvQXhJdFNuNllZZXhHOXFYeU5aU2x2OGpPS3FiWGdidWZnZHorVjY2OHVGMnpzRk5RY2pBUUxydGxqWnRFR0g4WEIwMFozT3ptb1ZmcWFqWFhMSlN6UjcwSFJHUWpYK2d6SFVBUlF3Z2ZxUVFtVWcwZmtBMStyNmZPWTVYMDVRdkxNaFprWmJwN0RuUmczQUZKMU9hYnRPYndJek9WRmhsN0p2SzZlTk9kK0NTNkttZUZSS3BwSExCNSt4Z3NpNGRSQ1VYL3VGZkVFZ2FxNm0xems5OXprSWpTZDdRWFhXQUpIWE52K1NuUjcwTzVkdkRTam1ZTSt2MnVVOGZNMlBiZzU1OWJ1LzIvYW5VQkxEMWJxZG9pTC9GSHFlb1B2am1zRktkcFdnRjFHRGVkam9sVmRzUWNTeUxoYlN0eXUzSWE5RU1OK0h6V3ZmVXd4M1hSOGQxMHpSS2lBL1J0Qjc1cUVFZm5UQTREa1grVUxCVGd1WkxkWklJYVVFTG5XN1UwZldnVEFuaEdqTVp1Tmdkdk5qb1BGRmRlcmxmRFplazM0aDVGQUJvM2srTlJuUk9USmhZaUhHOHE2MDF0NEVsaklCVnoyYkw4UW9vL055ejE4VFF5NkRGMUVhK08rVXkwUlhlMk51QXZBekpUVlAwU3prMGE4WTU3d0xZVElPdW55UUtKY3JxemVaSkUyZVFKNVM4bUtlR25ZOE5MRVFaNlpXZS9CK0UvOU9ORVFCSGhPUzVkMUtVV2NvakV4SE53b2p4VUF2cTZYOThmM3orRzYrakorcEl1aFNlaEdjcFFOVFVxYjIvSjdsbU9vSHF2dy9lbG9MRk96b3pya21wQURUVERDV1FsMCs0QllkbmRPN0FOZFVhRlBYMmtlUk1YaUQzZ3lxWDlzcmdTVHBzSlRuTHZWR2I0KzhrT1kzcSt5aUd0T3ZxMFpCZmZ5aDcyd3E2alVuNjZPR0hXS2oxM3RNM29GcnR3WmZXK3FnMDhCSGg1amlFVjFBbUhUSm1CaHUvSWtZMWl1YnpCZm0xdm4xMGhSYllnb2N6UkFNV3dkVWhIWnBmMUdjVUV2NUQ5djMrL1g5SjUxRWFwVGdaQlhtaUZqdUVtQ3lQK3hXWmRnTTFLRlZpTWhObWhiYjJwNmZSaEt3d2VwUGhrR1VKbnR1aTNuZDh3SFNlSVpQR3d4bDNpcFBJSmMzLzR6UTdmMk9tTFByNTNoMzRqRGhrTUhCcW1acURCV3VQelZQdFd3cEZCb01yZWpKTThCUGcxUmZtUEJxUEw2NnFBWFJJQnRnTmdIaHhLRm00dTVMd1o1Y1J0UGZkVXUrcTlvZ215WDNnU00zSDVYeXo3K0lSaWIySGErRmpHMmNGU2hvbXJTS0RaZFpGaEJOYVdnd21rU0Z1TDlpdTF5QmlLZ1p1aERCUkZMNVZOb08wd1hLWGJBeC90OG9hdElyTjRHRDlWYk4ycWdwMFBvRUw5dXVyUDZFU2prcTFJa3Q5UGtBOVNrMkRhMTZFdEJsM0ovRG9DSUczdDNvbFRjZ2RMakJ0N0R6S0EyWVlmMTRiZGI1ZStVOHBkbzMxemVWbkZTUXBTdmZUVU5KNHVuTlVkbEtIcFoxb1BDQnAyQy9wTVppMkJxVk1QdGNDeWZsb1Z5UlZFQ0RsZlBvLytQMzYvTy9aUEJKZ3pqcWdxOXdRUnliaW9FKzE4RDh0UXM3RGNaYnZ1VGlSbFlCNUkrRkd6YTk4QUZ1YTlCZklYR2d5b0pPNXNVVnVVYWh1VEYvYjZWc2ZSNmlRVlFXWVNvWlNTRnlMaFFTQncvM0FXUDRld0xOd0ZSZFFqUWM0NWpkdkdibmliY20ySVBVQjdzN0xhb1UvV2l2MWY0ZEoyMUlpSFlKQU1jeGo1cW9mNVNxNUdCVElDV0c3TVA4SHFFOHFmcElIVUsybTZRRVBMenFWNEkyTjlMRUxZTWE5OWZubzcxaDc4cDJhd20wR2VWSmZUd3k4V2NkYTJuQXlhMEFwd20wUGhIdFJoeDBrRTlQTDM0VWd4NUEzR3gxbDdiZjkxa3BqeE9QT2NoSjREUGFaSER3MmIvYk9HcnNDcTBJZms4dkluM2JxcFk5U3VYbmZpOHpHenNTb05SanhHZWdKOVZiYkh6MFpCK0p4b2JzdldDK2Z2MEpSb2FQM2ZDSkZ1bGdsazdOVk5EK05hTEgvR1JqVDJTbCtjS3ByV0R5THlqK0UzcE1yY2ZLWFNKck0xZHIyaVl6RDBPb3BRVWpnR2IxOFIzczdKVXZ0QVBSOUp5MU1KcmlIbjNjV2xZSXZCWXRmQ3lXQ1pIdUc5NTF1c3dYMWt1WURYaGVDUmM1ek9Td2o3SDVWR295eWZSdzBMdnNVZmdhUXNhT2dibTZLTFJRcGtQZkl5ajdiMWE2M3RrQ0lOSTI5cHNyTUdVei8zT0JYbkNBR0d2Q3BxZkFwL3hHZzByaDdwMWVLaE93alUrN2NVbWlUS0lsUFR6TVBITWtJMytFTDlLc1JzV2J5OGoyWVdmUWNCUHAwNGQ2QzVNdHJYeCtFMWhoamNTSEE3RklpSkh2V0V6RVpxRkpXTDFCdHp1UFEwNlVZcVRDb3ZxTjlnZFFkZ2NUQ1lub2FpN2QvZ2M1alJ1TGowa2QwdjVxbHlyQzdsYjJ5eGVLQmFuamVxVXloQ1FXdGc4MmlZVWJOMkVhSVZiVXBRaUlOT0YxTTZ2TmFtZUFGL3I2QjZRSy94VUxEalMvWms4WExhMG82ekYySWh4VjExUTkrRUZ4d2h1MVVZZkltbkx5OU5MODJtRFNQTUZxS3FsT1NvQWRxcTU3cUxvZmpGMndwY3kyTTdvWGNrQ2tPaVp6T0U5QkMzeGNsVjhoRVB4T2JKQTNjSk96emc4UUl2RjNrSmxaNTJMcDlMSnQ5Q0g2ZThyZEM5clZNZ1BneDU5YWlLTm1iMkFsOXBaN0hpUWZWRUZ6QkM5SEhDVjRPZzVKZmt1VzY1UjM0QUI5SUt3WEFyTmNDTWFWajcyL2ZPbnRhdVNDa0NIZ3RKdVdDNlphcmFzaVpIYWc2NG1kOFVWbWtwRUJ2WE1OYTZJN3Rtdm1YL1lmUE0rR3Y2MzcvR1U1MmhGRTRIRVVsK2l3eWlJQ2JxSndHNDNQenRkcVpuWTRvYmNydVlJMGJKSFdSSzhhZ1Y1aTkxbGx2Qm14WDVtelB1Y3Aza0JJSkkyWDNFVEZ6SDlRam8xbktrYzhtY3FlSWtmZWl3ekpyL1ZmeEY4UXg2VmJWSjJhN1o2VEVNd2NiVDRJUVZjaUlyKzYxUEdlV0svT3F5bGdZODIzMTczNHhpSG4rcGFnWGpCc2lObHcxQm1ublhKeHZucTJWRGw5Z0h0czJqMy9mcjYrbEgvaDUvY25CK3czRElVQzlGTmI5UFZtb1B6dkdJZ2ZiV2puSDI3SFRZOFBjaDRpZkVHV0tRMG51a2s2TytpbW4yUTdkZC9LYnNYTW5IdXZETDRHNmxlVWZpTnFvMUQ2OGJJT0IyQ3dkeHVvbk5yenF6ZVBZb0VPdHZQSE9iRmhuVUlXaGJXUG84Skx3ZU80UFNIYjh4U3dOa1JVOVNZaHZ1bWwyZWZMWi9maFo3ZzdGb2lIeS90ak1sK3R6am9JL0tKNEh2YWdINTYySEg4VFlNYUtCekpzVjdJdkVEV2J2Um9HOU1FWnlBdlJ0amw5WmZUMjlTdkgvRk9zejgrQ0lzZUJWSlVpbitDK3pZZDhKTDNIMzdkSDNLVVZxN0xKYXBESEZrRmtSU09tNllHKzVicnAxTXV0a3FaSUpaMWxOd00xTW15L1pmSnFWMUl6SHdPWE0rVm5xa25WZVk5SytUNzNiRlRWOUhmR0VQMVduVEczNWxjbUoyUHZ1TmdhVTIyejNWUVdmalNndG1JMWthVUxtd3lHMytlcmF4Nk1yWFJsZFBXYXJlZi9BTFJGUURhOWdXSTQzT3czVFE2SXpFRkVsS0czaDdHdE5Ba1NFU003MCtsWnNjMURUYnNrMjdNRUlha25MdUhjMkJXYmYra213eUIxZEozVENmd1RMR0VQZFNBa3BCa0ZtaXphMVFVeVhib3lsQnpZcEpucFYxV0dWWDU0R1hjb0p1cnR2RzNwN2lPeTlBcEpZcUl6U1pMYVJIazhCRHpXdDJjekhsMWJaN1VZMGNtbUxQUzlBc05SYnJWdm9LY2htUVNUZTJMcG9rTWpaaXltVGp0TG1OM2wxRE5VNHgxQXhTT1FhTVptNHlvUm94YUY2ckNBUlI4MFdsbHRvY0ZDK0lYTVJHMzlBSklwUGlRRTNwQmVHNHcrWTBGVUFLTDZHUmtqL01YbnQ0ckw5M1BkRldTZjN6MjU4V3VsQjRIcmVoaHl3UEh2dk5NUUJQYUtVb3VKc3BRZmpKYWpnMmZUbDVDMGVxZVh6UEM0YXM5M25uczY0ME5kQk95T3dRTnpXbEdsL3FrekUwS203WXBjRk43UjM2YnRqczF2dWtoQ0p4Z2hqTk5QUHdvei9xWE9oNDVYN2h4djQ1eHA5M0h6TE1Eam81ZjNEWXVsSkRNVXhONitySmdGdDJwbTV1VklkSXVNdFQ5eTBqcXdJS0dEaDR6elQ0MDloVzFZY204ZTVjRkdKWjRNeWR3dHNOT0l1Q0J0d2NFdDUxdG9kVWRYVDBrcTJ1WmR4TGorNGhZYk52OXVhMEFYLy9JNTdydVZhTTdkdVZDZU9oR1BVWU1UQWgzSnk5UktXOUxUbG9vVDJQM1JRQXJ1SFNGajlzSFBhQ2RodXNFbnY1V1VNWWd2SVAybU9YRUdhbCtVeTh6M3FZRStyU0Q5N0tRUkUvOEJlRkM5b3pNUUlEVXhQOW0veXVFMUlKdHBrVzRNaHdtM3MvUzVpK3kyeG1pQ1JlT3d3ZVV6Y3dMcjBNR08raHhtSDM2anVMQU5ZdEVWZm80aHlUY1FSdU83MVRMOE1NbWhITEJnVi85ZGN0Qkx4WC9CRmxRQW9SNVh3UHhWYktNMENMNE13RnNwUE1SYno3NXRzajJVZDQ2TkxoRHVBRjZVVGpNdDVxclBYT1pMSUNNQVFsbGlUK1lMZzhMamdTYWdKdkFSamEwczlWUnVOaHJIRjVXMU1LY0haRThLQklWR0orYktjLzFLWGJFT3dmUHUrZUxmSS9QR0pScnZlL2NWbTBhUXRMZ1VFcmNwRUpUd1FhMWUrRE1aUHJQS0h5VU9WZ1FkMTBEbTNTMElrL2NNWGx3d3RUSDVFR2YvZXY3R1pOL3EwYWRyY1l3OHVhZXRTVENzOXlhdnpuMTQ4M1RsRUQ1WE82eWZHOE9MdDA3TjFDNmxMTElpajdVb0xrRUlKTGpGY2VCTWU3amhOK1BmN2M3MXVzYUVCMjgrdDRSOEsvbGV6bzc4MEYzNS9ZZklKeGErVHZxbGVxdGhGempzSnpYOHZHSXNlWHpQaU1acHpwbUlxVHhNbzhPTUtlcFlPN3hnRzZZakUvZGtvdFFhUTIwUTRiOWpPaVdYNW9KSDAzcGY3eW9Sc0ZyamE3ZTBFeU1haGNsRlR1TE5lc3dXNkgyTDVhTzlzU3hjUG50a2JNbXpJMFcva1g1eUNMdlQ5WGIrVFM2cUdCV3pSNGFQdzVNQVpuWGxFcStUYm5RWTkrOW9xSTZoclMyQ1VUaUNFMWIzVjBOQ2w2bW1RK2NzV0tRSllBdVM1cDdqRzRDelcyVFQ5QXpGczNteE1TTnk3cVUzQ21sdlhNcDB0UDdnNEovWE91UXdBWCtMNDlidmVxZ2VWRUs4VVFkNDZZS2lRVkdsUHluNGF2T0k0a0dXNjF6NjVJUVBOOVVPcjZFRnhPVXhJWnIyb0ZEdEdVUnFuSzNVZEt3Nzdtdjkxd1NkZGRESlIvTHRkN0c3Wlpmb2lHR3hHZ0lLYzNCQUxleHhUOE5aMGNReHVFL0ZTMlR4dWVzSEJ6Y3lSNXkvVGZOeHVGdlRENzFrZElEeEk4eXVsYzZoUXNjMktudnZXTmNSMEREU3FmeFhDUjJ4OGp1WmxBWkkxbXUzcDBNRTJiV0lpUXgzaEFwdmljSkorN0JoRGhZLzh4R2U0WEVrVXhEMnJ3NWFremRWSkdWSTdEQnAwazhHMEV2YWw2cmUvQnpjRlVFNFJhZW94T1U2bDVRRjNZYjY2NnpvTnEzNzhnTzd1cDY2TmoxZGdFZ1lwOVhJUVN2WEo3Uk9FcEFscUxMRC82NWdOWE5wYmlWNXZ1bG1iMC9nQ3ZqcThRZ2ozTU0xNjAzNUhFZGlTdEpoanMydFJKRGhJQ1lHR09PVWdpTmlmKzYyOWlSajBGWHdNcXhncE9nTytLalo0R24vQU5YSFhGK0U5TlVLVk95c0ZkWkpQUGNpYU1kVXEva2F5TzFNSVluTktRQWZWRHgrME5qMVN5S0Yxc3dLVmxxY3NsaUVzaXVRaS9nL1NFaU9Gam9UcEcxSFdxdkdTYXJpU2VubXc5eE9ZZy9uU0F0c0FrMlF4S0g5Sk91TUh1L0N5c3REUXdOMHV0ZmpjNHNUQnFXdkRONUY1a3JXa1J1eWxLRkQvK0M4MjBCd2R2d3VobU0wQlplZklmTlJmQzd3cHF6dlRUWE1Dc1I0anFaeElsSW9Tc2swWjhtcGN4bGF5ZGx4RWVhdXYrYytYZ2xRV05QVFhMcEEwWm5WaW5uUS8wQXNPcm9Lb2ZnaGphcENneTFCL0FrMnk3Z0NXV1RrRkp6ZmZWQzY5QnJnOEYrYzJJMkRKa3JkT056aGcyVFB1YzduM0dFZXJHdWIxMkZybFRMODdzM2UwNk45QUl6TFlGa3M0MmVEWnN1QUlwM0ZmSzU0MlkzT0U3dkR2eFd5UEhFd1ZuanNyWndZaGdBUXV4Tjc2cUVRTkh6bkl3TzQyRzQwRTRFYlRTRUFTbDAyR2VQMUZ0TEVsZ1hZUEJXSGFtNnZhd0t2M0lMTmNNZmRBdnJJOThFZmx6K3Vma0pRL29JZFdnYU90Ly9BeXpPRFE1Zm94ZzhCNE5IQ3F4MTVWQ1dTWk9EV0RkOFlnTzNBcUNDSlpzMGxzdTN1TGpWcjZ0Z0thND08L3hlbmM6Q2lwaGVyVmFsdWU+PC94ZW5jOkNpcGhlckRhdGE+PC94ZW5jOkVuY3J5cHRlZERhdGE+PC9zYW1sMjpFbmNyeXB0ZWRBc3NlcnRpb24+PC9zYW1sMnA6UmVzcG9uc2U+'
@@ -193,26 +206,26 @@ describe( 'passport-saml /', function() {
       { name: "Empty Config",
         config: {},
         result: {
-          'samlp:AuthnRequest': 
-           { '$': 
+          'samlp:AuthnRequest':
+           { '$':
               { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
                 AssertionConsumerServiceURL: 'http://localhost:3033/login',
                 Destination: 'https://wwwexampleIdp.com/saml'},
-             'saml:Issuer': 
+             'saml:Issuer':
               [ { _: 'onelogin_saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
-             'samlp:NameIDPolicy': 
-              [ { '$': 
+             'samlp:NameIDPolicy':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Format: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
                      AllowCreate: 'true' } } ],
-             'samlp:RequestedAuthnContext': 
-              [ { '$': 
+             'samlp:RequestedAuthnContext':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Comparison: 'exact' },
-                  'saml:AuthnContextClassRef': 
+                  'saml:AuthnContextClassRef':
                    [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       },
@@ -224,9 +237,9 @@ describe( 'passport-saml /', function() {
           attributeConsumingServiceIndex: 123,
           forceAuthn: false
         },
-        result: { 
-          'samlp:AuthnRequest': 
-           { '$': 
+        result: {
+          'samlp:AuthnRequest':
+           { '$':
               { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
@@ -234,19 +247,19 @@ describe( 'passport-saml /', function() {
                 AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
                 IsPassive: 'true'},
-             'saml:Issuer': 
+             'saml:Issuer':
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
-             'samlp:NameIDPolicy': 
-              [ { '$': 
+             'samlp:NameIDPolicy':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Format: 'alternateIdentifier',
                      AllowCreate: 'true' } } ],
-             'samlp:RequestedAuthnContext': 
-              [ { '$': 
+             'samlp:RequestedAuthnContext':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Comparison: 'exact' },
-                  'saml:AuthnContextClassRef': 
+                  'saml:AuthnContextClassRef':
                    [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       },
@@ -258,9 +271,9 @@ describe( 'passport-saml /', function() {
           attributeConsumingServiceIndex: 123,
           skipRequestCompression: true
         },
-        result: { 
-          'samlp:AuthnRequest': 
-           { '$': 
+        result: {
+          'samlp:AuthnRequest':
+           { '$':
               { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
@@ -268,19 +281,19 @@ describe( 'passport-saml /', function() {
                 AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
                 IsPassive: 'true' },
-             'saml:Issuer': 
+             'saml:Issuer':
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
-             'samlp:NameIDPolicy': 
-              [ { '$': 
+             'samlp:NameIDPolicy':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Format: 'alternateIdentifier',
                      AllowCreate: 'true' } } ],
-             'samlp:RequestedAuthnContext': 
-              [ { '$': 
+             'samlp:RequestedAuthnContext':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Comparison: 'exact' },
-                  'saml:AuthnContextClassRef': 
+                  'saml:AuthnContextClassRef':
                    [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       },
@@ -294,9 +307,9 @@ describe( 'passport-saml /', function() {
           disableRequestedAuthnContext: true,
           forceAuthn: true
         },
-        result: { 
-          'samlp:AuthnRequest': 
-           { '$': 
+        result: {
+          'samlp:AuthnRequest':
+           { '$':
               { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
@@ -305,11 +318,11 @@ describe( 'passport-saml /', function() {
                 Destination: 'https://wwwexampleIdp.com/saml',
                 IsPassive: 'true',
                 ForceAuthn: 'true' },
-             'saml:Issuer': 
+             'saml:Issuer':
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
-             'samlp:NameIDPolicy': 
-              [ { '$': 
+             'samlp:NameIDPolicy':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Format: 'alternateIdentifier',
                      AllowCreate: 'true' } } ] } }
@@ -322,9 +335,9 @@ describe( 'passport-saml /', function() {
           attributeConsumingServiceIndex: 123,
           authnContext: 'myAuthnContext'
         },
-        result: { 
-          'samlp:AuthnRequest': 
-           { '$': 
+        result: {
+          'samlp:AuthnRequest':
+           { '$':
               { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 Version: '2.0',
                 ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
@@ -332,19 +345,19 @@ describe( 'passport-saml /', function() {
                 AttributeConsumingServiceIndex: '123',
                 Destination: 'https://wwwexampleIdp.com/saml',
                 IsPassive: 'true'},
-             'saml:Issuer': 
+             'saml:Issuer':
               [ { _: 'http://exampleSp.com/saml',
                   '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
-             'samlp:NameIDPolicy': 
-              [ { '$': 
+             'samlp:NameIDPolicy':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Format: 'alternateIdentifier',
                      AllowCreate: 'true' } } ],
-             'samlp:RequestedAuthnContext': 
-              [ { '$': 
+             'samlp:RequestedAuthnContext':
+              [ { '$':
                    { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                      Comparison: 'exact' },
-                  'saml:AuthnContextClassRef': 
+                  'saml:AuthnContextClassRef':
                    [ { _: 'myAuthnContext',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       }
@@ -367,7 +380,7 @@ describe( 'passport-saml /', function() {
           })
         );
 
-        app.get( '/login', 
+        app.get( '/login',
           passport.authenticate( "saml", { samlFallback: 'login-request', session: false } ),
           function(req, res) {
             res.status(200).send("200 OK");
@@ -423,16 +436,16 @@ describe( 'passport-saml /', function() {
 
   describe( 'saml.js / ', function() {
     it( 'generateLogoutRequest', function( done ) {
-      var expectedRequest = { 
-        'samlp:LogoutRequest': 
-         { '$': 
+      var expectedRequest = {
+        'samlp:LogoutRequest':
+         { '$':
             { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
               'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
               //ID: '_85ba0a112df1ffb57805',
               Version: '2.0',
               //IssueInstant: '2014-05-29T03:32:23Z',
               Destination: 'foo' },
-           'saml:Issuer': 
+           'saml:Issuer':
             [ { _: 'onelogin_saml',
                 '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
            'saml:NameID': [ { _: 'bar', '$': { Format: 'foo' } } ] } };
@@ -453,9 +466,9 @@ describe( 'passport-saml /', function() {
     });
 
     it( 'generateLogoutResponse', function( done ) {
-      var expectedResponse =  { 
-        'samlp:LogoutResponse': 
-         { '$': 
+      var expectedResponse =  {
+        'samlp:LogoutResponse':
+         { '$':
             { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
               'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
               //ID: '_d11b3c5e085b2417f4aa',
@@ -477,21 +490,21 @@ describe( 'passport-saml /', function() {
     });
 
     it( 'generateLogoutRequest', function( done ) {
-      var expectedRequest = { 
-        'samlp:LogoutRequest': 
-         { '$': 
+      var expectedRequest = {
+        'samlp:LogoutRequest':
+         { '$':
             { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
               'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
               //ID: '_85ba0a112df1ffb57805',
               Version: '2.0',
               //IssueInstant: '2014-05-29T03:32:23Z',
               Destination: 'foo' },
-           'saml:Issuer': 
+           'saml:Issuer':
             [ { _: 'onelogin_saml',
                 '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
            'saml:NameID': [ { _: 'bar', '$': { Format: 'foo' } } ],
-           'saml2p:SessionIndex': 
-           [ { _: 'session-id', 
+           'saml2p:SessionIndex':
+           [ { _: 'session-id',
                '$': { 'xmlns:saml2p': 'urn:oasis:names:tc:SAML:2.0:protocol' } } ] } };
 
       var samlObj = new SAML( { entryPoint: "foo" } );
