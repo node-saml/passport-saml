@@ -49,6 +49,7 @@ Config parameter details:
  * `entryPoint`: identity provider entrypoint
  * `issuer`: issuer string to supply to identity provider
  * `cert`: see 'security and signatures'
+ * `alt_cert`: see 'security and signatures' - allows for multiple certs in light of IdP certificate rotation
  * `privateCert`: see 'security and signatures'
  * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
 * Additional SAML behaviors
@@ -117,6 +118,12 @@ It is a good idea to validate the incoming SAML Responses. For this, you can pro
 
 ```javascript
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
+```
+
+In case of IdP certificate rotation, it is common for the IdP to define two signing certificates. In order to support rollover, you can define the `alt_cert` configuration key in the same way you do `cert`. Passport will attempt to validate signatures with both certitifcates.
+
+```javascript
+    alt_cert: 'MEICythsBvvc91GhapWemylxzSDmao ... V=='
 ```
 
 ## Usage with Active Directory Federation Services
