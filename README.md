@@ -48,8 +48,8 @@ Config parameter details:
  * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
  * `entryPoint`: identity provider entrypoint
  * `issuer`: issuer string to supply to identity provider
- * `cert`: see 'security and signatures'
- * `privateCert`: see 'security and signatures'
+ * `cert`: see [Security and signatures](#security-and-signatures)
+ * `privateCert`: see [Security and signatures](#security-and-signatures)
  * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
  * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
 * Additional SAML behaviors
@@ -104,7 +104,7 @@ app.get('/login',
 
 As a convenience, the strategy object exposes a `generateServiceProviderMetadata` method which will generate a service provider metadata document suitable for supplying to an identity provider.  This method will only work on strategies which are configured with a `callbackUrl` (since the relative path for the callback is not sufficient information to generate a complete metadata document).
 
-The `decryptionCert` argument should be a certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
+The `decryptionCert` argument should be a public certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
 
 
 ## Security and signatures
