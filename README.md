@@ -1,6 +1,8 @@
 Passport-SAML
 =============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/bergie/passport-saml.svg)](https://greenkeeper.io/)
+
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
 The code was originally based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library.
