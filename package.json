@@ -1,6 +1,6 @@
 {
   "name": "passport-saml",
-  "version": "0.15.0",
+  "version": "0.16.2",
   "licenses": [
     {
       "type": "MIT",
@@ -31,26 +31,25 @@
   "main": "./lib/passport-saml",
   "dependencies": {
     "passport-strategy": "*",
-    "q": "1.1.x",
+    "q": "^1.5.0",
+    "xml-crypto": "^0.9.0",
+    "xml-encryption": "^0.11.0",
     "xml2js": "0.4.x",
-    "xml-crypto": "0.8.x",
-    "xmldom": "0.1.x",
-    "xmlbuilder": "2.5.x",
-    "xml-encryption": "~0.7"
+    "xmlbuilder": "^8.2.2",
+    "xmldom": "0.1.x"
   },
   "devDependencies": {
-    "body-parser": "1.9.x",
-    "ejs": "1.0.x",
+    "body-parser": "^1.17.1",
     "express": "4.x",
     "jshint": "*",
     "mocha": "*",
+    "passport": "0.3.x",
     "request": "*",
     "should": "*",
-    "sinon": "^1.10.2",
-    "passport": "0.3.x"
+    "sinon": "^2.1.0"
   },
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 0.10.0"
   },
   "scripts": {
     "test": "mocha",
