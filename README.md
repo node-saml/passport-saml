@@ -65,6 +65,7 @@ passport.use(new SamlStrategy(
   * `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
   * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
   * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
+  * `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
   * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
  * **InResponseTo Validation**
@@ -77,6 +78,7 @@ passport.use(new SamlStrategy(
   * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
   * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
   * `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
+
 
 ### Provide the authentication callback
 
