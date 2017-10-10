@@ -22,7 +22,8 @@
   "contributors": [
     "Michael Bosworth",
     "Herbert Vojčík",
-    "Peter Loer"
+    "Peter Loer",
+    "Mark Stosberg"
   ],
   "repository": {
     "type": "git",
@@ -40,11 +41,11 @@
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
-    "express": "4.x",
+    "express": "^4.16.2",
     "jshint": "*",
     "mocha": "*",
-    "passport": "0.3.x",
-    "request": "*",
+    "passport": "0.4.x",
+    "request": "^2.83.0",
     "should": "*",
     "sinon": "^2.1.0"
   },
