@@ -1,5 +1,8 @@
 Passport-SAML
 =============
+[![Build Status](https://travis-ci.org/bergie/passport-saml.svg?branch=master)](https://travis-ci.org/bergie/passport-saml) [![GitHub version](https://badge.fury.io/gh/bergie%2Fpassport-saml.svg)](https://badge.fury.io/gh/bergie%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![dependencies](https://david-dm.org/bergie/passport-saml.svg)](https://david-dm.org/bergie/passport-saml.svg) [![devDependencies](https://david-dm.org/bergie/passport-saml/dev-status.svg)](https://david-dm.org/bergie/passport-saml/dev-status.svg) [![peerDependencies](https://david-dm.org/bergie/passport-saml/peer-status.svg)](https://david-dm.org/bergie/passport-saml/peer-status.svg)
+
+[![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/)
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
@@ -62,6 +65,7 @@ passport.use(new SamlStrategy(
   * `disableRequestedAuthnContext`: if truthy, do not request a specific auth context
   * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
   * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
+  * `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
   * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
  * **InResponseTo Validation**
@@ -74,6 +78,7 @@ passport.use(new SamlStrategy(
   * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
   * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
   * `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
+
 
 ### Provide the authentication callback
 
@@ -118,11 +123,18 @@ Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To s
     privateCert: fs.readFileSync('./cert.pem', 'utf-8')
 ```
 
-It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's public signing certificate using the `cert` configuration key:
+
+It is a good idea to validate the incoming SAML Responses. For this, you can provide the Identity Provider's public PEM-encoded X.509 certificate using the `cert` confguration key. The "BEGIN CERTIFICATE" and "END CERTIFICATE" lines should be stripped out and the certificate should be provided on a single line.
 
 ```javascript
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
 ```
+
+If you have a certificate in the binary DER encoding, you can convert it to the necessary PEM encoding like this:
+
+```bash
+     openssl x509 -inform der -in my_certificate.cer -out my_certificate.pem
+````
 
 ## Usage with Active Directory Federation Services
 
