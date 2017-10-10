@@ -45,7 +45,7 @@
     "sinon": "^2.1.0"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 4"
   },
   "scripts": {
     "test": "mocha",
