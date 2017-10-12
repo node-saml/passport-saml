@@ -505,6 +505,14 @@ describe( 'passport-saml /', function() {
   });
 
   describe( 'saml.js / ', function() {
+    it( 'generateUniqueID should generate 20 char IDs', function( done ) {
+      var samlObj = new SAML( { entryPoint: "foo" } );
+      for(var i = 0; i < 200; i++){
+          samlObj.generateUniqueID().length.should.eql(20);
+      }
+      done();
+    });
+
     it( 'generateLogoutRequest', function( done ) {
       var expectedRequest = {
         'samlp:LogoutRequest':
