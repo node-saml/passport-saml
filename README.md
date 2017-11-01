@@ -156,7 +156,7 @@ Here is a configuration that has been proven to work with ADFS:
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.
 
-For more detailed instructions, see [this document from Tim Brody](docs/adfs/README.md).
+For more detailed instructions, see [ADSF documentation](docs/adfs/README.md).
 
 ## SAML Response Validation - NotBefore and NotOnOrAfter
 
