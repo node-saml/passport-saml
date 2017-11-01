@@ -109,8 +109,9 @@ module.exports = passport;
 
   var server = http.createServer(app);
 ```
+# Troubleshooting
 
-# ADFS 2016
+## ADFS 2016
 
 If you are setting up an ADFS 2016 server, you might run into the following issue with the previous settings:
 
