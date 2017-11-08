@@ -1,7 +1,7 @@
 {
   "name": "passport-saml",
   "version": "0.31.0",
-  "license" : "MIT",
+  "license": "MIT",
   "keywords": [
     "saml",
     "adfs",
@@ -18,7 +18,8 @@
     "Michael Bosworth",
     "Herbert Vojčík",
     "Peter Loer",
-    "Mark Stosberg"
+    "Mark Stosberg",
+    "Jan Cajthaml <jan.cajthaml@gmail.com>"
   ],
   "repository": {
     "type": "git",
