@@ -235,7 +235,7 @@ describe( 'passport-saml /', function() {
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       },
       { name: "Empty Config w/ HTTP-POST binding",
-        config: { authnRequestBinding: 'HTTP-POST' },
+        config: { authnRequestBinding: 'PASS' },
         result: {
           'samlp:AuthnRequest':
            { '$':
@@ -468,6 +468,10 @@ describe( 'passport-saml /', function() {
               response.statusCode.should.equal(200);
               body.should.match(/<!DOCTYPE html>[^]*<input.*name="SAMLRequest"[^]*<\/html>/);
               encodedSamlRequest = body.match( /<input.*name="SAMLRequest" value="([^"]*)"/ )[1];
+            } else if (check.config.authnRequestBinding === "PASS") {
+              response.statusCode.should.equal(200);
+              var redirect = JSON.parse(body).redirect.match( /^[^\?]*\?(.*)$/ )[1];
+              encodedSamlRequest = querystring.parse( redirect ).SAMLRequest;
             } else {
               response.statusCode.should.equal(302);
               var query = response.headers.location.match( /^[^\?]*\?(.*)$/ )[1];
@@ -912,7 +916,7 @@ describe( 'passport-saml /', function() {
             done();
           });
         });
-  
+
         it( 'cert as a function should validate with the returned cert', function( done ) {
           var functionCertSamlConfig = {
             entryPoint: samlConfig.entryPoint,
@@ -930,7 +934,7 @@ describe( 'passport-saml /', function() {
             done();
           });
         });
-  
+
         it( 'cert as a function should validate with one of the returned certs', function( done ) {
           var functionMultiCertSamlConfig = {
             entryPoint: samlConfig.entryPoint,
