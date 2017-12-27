@@ -52,6 +52,7 @@ passport.use(new SamlStrategy(
   * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
   * `entryPoint`: identity provider entrypoint
   * `issuer`: issuer string to supply to identity provider
+  * `audience`: expected saml response Audience (if not provided, Audience won't be verified)
   * `cert`: see [Security and signatures](#security-and-signatures)
   * `privateCert`: see [Security and signatures](#security-and-signatures)
   * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
