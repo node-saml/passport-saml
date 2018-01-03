@@ -228,6 +228,10 @@ function callback(err, result)
 
 Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.
 
+## ChangeLog
+
+See [Releases](https://github.com/bergie/passport-saml/releases) to find the changes that go into each release.
+
 ## FAQ
 
 ### What if I have multiple SAML providers that my users may be connecting to?
