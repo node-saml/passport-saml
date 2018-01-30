@@ -692,10 +692,12 @@ describe( 'passport-saml /', function() {
           issuer: 'http://example.serviceprovider.com',
           callbackUrl: [{
             default: true, 
-            callbackUrl:'http://example.serviceprovider.com/saml/callback'
+            callbackUrl:'http://example.serviceprovider.com/saml/callback',
+            metadataDefault: true
           },
           { default: false,
-            callbackUrl: 'http://example.serviceprovider.com/saml/callback2'
+            callbackUrl: 'http://example.serviceprovider.com/saml/callback2',
+            metadataDefault: false
           }],
           identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
         };
