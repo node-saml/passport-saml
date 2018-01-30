@@ -675,6 +675,37 @@ describe( 'passport-saml /', function() {
         done();
       });
 
+      it( 'config with callbackUrl as array of string should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          callbackUrl: ['http://example.serviceprovider.com/saml/callback', 'http://example.serviceprovider.com/saml/callback2'],
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata without key multiple callbacks.xml', 'utf-8');
+
+        testMetadata( samlConfig, expectedMetadata );
+        done();
+      });
+
+      it( 'config with callbackUrl as array of objects should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          callbackUrl: [{
+            default: true, 
+            callbackUrl:'http://example.serviceprovider.com/saml/callback'
+          },
+          { default: false,
+            callbackUrl: 'http://example.serviceprovider.com/saml/callback2'
+          }],
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expected metadata without key multiple callbacks.xml', 'utf-8');
+
+        testMetadata( samlConfig, expectedMetadata );
+        done();
+      });
+
+
       it( 'config with protocol, path, host, and decryptionPvk should pass', function( done ) {
         var samlConfig = {
           issuer: 'http://example.serviceprovider.com',
