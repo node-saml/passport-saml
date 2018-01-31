@@ -46,7 +46,7 @@ passport.use(new SamlStrategy(
 #### Config parameter details:
 
  * **Core**
-  * `callbackUrl`: full callbackUrl (overrides path/protocol if supplied)
+  * `callbackUrl`: full callbackUrl (overrides path/protocol if supplied); multiple can be supplied as either an array of strings, or an array of objects `{ callbackUrl: 'string', default: true, metadataDefault: true }`. If the default can't be determined the first one will be used. 
   * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
   * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `http://`)
   * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
