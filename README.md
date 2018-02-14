@@ -75,6 +75,9 @@ passport.use(new SamlStrategy(
   * `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
  * **Passport**
   * `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
+  * `name`: Optionally, provide a custom name. (default: `saml`). Useful If you want to instantiate the strategy multiple times with different configurations,
+            allowing users to authenticate against multiple different SAML targets from the same site. You'll need to use a unique set of URLs
+            for each target, and use this custom name when calling `passport.authenticate()` as well.
  * **Logout**
   * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
   * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
