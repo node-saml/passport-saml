@@ -111,6 +111,16 @@ module.exports = passport;
 ```
 # Troubleshooting
 
+## Errors you might encounter
+
+|Error   | Explanation  | Mitigation  |
+|--------|---|---|
+| `SAML assertion not yet valid`  | This means that there is a clock skew between your server time and your saml provider time. There might be a better way by fiddling with the ClockSkew You can disable clock skew validation with a value of `-1`.  | `{ acceptedClockSkewMs: -1 }`  |
+| `SAML provider returned Requester error: InvalidNameIDPolicy`  | Setting the   |   |
+| `SAML provider returned Requester error: unspecified`  |   |   |
+
+
+
 ## ADFS 2016
 
 If you are setting up an ADFS 2016 server, you might run into the following issue with the previous settings:
