@@ -1,4 +1,15 @@
 node_modules/
 .tern-port
+
+# =========================
+# Package manger lock file
+# =========================
+
+package-lock.json
 yarn.lock
+
+# =========================
+# Webstorm
+# =========================
+
 .idea
