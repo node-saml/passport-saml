@@ -16,9 +16,9 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 
 ## Usage
 
-### Configure strategy
+The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
 
-This example utilizes the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
+### Configure strategy
 
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
@@ -31,6 +31,36 @@ passport.use(new SamlStrategy(
     path: '/login/callback',
     entryPoint: 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
     issuer: 'passport-saml'
+  },
+  function(profile, done) {
+    findByEmail(profile.email, function(err, user) {
+      if (err) {
+        return done(err);
+      }
+      return done(null, user);
+    });
+  })
+);
+```
+
+### Configure strategy for multiple providers
+
+You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
+
+```javascript
+var MultiSamlStrategy = require('passport-saml/MultiSamlStrategy');
+[...]
+
+passport.use(new MultiSamlStrategy(
+  {
+    getSamlOptions: function(request, done) {
+      findProvider(request, function(err, provider) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, provider.configuration);
+      });
+    }
   },
   function(profile, done) {
     findByEmail(profile.email, function(err, user) {
@@ -236,10 +266,6 @@ Provide an instance of an object which has these functions passed to the `cacheP
 See [Releases](https://github.com/bergie/passport-saml/releases) to find the changes that go into each release.
 
 ## FAQ
-
-### What if I have multiple SAML providers that my users may be connecting to?
-
-A single instance of passport-saml will only authenticate users against a single identity provider.  If you have a use case where different logins need to be routed to different identity providers, you can create multiple instances of passport-saml, and either dispatch to them with your own routing code, or use a library like https://www.npmjs.org/package/passports.
 
 ### Is there an example I can look at?
 
