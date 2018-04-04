@@ -169,7 +169,7 @@ app.get('/login',
   passport.authenticate('saml', { additionalParams: { 'username': 'user@domain.com' }}),
   function(req, res) {
     res.redirect('/');
-  }     
+  }
 );
 ```
 
@@ -293,6 +293,14 @@ function callback(err, result)
 ```
 
 Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.
+
+## SLO (single logout)
+
+Passport-SAML has built in support for SLO including
+* Signature validation
+* IdP initiated and SP initiated logouts
+* `Redirect` and `POST` SAML Protocol Bindings
+
 
 ## ChangeLog
 
