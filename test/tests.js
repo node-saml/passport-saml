@@ -1598,6 +1598,7 @@ describe( 'passport-saml /', function() {
         var samlObj = new SAML( samlConfig );
 
         // Fake the current date to be within the valid time range
+        fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:09Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
@@ -1616,6 +1617,7 @@ describe( 'passport-saml /', function() {
         var samlObj = new SAML( samlConfig );
 
         // Fake the current date to be within the valid time range
+        fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:08Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
@@ -1634,6 +1636,7 @@ describe( 'passport-saml /', function() {
         var samlObj = new SAML( samlConfig );
 
         // Fake the current date to be after the valid time range
+        fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:13:07Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
@@ -1652,6 +1655,7 @@ describe( 'passport-saml /', function() {
         var samlObj = new SAML( samlConfig );
 
         // Fake the current date to be after the valid time range
+        fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:19:08Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
@@ -1670,6 +1674,7 @@ describe( 'passport-saml /', function() {
         var samlObj = new SAML( samlConfig );
 
         // Fake the current date to be after the valid time range
+        fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:19:09Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
@@ -1694,6 +1699,7 @@ describe( 'passport-saml /', function() {
         var samlObj = new SAML( samlConfig );
 
         // Fake the current date to be after the valid time range
+        fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse('2014-05-28T00:20:09Z'));
 
         samlObj.validatePostResponse( container, function( err, profile, logout ) {
@@ -1863,5 +1869,139 @@ describe( 'passport-saml /', function() {
             done();
         });
 	  });
+  });
+
+  describe('validateRedirect()', function() {
+    describe('idp slo', function() {
+      var samlObj;
+      beforeEach(function() {
+        samlObj = new SAML({
+          cert: fs.readFileSync(__dirname + '/static/acme_tools_com.cert', 'ascii'),
+          samlIssuer: 'http://localhost:20000/saml2/idp/metadata.php'
+        });
+        this.request = Object.assign({}, require('./static/idp_slo_redirect'));
+        this.clock = sinon.useFakeTimers(Date.parse('2018-04-11T14:08:00Z'));
+      });
+      afterEach(function() {
+        this.clock.restore();
+      });
+      it('errors if bad xml', function(done) {
+        var body = {
+          SAMLRequest: "asdf"
+        };
+        samlObj.validateRedirect(body, function(err) {
+          should.exist(err);
+          done();
+        });
+      });
+      it('errors if samlIssuer is set and issuer is wrong', function(done) {
+        samlObj.options.samlIssuer = 'foo';
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.should.eql(
+            'Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php'
+          );
+          done();
+        });
+      });
+      it('errors if request has expired', function(done) {
+        this.clock.restore();
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.message.should.eql('SAML assertion expired');
+          done();
+        });
+      });
+      it('errors if request has a bad signature', function(done) {
+        this.request.Signature = 'foo';
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.should.eql('Invalid signature');
+          done();
+        });
+      });
+      it('returns profile for valid signature including session index', function(done) {
+        samlObj.validateRedirect(this.request, function(err, profile) {
+          should.not.exist(err);
+          profile.should.eql({
+            ID: '_8f0effde308adfb6ae7f1e29b414957fc320f5636f',
+            issuer: 'http://localhost:20000/saml2/idp/metadata.php',
+            nameID: 'stavros@workable.com',
+            nameIDFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+            sessionIndex: '_00bf7b2d5d9d3c970217eecefb1194bef3362a618e'
+          });
+          done();
+        });
+      });
+    });
+    describe('sp slo', function() {
+      var samlObj;
+      beforeEach(function() {
+        samlObj = new SAML({
+          cert: fs.readFileSync(__dirname + '/static/acme_tools_com.cert', 'ascii'),
+          samlIssuer: 'http://localhost:20000/saml2/idp/metadata.php',
+          validateInResponseTo: true
+        });
+        this.request = Object.assign({}, require('./static/sp_slo_redirect'));
+        this.clock = sinon.useFakeTimers(Date.parse('2018-04-11T14:08:00Z'));
+      });
+      afterEach(function(done) {
+        this.clock.restore();
+        samlObj.cacheProvider.remove('_79db1e7ad12ca1d63e5b', done);
+      });
+      it('errors if bad xml', function(done) {
+        var body = {
+          SAMLRequest: "asdf"
+        };
+        samlObj.validateRedirect(body, function(err) {
+          should.exist(err);
+          done();
+        });
+      });
+      it('errors if samlIssuer is set and wrong issuer', function(done) {
+        samlObj.options.samlIssuer = 'foo';
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.should.eql(
+            'Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php'
+          );
+          done();
+        });
+      });
+      it('errors if unsuccessful', function(done) {
+        this.request = require('./static/sp_slo_redirect_failure');
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.should.eql(
+            'Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester'
+          );
+          done();
+        });
+      });
+      it('errors if InResponseTo is not found', function(done) {
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.message.should.eql('InResponseTo is not valid');
+          done();
+        });
+      });
+      it('errors if bad signature', function(done) {
+        samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
+        this.request.Signature = 'foo';
+        samlObj.validateRedirect(this.request, function(err) {
+          should.exist(err);
+          err.should.eql('Invalid signature');
+          done();
+        });
+      });
+      it('returns true for valid signature', function(done) {
+        samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
+        samlObj.validateRedirect(this.request, function(err, _data, success) {
+          should.not.exist(err);
+          success.should.eql(true);
+          done();
+        });
+      });
+    });
   });
 });
