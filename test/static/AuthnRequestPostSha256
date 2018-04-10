@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_12345678901234567890" Version="2.0" IssueInstant="2014-05-28T00:13:09.000Z" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" AssertionConsumerServiceURL="https://relyingparty/adfs/postResponse" Destination="https://adfs.acme_tools.com/adfs/ls/">
+<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+acme_tools_com</saml:Issuer>
+<samlp:RequestedAuthnContext xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Comparison="exact">
+<saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password</saml:AuthnContextClassRef>
+</samlp:RequestedAuthnContext>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<Reference URI="#_12345678901234567890">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<DigestValue>
+I5sUbdzY5j+6EArRiVKCAQ1shrksFgiPF3ZI2W0t2UU=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>
+GAHPaW3Cuf51hBjGCOA+EZElZbbR1NVJFyMbe3t4jo+eKSz5zbR1QxdtheRkZM/DhWY/fjNazzeBvwBs0+yXH6FyOF7/XriXFpAwpv/E+wrlugkoZTxIXB74FqZ/8uhvXDltSaO/EL+lCp+L+lEA783qmEDMU+HNV1aH6Pd1nAp93T8899mk0G33ASZw0xwY5Ap3UBbpD3v9fejC0is+4mF0E8TbVbcKymrl16BlcbUrCaFNepgskOwfR/Za9CMdnH2M/DFzzH2ONZmZY6hKkWu3jSKkCz1Yz08Qf077ns61gHOyTOltPP1g1H3v2erXVj7JOgMqPjNVLYiDmXAPmg==</SignatureValue>
+</Signature>
+</samlp:AuthnRequest>
