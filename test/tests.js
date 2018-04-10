@@ -673,16 +673,16 @@ describe( 'passport-saml /', function() {
     });
 
     describe( 'generateServiceProviderMetadata tests /', function() {
-      function testMetadata( samlConfig, expectedMetadata ) {
+      function testMetadata( samlConfig, expectedMetadata, signingCert ) {
         var samlObj = new SAML( samlConfig );
         var decryptionCert = fs.readFileSync(__dirname + '/static/testshib encryption cert.pem', 'utf-8');
-        var metadata = samlObj.generateServiceProviderMetadata( decryptionCert );
+        var metadata = samlObj.generateServiceProviderMetadata( decryptionCert, signingCert );
         // splits are to get a nice diff if they don't match for some reason
         metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
 
         // verify that we are exposed through Strategy as well
         var strategy = new SamlStrategy( samlConfig, function() {} );
-        metadata = strategy.generateServiceProviderMetadata( decryptionCert );
+        metadata = strategy.generateServiceProviderMetadata( decryptionCert, signingCert );
         metadata.split( '\n' ).should.eql( expectedMetadata.split( '\n' ) );
       }
 
@@ -739,6 +739,24 @@ describe( 'passport-saml /', function() {
         testMetadata( samlConfig, expectedMetadata );
         done();
       });
+
+      it( 'config with protocol, path, host, decryptionPvk and privateCert should pass', function( done ) {
+        var samlConfig = {
+          issuer: 'http://example.serviceprovider.com',
+          protocol: 'http://',
+          host: 'example.serviceprovider.com',
+          path: '/saml/callback',
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+          decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem'),
+          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key')
+        };
+        var expectedMetadata = fs.readFileSync(__dirname + '/static/expectedMetadataWithBothKeys.xml', 'utf-8');
+        var signingCert = fs.readFileSync(__dirname + '/static/acme_tools_com.cert').toString();
+
+        testMetadata( samlConfig, expectedMetadata, signingCert );
+        done();
+      });
+
   });
 
     it('generateServiceProviderMetadata contains logout callback url', function (done) {
