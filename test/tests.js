@@ -912,7 +912,7 @@ describe( 'passport-saml /', function() {
             done();
           });
         });
-  
+
         it( 'cert as a function should validate with the returned cert', function( done ) {
           var functionCertSamlConfig = {
             entryPoint: samlConfig.entryPoint,
@@ -930,7 +930,7 @@ describe( 'passport-saml /', function() {
             done();
           });
         });
-  
+
         it( 'cert as a function should validate with one of the returned certs', function( done ) {
           var functionMultiCertSamlConfig = {
             entryPoint: samlConfig.entryPoint,
@@ -982,6 +982,80 @@ describe( 'passport-saml /', function() {
       });
       afterEach(function(){
           fakeClock.restore();
+      });
+
+      it( 'acme_tools POST request signed with sha1', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          identifierFormat: null,
+          authnRequestBinding: 'HTTP-POST',
+          skipRequestCompression: false
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+        var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha1', 'utf-8');
+        samlObj.generateAuthorizeRequest(null,false, (err, request)=>{
+          if(err){
+            done(err)
+          } else {
+            request.toString().replace(/>/g,'>\n').split('\n').should.eql(expectedHtml.split('\n'))
+            done()
+          }
+        })
+      });
+
+      it( 'acme_tools POST request signed with sha256', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          identifierFormat: null,
+          signatureAlgorithm: 'sha256',
+          authnRequestBinding: 'HTTP-POST',
+          skipRequestCompression: false
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+        var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha256', 'utf-8');
+        samlObj.generateAuthorizeRequest(null,false, (err, request)=>{
+          if(err){
+            done(err)
+          } else {
+            request.toString().replace(/>/g,'>\n').split('\n').should.eql(expectedHtml.split('\n'))
+            done()
+          }
+        })
+      });
+
+      it( 'acme_tools POST request signed with sha512', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          identifierFormat: null,
+          signatureAlgorithm: 'sha512',
+          authnRequestBinding: 'HTTP-POST',
+          skipRequestCompression: false
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+        var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha512', 'utf-8');
+        samlObj.generateAuthorizeRequest(null,false, (err, request)=>{
+          if(err){
+            done(err)
+          } else {
+            request.toString().replace(/>/g,'>\n').split('\n').should.eql(expectedHtml.split('\n'))
+            done()
+          }
+        })
       });
 
       it( 'acme_tools request signed with sha256', function( done ) {
