@@ -115,11 +115,11 @@ module.exports = passport;
 
 |Error   | Explanation  | Mitigation  |
 |--------|---|---|
-| `SAML assertion not yet valid`  | This means that there is a clock skew between your server time and your saml provider time. There might be a better way by fiddling with the ClockSkew You can disable clock skew validation with a value of `-1`.  | `{ acceptedClockSkewMs: -1 }`  |
-| `SAML provider returned Requester error: InvalidNameIDPolicy`  | Setting the   |   |
-| `SAML provider returned Requester error: unspecified`  |   |   |
+| `SAML assertion not yet valid`  | This means that there is a clock skew between your server time and your saml provider time. There might be a better way by fiddling with the ClockSkew You can disable clock skew validation with a value of `-1`.  | `acceptedClockSkewMs: -1`  |
+| `SAML provider returned Requester error: InvalidNameIDPolicy`  | The provided `identifierFormat` is not supported by ADFS. Setting it to `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified` seemed to do the trick | `identifierFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'` |
+| `SAML provider returned Requester error: unspecified`  | An error happened on the identity provider side (ADFS) but no details have been given. Technically, the XML returned contains the status code `urn:oasis:names:tc:SAML:2.0:status:Responder` but no second level status code has been provided in the reply | *Contact the ADFS administrator to get more information from the ADFS logs.*  |
 
-
+[This page](https://msdn.microsoft.com/en-us/library/hh269642.aspx) references more error messages that helped me debug through.
 
 ## ADFS 2016
 
