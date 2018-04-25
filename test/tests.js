@@ -909,6 +909,7 @@ describe( 'passport-saml /', function() {
           samlObj.validatePostResponse( container, function( err, profile, logout ) {
             should.not.exist( err );
             profile.nameID.should.startWith( 'ploer' );
+            profile.sessionDuration.should.equal("2014-05-29T00:16:08Z");
             done();
           });
         });
