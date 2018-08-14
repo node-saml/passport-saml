@@ -839,7 +839,7 @@ describe( 'passport-saml /', function() {
           var samlObj = new SAML( samlConfig );
           samlObj.validatePostResponse( container, function( err, profile, logout ) {
             should.exist( err );
-            err.message.should.match( 'Invalid signature' );
+            err.message.should.match(/Invalid signature/);
             done();
           });
         });
@@ -854,7 +854,7 @@ describe( 'passport-saml /', function() {
           var samlObj = new SAML( samlConfig );
           samlObj.validatePostResponse( container, function( err, profile, logout ) {
             should.exist( err );
-            err.message.should.match( 'Invalid signature' );
+            err.message.should.match(/Invalid signature/);
             done();
           });
         });
@@ -869,7 +869,7 @@ describe( 'passport-saml /', function() {
           var samlObj = new SAML( samlConfig );
           samlObj.validatePostResponse( container, function( err, profile, logout ) {
             should.exist( err );
-            err.message.should.match( 'Invalid signature' );
+            err.message.should.match(/Invalid signature/);
             done();
           });
         });
@@ -887,7 +887,7 @@ describe( 'passport-saml /', function() {
           var samlObj = new SAML( samlConfig );
           samlObj.validatePostResponse( container, function( err, profile, logout ) {
             should.exist( err );
-            err.message.should.match( 'Invalid signature' );
+            err.message.should.match(/Invalid signature/);
             done();
           });
         });
@@ -1594,7 +1594,7 @@ describe( 'passport-saml /', function() {
       };
       samlObj.validatePostRequest(body, function(err) {
         should.exist(err);
-        err.should.eql(new Error('Invalid signature'));
+        err.should.eql(new Error('Invalid signature on documentElement'));
         done();
       });
     });
