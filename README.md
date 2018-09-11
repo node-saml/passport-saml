@@ -88,7 +88,7 @@ passport.use(new MultiSamlStrategy(
   * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
   * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
  * **Additional SAML behaviors**
-  * `additionalParams`: dictionary of additional query params to add to all requests
+  * `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
   * `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
   * `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
   * `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
@@ -137,6 +137,17 @@ app.get('/login',
   function(req, res) {
     res.redirect('/');
   }
+);
+```
+
+...or, if you wish to add or override query string parameters:
+
+```javascript
+app.get('/login',
+  passport.authenticate('saml', { additionalParams: { 'username': 'user@domain.com' }}),
+  function(req, res) {
+    res.redirect('/');
+  }     
 );
 ```
 

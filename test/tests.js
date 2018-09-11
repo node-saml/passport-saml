@@ -510,7 +510,7 @@ describe( 'passport-saml /', function() {
               encodedSamlRequest = querystring.parse( query ).SAMLRequest;
             }
 
-            var buffer = new Buffer(encodedSamlRequest, 'base64')
+            var buffer = new Buffer(encodedSamlRequest, 'base64');
             if (check.config.skipRequestCompression)
               helper(null, buffer);
             else
@@ -1035,7 +1035,7 @@ describe( 'passport-saml /', function() {
         };
         var samlObj = new SAML( samlConfig );
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
-        samlObj.getAuthorizeUrl({}, function(err, url) {
+        samlObj.getAuthorizeUrl({}, {}, function(err, url) {
           var qry = require('querystring').parse(require('url').parse(url).query);
           qry.SigAlg.should.match('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256');
           qry.Signature.should.match('SL85w0h6Pt7ejplGrR4OOTh4Zo9zs/MQHZep27kSzs4+U/0QdQi7hg5T0TKqCSRBZpVtspMpw+i6F0tZrFot0dIJgeCgkvMA2Tllwt6K0DbKWOiNXW5S2M9tUZktdJVfjr2D5e0SG4jQIwa4PVONgNQEKFxydIqwxVh9NGYeDeMUGq5/4QpMDLgYOvLfShyvhlzmqeUs7LBlZbKJLCeXZi/Z5bnF+QOAugtKuh0G6kFOS0CmKVLIW/4XicLHmggUBDlt0VJaskxUx2amHSNUoYe3Z9/9TeZqc7IswNUOEiq/oy0DLhokLnBEj+dBRMlgkAHp/gaWcc1Vp/1jSlVAvg==');
@@ -1059,7 +1059,7 @@ describe( 'passport-saml /', function() {
         };
         var samlObj = new SAML( samlConfig );
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
-        samlObj.getAuthorizeUrl({}, function(err, url) {
+        samlObj.getAuthorizeUrl({}, {}, function(err, url) {
           var qry = require('querystring').parse(require('url').parse(url).query);
           qry.SigAlg.should.match('http://www.w3.org/2000/09/xmldsig#rsa-sha1');
           qry.Signature.should.match('VnYOXVDiIaio+Vt8D2XXVwdyvwhDcdvgrQSkeq85G+MfU31yK9fvYEPFARK5pF1uJakMsYrKzVBv7HLCFcYuztpuIZloMFvFkado0MxFK4A/QFZn+EYDJE8ddLSvrW3iyuoxyVBSnH0+KLzDiI81B28YZNU3NFJIKCKzQSGIllJ7Vgw6KjH/BmE5DY0eSeUCEe6OygHgazjSrNIWQQjww5nSGIqAQl94OVanZtQBrYIUtik+d1lAhnginG0UnPccstenxEMAun2uMGp9hVqroWQvWRbX/xspRpjPOrIkvv63FzEgmRObXVNqpzDICJRUSlhTLdXAm2hb+ScYocO6EQ==');
@@ -1198,6 +1198,41 @@ describe( 'passport-saml /', function() {
         done();
       });
 
+      it ( 'should merge run-time params additionalLogoutParams and additionalAuthorizeParams with additionalParams', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalParams: {
+            'queryParam1': 'queryParamValue'
+          },
+          additionalAuthorizeParams: {
+            'queryParam2': 'queryParamValueAuthorize'
+          },
+          additionalLogoutParams: {
+            'queryParam2': 'queryParamValueLogout'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+        var options = {
+          additionalParams: {
+            queryParam3: 'queryParamRuntimeValue'
+          }
+        };
+
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, 'authorize', options.additionalParams);
+        Object.keys(additionalAuthorizeParams).should.have.length(3);
+        additionalAuthorizeParams.should.containEql({'queryParam1': 'queryParamValue',
+          'queryParam2': 'queryParamValueAuthorize',
+          'queryParam3': 'queryParamRuntimeValue'});
+
+        var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout', options.additionalParams);
+        Object.keys(additionalLogoutParams).should.have.length(3);
+        additionalLogoutParams.should.containEql({'queryParam1': 'queryParamValue',
+          'queryParam2': 'queryParamValueLogout',
+          'queryParam3': 'queryParamRuntimeValue'});
+
+        done();
+      });
+
       it ( 'should prioritize additionalLogoutParams and additionalAuthorizeParams over additionalParams', function( done ) {
         var samlConfig = {
           entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
@@ -1220,6 +1255,37 @@ describe( 'passport-saml /', function() {
         var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout');
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({'queryParam': 'queryParamValueLogout'});
+
+        done();
+      });
+
+      it ( 'should prioritize run-time params over all other params', function( done ) {
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          additionalParams: {
+            'queryParam': 'queryParamValue'
+          },
+          additionalAuthorizeParams: {
+            'queryParam': 'queryParamValueAuthorize'
+          },
+          additionalLogoutParams: {
+            'queryParam': 'queryParamValueLogout'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+        var options = {
+          additionalParams: {
+            queryParam: 'queryParamRuntimeValue'
+          }
+        };
+
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, 'authorize', options.additionalParams);
+        Object.keys(additionalAuthorizeParams).should.have.length(1);
+        additionalAuthorizeParams.should.containEql({'queryParam': 'queryParamRuntimeValue'});
+
+        var additionalLogoutParams = samlObj.getAdditionalParams({}, 'logout', options.additionalParams);
+        Object.keys(additionalLogoutParams).should.have.length(1);
+        additionalLogoutParams.should.containEql({'queryParam': 'queryParamRuntimeValue'});
 
         done();
       });
