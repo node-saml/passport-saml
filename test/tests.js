@@ -392,6 +392,42 @@ describe( 'passport-saml /', function() {
                    [ { _: 'myAuthnContext',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
       },
+      { name: "Config with multiple AuthnContext",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          passive: true,
+          attributeConsumingServiceIndex: 123,
+          authnContext: ['myAuthnContext', 'myAuthnContext2']
+        },
+        result: {
+          'samlp:AuthnRequest':
+           { '$':
+              { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                Version: '2.0',
+                ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                AssertionConsumerServiceURL: 'http://localhost:3033/login',
+                AttributeConsumingServiceIndex: '123',
+                Destination: 'https://wwwexampleIdp.com/saml',
+                IsPassive: 'true'},
+             'saml:Issuer':
+              [ { _: 'http://exampleSp.com/saml',
+                  '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
+             'samlp:NameIDPolicy':
+              [ { '$':
+                   { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                     Format: 'alternateIdentifier',
+                     AllowCreate: 'true' } } ],
+             'samlp:RequestedAuthnContext':
+              [ { '$':
+                   { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                     Comparison: 'exact' },
+                  'saml:AuthnContextClassRef':
+                   [ { _: 'myAuthnContext',
+                       '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } },
+                     { _: 'myAuthnContext2',
+                       '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
+      },
       { name: "Config with ProviderName",
         config: {
           issuer: 'http://exampleSp.com/saml',
