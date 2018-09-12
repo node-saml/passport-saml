@@ -1044,6 +1044,29 @@ describe( 'passport-saml /', function() {
         });
       });
 
+      it( 'acme_tools request not signed if missing entry point', function( done ) {
+        var samlConfig = {
+          entryPoint: '',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          signatureAlgorithm: 'sha256',
+          additionalParams: {
+            customQueryStringParam: 'CustomQueryStringParamValue'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+
+        var request = '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
+        samlObj.requestToUrl(request, null, 'authorize', {}, function(err) {
+            should.exist(err);
+            err.message.should.eql('"entryPoint" config parameter is required for signed messages');
+            done();
+        });
+      });
+
       it( 'acme_tools request signed with sha1', function( done ) {
         var samlConfig = {
           entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
