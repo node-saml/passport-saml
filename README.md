@@ -48,7 +48,7 @@ passport.use(new SamlStrategy(
 You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
 
 ```javascript
-var MultiSamlStrategy = require('passport-saml/MultiSamlStrategy');
+var MultiSamlStrategy = require('passport-saml').MultiSamlStrategy;
 [...]
 
 passport.use(new MultiSamlStrategy(
@@ -147,7 +147,7 @@ app.get('/login',
   passport.authenticate('saml', { additionalParams: { 'username': 'user@domain.com' }}),
   function(req, res) {
     res.redirect('/');
-  }     
+  }
 );
 ```
 
