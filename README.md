@@ -16,9 +16,9 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 
 ## Usage
 
-### Configure strategy
+The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
 
-This example utilizes the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
+### Configure strategy
 
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
@@ -43,6 +43,58 @@ passport.use(new SamlStrategy(
 );
 ```
 
+### Configure strategy for multiple providers
+
+You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
+
+```javascript
+var MultiSamlStrategy = require('passport-saml/multiSamlStrategy');
+[...]
+
+passport.use(new MultiSamlStrategy(
+  {
+    getSamlOptions: function(request, done) {
+      findProvider(request, function(err, provider) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, provider.configuration);
+      });
+    }
+  },
+  function(profile, done) {
+    findByEmail(profile.email, function(err, user) {
+      if (err) {
+        return done(err);
+      }
+      return done(null, user);
+    });
+  })
+);
+```
+
+#### The profile object:
+
+The profile object referenced above contains the following:
+
+```typescript
+type Profile = {
+  issuer?: string;
+  sessionIndex?: string;
+  nameID?: string;
+  nameIDFormat?: string;
+  nameQualifier?: string;
+  spNameQualifier?: string;
+  mail?: string;  // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
+  email?: string;  // `mail` if not present in the assertion
+  getAssertionXml(): string;  // get the raw assertion XML
+  getAssertion(): object;  // get the assertion XML parsed as a JavaScript object
+  ID?: string;
+} & {
+  [attributeName: string]: string;  // arbitrary `AttributeValue`s
+}
+```
+
 #### Config parameter details:
 
  * **Core**
@@ -50,7 +102,7 @@ passport.use(new SamlStrategy(
   * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
   * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `http://`)
   * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
-  * `entryPoint`: identity provider entrypoint
+  * `entryPoint`: identity provider entrypoint (is required to be spec-compliant when the request is signed)
   * `issuer`: issuer string to supply to identity provider
   * `audience`: expected saml response Audience (if not provided, Audience won't be verified)
   * `cert`: see [Security and signatures](#security-and-signatures)
@@ -58,13 +110,13 @@ passport.use(new SamlStrategy(
   * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
   * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
  * **Additional SAML behaviors**
-  * `additionalParams`: dictionary of additional query params to add to all requests
+  * `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
   * `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
   * `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
   * `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps.  Setting to `-1` will disable checking these conditions entirely.  Default is `0`.
   * `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
   * `disableRequestedAuthnContext`: if truthy, do not request a specific authentication context. This is [known to help when authenticating against Active Directory](https://github.com/bergie/passport-saml/issues/226) (AD FS) servers.
-  * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`)
+  * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`); array of values is also supported
   * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
   * `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
@@ -107,6 +159,17 @@ app.get('/login',
   function(req, res) {
     res.redirect('/');
   }
+);
+```
+
+...or, if you wish to add or override query string parameters:
+
+```javascript
+app.get('/login',
+  passport.authenticate('saml', { additionalParams: { 'username': 'user@domain.com' }}),
+  function(req, res) {
+    res.redirect('/');
+  }     
 );
 ```
 
@@ -238,10 +301,6 @@ Provide an instance of an object which has these functions passed to the `cacheP
 See [Releases](https://github.com/bergie/passport-saml/releases) to find the changes that go into each release.
 
 ## FAQ
-
-### What if I have multiple SAML providers that my users may be connecting to?
-
-A single instance of passport-saml will only authenticate users against a single identity provider.  If you have a use case where different logins need to be routed to different identity providers, you can create multiple instances of passport-saml, and either dispatch to them with your own routing code, or use a library like https://www.npmjs.org/package/passports.
 
 ### Is there an example I can look at?
 
