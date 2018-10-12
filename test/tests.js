@@ -1877,7 +1877,7 @@ describe( 'passport-saml /', function() {
       beforeEach(function() {
         samlObj = new SAML({
           cert: fs.readFileSync(__dirname + '/static/acme_tools_com.cert', 'ascii'),
-          samlIssuer: 'http://localhost:20000/saml2/idp/metadata.php'
+          idpIssuer: 'http://localhost:20000/saml2/idp/metadata.php'
         });
         this.request = Object.assign({}, require('./static/idp_slo_redirect'));
         this.clock = sinon.useFakeTimers(Date.parse('2018-04-11T14:08:00Z'));
@@ -1894,8 +1894,8 @@ describe( 'passport-saml /', function() {
           done();
         });
       });
-      it('errors if samlIssuer is set and issuer is wrong', function(done) {
-        samlObj.options.samlIssuer = 'foo';
+      it('errors if idpIssuer is set and issuer is wrong', function(done) {
+        samlObj.options.idpIssuer = 'foo';
         samlObj.validateRedirect(this.request, function(err) {
           should.exist(err);
           err.should.eql(
@@ -1939,7 +1939,7 @@ describe( 'passport-saml /', function() {
       beforeEach(function() {
         samlObj = new SAML({
           cert: fs.readFileSync(__dirname + '/static/acme_tools_com.cert', 'ascii'),
-          samlIssuer: 'http://localhost:20000/saml2/idp/metadata.php',
+          idpIssuer: 'http://localhost:20000/saml2/idp/metadata.php',
           validateInResponseTo: true
         });
         this.request = Object.assign({}, require('./static/sp_slo_redirect'));
@@ -1958,8 +1958,8 @@ describe( 'passport-saml /', function() {
           done();
         });
       });
-      it('errors if samlIssuer is set and wrong issuer', function(done) {
-        samlObj.options.samlIssuer = 'foo';
+      it('errors if idpIssuer is set and wrong issuer', function(done) {
+        samlObj.options.idpIssuer = 'foo';
         samlObj.validateRedirect(this.request, function(err) {
           should.exist(err);
           err.should.eql(
