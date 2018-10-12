@@ -125,6 +125,8 @@ type Profile = {
   * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
   * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
   * `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
+ * **Issuer Validation**
+  * `idpIssuer`: if provided, then the IdP issuer will be validated for incoming Logout Requests/Responses. For ADFS this looks like `https://acme_tools.windows.net/deadbeef`
  * **Passport**
   * `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
   * `name`: Optionally, provide a custom name. (default: `saml`). Useful If you want to instantiate the strategy multiple times with different configurations,
