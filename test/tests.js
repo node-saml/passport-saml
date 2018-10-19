@@ -458,6 +458,23 @@ describe( 'passport-saml /', function() {
                   'saml:AuthnContextClassRef':
                    [ { _: 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport',
                        '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } ] } }
+      },
+      { name: "Remove NameIDPolicy, AuthnRequest, and AssertionConsumerServiceURL Config",
+      config: {
+        identifierFormat: null,
+        disableRequestedAuthnContext: true,
+        disableRequestACSUrl: true,
+      },
+      result: {
+        'samlp:AuthnRequest':
+         { '$':
+            { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+              Version: '2.0',
+              ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+              Destination: 'https://wwwexampleIdp.com/saml'},
+           'saml:Issuer':
+            [ { _: 'onelogin_saml',
+                '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } }
       }
     ];
 
@@ -1056,7 +1073,7 @@ describe( 'passport-saml /', function() {
         samlObj.getAuthorizeUrl({}, {}, function(err, url) {
           var qry = require('querystring').parse(require('url').parse(url).query);
           qry.SigAlg.should.match('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256');
-          qry.Signature.should.match('SL85w0h6Pt7ejplGrR4OOTh4Zo9zs/MQHZep27kSzs4+U/0QdQi7hg5T0TKqCSRBZpVtspMpw+i6F0tZrFot0dIJgeCgkvMA2Tllwt6K0DbKWOiNXW5S2M9tUZktdJVfjr2D5e0SG4jQIwa4PVONgNQEKFxydIqwxVh9NGYeDeMUGq5/4QpMDLgYOvLfShyvhlzmqeUs7LBlZbKJLCeXZi/Z5bnF+QOAugtKuh0G6kFOS0CmKVLIW/4XicLHmggUBDlt0VJaskxUx2amHSNUoYe3Z9/9TeZqc7IswNUOEiq/oy0DLhokLnBEj+dBRMlgkAHp/gaWcc1Vp/1jSlVAvg==');
+          qry.Signature.should.match('hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA==');
           qry.customQueryStringParam.should.match('CustomQueryStringParamValue');
           done();
         });
@@ -1103,7 +1120,7 @@ describe( 'passport-saml /', function() {
         samlObj.getAuthorizeUrl({}, {}, function(err, url) {
           var qry = require('querystring').parse(require('url').parse(url).query);
           qry.SigAlg.should.match('http://www.w3.org/2000/09/xmldsig#rsa-sha1');
-          qry.Signature.should.match('VnYOXVDiIaio+Vt8D2XXVwdyvwhDcdvgrQSkeq85G+MfU31yK9fvYEPFARK5pF1uJakMsYrKzVBv7HLCFcYuztpuIZloMFvFkado0MxFK4A/QFZn+EYDJE8ddLSvrW3iyuoxyVBSnH0+KLzDiI81B28YZNU3NFJIKCKzQSGIllJ7Vgw6KjH/BmE5DY0eSeUCEe6OygHgazjSrNIWQQjww5nSGIqAQl94OVanZtQBrYIUtik+d1lAhnginG0UnPccstenxEMAun2uMGp9hVqroWQvWRbX/xspRpjPOrIkvv63FzEgmRObXVNqpzDICJRUSlhTLdXAm2hb+ScYocO6EQ==');
+          qry.Signature.should.match('MeFo+LjufxP5A+sCRwzR/YH/RV6W14aYSFjUdie62JxkI6hDcVhoSZQUJ3wtWMhL59gJj05tTFnXAZRqUQVsavyy41cmUZVeCsat0gaHBQOILXpp9deB0iSJt1EVQTOJkVx8uu2/WYu/bBiH7w2bpwuCf1gJhlqZb/ca3B6yjHSMjnnVfc2LbNPWHpE5464lrs79VjDXf9GQWfrBr95dh3P51IAb7C+77KDWQUl9WfZfyyuEgS83vyZ0UGOxT4AObJ6NOcLs8+iidDdWJJkBaKQev6U+AghCjLQUYOrflivLIIyqATKu2q9PbOse6Phmnxok50+broXSG23+e+742Q==');
           qry.customQueryStringParam.should.match('CustomQueryStringParamValue');
           done();
         });
