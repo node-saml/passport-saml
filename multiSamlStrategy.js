@@ -6,9 +6,14 @@ function MultiSamlStrategy (options, verify) {
   if (!options || typeof options.getSamlOptions != 'function') {
     throw new Error('Please provide a getSamlOptions function');
   }
+  
+  if (typeof options.errorCallback != 'function') {
+    throw new Error('Please provide a callback for handling fetch errors');
+  }
 
   SamlStrategy.call(this, options, verify);
   this._getSamlOptions = options.getSamlOptions;
+  this.error = options.errorCallback;
 }
 
 util.inherits(MultiSamlStrategy, SamlStrategy);
