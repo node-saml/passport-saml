@@ -105,7 +105,7 @@ type Profile = {
   * `entryPoint`: identity provider entrypoint (is required to be spec-compliant when the request is signed)
   * `issuer`: issuer string to supply to identity provider
   * `audience`: expected saml response Audience (if not provided, Audience won't be verified)
-  * `cert`: see [Security and signatures](#security-and-signatures)
+  * `cert`: the IDP's public signing certificate used to validate the signatures of the incoming SAML Responses, see [Security and signatures](#security-and-signatures)
   * `privateCert`: see [Security and signatures](#security-and-signatures)
   * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
   * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
