@@ -6,21 +6,21 @@ acme_tools_com</saml:Issuer>
 <saml:AuthnContextClassRef xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
 http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password</saml:AuthnContextClassRef>
 </samlp:RequestedAuthnContext>
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-<SignedInfo>
-<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-<Reference URI="#_12345678901234567890">
-<Transforms>
-<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
-<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-</Transforms>
-<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-<DigestValue>
-I5sUbdzY5j+6EArRiVKCAQ1shrksFgiPF3ZI2W0t2UU=</DigestValue>
-</Reference>
-</SignedInfo>
-<SignatureValue>
-MWMBR24noTSmRaA5B79njzWPi9yMgHQkP5vnk8qdBwKHvoH1J6NUZqiTpi7izS3m/7LAFzEeprV1GIupqvfa1HrNa6zdxfY1BkSa8UBkUXPE/W/zzaU0uiEDPh7ps8USqsf8Ly8pHUlQCM1bj9YlPfkyaTtQX+r0kgHukT7TSiI27sYPBMbv04VQ/sndBU5cNKa9IDfO0SNytOKhM4x9uwyT1Q+zT9mjAcSTMG4/qHqzuRn/n9Q0qLGB3/hPuauxPKr35T7kPWz2TszYYf1SwpcdpCnlsPiqoWLFCHle4ooYAZfhtkD0a/opakCcBJ2fJorP9i7up7w7f653bhbpVg==</SignatureValue>
-</Signature>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#_12345678901234567890">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<ds:DigestValue>
+I5sUbdzY5j+6EArRiVKCAQ1shrksFgiPF3ZI2W0t2UU=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+ZErQ91IvETvGPvNdBVgTMtOdxt4Izes2aLsRJO34ggjJdazi9dyh2zCyiTV68aeFxONVlPB/kM42kvbOYd8isnIhy81GidcxAFU6Vf0IRfR+2NJrlNo+Hg5hc+KlKPsHSVW954MdG9MmXsAV6oQ41KZX3sw9buVJUWAL7gxY8c3+Vmr9Kez62IsTpnjyAL5iZk5SB4xtozyzH6WlLOHFAphGOo6QJ7IoS+A2Y8h2NtuVNxS5FnfoK4EgpaKsxV9X1URTfcX+2/rG9W9HFjEnQo7kHq3j624lsArvzDZQGdpOsR/v1x2Te6nV2xYIjHXdCtj9Xkj7mXRK9OtU2mmHng==</ds:SignatureValue>
+</ds:Signature>
 </samlp:AuthnRequest>

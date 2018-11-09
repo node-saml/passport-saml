@@ -746,7 +746,7 @@ describe( 'passport-saml /', function() {
         done();
       });
 
-      it( 'config with protocol, path, host, decryptionPvk and privateCert should pass', function( done ) {
+      it( 'config with protocol, path, host, decryptionPvk and providerPrivateKey should pass', function( done ) {
         var samlConfig = {
           issuer: 'http://example.serviceprovider.com',
           protocol: 'http://',
@@ -754,7 +754,7 @@ describe( 'passport-saml /', function() {
           path: '/saml/callback',
           identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
           decryptionPvk: fs.readFileSync(__dirname + '/static/testshib encryption pvk.pem'),
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key')
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key')
         };
         var expectedMetadata = fs.readFileSync(__dirname + '/static/expectedMetadataWithBothKeys.xml', 'utf-8');
         var signingCert = fs.readFileSync(__dirname + '/static/acme_tools_com.cert').toString();
@@ -1049,7 +1049,7 @@ describe( 'passport-saml /', function() {
           entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
           issuer: 'acme_tools_com',
           callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
           authnRequestBinding: 'HTTP-POST',
@@ -1059,6 +1059,7 @@ describe( 'passport-saml /', function() {
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
         var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha1', 'utf-8');
         samlObj.generateAuthorizeRequest(null,false, (err, request)=>{
+          console.log('»»» I expect this maaaain', request);
           if(err){
             done(err)
           } else {
@@ -1073,7 +1074,7 @@ describe( 'passport-saml /', function() {
           entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
           issuer: 'acme_tools_com',
           callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
           signatureAlgorithm: 'sha256',
@@ -1084,6 +1085,7 @@ describe( 'passport-saml /', function() {
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
         var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha256', 'utf-8');
         samlObj.generateAuthorizeRequest(null,false, (err, request)=>{
+          console.log('»»» I expect this maaaain', request);
           if(err){
             done(err)
           } else {
@@ -1098,7 +1100,7 @@ describe( 'passport-saml /', function() {
           entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
           issuer: 'acme_tools_com',
           callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
           signatureAlgorithm: 'sha512',
@@ -1109,6 +1111,7 @@ describe( 'passport-saml /', function() {
         samlObj.generateUniqueID = function () { return '12345678901234567890' };
         var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha512', 'utf-8');
         samlObj.generateAuthorizeRequest(null,false, (err, request)=>{
+          console.log('»»» I expect this maaaain', request);
           if(err){
             done(err)
           } else {
@@ -1118,12 +1121,61 @@ describe( 'passport-saml /', function() {
         })
       });
 
+      it('acme_tools POST AuthnRequest signed with sha512 and certificate', function(done) {
+        var samlConfig = {
+          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerCert: fs.readFileSync(__dirname + '/static/acme_tools_com.cert', 'utf-8'),
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          identifierFormat: null,
+          signatureAlgorithm: 'sha512',
+          authnRequestBinding: 'HTTP-POST',
+          skipRequestCompression: false
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+        var expectedHtml = fs.readFileSync(__dirname + '/static/AuthnRequestPostSha512Certificate', 'utf-8');
+        samlObj.generateAuthorizeRequest(null,false, (err, request) => {
+          console.log('»»» I expect this maaaain', request);
+          if (err) {
+            done(err);
+          } else {
+            request.toString().replace(/>/g,'>\n').split('\n').should.eql(expectedHtml.split('\n'));
+            done();
+          }
+        });
+      });
+
+      it('acme_tools POST Logout response signed with sha512 and certificate', function(done) {
+        var samlConfig = {
+          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerCert: fs.readFileSync(__dirname + '/static/acme_tools_com.cert', 'utf-8'),
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          identifierFormat: null,
+          signatureAlgorithm: 'sha512',
+          authnRequestBinding: 'HTTP-POST',
+          skipRequestCompression: false
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+        var expectedHtml = fs.readFileSync(__dirname + '/static/logout-response-with-signature.xml', 'utf-8');
+
+        var response = samlObj.generateLogoutResponse({}, { ID: "quux" });
+        response.toString().replace(/>/g,'>\n').split('\n').should.eql(expectedHtml.split('\n'));
+        done();
+      });
+
       it( 'acme_tools request signed with sha256', function( done ) {
         var samlConfig = {
           entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
           issuer: 'acme_tools_com',
           callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
           signatureAlgorithm: 'sha256',
@@ -1147,7 +1199,7 @@ describe( 'passport-saml /', function() {
           entryPoint: '',
           issuer: 'acme_tools_com',
           callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           signatureAlgorithm: 'sha256',
           additionalParams: {
@@ -1170,7 +1222,7 @@ describe( 'passport-saml /', function() {
           entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
           issuer: 'acme_tools_com',
           callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
+          providerPrivateKey: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8'),
           authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
           identifierFormat: null,
           signatureAlgorithm: 'sha1',
@@ -1912,10 +1964,10 @@ describe( 'passport-saml /', function() {
         done();
       });
     });
-	  it('errors if bad privateCert to requestToURL', function(done){
+	  it('errors if bad providerPrivateKey to requestToURL', function(done){
 		  var samlObj = new SAML({
               entryPoint: "foo",
-              privateCert: "-----BEGIN CERTIFICATE-----\n"+
+              providerPrivateKey: "-----BEGIN CERTIFICATE-----\n"+
                 "8mvhvrcCOiJ3mjgKNN1F31jOBJuZNmq0U7n9v+Z+3NfyU/0E9jkrnFvm5ks+p8kl\n" +
                 "BjuBk9RAkazsU9l02XMS/VxOOIifxKC7R9bDtx0hjolYxgqxPIO5s4rmjj0rLzvo\n" +
                 "vQTTTx/tB5e+hbdx922QSeTjP4DO4ms6cIexcH+ZEUOJ3wXiHToJW83SXLRtwPI9\n" +
