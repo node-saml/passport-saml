@@ -184,6 +184,8 @@ The `decryptionCert` argument should be a public certificate matching the `decry
 
 The `signingCert` argument should be a public certificate matching the `privateCert` and is required if the strategy is configured with a `privateCert`.
 
+The `generateServiceProviderMetadata` method is also available on the `MultiSamlStrategy`, but needs an extra request and a callback argument (`generateServiceProviderMetadata( req, decryptionCert, signingCert, next )`), which are passed to the `getSamlOptions` to retrieve the correct configuration.
+
 
 ## Security and signatures
 
