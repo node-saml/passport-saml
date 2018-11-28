@@ -49,4 +49,17 @@ MultiSamlStrategy.prototype.logout = function (req, options) {
   });
 };
 
+MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, decryptionCert, signingCert, next ) {
+  var self = this;
+
+  return this._getSamlOptions(req, function (err, samlOptions) {
+    if (err) {
+      return next(err);
+    }
+
+    self._saml = new saml.SAML(samlOptions);
+    return next(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(self, decryptionCert, signingCert ));
+  });
+};
+
 module.exports = MultiSamlStrategy;
