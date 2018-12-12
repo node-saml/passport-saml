@@ -149,8 +149,13 @@ type Profile = {
 
 You need to provide a route corresponding to the `path` configuration parameter given to the strategy:
 
+The authentication callback must be invoked after the `body-parser` middlerware.
+
 ```javascript
+const bodyParser = require('body-parser');
+
 app.post('/login/callback',
+  bodyParser.urlencoded({ extended: false }),
   passport.authenticate('saml', { failureRedirect: '/', failureFlash: true }),
   function(req, res) {
     res.redirect('/');
