@@ -89,6 +89,7 @@ type Profile = {
   email?: string;  // `mail` if not present in the assertion
   getAssertionXml(): string;  // get the raw assertion XML
   getAssertion(): object;  // get the assertion XML parsed as a JavaScript object
+  getSamlResponseXml(): string; // get the raw SAML response XML
   ID?: string;
 } & {
   [attributeName: string]: string;  // arbitrary `AttributeValue`s
