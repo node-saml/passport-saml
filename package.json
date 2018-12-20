@@ -1,5 +1,5 @@
 {
-  "name": "passport-saml",
+  "name": "suomifi-passport-saml",
   "version": "1.0.0",
   "license": "MIT",
   "keywords": [
@@ -8,7 +8,7 @@
     "sso",
     "shibboleth"
   ],
-  "description": "SAML 2.0 authentication strategy for Passport",
+  "description": "SAML 2.0 authentication strategy for Passport with Vetuma language selection extension",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi",
