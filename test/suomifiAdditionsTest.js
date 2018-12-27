@@ -92,6 +92,7 @@ describe( 'suomifi additions for passport-saml /', function() {
       //       tests are enabled (i.e there are only few test cases which must be tested with one or more
       //       of these checks disabled in order to "reach" relevant part of the code/system under test)
       suomifiAdditions: {
+        disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes: false,
         disableValidateInResponseEnforcementForUnitTestingPurposes: false,
         disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false,
         disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: false,
@@ -168,7 +169,28 @@ describe( 'suomifi additions for passport-saml /', function() {
         });
       });
 
-      it('must not consume unsigned message with unsigned UNencrypted login responses', function (done) {
+      it('must not consume login response with encrypted and plaintext assertions (i.e. >1 assertions)', function (done) {
+
+        const samlConfig = createBaselineSAMLConfiguration();
+
+        // NOTE: message has encrypted and unencrypted assertions
+        const base64xml = new Buffer(
+          assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_ALONG_WITH_PLAIN_TEXT_ASSERTION_LOGIN_RESPONSE)
+        ).toString('base64');
+
+        const container = {SAMLResponse: base64xml};
+        const samlObj = new SAML(samlConfig);
+        samlObj.validatePostResponse(container, function (err, profile) {
+          should.exist(err);
+          should.not.exist(profile);
+          // NOTE: unfortunately passport-saml's current error message for encrypted and plain text assertions
+          // case in same login response is not very "intuitive"
+          err.message.should.match('Invalid signature: multiple assertions');
+          done();
+        });
+      });
+
+      it('must not consume unsigned message with unsigned UNencrypted login response', function (done) {
 
         const samlConfig = createBaselineSAMLConfiguration();
 
@@ -186,7 +208,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         });
       });
 
-      it('must not consume unsigned message with unsigned ENcrypted login responses', function (done) {
+      it('must not consume unsigned message with unsigned ENcrypted login response', function (done) {
 
         const samlConfig = createBaselineSAMLConfiguration();
 
@@ -236,6 +258,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         const samlConfig = createBaselineSAMLConfiguration();
         // In order to test this particular case few suomifi additional checks must be disabled
         samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
+        samlConfig.suomifiAdditions.disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes = true;
 
         const base64xml = new Buffer(
           // NOTE: modify content of signed assertion
@@ -258,6 +281,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         const samlConfig = createBaselineSAMLConfiguration();
         // in order to test this particular case few suomifi additional checks must be disabled
         samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
+        samlConfig.suomifiAdditions.disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes = true;
 
         const base64xml = new Buffer(
           assertTruthy(testData.UNSIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
@@ -414,6 +438,85 @@ describe( 'suomifi additions for passport-saml /', function() {
 
       });
 
+      describe('validate EncryptedAssertionsOnlyPolicyEnforcement /', function () {
+
+        it('must not consume signed login messages with unencrypted (signed) assertion', function (done) {
+
+          const samlConfig = createBaselineSAMLConfiguration();
+
+          // NOTE: top level message signature validity enforcement is turned of in this particular test case because
+          // current baseline passport-saml's top level/message level signature validation does not work
+          // correctly when message has two signatures available/visible during top/message level signature validation.
+          //
+          // I.e. because this test case has message which
+          //   1) has message level signature
+          //   2) does not have encrypted assertion
+          //   3) has signed assertion
+          // and because baseline passport-saml (0.32.1)'s validateSignature function has xpathSigQuery which
+          // shall return both signatures (even though those signatures do not cover same content), validateSignature
+          // function implementation shall consider this situation as error and returns false. See:
+          //
+          // https://github.com/bergie/passport-saml/blob/3165135d75e96550e2cd9d4edd6e310cb8261972/lib/passport-saml/saml.js#L575
+          // https://github.com/bergie/passport-saml/blob/3165135d75e96550e2cd9d4edd6e310cb8261972/lib/passport-saml/saml.js#L490
+          // https://github.com/bergie/passport-saml/blob/3165135d75e96550e2cd9d4edd6e310cb8261972/lib/passport-saml/saml.js#L492-L498
+          // ( 3165135d75e96550e2cd9d4edd6e310cb8261972 == 0.32.1 )
+          //
+          // As visible in this block:
+          // https://github.com/bergie/passport-saml/blob/3165135d75e96550e2cd9d4edd6e310cb8261972/lib/passport-saml/saml.js#L575-L577
+          // baseline passport-saml basically ignores situation where it was unable to verify message level signature.
+          // I.e. it considers this situation as "soft error" (i.e. does not set validSignature flag to true) and
+          // proceeds to process content of the message. If content happens to contain assertion it tries to verify
+          // assertion's signature (unless message level signature was not considered valid), see
+          // https://github.com/bergie/passport-saml/blob/3165135d75e96550e2cd9d4edd6e310cb8261972/lib/passport-saml/saml.js#L591-592
+          // https://github.com/bergie/passport-saml/blob/3165135d75e96550e2cd9d4edd6e310cb8261972/lib/passport-saml/saml.js#L613-L614
+          //
+          // BUT because one of the suomifi's additional checks / enforcements is that message's (top level) signature
+          // MUST be valid, passport-saml's default behaviour is/was modified so that if message's signature check failed
+          // (i.e. validSignature flag is false after messages signature check code block) regardless of the reason reason
+          // (i.e. e.g. if validateSignature did not return true) whole message is discarded.
+          //
+          // So..."message which is signed and has unencrypted signed assertion" would normally (i.e. without any
+          // policy changes) pass through message level signature check (even though signature's validity was not
+          // checked) and content of that message (in this case unencrypted signed assertion) would be handled.
+          //
+          // BUT since one of the suomifi additions is that assertions must always be encrypted and because this
+          // particular test case is about testing this particular policy (i.e. encrypted assertions only)
+          // disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes is set to true
+          // so that this test case is able to verify that message which contain unencrypted assertion causes
+          // expected error.
+          samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
+
+          const base64xml = new Buffer(
+            assertTruthy(testData.SIGNED_MESSAGE_SIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+          ).toString('base64');
+          const container = {SAMLResponse: base64xml};
+          const samlObj = new SAML(samlConfig);
+          samlObj.validatePostResponse(container, function (err, profile) {
+            should.exist(err);
+            should.not.exist(profile);
+            err.message.should.match('Unencrypted assertion(s) are not allowed');
+            done();
+          });
+        });
+
+        it('must not consume signed login messages with unencrypted (unsigned) assertion', function (done) {
+
+          const samlConfig = createBaselineSAMLConfiguration();
+
+          const base64xml = new Buffer(
+            assertTruthy(testData.SIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+          ).toString('base64');
+          const container = {SAMLResponse: base64xml};
+          const samlObj = new SAML(samlConfig);
+          samlObj.validatePostResponse(container, function (err, profile) {
+            should.exist(err);
+            should.not.exist(profile);
+            err.message.should.match('Unencrypted assertion(s) are not allowed');
+            done();
+          });
+        });
+      });
+
       describe('validate AssertionSignatureVerificationEnforcement /', function () {
 
         it('must not consume signed login messages with encrypted unsigned assertion', function (done) {
@@ -436,6 +539,10 @@ describe( 'suomifi additions for passport-saml /', function() {
         it('must not consume signed login messages with unencrypted unsigned assertion', function (done) {
 
           const samlConfig = createBaselineSAMLConfiguration();
+          // NOTE: in order to test AssertionSignatureVerificationEnforcement with messages that have unencrypted
+          // assertions one suomifi additional enforcement must be disabled
+          samlConfig.suomifiAdditions.disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes = true;
+
           const base64xml = new Buffer(
             assertTruthy(testData.SIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');

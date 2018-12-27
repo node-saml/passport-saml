@@ -12,6 +12,7 @@ var reqOptions = null
 // passport-saml tests against modified passport-saml saml.js following checks must be disabled (i.e. disable flags
 // must be turned to true)
 const suomifiAdditionsOptions = Object.freeze({
+  disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes: true,
   disableValidateInResponseEnforcementForUnitTestingPurposes: true,
   disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: true,
   disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: true,
