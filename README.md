@@ -144,6 +144,7 @@ type Profile = {
 Default values are (see [lib/passport-saml/saml.js](lib/passport-saml/saml.js)):
 ```javascript
 suomifiAdditions = {
+  disableValidateInResponseEnforcementForUnitTestingPurposes:  false,
   disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false
 }
 ```

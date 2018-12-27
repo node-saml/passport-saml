@@ -66,7 +66,7 @@ describe( 'suomifi additions for passport-saml /', function() {
    *     validateInResponseTo: boolean,
    *     suomifiAdditions: {
    *       disableEncryptedOnlyAssertionsPolicyEnforcementForUnitTestPurposes: boolean,
-   *       disableValidateInResponseEnforcingForUnitTestingPurposes: boolean,
+   *       disableValidateInResponseEnforcementForUnitTestingPurposes: boolean,
    *       disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: boolean,
    *       disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: boolean,
    *       disableAudienceCheckEnforcementForUnitTestPurposes: boolean,
@@ -92,6 +92,7 @@ describe( 'suomifi additions for passport-saml /', function() {
       //       tests are enabled (i.e there are only few test cases which must be tested with one or more
       //       of these checks disabled in order to "reach" relevant part of the code/system under test)
       suomifiAdditions: {
+        disableValidateInResponseEnforcementForUnitTestingPurposes: false,
         disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false
       }
     }
@@ -116,6 +117,31 @@ describe( 'suomifi additions for passport-saml /', function() {
           should.exist(profile);
           profile.nameID.should.exactly(VALID_NAME_ID);
           profile[SSN_ATTRIBUTE_NAME].should.exactly(VALID_SSN);
+          done();
+        });
+      });
+
+      it('must not consume valid login response with incorrect in_response_to value', function (done) {
+
+        const samlConfig = createBaselineSAMLConfiguration();
+
+        // setup cacheprovider wich does not have valid auth request stored
+        // i.e. remove existing in response value from cache
+        samlConfig.cacheProvider.remove(VALID_AUTH_REQUEST_ID, (err, result) => {
+          should.not.exist(err);
+          should.exist(result);
+          result.should.match(VALID_AUTH_REQUEST_ID);
+        });
+
+        const base64xml = new Buffer(
+          assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+        ).toString('base64');
+        const container = {SAMLResponse: base64xml};
+        const samlObj = new SAML(samlConfig);
+        samlObj.validatePostResponse(container, function (err, profile) {
+          should.exist(err);
+          should.not.exist(profile);
+          err.message.should.match('InResponseTo is not valid');
           done();
         });
       });
@@ -261,6 +287,29 @@ describe( 'suomifi additions for passport-saml /', function() {
             should.not.exist(profile);
             // NOTE: baseline passport-saml would NOT throw exception if cert is not configured
             err.message.should.match('Invalid top level signature');
+            done();
+          });
+        });
+
+      });
+
+      describe('validate ValidateInResponseEnforcement /', function () {
+
+        it('must not consume login response if ValidateInResponse is not configured and used', function (done) {
+
+          const samlConfig = createBaselineSAMLConfiguration();
+          // NOTE: set validateInResponseTo undefined to test this case
+          samlConfig.validateInResponseTo = undefined;
+
+          const base64xml = new Buffer(
+            assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+          ).toString('base64');
+          const container = {SAMLResponse: base64xml};
+          const samlObj = new SAML(samlConfig);
+          samlObj.validatePostResponse(container, function (err, profile) {
+            should.exist(err);
+            should.not.exist(profile);
+            err.message.should.match('validateInResponseTo feature is not configured on');
             done();
           });
         });
