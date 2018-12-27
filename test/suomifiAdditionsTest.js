@@ -93,7 +93,8 @@ describe( 'suomifi additions for passport-saml /', function() {
       //       of these checks disabled in order to "reach" relevant part of the code/system under test)
       suomifiAdditions: {
         disableValidateInResponseEnforcementForUnitTestingPurposes: false,
-        disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false
+        disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false,
+        disableAudienceCheckEnforcementForUnitTestPurposes: false
       }
     }
   }
@@ -117,6 +118,26 @@ describe( 'suomifi additions for passport-saml /', function() {
           should.exist(profile);
           profile.nameID.should.exactly(VALID_NAME_ID);
           profile[SSN_ATTRIBUTE_NAME].should.exactly(VALID_SSN);
+          done();
+        });
+      });
+
+      it('must not consume valid login response with incorrect audience', function (done) {
+
+        const samlConfig = createBaselineSAMLConfiguration();
+
+        // configure audience to be anything but the value inside login response
+        samlConfig.audience = VALID_AUDIENCE + 'incorrect_audience';
+
+        const base64xml = new Buffer(
+          assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+        ).toString('base64');
+        const container = {SAMLResponse: base64xml};
+        const samlObj = new SAML(samlConfig);
+        samlObj.validatePostResponse(container, function (err, profile) {
+          should.exist(err);
+          should.not.exist(profile);
+          err.message.should.match('SAML assertion audience mismatch');
           done();
         });
       });
@@ -310,6 +331,29 @@ describe( 'suomifi additions for passport-saml /', function() {
             should.exist(err);
             should.not.exist(profile);
             err.message.should.match('validateInResponseTo feature is not configured on');
+            done();
+          });
+        });
+
+      });
+
+      describe('validate AudienceCheckEnforcement /', function () {
+
+        it('must not consume login response if audience check is not configured and used', function (done) {
+
+          const samlConfig = createBaselineSAMLConfiguration();
+          // NOTE: set audience to undefined to test this case
+          samlConfig.audience = undefined;
+
+          const base64xml = new Buffer(
+            assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+          ).toString('base64');
+          const container = {SAMLResponse: base64xml};
+          const samlObj = new SAML(samlConfig);
+          samlObj.validatePostResponse(container, function (err, profile) {
+            should.exist(err);
+            should.not.exist(profile);
+            err.message.should.match('options.audience was not configured');
             done();
           });
         });

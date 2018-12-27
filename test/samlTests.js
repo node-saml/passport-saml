@@ -13,7 +13,8 @@ var reqOptions = null
 // must be turned to true)
 const suomifiAdditionsOptions = Object.freeze({
   disableValidateInResponseEnforcementForUnitTestingPurposes: true,
-  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: true
+  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: true,
+  disableAudienceCheckEnforcementForUnitTestPurposes: true
 });
 // End suomifi additions
 

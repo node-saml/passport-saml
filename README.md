@@ -145,7 +145,8 @@ Default values are (see [lib/passport-saml/saml.js](lib/passport-saml/saml.js)):
 ```javascript
 suomifiAdditions = {
   disableValidateInResponseEnforcementForUnitTestingPurposes:  false,
-  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false
+  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false,
+  disableAudienceCheckEnforcementForUnitTestPurposes: false
 }
 ```
 i.e. these additional checks / policy enforcements are enabled by default
