@@ -20,6 +20,7 @@ var sinon        = require('sinon');
 const suomifiAdditionsOptions = Object.freeze({
   disableValidateInResponseEnforcementForUnitTestingPurposes: true,
   disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: true,
+  disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: true,
   disableAudienceCheckEnforcementForUnitTestPurposes: true
 });
 // End suomifi additions

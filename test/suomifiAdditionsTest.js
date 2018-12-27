@@ -94,6 +94,7 @@ describe( 'suomifi additions for passport-saml /', function() {
       suomifiAdditions: {
         disableValidateInResponseEnforcementForUnitTestingPurposes: false,
         disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false,
+        disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: false,
         disableAudienceCheckEnforcementForUnitTestPurposes: false
       }
     }
@@ -218,6 +219,59 @@ describe( 'suomifi additions for passport-saml /', function() {
           should.exist(err);
           should.not.exist(profile);
           err.message.should.match('Invalid top level signature');
+          done();
+        });
+      });
+
+      // NOTE: this case tests baseline passport-saml functionality which is that if
+      // 1) top level signature doesn't exist it (passport-saml) proceeds forwards
+      // 2) if it encounters assertion (and if IdP certificate is configured) it checks whether
+      //    assertions signature match
+      //
+      // i.e. this case test that if suomifi "enforce top level signature checking" is turned off
+      // that passport-saml shall spot modified assertion (and that assertions signature is verified even though
+      // top/message level signature was not verified)
+      it('must not consume unsigned login response with signed assertion if assertion\'s signature doesn\'t match (i.e. if assertion content is modified)', function (done) {
+
+        const samlConfig = createBaselineSAMLConfiguration();
+        // In order to test this particular case few suomifi additional checks must be disabled
+        samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
+
+        const base64xml = new Buffer(
+          // NOTE: modify content of signed assertion
+          assertTruthy(testData.UNSIGNED_MESSAGE_SIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+            .replace(VALID_SSN, 'modified_ssn' + VALID_SSN + 'modified_ssn')
+        ).toString('base64');
+        const container = {SAMLResponse: base64xml};
+        const samlObj = new SAML(samlConfig);
+        samlObj.validatePostResponse(container, function (err, profile) {
+          should.exist(err);
+          should.not.exist(profile);
+          err.message.should.match('Invalid assertion signature');
+          done();
+        });
+      });
+
+      // NOTE: this test requires that few suomifi additional checks are disabled
+      it('must not consume unsigned login response with unsigned assertion when IdP cert is configured', function (done) {
+
+        const samlConfig = createBaselineSAMLConfiguration();
+        // in order to test this particular case few suomifi additional checks must be disabled
+        samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
+
+        const base64xml = new Buffer(
+          assertTruthy(testData.UNSIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+        ).toString('base64');
+        const container = {SAMLResponse: base64xml};
+        const samlObj = new SAML(samlConfig);
+        samlObj.validatePostResponse(container, function (err, profile) {
+          should.exist(err);
+          should.not.exist(profile);
+          // NOTE: baseline passport-saml works so that if top level message signature is invalid / not available
+          // it (baseline passport-saml) doesn't stop there. It proceeds forward and if assertion is spotted
+          // it tries to verify assertions signature (if IdP cert is configured)...thus expected error message
+          // from baseline passport-saml in this particular case is "Invalid assertion signature"
+          err.message.should.match('Invalid assertion signature');
           done();
         });
       });
@@ -358,6 +412,42 @@ describe( 'suomifi additions for passport-saml /', function() {
           });
         });
 
+      });
+
+      describe('validate AssertionSignatureVerificationEnforcement /', function () {
+
+        it('must not consume signed login messages with encrypted unsigned assertion', function (done) {
+
+          const samlConfig = createBaselineSAMLConfiguration();
+
+          const base64xml = new Buffer(
+            assertTruthy(testData.SIGNED_MESSAGE_USIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+          ).toString('base64');
+          const container = {SAMLResponse: base64xml};
+          const samlObj = new SAML(samlConfig);
+          samlObj.validatePostResponse(container, function (err, profile) {
+            should.exist(err);
+            should.not.exist(profile);
+            err.message.should.match('Invalid assertion signature');
+            done();
+          });
+        });
+
+        it('must not consume signed login messages with unencrypted unsigned assertion', function (done) {
+
+          const samlConfig = createBaselineSAMLConfiguration();
+          const base64xml = new Buffer(
+            assertTruthy(testData.SIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+          ).toString('base64');
+          const container = {SAMLResponse: base64xml};
+          const samlObj = new SAML(samlConfig);
+          samlObj.validatePostResponse(container, function (err, profile) {
+            should.exist(err);
+            should.not.exist(profile);
+            err.message.should.match('Invalid assertion signature');
+            done();
+          });
+        });
       });
 
     });
