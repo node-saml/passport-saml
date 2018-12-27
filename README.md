@@ -136,7 +136,18 @@ type Profile = {
   * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
   * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
   * `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
+ * **Suomi.fi Additions**
+  * `suomifiAdditions`: contains (debug) flags which can be used to turn off certain suomi.fi specific SAML (login) response checks / policy enforcements
 
+### Suomi.fi Additions
+
+Default values are (see [lib/passport-saml/saml.js](lib/passport-saml/saml.js)):
+```javascript
+suomifiAdditions = {
+  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false
+}
+```
+i.e. these additional checks / policy enforcements are enabled by default
 
 ### Provide the authentication callback
 

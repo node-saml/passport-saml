@@ -6,11 +6,22 @@ var url = require('url');
 
 var reqOptions = null
 
+// Start suomifi additions
+//
+// few checks are enforced by default in suomifi-passport-saml. In order to be able to run default (unmodified)
+// passport-saml tests against modified passport-saml saml.js following checks must be disabled (i.e. disable flags
+// must be turned to true)
+const suomifiAdditionsOptions = Object.freeze({
+  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: true
+});
+// End suomifi additions
+
 describe('SAML.js', function () {
   describe('get Urls', function () {
     var saml, req, options;
     beforeEach(function () {
       saml = new SAML({
+        suomifiAdditions: suomifiAdditionsOptions,
         entryPoint: 'https://exampleidp.com/path?key=value',
         logoutUrl: 'https://exampleidp.com/path?key=value'
       });
