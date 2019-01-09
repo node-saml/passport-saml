@@ -4,11 +4,28 @@ var SAML = require('../lib/passport-saml/saml.js').SAML;
 var should = require('should');
 var url = require('url');
 
+var reqOptions = null
+
+// Start suomifi additions
+//
+// few checks are enforced by default in suomifi-passport-saml. In order to be able to run default (unmodified)
+// passport-saml tests against modified passport-saml saml.js following checks must be disabled (i.e. disable flags
+// must be turned to true)
+const suomifiAdditionsOptions = Object.freeze({
+  disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes: true,
+  disableValidateInResponseEnforcementForUnitTestingPurposes: true,
+  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: true,
+  disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: true,
+  disableAudienceCheckEnforcementForUnitTestPurposes: true
+});
+// End suomifi additions
+
 describe('SAML.js', function () {
   describe('get Urls', function () {
     var saml, req, options;
     beforeEach(function () {
       saml = new SAML({
+        suomifiAdditions: suomifiAdditionsOptions,
         entryPoint: 'https://exampleidp.com/path?key=value',
         logoutUrl: 'https://exampleidp.com/path?key=value'
       });
@@ -77,31 +94,31 @@ describe('SAML.js', function () {
 
     describe('getLogoutUrl', function () {
       it('calls callback with right host', function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
+        saml.getLogoutUrl(req, {}, reqOptions, function (err, target) {
           url.parse(target).host.should.equal('exampleidp.com');
           done();
         });
       });
       it('calls callback with right protocol', function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
+        saml.getLogoutUrl(req, {}, reqOptions, function (err, target) {
           url.parse(target).protocol.should.equal('https:');
           done();
         });
       });
       it('calls callback with right path', function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
+        saml.getLogoutUrl(req, {}, reqOptions, function (err, target) {
           url.parse(target).pathname.should.equal('/path');
           done();
         });
       });
       it('calls callback with original query string', function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
+        saml.getLogoutUrl(req, {}, reqOptions, function (err, target) {
           url.parse(target, true).query['key'].should.equal('value');
           done();
         });
       });
       it('calls callback with additional run-time params in query string', function (done) {
-        saml.getLogoutUrl(req, options, function (err, target) {
+        saml.getLogoutUrl(req, options, reqOptions, function (err, target) {
           Object.keys(url.parse(target, true).query).should.have.length(3);
           url.parse(target, true).query['key'].should.equal('value');
           url.parse(target, true).query['SAMLRequest'].should.not.be.empty();
@@ -111,7 +128,7 @@ describe('SAML.js', function () {
       });
       // NOTE: This test only tests existence of the assertion, not the correctness
       it('calls callback with saml request object', function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
+        saml.getLogoutUrl(req, {}, reqOptions, function (err, target) {
           should(url.parse(target, true).query).have.property('SAMLRequest');
           done();
         });

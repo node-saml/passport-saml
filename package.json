@@ -1,6 +1,6 @@
 {
-  "name": "passport-saml",
-  "version": "1.0.0",
+  "name": "suomifi-passport-saml",
+  "version": "1.0.0-sfi.1",
   "license": "MIT",
   "keywords": [
     "saml",
@@ -8,7 +8,7 @@
     "sso",
     "shibboleth"
   ],
-  "description": "SAML 2.0 authentication strategy for Passport",
+  "description": "SAML 2.0 authentication strategy for Passport with Vetuma language selection extension",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi",
@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/bergie/passport-saml.git"
+    "url": "https://github.com/vrk-kpa/suomifi-passport-saml.git"
   },
   "main": "./lib/passport-saml",
   "dependencies": {

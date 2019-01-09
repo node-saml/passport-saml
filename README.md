@@ -1,18 +1,26 @@
-Passport-SAML
+Passport-SAML with Vetuma language selection extension
 =============
-[![Build Status](https://travis-ci.org/bergie/passport-saml.svg?branch=master)](https://travis-ci.org/bergie/passport-saml) [![GitHub version](https://badge.fury.io/gh/bergie%2Fpassport-saml.svg)](https://badge.fury.io/gh/bergie%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![dependencies](https://david-dm.org/bergie/passport-saml.svg)](https://david-dm.org/bergie/passport-saml.svg) [![devDependencies](https://david-dm.org/bergie/passport-saml/dev-status.svg)](https://david-dm.org/bergie/passport-saml/dev-status.svg) [![peerDependencies](https://david-dm.org/bergie/passport-saml/peer-status.svg)](https://david-dm.org/bergie/passport-saml/peer-status.svg)
+[![Build Status](https://travis-ci.org/vrk-kpa/suomifi-passport-saml.svg?branch=master)](https://travis-ci.org/vrk-kpa/suomifi-passport-saml) [![GitHub version](https://badge.fury.io/gh/vrk-kpa%2Fsuomifi-passport-saml.svg)](https://badge.fury.io/gh/vrk-kpa%2Fsuomifi-passport-saml) [![npm version](https://badge.fury.io/js/suomifi-passport-saml.svg)](http://badge.fury.io/js/suomifi-passport-saml) [![dependencies](https://david-dm.org/vrk-kpa/suomifi-passport-saml.svg)](https://david-dm.org/vrk-kpa/suomifi-passport-saml.svg) [![devDependencies](https://david-dm.org/vrk-kpa/suomifi-passport-saml/dev-status.svg)](https://david-dm.org/vrk-kpa/suomifi-passport-saml/dev-status.svg) [![peerDependencies](https://david-dm.org/vrk-kpa/suomifi-passport-saml/peer-status.svg)](https://david-dm.org/vrk-kpa/suomifi-passport-saml/peer-status.svg)
 
-[![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/)
+[![NPM](https://nodei.co/npm/suomifi-passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/suomifi-passport-saml/)
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
+This suomifi-passport-saml fork contains extensions for Vetuma language selection and the following hardening:
+
+* Enforce audience checking
+* Enforce validteInResponseTo checking
+* Enforce assertion's signature validation
+* Enforce (by default) encrypted assertion(s) only policy
+* Enforce top level SAML response signature validation
+  
 The code was originally based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library.
 
 Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSAMLphp](http://simplesamlphp.org/) based Identity Providers, and with [Active Directory Federation Services](http://en.wikipedia.org/wiki/Active_Directory_Federation_Services).
 
 ## Installation
 
-    $ npm install passport-saml
+    $ npm install suomifi-passport-saml
 
 ## Usage
 
@@ -23,7 +31,7 @@ The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
 ```javascript
-var SamlStrategy = require('passport-saml').Strategy;
+var SamlStrategy = require('suomifi-passport-saml').Strategy;
 [...]
 
 passport.use(new SamlStrategy(
@@ -48,7 +56,7 @@ passport.use(new SamlStrategy(
 You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
 
 ```javascript
-var MultiSamlStrategy = require('passport-saml/multiSamlStrategy');
+var MultiSamlStrategy = require('suomifi-passport-saml/multiSamlStrategy');
 [...]
 
 passport.use(new MultiSamlStrategy(
@@ -136,7 +144,22 @@ type Profile = {
   * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
   * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
   * `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
+ * **Suomi.fi Additions**
+  * `suomifiAdditions`: contains (debug) flags which can be used to turn off certain suomi.fi specific SAML (login) response checks / policy enforcements
 
+### Suomi.fi Additions
+
+Default values are (see [lib/passport-saml/saml.js](lib/passport-saml/saml.js)):
+```javascript
+suomifiAdditions = {
+  disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes: false,
+  disableValidateInResponseEnforcementForUnitTestingPurposes:  false,
+  disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false,
+  disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: false,
+  disableAudienceCheckEnforcementForUnitTestPurposes: false
+}
+```
+i.e. these additional checks / policy enforcements are enabled by default
 
 ### Provide the authentication callback
 
@@ -309,7 +332,7 @@ Passport-SAML has built in support for SLO including
 
 ## ChangeLog
 
-See [Releases](https://github.com/bergie/passport-saml/releases) to find the changes that go into each release.
+See [Releases](https://github.com/vrk-kpa/suomifi-passport-saml/releases) to find the changes that go into each release.
 
 ## FAQ
 
