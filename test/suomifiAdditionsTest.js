@@ -300,6 +300,26 @@ describe( 'suomifi additions for passport-saml /', function() {
         });
       });
 
+      it('must remove InResponseTo value if response validation fails', function (done) {
+
+        const samlConfig = createBaselineSAMLConfiguration();
+        samlConfig.cert = [];
+
+        const base64xml = Buffer.from(
+          assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+        ).toString('base64');
+        const container = {SAMLResponse: base64xml};
+        const samlObj = new SAML(samlConfig);
+        samlObj.validatePostResponse(container, function (err, profile) {
+          should.exist(err);
+          should.not.exist(profile);
+          err.message.should.match('Invalid top level signature');
+          samlObj.validatePostResponse(container, function (err, profile) {
+            err.message.should.match('InResponseTo is not valid');
+            done();
+          });
+        });
+      });
     });
 
     describe("validate suomifi additions checks /", function () {
