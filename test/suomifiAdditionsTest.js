@@ -110,7 +110,7 @@ describe( 'suomifi additions for passport-saml /', function() {
 
       it('must consume valid login response', function (done) {
         const samlConfig = createBaselineSAMLConfiguration();
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
         const container = {SAMLResponse: base64xml};
@@ -131,7 +131,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         // configure audience to be anything but the value inside login response
         samlConfig.audience = VALID_AUDIENCE + 'incorrect_audience';
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
         const container = {SAMLResponse: base64xml};
@@ -156,7 +156,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           result.should.match(VALID_AUTH_REQUEST_ID);
         });
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
         const container = {SAMLResponse: base64xml};
@@ -174,7 +174,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         const samlConfig = createBaselineSAMLConfiguration();
 
         // NOTE: message has encrypted and unencrypted assertions
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_ALONG_WITH_PLAIN_TEXT_ASSERTION_LOGIN_RESPONSE)
         ).toString('base64');
 
@@ -194,7 +194,7 @@ describe( 'suomifi additions for passport-saml /', function() {
 
         const samlConfig = createBaselineSAMLConfiguration();
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.UNSIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
 
@@ -212,7 +212,7 @@ describe( 'suomifi additions for passport-saml /', function() {
 
         const samlConfig = createBaselineSAMLConfiguration();
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.UNSIGNED_MESSAGE_UNSIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
 
@@ -232,7 +232,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         // switch IdP cert to something that is not used to sign message in order to test this case
         samlConfig.cert = assertTruthy(testData.INDVALID_IDP_CERT);
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
         const container = {SAMLResponse: base64xml};
@@ -260,7 +260,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
         samlConfig.suomifiAdditions.disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes = true;
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           // NOTE: modify content of signed assertion
           assertTruthy(testData.UNSIGNED_MESSAGE_SIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
             .replace(VALID_SSN, 'modified_ssn' + VALID_SSN + 'modified_ssn')
@@ -283,7 +283,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
         samlConfig.suomifiAdditions.disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes = true;
 
-        const base64xml = new Buffer(
+        const base64xml = Buffer.from(
           assertTruthy(testData.UNSIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
         ).toString('base64');
         const container = {SAMLResponse: base64xml};
@@ -330,7 +330,7 @@ describe( 'suomifi additions for passport-saml /', function() {
         // e.g. exception if message level signature cannot be validated)
         it('must not consume signed login response if message content is modified and top level signature doesn\'t match', function (done) {
           const samlConfig = createBaselineSAMLConfiguration();
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             // NOTE: modify conent of signed message in order to to test that (in this case) top level signature
             // checking works
             assertTruthy(
@@ -376,7 +376,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           // set IdP cert to empty array
           samlConfig.cert = [];
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -396,7 +396,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           // set IdP cert to empty array
           samlConfig.cert = [];
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.UNSIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -420,7 +420,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           // NOTE: set validateInResponseTo undefined to test this case
           samlConfig.validateInResponseTo = undefined;
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -443,7 +443,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           // NOTE: set audience to undefined to test this case
           samlConfig.audience = undefined;
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -506,7 +506,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           // expected error.
           samlConfig.suomifiAdditions.disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes = true;
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_SIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -523,7 +523,7 @@ describe( 'suomifi additions for passport-saml /', function() {
 
           const samlConfig = createBaselineSAMLConfiguration();
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -543,7 +543,7 @@ describe( 'suomifi additions for passport-saml /', function() {
 
           const samlConfig = createBaselineSAMLConfiguration();
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_USIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
@@ -563,7 +563,7 @@ describe( 'suomifi additions for passport-saml /', function() {
           // assertions one suomifi additional enforcement must be disabled
           samlConfig.suomifiAdditions.disableEncryptedAssertionsOnlyPolicyEnforcementForUnitTestPurposes = true;
 
-          const base64xml = new Buffer(
+          const base64xml = Buffer.from(
             assertTruthy(testData.SIGNED_MESSAGE_UNSIGNED_UNENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
           ).toString('base64');
           const container = {SAMLResponse: base64xml};
