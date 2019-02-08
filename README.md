@@ -72,6 +72,11 @@ passport.use(new MultiSamlStrategy(
   })
 );
 ```
+The options passed when the `MultiSamlStrategy` is initialized are also passed as default values to each provider.
+e.g. If you provide an `issuer` on `MultiSamlStrategy`, this will be also a default value for every provider.
+You can override these defaults by passing a new value through the `getSamlOptions` function.
+
+Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](!https://github.com/bergie/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
 
 #### The profile object:
 
