@@ -37,7 +37,9 @@ describe('strategy#authenticate', function() {
       done();
     };
 
-    var strategy = new MultiSamlStrategy({ getSamlOptions: getSamlOptions }, verify);
+    var strategy = new MultiSamlStrategy({
+      getSamlOptions: getSamlOptions
+    }, verify);
     strategy.authenticate();
   });
 
@@ -57,7 +59,7 @@ describe('strategy#authenticate', function() {
     strategy.authenticate();
   });
 
-  it('uses geted options to setup internal saml provider', function(done) {
+  it('uses given options to setup internal saml provider', function(done) {
     var samlOptions = {
       issuer: 'http://foo.issuer',
       callbackUrl: 'http://foo.callback',
@@ -73,12 +75,15 @@ describe('strategy#authenticate', function() {
 
     function getSamlOptions (req, fn) {
       fn(null, samlOptions);
-      strategy._saml.options.should.containEql(samlOptions);
+      strategy._saml.options.should.containEql(Object.assign({},
+        { cacheProvider: 'mock cache provider' },
+        samlOptions
+      ));
       done();
     }
 
     var strategy = new MultiSamlStrategy(
-      { getSamlOptions: getSamlOptions },
+      { getSamlOptions: getSamlOptions, cacheProvider: 'mock cache provider'},
       verify
     );
     strategy.authenticate();
@@ -122,7 +127,7 @@ describe('strategy#logout', function() {
     strategy.logout();
   });
 
-  it('uses geted options to setup internal saml provider', function(done) {
+  it('uses given options to setup internal saml provider', function(done) {
     var samlOptions = {
       issuer: 'http://foo.issuer',
       callbackUrl: 'http://foo.callback',
