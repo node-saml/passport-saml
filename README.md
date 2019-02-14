@@ -128,11 +128,11 @@ type Profile = {
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
   * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
   * `disableRequestACSUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
+  * `assertionConsumerServiceIndex`: if provided, overrides the `AssertionConsumerService` index in the generated metadata (defaults to `1`).
  * **InResponseTo Validation**
   * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
   * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
   * `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation.  Default is a built-in in-memory cache provider.  For details see the 'Cache Provider' section.
-  * `assertionConsumerServiceIndex`: if provided, overrides the `AssertionConsumerService` index in the generated metadata (defaults to `1`).
  * **Issuer Validation**
   * `idpIssuer`: if provided, then the IdP issuer will be validated for incoming Logout Requests/Responses. For ADFS this looks like `https://acme_tools.windows.net/deadbeef`
  * **Passport**
