@@ -589,18 +589,21 @@ describe( 'passport-saml /', function() {
            'saml:NameID': [ { _: 'bar', '$': { Format: 'foo' } } ] } };
 
       var samlObj = new SAML( { entryPoint: "foo" } );
-      var logoutRequest = samlObj.generateLogoutRequest({
+      var logoutRequestPromise = samlObj.generateLogoutRequest({
         user: {
           nameIDFormat: 'foo',
           nameID: 'bar'
         }
       });
-      parseString( logoutRequest, function( err, doc ) {
-        delete doc['samlp:LogoutRequest']['$']["ID"];
-        delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
-        doc.should.eql( expectedRequest );
-        done();
-      });
+
+      logoutRequestPromise.then(function(logoutRequest) {
+        parseString( logoutRequest, function( err, doc ) {
+          delete doc['samlp:LogoutRequest']['$']["ID"];
+          delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
+          doc.should.eql( expectedRequest );
+          done();
+        });
+      })
     });
 
     it( 'generateLogoutRequest adds the NameQualifier and SPNameQualifier to the saml request', function( done ) {
@@ -621,7 +624,7 @@ describe( 'passport-saml /', function() {
                                                NameQualifier: 'Identity Provider' } } ] } };
 
       var samlObj = new SAML( { entryPoint: "foo" } );
-      var logoutRequest = samlObj.generateLogoutRequest({
+      var logoutRequestPromise = samlObj.generateLogoutRequest({
         user: {
           nameIDFormat: 'foo',
           nameID: 'bar',
@@ -629,12 +632,15 @@ describe( 'passport-saml /', function() {
           spNameQualifier: 'Service Provider'
         }
       });
-      parseString( logoutRequest, function( err, doc ) {
-        delete doc['samlp:LogoutRequest']['$']["ID"];
-        delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
-        doc.should.eql( expectedRequest );
-        done();
-      });
+
+      logoutRequestPromise.then(function(logoutRequest) {
+        parseString( logoutRequest, function( err, doc ) {
+          delete doc['samlp:LogoutRequest']['$']["ID"];
+          delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
+          doc.should.eql( expectedRequest );
+          done();
+        });
+      })
     });
 
     it( 'generateLogoutResponse', function( done ) {
@@ -680,19 +686,65 @@ describe( 'passport-saml /', function() {
                '$': { 'xmlns:saml2p': 'urn:oasis:names:tc:SAML:2.0:protocol' } } ] } };
 
       var samlObj = new SAML( { entryPoint: "foo" } );
-      var logoutRequest = samlObj.generateLogoutRequest({
+      var logoutRequestPromise = samlObj.generateLogoutRequest({
         user: {
           nameIDFormat: 'foo',
           nameID: 'bar',
           sessionIndex: 'session-id'
         }
       });
-      parseString( logoutRequest, function( err, doc ) {
-        delete doc['samlp:LogoutRequest']['$']["ID"];
-        delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
-        doc.should.eql( expectedRequest );
-        done();
+
+      logoutRequestPromise.then(function(logoutRequest) {
+        parseString( logoutRequest, function( err, doc ) {
+          delete doc['samlp:LogoutRequest']['$']["ID"];
+          delete doc['samlp:LogoutRequest']['$']["IssueInstant"];
+          doc.should.eql( expectedRequest );
+          done();
+        });
+      })
+    });
+
+    it( 'generateLogoutRequest saves id and instant to cache', function( done ) {
+      var expectedRequest = {
+        'samlp:LogoutRequest':
+         { '$':
+            { 'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+              'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+              //ID: '_85ba0a112df1ffb57805',
+              Version: '2.0',
+              //IssueInstant: '2014-05-29T03:32:23Z',
+              Destination: 'foo' },
+           'saml:Issuer':
+            [ { _: 'onelogin_saml',
+                '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ],
+           'saml:NameID': [ { _: 'bar', '$': { Format: 'foo' } } ],
+           'saml2p:SessionIndex':
+           [ { _: 'session-id',
+               '$': { 'xmlns:saml2p': 'urn:oasis:names:tc:SAML:2.0:protocol' } } ] } };
+
+      var samlObj = new SAML( { entryPoint: "foo" } );
+      var cacheSaveSpy = sinon.spy(samlObj.cacheProvider, 'save')
+      var logoutRequestPromise = samlObj.generateLogoutRequest({
+        user: {
+          nameIDFormat: 'foo',
+          nameID: 'bar',
+          sessionIndex: 'session-id'
+        }
       });
+
+      logoutRequestPromise.then(function(logoutRequest) {
+        parseString( logoutRequest, function( err, doc ) {
+
+          var id = doc['samlp:LogoutRequest']['$']["ID"];
+          var issueInstant = doc['samlp:LogoutRequest']['$']["IssueInstant"];
+
+          id.should.be.an.instanceOf(String);
+          issueInstant.should.be.an.instanceOf(String);
+          cacheSaveSpy.called.should.eql(true);
+          cacheSaveSpy.calledWith(id, issueInstant).should.eql(true);
+          done();
+        });
+      })
     });
 
     describe( 'generateServiceProviderMetadata tests /', function() {
