@@ -128,6 +128,9 @@ type Profile = {
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
   * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
   * `disableRequestACSUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
+  * `authnRequestsSigned`: if truthy, the `AuthnRequestsSigned="true"` attribute will be added to the metadata tag `SPSSODescriptor`.
+  * `wantAssertionsSigned`: if truthy, the `WantAssertionsSigned="true"` attribute will be added to the metadata tag `SPSSODescriptor`.
+  * `wantAssertionsEncrypted`: if truthy, the `WantAssertionsEncrypted="true"` attribute will be added to the metadata tag `SPSSODescriptor`.
  * **InResponseTo Validation**
   * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
   * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.
