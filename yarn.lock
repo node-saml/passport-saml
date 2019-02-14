@@ -1329,13 +1329,13 @@ wrappy@1:
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
-xml-crypto@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-1.0.2.tgz#248df860b1e3f7326e61bcbd00c234886b0d6e3b"
-  integrity sha512-bDQkgu1yuwl+QoJbi4GBP9MWxpmYkXc8a9iSHbZ7lKqcxzGlDqMRugcl7qK7TsMI0ydU66GG8/eLNvRUk5T2fw==
+xml-crypto@^1.1.2:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-1.1.4.tgz#fbd01c1aaa343945f8ee51327e4299ce743ee37b"
+  integrity sha512-tvRWUUCQF29+K6SKAK9PHP/uMOGg/QKkxapxxovDLTEFHPMCtmolUftNu4wpofShKivmOesO0HhX65xl73ILeA==
   dependencies:
     xmldom "0.1.27"
-    xpath.js ">=0.0.3"
+    xpath "0.0.27"
 
 xml-encryption@^0.11.0:
   version "0.11.2"
@@ -1365,11 +1365,6 @@ xmldom@0.1.27, xmldom@0.1.x, xmldom@~0.1.15:
   version "0.1.27"
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"
   integrity sha1-1QH5ezvbQDr4757MIFcxh6rawOk=
-
-xpath.js@>=0.0.3:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/xpath.js/-/xpath.js-1.1.0.tgz#3816a44ed4bb352091083d002a383dd5104a5ff1"
-  integrity sha512-jg+qkfS4K8E7965sqaUl8mRngXiKb3WZGfONgE18pr03FUQiuSV6G+Ej4tS55B+rIQSFEIw3phdVAQ4pPqNWfQ==
 
 xpath@0.0.27:
   version "0.0.27"
