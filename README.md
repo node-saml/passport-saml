@@ -210,6 +210,29 @@ app.get('/login',
 );
 ```
 
+Authenticate the logout callback also:
+
+```javascript
+app.get('logoutCallback', function(req, res, next) {
+  if (req.session) {
+    req.logout();
+    req.session.destroy();
+  }
+  passport.authenticate('saml', { additionalParams: { 'username': 'user@domain.com' }}, function(err, data) {
+    // this callback should only be entered on error situation in logout callback.
+    if (err) {
+      // error handling
+    }
+    next();
+  })(req, res, next);
+},
+  function(req, res, next) {
+    // callback for logout response
+    return res.redirect('/');
+  }
+);
+```
+
 ### generateServiceProviderMetadata( decryptionCert, signingCert )
 
 
