@@ -163,6 +163,21 @@ app.post('/login/callback',
 );
 ```
 
+- The authenticate middleware is also used for the LogoutResponse that will be sent when IDP-initiates a logout as a result of a user logging out of an application. 
+*This will generate a LogoutResponse in response to an IDP LogoutRequest, effectively logging the user out of the application, as well as any other SAML enabled application*
+
+```javascript
+const bodyParser = require('body-parser');
+
+app.post('/saml/logout/callback',
+  bodyParser.urlencoded({ extended: false }),
+  passport.authenticate('saml', { failureRedirect: '/', failureFlash: true }),
+  function(req, res) {
+    res.redirect('/');
+  }
+);
+```
+
 ### Authenticate requests
 
 Use `passport.authenticate()`, specifying `saml` as the strategy:
@@ -183,6 +198,33 @@ app.get('/login',
   passport.authenticate('saml', { additionalParams: { 'username': 'user@domain.com' }}),
   function(req, res) {
     res.redirect('/');
+  }
+);
+```
+
+
+### Logout 
+
+Use `passport.logout()`, in order to handle user's logging out of the application, and notifyng IDP to log user's out of other SAML enabled applications:
+
+```
+app.get('/logout',
+  function(req, res) {
+    if (!req.isAuthenticated()) {
+        return res.redirect('/');
+    }
+    return samlStrategy.logout(req, (err, uri) => {
+        if (err) {
+            logger.error(err);
+        }
+        req.session.destroy((error) => {
+            if (error) {
+                logger.error(error);
+            }
+            req.logout();
+            res.redirect(uri);
+        });
+    });
   }
 );
 ```
