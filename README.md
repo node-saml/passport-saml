@@ -97,7 +97,7 @@ type Profile = {
   getSamlResponseXml(): string; // get the raw SAML response XML
   ID?: string;
 } & {
-  [attributeName: string]: string;  // arbitrary `AttributeValue`s
+  [attributeName: string]: unknown;  // arbitrary `AttributeValue`s
 }
 ```
 
