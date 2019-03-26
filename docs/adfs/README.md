@@ -57,7 +57,7 @@ passport.use(new SamlStrategy(
     identifierFormat: null,
   // this is configured under the Advanced tab in AD FS relying party
     signatureAlgorithm: 'sha256',
-    comparisonType: 'exact', // default to exact RequestedAuthnContext Comparison Type
+    RACComparison: 'exact', // default to exact RequestedAuthnContext Comparison Type
   },
   function(profile, done) {
     return done(null,

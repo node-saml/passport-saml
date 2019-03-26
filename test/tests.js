@@ -1406,14 +1406,14 @@ describe( 'passport-saml /', function() {
         done();
       });
 
-      it('should check the value of the option `comparisonType`', function(done) {
-        var samlObjBadComparisonType = new SAML({ comparisonType: 'bad_value' });
-        should.equal(samlObjBadComparisonType.options.comparisonType, 'exact', ['the default value of the option `comparisonType` must be exact']);
+      it('should check the value of the option `RACComparison`', function(done) {
+        var samlObjBadComparisonType = new SAML({ RACComparison: 'bad_value' });
+        should.equal(samlObjBadComparisonType.options.RACComparison, 'exact', ['the default value of the option `RACComparison` must be exact']);
 
         var validComparisonTypes = ['exact','minimum','maximum','better'], samlObjValidComparisonType;
-        validComparisonTypes.forEach(function(comparisonType) {
-            samlObjValidComparisonType = new SAML( {comparisonType: comparisonType} );
-            should.equal(samlObjValidComparisonType.options.comparisonType, comparisonType);
+        validComparisonTypes.forEach(function(RACComparison) {
+            samlObjValidComparisonType = new SAML( {RACComparison: RACComparison} );
+            should.equal(samlObjValidComparisonType.options.RACComparison, RACComparison);
         });
         done();
       });
