@@ -52,7 +52,7 @@ MultiSamlStrategy.prototype.logout = function (req, options) {
 MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, decryptionCert, signingCert, next ) {
   var self = this;
 
-  return this._getSamlOptions(req, function (err, samlOptions) {
+  return this._options.getSamlOptions(req, function (err, samlOptions) {
     if (err) {
       return next(err);
     }
