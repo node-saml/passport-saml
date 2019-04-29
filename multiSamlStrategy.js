@@ -36,29 +36,33 @@ MultiSamlStrategy.prototype.authenticate = function (req, options) {
   });
 };
 
-MultiSamlStrategy.prototype.logout = function (req, options) {
+MultiSamlStrategy.prototype.logout = function (req, callback) {
   var self = this;
 
   this._options.getSamlOptions(req, function (err, samlOptions) {
     if (err) {
-      return self.error(err);
+      return callback(err);
     }
 
     self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    self.constructor.super_.prototype.logout.call(self, req, options);
+    self.constructor.super_.prototype.logout.call(self, req, callback);
   });
 };
 
-MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, decryptionCert, signingCert, next ) {
+MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, decryptionCert, signingCert, callback ) {
+  if (typeof callback !== 'function') {
+    throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
+  }
+
   var self = this;
 
   return this._options.getSamlOptions(req, function (err, samlOptions) {
     if (err) {
-      return next(err);
+      return callback(err);
     }
 
-    self._saml = new saml.SAML(samlOptions);
-    return next(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(self, decryptionCert, signingCert ));
+    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
+    return callback(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(self, decryptionCert, signingCert ));
   });
 };
 
