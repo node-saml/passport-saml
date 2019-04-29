@@ -36,7 +36,7 @@ MultiSamlStrategy.prototype.authenticate = function (req, options) {
   });
 };
 
-MultiSamlStrategy.prototype.logout = function (req, options) {
+MultiSamlStrategy.prototype.logout = function (req, callback) {
   var self = this;
 
   this._options.getSamlOptions(req, function (err, samlOptions) {
@@ -45,7 +45,7 @@ MultiSamlStrategy.prototype.logout = function (req, options) {
     }
 
     self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    self.constructor.super_.prototype.logout.call(self, req, options);
+    self.constructor.super_.prototype.logout.call(self, req, callback);
   });
 };
 
