@@ -2174,7 +2174,7 @@ describe( 'passport-saml /', function() {
         var body = {
           SAMLRequest: "asdf"
         };
-        samlObj.validateRedirect(body, function(err) {
+        samlObj.validateRedirect(body, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             done();
@@ -2185,7 +2185,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if idpIssuer is set and issuer is wrong', function(done) {
         samlObj.options.idpIssuer = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql(
@@ -2199,7 +2199,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if request has expired', function(done) {
         this.clock.restore();
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.message.should.eql('SAML assertion expired');
@@ -2211,7 +2211,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if request has a bad signature', function(done) {
         this.request.Signature = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql('Invalid signature');
@@ -2222,7 +2222,7 @@ describe( 'passport-saml /', function() {
         });
       });
       it('returns profile for valid signature including session index', function(done) {
-        samlObj.validateRedirect(this.request, function(err, profile) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err, profile) {
           try {
             should.not.exist(err);
             profile.should.eql({
@@ -2258,7 +2258,7 @@ describe( 'passport-saml /', function() {
         var body = {
           SAMLRequest: "asdf"
         };
-        samlObj.validateRedirect(body, function(err) {
+        samlObj.validateRedirect(body, null, function(err) {
           try {
             should.exist(err);
             done();
@@ -2269,7 +2269,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if idpIssuer is set and wrong issuer', function(done) {
         samlObj.options.idpIssuer = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql(
@@ -2283,7 +2283,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if unsuccessful', function(done) {
         this.request = require('./static/sp_slo_redirect_failure');
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql(
@@ -2296,7 +2296,7 @@ describe( 'passport-saml /', function() {
         });
       });
       it('errors if InResponseTo is not found', function(done) {
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.message.should.eql('InResponseTo is not valid');
@@ -2309,7 +2309,7 @@ describe( 'passport-saml /', function() {
       it('errors if bad signature', function(done) {
         samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
         this.request.Signature = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql('Invalid signature');
@@ -2322,7 +2322,7 @@ describe( 'passport-saml /', function() {
 
       it('returns true for valid signature', function(done) {
         samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
-        samlObj.validateRedirect(this.request, function(err, _data, success) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err, _data, success) {
           try {
             should.not.exist(err);
             success.should.eql(true);
