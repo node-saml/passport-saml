@@ -2,7 +2,7 @@
 
 var sinon = require('sinon');
 var should = require( 'should' );
-var SamlStrategy = require( '../lib/passport-saml/index.js' ).Strategy;
+var SamlStrategy = require( '../lib/passport-saml' ).Strategy;
 var MultiSamlStrategy = require( '../multiSamlStrategy' );
 
 function verify () {}

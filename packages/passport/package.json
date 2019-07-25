@@ -25,7 +25,7 @@
     "type": "git",
     "url": "https://github.com/bergie/passport-saml.git"
   },
-  "main": "packages/passport/lib/passport-saml",
+  "main": "./lib/passport-saml",
   "dependencies": {
     "debug": "^3.1.0",
     "passport-strategy": "*",
@@ -40,24 +40,17 @@
     "body-parser": "^1.17.1",
     "express": "^4.16.2",
     "jshint": "^2.10.1",
-    "lerna": "^3.16.4",
     "mocha": "^6.0.2",
     "passport": "0.4.x",
     "request": "^2.83.0",
     "should": "*",
     "sinon": "^7.2.7"
   },
-  "private": "true",
   "engines": {
     "node": ">= 6"
   },
   "scripts": {
-    "test": "yarn workspace passport-saml test",
-    "jshint": "yarn workspace passport-saml jshint"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
+    "test": "mocha",
+    "jshint": "./node_modules/.bin/jshint lib"
   }
 }

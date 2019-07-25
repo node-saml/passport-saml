@@ -2,13 +2,13 @@
 var express      = require( 'express' );
 var bodyParser   = require( 'body-parser' );
 var passport     = require( 'passport' );
-var SamlStrategy = require( '../lib/passport-saml/index.js' ).Strategy;
+var SamlStrategy = require( '../lib/passport-saml' ).Strategy;
 var request      = require( 'request' );
 var should       = require( 'should' );
 var zlib         = require( 'zlib' );
 var querystring  = require( 'querystring' );
 var parseString  = require( 'xml2js' ).parseString;
-var SAML         = require( '../lib/passport-saml/index.js' ).SAML;
+var SAML         = require( '../lib/passport-saml' ).SAML;
 var fs           = require( 'fs' );
 var sinon        = require('sinon');
 
