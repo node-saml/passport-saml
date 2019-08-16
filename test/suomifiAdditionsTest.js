@@ -70,9 +70,10 @@ describe( 'suomifi additions for passport-saml /', function() {
    *       disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: boolean,
    *       disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: boolean,
    *       disableAudienceCheckEnforcementForUnitTestPurposes: boolean,
+   *       usePublicKeyAsCertParamForSignatureValidation: boolean
    *     }
    *   }
-   * } configuration which has valid IdP certificae, valid SP key, valid, entrypoint, valid audience and valid
+   * } configuration which has valid IdP certificate, valid SP key, valid, entrypoint, valid audience and valid
    * inresponseto check configuration
    */
   function createBaselineSAMLConfiguration() {
@@ -96,7 +97,8 @@ describe( 'suomifi additions for passport-saml /', function() {
         disableValidateInResponseEnforcementForUnitTestingPurposes: false,
         disablePostResponseTopLevelSignatureValidationEnforcementForUnitTestPurposes: false,
         disableAssertionSignatureVerificationEnforcementForUnitTestPurposes: false,
-        disableAudienceCheckEnforcementForUnitTestPurposes: false
+        disableAudienceCheckEnforcementForUnitTestPurposes: false,
+        usePublicKeyAsCertParamForSignatureValidation: false,
       }
     }
   }
@@ -577,6 +579,33 @@ describe( 'suomifi additions for passport-saml /', function() {
         });
       });
 
+      describe('validate suomifi configuration additions /', function() {
+        describe('validate usePublicKeyAsCertParamForSignatureValidation /', function() {
+          function createBaselineSAMLConfigurationWithPublicKeyAsCert() {
+            const samlConfig = createBaselineSAMLConfiguration();
+            samlConfig.cert = assertTruthy(testData.IDP_PUBLIC_KEY)
+            samlConfig.suomifiAdditions.usePublicKeyAsCertParamForSignatureValidation = true
+            return samlConfig;
+          }
+
+          it('must consume valid login response when "usePublicKeyAsCertParamForSignatureValidation" is set true and cert param value is public key', function(done) {
+            const samlConfig = createBaselineSAMLConfigurationWithPublicKeyAsCert();
+
+            const base64xml = Buffer.from(
+              assertTruthy(testData.SIGNED_MESSAGE_SIGNED_ENCRYPTED_ASSERTION_VALID_LOGIN_RESPONSE)
+            ).toString('base64');
+            const container = {SAMLResponse: base64xml};
+            const samlObj = new SAML(samlConfig);
+            samlObj.validatePostResponse(container, function (err, profile) {
+              should.not.exist(err);
+              should.exist(profile);
+              profile.nameID.should.exactly(VALID_NAME_ID);
+              profile[SSN_ATTRIBUTE_NAME].should.exactly(VALID_SSN);
+              done();
+            });
+          });
+        });
+      });
     });
-  });
+  })
 });

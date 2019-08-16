@@ -87,7 +87,26 @@ lrhFfreYoDJMZkupF+BVOROVZPpI5TOeThIsuVumk9hR34mvsoqGlbP8cSXd9KJx
 -----END CERTIFICATE-----`;
 
 /**
- * Private key of "uknown SP" (i.e. key of "some other" SP)
+ *
+ * @type {string}
+ */
+testData.IDP_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAumoRKMchYJomYFVKRFbF
++nt1SK8siEjrFjfRBI4D5TQaZUobnmBGWXQ8pDPJPFAs2+UZpFSLRqZHziuO/YH9
+cVfe9qRJL9JEHy0KRWiOI+r7008clLjFc/GT1L3jHoCjfPex7+jGTpb7bEo9P+BE
+Q1bnytqOVQPiwYsnPKH38/xqu8Lo9kxM9rMWhvaM+Ut9LY59+XDSiYCQDcdKyg6M
+gptDR5Ym3qZFdFGLOLUrRIPSS+kZ/ee6uQtm5n2Rf1+WrU37vPayqB4ADZ6rHWIy
+hvPyRZm6r4QKSPJhSQQHBdNJ5U4d6EKOGFc52iLcuZmtVBEMJ3F3V97NyU3C/GEo
+aSJG0DcYqq+CLQ9m9GZcF3iEpdibR84vnLFjC4OdsukoYzmx/nEOf0cZfxa6VfIz
+B+CZ9gibP7Bx55QT3K+b99/vKd1WwUHogzt+GckXCJCfufYpxdrtZPu9jJD+2oVz
+RhyhijyqZeFVX5Kf9X+j1D4MrwKEDcCVX+oJ6fNjgIWPPpNsrZ/Z1Td9gTQQ3Tn+
+378B85o9uWpfNPW1WgJTHai8JV2MtVG1XeoTJuIKqMI5LM3oTK3mnulDu4gQxIFl
+sQyNB33ExWIbelcP9o9iSFouyg9j+otX0uLnh/Hv9EBy5T5r1FgwlK1zvIUWYsvU
+GtN+L4HXW9oDzK3Yot2N/KMCAwEAAQ==
+-----END PUBLIC KEY-----`
+
+/**
+ * Private key of "unknown SP" (i.e. key of "some other" SP)
  *
  * @type {string}
  */
