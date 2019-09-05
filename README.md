@@ -130,6 +130,7 @@ type Profile = {
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
   * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
   * `disableRequestACSUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
+  * `useFriendlyNames`: if truthy `FriendlyName` from assertion will be used instead of `Name` for profile property name
  * **InResponseTo Validation**
   * `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
   * `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field.  Default is 8 hours.

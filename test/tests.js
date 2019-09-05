@@ -211,8 +211,60 @@ describe( 'passport-saml /', function() {
       fakeClock.restore();
       server.close(done);
     });
-  });
 
+    describe('FriendlyName', function () {
+      var app, profile;
+
+      beforeEach(function () {
+        var check = capturedChecks.find(c => c.name === 'Testshib -- valid encrypted response should succeed')
+        var pp = new passport.Authenticator();
+        app = express();
+        app.use(bodyParser.urlencoded({extended: false}));
+        app.use(pp.initialize());
+        var config = check.config;
+        config.callbackUrl = 'http://localhost:3033/login';
+        config.useFriendlyNames = true;
+        config.passReqToCallback = false;
+        pp.use(new SamlStrategy(config, function (_profile, done) {
+            profile = _profile;
+            done(null, { id: profile.nameID });
+          })
+        );
+
+        fakeClock = sinon.useFakeTimers(Date.parse(check.mockDate));
+
+        app.post('/login',
+          pp.authenticate("saml"),
+          function (req, res) {
+            res.status(200).send("200 OK");
+          });
+
+        app.use(function (err, req, res, next) {
+          // console.log( err.stack );
+          res.status(500).send('500 Internal Server Error');
+        });
+      });
+
+      it('should use FriendlyName when useFriendlyNames set in config', function (done) {
+        server = app.listen(3033, function () {
+          var requestOpts = {
+            url: 'http://localhost:3033/login',
+            method: 'POST',
+            form: check.samlResponse
+          };
+
+          request(requestOpts, function (err, response, body) {
+            should.not.exist(err);
+            profile.should.not.have.property('urn:oid:1.3.6.1.4.1.5923.1.1.1.6')
+            profile.eduPersonPrincipalName.should.equal('myself@testshib.org')
+            profile.should.not.have.property('urn:oid:1.3.6.1.4.1.5923.1.1.1.7')
+            profile.eduPersonEntitlement.should.equal('urn:mace:dir:entitlement:common-lib-terms')
+            done()
+          });
+        });
+      });
+    })
+  });
 
   describe( 'captured SAML requests /', function() {
     var capturedChecks = [
