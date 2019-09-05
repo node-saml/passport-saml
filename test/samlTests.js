@@ -32,6 +32,47 @@ describe('SAML.js', function () {
       };
     });
 
+    describe('getCallbackUrl', function () {
+      describe('when callbackUrl and host/path not specified', function () {
+        it('returns callbackUrl based on request headers', function () {
+          var callbackUrl = saml.getCallbackUrl(req);
+          callbackUrl.should.equal('https://examplesp.com/saml/consume')
+        });
+      });
+
+      describe('when protocol, host, path specified', function () {
+        beforeEach(function () {
+          saml = new SAML({
+            entryPoint: 'https://exampleidp.com/path?key=value',
+            logoutUrl: 'https://exampleidp.com/path?key=value',
+            protocol: 'test-protocol://',
+            host: 'test-host',
+            path: '/test-path'
+          });
+        });
+
+        it('returns callbackUrl', function () {
+          var callbackUrl = saml.getCallbackUrl(req);
+          callbackUrl.should.equal('test-protocol://test-host/test-path')
+        });
+      });
+
+      describe('when callbackUrl specified', function () {
+        beforeEach(function () {
+          saml = new SAML({
+            entryPoint: 'https://exampleidp.com/path?key=value',
+            logoutUrl: 'https://exampleidp.com/path?key=value',
+            callbackUrl: 'http://fake-callback.com/url'
+          });
+        });
+
+        it('returns callbackUrl', function () {
+          var callbackUrl = saml.getCallbackUrl(req);
+          callbackUrl.should.equal('http://fake-callback.com/url')
+        });
+      });
+    });
+
     describe('getAuthorizeUrl', function () {
       it('calls callback with right host', function (done) {
         saml.getAuthorizeUrl(req, {}, function (err, target) {
