@@ -30,21 +30,21 @@
     "debug": "^3.1.0",
     "passport-strategy": "*",
     "q": "^1.5.0",
-    "xml-crypto": "^1.1.2",
+    "xml-crypto": "^1.1.4",
     "xml-encryption": "^0.11.0",
     "xml2js": "0.4.x",
-    "xmlbuilder": "^9.0.4",
+    "xmlbuilder": "^11.0.0",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
     "express": "^4.16.2",
-    "jshint": "*",
-    "mocha": "*",
+    "jshint": "^2.10.1",
+    "mocha": "^6.0.2",
     "passport": "0.4.x",
     "request": "^2.83.0",
     "should": "*",
-    "sinon": "^2.1.0"
+    "sinon": "^7.2.7"
   },
   "engines": {
     "node": ">= 6"
