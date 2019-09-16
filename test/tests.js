@@ -1004,6 +1004,43 @@ describe( 'passport-saml /', function() {
         });
       });
 
+      it('removes InResponseTo value if response validation fails', function(done) {
+        var requestId = '_a6fc46be84e1e3cf3c50';
+        var xml = '<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="R689b0733bccca22a137e3654830312332940b1be" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>' +
+        '<saml:Assertion xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.0" ID="pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa" IssueInstant="2014-05-28T00:16:08Z"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>DCnPTQYBb1hKspbe6fg1U3q8xn4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>e0+aFomA0+JAY0f9tKqzIuqIVSSw7LiFUsneEDKPBWdiTz1sMdgr/2y1e9+rjaS2mRmCi/vSQLY3zTYz0hp6nJNU19+TWoXo9kHQyWT4KkeQL4Xs/gZ/AoKC20iHVKtpPps0IQ0Ml/qRoouSitt6Sf/WDz2LV/pWcH2hx5tv3xSw36hK2NQc7qw7r1mEXnvcjXReYo8rrVf7XHGGxNoRIEICUIi110uvsWemSXf0Z0dyb0FVYOWuSsQMDlzNpheADBifFO4UTfSEhFZvn8kVCGZUIwrbOhZ2d/+YEtgyuTg+qtslgfy4dwd4TvEcfuRzQTazeefprSFyiQckAXOjcw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>'+TEST_CERT+'</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient">ben@subspacesw.com</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData NotOnOrAfter="2014-05-28T00:19:08Z" Recipient="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"/></saml:SubjectConfirmation></saml:Subject><saml:Conditions NotBefore="2014-05-28T00:13:08Z" NotOnOrAfter="2014-05-28T00:19:08Z"><saml:AudienceRestriction><saml:Audience>{audience}</saml:Audience></saml:AudienceRestriction></saml:Conditions><saml:AuthnStatement AuthnInstant="2014-05-28T00:16:07Z" SessionNotOnOrAfter="2014-05-29T00:16:08Z" SessionIndex="_30a4af50-c82b-0131-f8b5-782bcb56fcaa"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement></saml:Assertion>' +
+        '</samlp:Response>';
+        var base64xml = Buffer.from( xml ).toString('base64');
+        var container = { SAMLResponse: base64xml };
+        var samlConfig = {
+          entryPoint: 'https://app.onelogin.com/trust/saml2/http-post/sso/371755',
+          cert: TEST_CERT,
+          validateInResponseTo: true
+        };
+        var samlObj = new SAML( samlConfig );
+
+        // Mock the SAML request being passed through Passport-SAML
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function(){});
+
+        samlObj.validatePostResponse( container, function( err, profile, logout ) {
+          try {
+            should.exist(err);
+            // Suomifi Additions: returns 'Invalid top level signature' instead of 'Invalid signature'
+            err.message.should.match("Invalid top level signature");
+          } catch (err2) {
+            done(err2);
+          }
+          samlObj.validatePostResponse( container, function( err, profile, logout ) {
+            try {
+              should.exist(err);
+              err.message.should.match("InResponseTo is not valid");
+              done();
+            } catch (err2) {
+              done(err2);
+            }
+          });
+        });
+      });
+
       describe( 'validatePostResponse xml signature checks /', function() {
 
         var fakeClock;
@@ -2198,7 +2235,7 @@ describe( 'passport-saml /', function() {
         var body = {
           SAMLRequest: "asdf"
         };
-        samlObj.validateRedirect(body, function(err) {
+        samlObj.validateRedirect(body, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             done();
@@ -2209,7 +2246,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if idpIssuer is set and issuer is wrong', function(done) {
         samlObj.options.idpIssuer = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql(
@@ -2223,7 +2260,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if request has expired', function(done) {
         this.clock.restore();
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.message.should.eql('SAML assertion expired');
@@ -2235,7 +2272,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if request has a bad signature', function(done) {
         this.request.Signature = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql('Invalid signature');
@@ -2246,7 +2283,7 @@ describe( 'passport-saml /', function() {
         });
       });
       it('returns profile for valid signature including session index', function(done) {
-        samlObj.validateRedirect(this.request, function(err, profile) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err, profile) {
           try {
             should.not.exist(err);
             profile.should.eql({
@@ -2283,7 +2320,7 @@ describe( 'passport-saml /', function() {
         var body = {
           SAMLRequest: "asdf"
         };
-        samlObj.validateRedirect(body, function(err) {
+        samlObj.validateRedirect(body, null, function(err) {
           try {
             should.exist(err);
             done();
@@ -2294,7 +2331,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if idpIssuer is set and wrong issuer', function(done) {
         samlObj.options.idpIssuer = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql(
@@ -2308,7 +2345,7 @@ describe( 'passport-saml /', function() {
       });
       it('errors if unsuccessful', function(done) {
         this.request = require('./static/sp_slo_redirect_failure');
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql(
@@ -2321,7 +2358,7 @@ describe( 'passport-saml /', function() {
         });
       });
       it('errors if InResponseTo is not found', function(done) {
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.message.should.eql('InResponseTo is not valid');
@@ -2334,7 +2371,7 @@ describe( 'passport-saml /', function() {
       it('errors if bad signature', function(done) {
         samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
         this.request.Signature = 'foo';
-        samlObj.validateRedirect(this.request, function(err) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
             err.should.eql('Invalid signature');
@@ -2344,9 +2381,10 @@ describe( 'passport-saml /', function() {
           }
         });
       });
+
       it('returns true for valid signature', function(done) {
         samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
-        samlObj.validateRedirect(this.request, function(err, _data, success) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err, _data, success) {
           try {
             should.not.exist(err);
             success.should.eql(true);
@@ -2359,7 +2397,7 @@ describe( 'passport-saml /', function() {
       it('accepts cert without header and footer line', function(done) {
         samlObj.options.cert = fs.readFileSync(__dirname + '/static/acme_tools_com_without_header_and_footer.cert', 'ascii')
         samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
-        samlObj.validateRedirect(this.request, function(err, _data, success) {
+        samlObj.validateRedirect(this.request, this.request.originalQuery,function(err, _data, success) {
           should.not.exist(err);
           success.should.eql(true);
           done();
