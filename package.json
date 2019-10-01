@@ -38,8 +38,8 @@
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
+    "eslint": "^5.16.0",
     "express": "^4.16.2",
-    "jshint": "^2.10.1",
     "mocha": "^6.0.2",
     "passport": "0.4.x",
     "request": "^2.83.0",
@@ -51,6 +51,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "jshint": "./node_modules/.bin/jshint lib"
+    "lint": "./node_modules/.bin/eslint lib",
+    "lint:fix": "./node_modules/.bin/eslint --fix lib"
   }
 }

@@ -1,0 +1,10 @@
+env:
+  node: true
+  es6: false
+extends: 'eslint:recommended'
+parserOptions:
+  ecmaVersion: 5
+rules:
+  no-undefined: 'off'
+  no-unused-vars: 'off'
+  semi: ["error", "always"]
