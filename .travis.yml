@@ -5,4 +5,4 @@ node_js:
 
 script:
   - npm test
-  - ./node_modules/.bin/jshint lib
+  - ./node_modules/.bin/eslint lib
