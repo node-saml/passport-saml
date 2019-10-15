@@ -24,7 +24,7 @@ SAML.prototype.initialize = function (options) {
     options = {};
   }
 
-  if (options.hasOwnProperty('cert') && !options.cert) {
+  if (Object.prototype.hasOwnProperty.call(options, 'cert') && !options.cert) {
     throw new Error('Invalid property: cert must not be empty');
   }
 
@@ -591,7 +591,7 @@ SAML.prototype.validatePostResponse = function (container, callback) {
     doc = new xmldom.DOMParser({
     }).parseFromString(xml);
 
-    if (!doc.hasOwnProperty('documentElement'))
+    if (!Object.prototype.hasOwnProperty.call(doc, 'documentElement'))
       throw new Error('SAMLResponse is not valid base64-encoded XML');
 
     inResponseTo = xpath(doc, "/*[local-name()='Response']/@InResponseTo");
@@ -750,7 +750,7 @@ SAML.prototype.validateInResponseTo = function (inResponseTo) {
   }
 };
 
-SAML.prototype.validateRedirect = function(container, callback) {
+SAML.prototype.validateRedirect = function(container, originalQuery, callback) {
   var self = this;
   var samlMessageType = container.SAMLRequest ? 'SAMLRequest' : 'SAMLResponse';
 
@@ -777,7 +777,7 @@ SAML.prototype.validateRedirect = function(container, callback) {
           self.verifyLogoutResponse(doc) : self.verifyLogoutRequest(doc);
       })
       .then(function() {
-        return self.hasValidSignatureForRedirect(samlMessageType, container);
+        return self.hasValidSignatureForRedirect(container, originalQuery);
       })
       .then(function () {
         processValidlySignedSamlLogout(self, doc, callback);
@@ -802,23 +802,27 @@ function processValidlySignedSamlLogout(self, doc, callback) {
   }
 }
 
-SAML.prototype.hasValidSignatureForRedirect = function (samlMessageType, container) {
-  var signature = container.Signature;
-  if (signature && this.options.cert) {
-    var urlString = samlMessageType + '=' + encodeURIComponent(container[samlMessageType]);
+SAML.prototype.hasValidSignatureForRedirect = function (container, originalQuery) {
+  var tokens = originalQuery.split('&');
+  var getParam = function (key) {
+    var exists = tokens.filter(function(t) { return new RegExp(key).test(t); });
+    return exists[0];
+  };
 
-    if (container.RelayState) {
-      urlString += '&RelayState=' +
-        encodeURIComponent(container.RelayState);
+  if (container.Signature && this.options.cert) {
+    var urlString = getParam('SAMLRequest') || getParam('SAMLResponse');
+
+    if (getParam('RelayState')) {
+      urlString += '&' + getParam('RelayState');
     }
 
-    urlString += '&SigAlg=' + encodeURIComponent(container.SigAlg);
+    urlString += '&' + getParam('SigAlg');
 
     return this.certsToCheck()
       .then(function(certs) {
         var hasValidQuerySignature = certs.some(function (cert) {
           return validateSignatureForRedirect(
-            urlString, signature, container.SigAlg, cert
+            urlString, container.Signature, container.SigAlg, cert
           );
         });
 
@@ -832,15 +836,23 @@ SAML.prototype.hasValidSignatureForRedirect = function (samlMessageType, contain
 };
 
 function validateSignatureForRedirect (urlString, signature, alg, cert) {
-  var supportedAlgs = crypto.getHashes().filter(
-    function(h) { return new RegExp(h).test(alg); }
-  );
-
-  if (supportedAlgs.length === 0) {
+  // See if we support a matching algorithm, case-insensitive. Otherwise, throw error.
+  function hasMatch (ourAlgo) {
+    // The incoming algorithm is forwarded as a URL.
+    // We trim everything before the last # get something we can compare to the Node.js list
+    const algFromURI = alg.toLowerCase().replace(/.*#(.*)$/,'$1');
+    return ourAlgo.toLowerCase() === algFromURI;
+  }
+  let i = crypto.getHashes().findIndex(hasMatch);
+  let matchingAlgo;
+  if (i > -1) {
+    matchingAlgo = crypto.getHashes()[i];
+  }
+  else {
     throw alg + ' is not supported';
   }
 
-  var verifier = crypto.createVerify(supportedAlgs[supportedAlgs.length-1]);
+  var verifier = crypto.createVerify(matchingAlgo);
   verifier.update(urlString);
 
   return verifier.verify(cert, signature, 'base64');
@@ -1026,7 +1038,7 @@ SAML.prototype.processValidlySignedAssertion = function(xml, samlResponseXml, in
 
       if (attributes) {
         attributes.forEach(function (attribute) {
-         if(!attribute.hasOwnProperty('AttributeValue')) {
+         if(!Object.prototype.hasOwnProperty.call(attribute, 'AttributeValue')) {
             // if attributes has no AttributeValue child, continue
             return;
           }
@@ -1249,7 +1261,10 @@ SAML.prototype.generateServiceProviderMetadata = function( decryptionCert, signi
     };
   }
 
-  metadata.EntityDescriptor.SPSSODescriptor.NameIDFormat = this.options.identifierFormat;
+  if (this.options.identifierFormat) {
+    metadata.EntityDescriptor.SPSSODescriptor.NameIDFormat = this.options.identifierFormat;
+  }
+
   metadata.EntityDescriptor.SPSSODescriptor.AssertionConsumerService = {
     '@index': '1',
     '@isDefault': 'true',

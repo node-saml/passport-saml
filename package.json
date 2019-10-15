@@ -1,6 +1,6 @@
 {
   "name": "passport-saml",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "license": "MIT",
   "keywords": [
     "saml",
@@ -38,8 +38,8 @@
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
+    "eslint": "^6.5.1",
     "express": "^4.16.2",
-    "jshint": "^2.10.1",
     "lerna": "^3.16.4",
     "mocha": "^6.0.2",
     "passport": "0.4.x",
@@ -49,15 +49,34 @@
   },
   "private": "true",
   "engines": {
-    "node": ">= 6"
+    "node": ">= 8"
   },
   "scripts": {
     "test": "yarn workspace passport-saml test",
-    "jshint": "yarn workspace passport-saml jshint"
+    "lint": "yarn eslint packages/*",
+    "lint:fix": "yarn eslint --fix packages/*"
   },
   "workspaces": {
     "packages": [
       "packages/*"
     ]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": false
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "rules": {
+      "no-undefined": "off",
+      "no-unused-vars": "off",
+      "semi": [
+        "error",
+        "always"
+      ]
+    }
   }
 }
