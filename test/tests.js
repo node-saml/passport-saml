@@ -2332,6 +2332,16 @@ describe( 'passport-saml /', function() {
           }
         });
       });
+
+      it('accepts cert without header and footer line', function(done) {
+        samlObj.options.cert = fs.readFileSync(__dirname + '/static/acme_tools_com_without_header_and_footer.cert', 'ascii')
+        samlObj.cacheProvider.save('_79db1e7ad12ca1d63e5b', new Date().toISOString(), function(){});
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function(err, _data, success) {
+          should.not.exist(err);
+          success.should.eql(true);
+          done();
+        });
+      });
     });
   });
 });
