@@ -332,3 +332,15 @@ See [Releases](https://github.com/bergie/passport-saml/releases) to find the cha
 ### Is there an example I can look at?
 
 Gerard Braad has provided an example app at https://github.com/gbraad/passport-saml-example/
+
+## Node Support Policy
+
+We only support [Long-Term Support](https://github.com/nodejs/Release) versions of Node.
+
+We specifically limit our support to LTS versions of Node, not because this package won't work on other versions, but because we have a limited amount of time, and supporting LTS offers the greatest return on that investment.
+
+It's possible this package will work correctly on newer versions of Node. It may even be possible to use this package on older versions of Node, though that's more unlikely as we'll make every effort to take advantage of features available in the oldest LTS version we support.
+
+As each Node LTS version reaches its end-of-life we will remove that version from the `node` `engines` property of our package's `package.json` file. Removing a Node version is considered a breaking change and will entail the publishing of a new major version of this package. We will not accept any requests to support an end-of-life version of Node. Any merge requests or issues supporting an end-of-life version of Node will be closed.
+
+We will accept code that allows this package to run on newer, non-LTS, versions of Node.
