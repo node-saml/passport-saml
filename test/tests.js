@@ -2172,6 +2172,31 @@ describe( 'passport-saml /', function() {
         }
       });
     });
+    it('returns profile for valid signature with encrypted nameID', function(done) {
+      var samlObj = new SAML({
+        suomifiAdditions: suomifiAdditionsOptions,
+        cert: fs.readFileSync(__dirname + '/static/cert.pem', 'ascii'),
+        decryptionPvk: fs.readFileSync(__dirname + '/static/key.pem', 'ascii')
+      });
+      var body = {
+        SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_encrypted_name_id.xml', 'base64')
+      };
+      samlObj.validatePostRequest(body, function(err, profile) {
+        try {
+          should.not.exist(err);
+          profile.should.eql({
+            ID: 'pfx00cb5227-d9d0-1d4b-bdb2-c7ad6c3c6906',
+            issuer: 'http://sp.example.com/demo1/metadata.php',
+            nameID: 'ONELOGIN_f92cc1834efc0f73e9c09f482fce80037a6251e7',
+            nameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+            sessionIndex: '1'
+          });
+          done();
+        } catch (err2) {
+          done(err2);
+        }
+      });
+    });
 	  it('errors if bad privateCert to requestToURL', function(done){
 		  var samlObj = new SAML({
               suomifiAdditions: suomifiAdditionsOptions,
