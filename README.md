@@ -322,6 +322,7 @@ Provide an instance of an object which has these functions passed to the `cacheP
 Passport-SAML has built in support for SLO including
 * Signature validation
 * IdP initiated and SP initiated logouts
+* Decryption of encrypted name identifiers in IdP initiated logout
 * `Redirect` and `POST` SAML Protocol Bindings
 
 
