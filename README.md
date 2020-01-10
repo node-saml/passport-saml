@@ -107,7 +107,7 @@ type Profile = {
   * `callbackUrl`: full callbackUrl (overrides path/protocol if supplied)
   * `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
   * `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `http://`)
-  * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: `localhost`)
+  * `host`: host for callback; will be combined with path and protocol to construct callback url if `callbackUrl` is not specified (default: value of `Host` header.)
   * `entryPoint`: identity provider entrypoint (is required to be spec-compliant when the request is signed)
   * `issuer`: issuer string to supply to identity provider
   * `audience`: expected saml response Audience (if not provided, Audience won't be verified)
