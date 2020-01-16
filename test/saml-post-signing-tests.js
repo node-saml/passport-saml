@@ -8,14 +8,21 @@ const signingKey = fs.readFileSync(__dirname + '/static/key.pem');
 
 describe('SAML POST Signing', function () {
   it('should sign a simple saml request', function () {
-    var xml = '<SAMLRequest/>';
+    var xml = '<SAMLRequest><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://example.com</saml2:Issuer></SAMLRequest>';
     var result = signSamlPost(xml, '/SAMLRequest', { privateCert: signingKey });
     result.should.match(/<DigestValue>[A-Za-z0-9\/\+\=]+<\/DigestValue>/);
     result.should.match(/<SignatureValue>[A-Za-z0-9\/\+\=]+<\/SignatureValue>/);
   });
 
+  it('should place the Signature element after the Issuer element', function () {
+    var xml = '<SAMLRequest><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://example.com</saml2:Issuer><SomeOtherElement /></SAMLRequest>';
+    var result = signSamlPost(xml, '/SAMLRequest', { privateCert: signingKey });
+    result.should.match(/<\/saml2:Issuer><Signature/);
+    result.should.match(/<\/Signature><SomeOtherElement/);
+  });
+
   it('should sign and digest with SHA256 when specified', function () {
-    var xml = '<SAMLRequest/>';
+    var xml = '<SAMLRequest><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://example.com</saml2:Issuer></SAMLRequest>';
     var options = {
       signatureAlgorithm: 'sha256',
       digestAlgorithm: 'sha256',
@@ -29,7 +36,7 @@ describe('SAML POST Signing', function () {
   });
 
   it('should sign an AuthnRequest', function () {
-    var xml = '<AuthnRequest xmlns="urn:oasis:names:tc:SAML:2.0:protocol" />';
+    var xml = '<AuthnRequest xmlns="urn:oasis:names:tc:SAML:2.0:protocol"><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">http://example.com</saml2:Issuer></AuthnRequest>';
     var result = signAuthnRequestPost(xml, { privateCert: signingKey });
     result.should.match(/<DigestValue>[A-Za-z0-9\/\+\=]+<\/DigestValue>/);
     result.should.match(/<SignatureValue>[A-Za-z0-9\/\+\=]+<\/SignatureValue>/);
