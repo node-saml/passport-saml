@@ -1260,6 +1260,38 @@ describe( 'passport-saml /', function() {
         });
       });
 
+      it( 'acme_tools request signed with sha256 when cert not in PEM format', function( done ) {
+        var privateCert = fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8')
+          .replace('-----BEGIN PRIVATE KEY-----', '')
+          .replace('-----END PRIVATE KEY-----', '')
+          .replace(/\n/g, '')
+        var samlConfig = {
+          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
+          issuer: 'acme_tools_com',
+          callbackUrl: 'https://relyingparty/adfs/postResponse',
+          privateCert: privateCert,
+          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
+          identifierFormat: null,
+          signatureAlgorithm: 'sha256',
+          additionalParams: {
+            customQueryStringParam: 'CustomQueryStringParamValue'
+          }
+        };
+        var samlObj = new SAML( samlConfig );
+        samlObj.generateUniqueID = function () { return '12345678901234567890' };
+        samlObj.getAuthorizeUrl({}, {}, function(err, url) {
+          try {
+            var qry = require('querystring').parse(require('url').parse(url).query);
+            qry.SigAlg.should.match('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256');
+            qry.Signature.should.match('hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA==');
+            qry.customQueryStringParam.should.match('CustomQueryStringParamValue');
+            done();
+          } catch (err2) {
+            done(err2);
+          }
+        });
+      });
+
       it( 'acme_tools request not signed if missing entry point', function( done ) {
         var samlConfig = {
           entryPoint: '',
@@ -2112,6 +2144,30 @@ describe( 'passport-saml /', function() {
           done(err2);
         }
       });
+    })
+    it('returns profile for valid signature with encrypted nameID', function(done) {
+      var samlObj = new SAML({
+        cert: fs.readFileSync(__dirname + '/static/cert.pem', 'ascii'),
+        decryptionPvk: fs.readFileSync(__dirname + '/static/key.pem', 'ascii')
+      });
+      var body = {
+        SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_encrypted_name_id.xml', 'base64')
+      };
+      samlObj.validatePostRequest(body, function(err, profile) {
+        try {
+          should.not.exist(err);
+          profile.should.eql({
+            ID: 'pfx00cb5227-d9d0-1d4b-bdb2-c7ad6c3c6906',
+            issuer: 'http://sp.example.com/demo1/metadata.php',
+            nameID: 'ONELOGIN_f92cc1834efc0f73e9c09f482fce80037a6251e7',
+            nameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+            sessionIndex: '1'
+          });
+          done();
+        } catch (err2) {
+          done(err2);
+        }
+      });
     });
 	  it('errors if bad privateCert to requestToURL', function(done){
 		  var samlObj = new SAML({
@@ -2147,7 +2203,7 @@ describe( 'passport-saml /', function() {
         samlObj.requestToUrl(request, null, 'authorize', {}, function(err) {
           try {
             should.exist(err);
-            err.message.should.containEql('no start line');
+            err.message.should.containEql('bad end line');
             done();
           } catch (err2) {
             done(err2);
