@@ -117,7 +117,7 @@ describe( 'passport-saml /', function() {
           });
 
         app.use(function (err, req, res, next) {
-          // console.log( err.stack );
+          console.log( err.stack );
           res.status(500).send('500 Internal Server Error');
         });
 
@@ -171,7 +171,7 @@ describe( 'passport-saml /', function() {
             res.status(200).send("200 OK");
           });
         app.use(function (err, req, res, next) {
-          // console.log( err.stack );
+          console.log( err.stack );
           res.status(500).send('500 Internal Server Error');
         });
         server = app.listen(3033, function () {
@@ -215,6 +215,47 @@ describe( 'passport-saml /', function() {
 
 
   describe( 'captured SAML requests /', function() {
+    var logoutChecks = [
+      { name: "Logout",
+        config: {
+          skipRequestCompression: true,
+          entryPoint: 'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO',
+          cert: fs.readFileSync(__dirname + '/static/cert.pem', 'ascii'),
+          identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+        },
+        samlRequest: {
+          SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_good_signature.xml', 'base64'),
+        },
+        expectedStatusCode: 200,
+        mockDate: '2014-06-02T17:48:56.820Z',
+        result: {
+          "samlp:LogoutResponse": {
+            "$": {
+              "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
+              "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
+              "Version": "2.0",
+              "Destination": "https://wwwexampleIdp.com/saml",
+              "InResponseTo": "pfxd4d369e8-9ea1-780c-aff8-a1d11a9862a1",
+            },
+            "saml:Issuer": [
+              "onelogin_saml"
+            ],
+            "samlp:Status": [
+              {
+                "samlp:StatusCode": [
+                  {
+                    "$": {
+                      "Value": "urn:oasis:names:tc:SAML:2.0:status:Success"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+      },
+    ];
+
     var capturedChecks = [
       { name: "Empty Config",
         config: {},
@@ -498,10 +539,16 @@ describe( 'passport-saml /', function() {
         config.entryPoint = 'https://wwwexampleIdp.com/saml';
         var profile = null;
         passport.use( new SamlStrategy( config, function(_profile, done) {
-            profile = _profile;
-            done(null, { id: profile.nameID } );
+          profile = _profile;
+          done(null, profile );
           })
         );
+
+        var userSerialized = false;
+        passport.serializeUser(function(user, done) {
+          userSerialized = true;
+          done(null, user);
+        });
 
         app.get( '/login',
           passport.authenticate( "saml", { samlFallback: 'login-request', session: false } ),
@@ -568,9 +615,92 @@ describe( 'passport-saml /', function() {
       };
     }
 
+    function testForCheckLogout( check ) {
+      return function( done ) {
+        var app = express();
+        app.use( bodyParser.urlencoded({extended: false}) );
+        app.use( passport.initialize() );
+        var config = check.config;
+        config.callbackUrl = 'http://localhost:3033/login';
+        config.entryPoint = 'https://wwwexampleIdp.com/saml';
+        var profile = null;
+        passport.use( new SamlStrategy( config, function(_profile, done) {
+            profile = _profile;
+            done(null, profile );
+          })
+        );
+
+        var userSerialized = false;
+        passport.serializeUser(function(user, done) {
+          userSerialized = true;
+          done(null, user);
+        });
+
+        app.post( '/login',
+          passport.authenticate( "saml"),
+          function(req, res) {
+            res.status(200).send("200 OK");
+          });
+
+        app.use( function( err, req, res, next ) {
+          console.log( err.stack );
+          res.status(500).send('500 Internal Server Error');
+        });
+
+        server = app.listen( 3033, function() {
+          var requestOpts = {
+            url: 'http://localhost:3033/login',
+            method: 'post',
+            form: check.samlRequest
+          };
+
+          request(requestOpts, function(err, response, body) {
+            try {
+              var encodedSamlResponse = querystring.parse(this.uri.query).SAMLResponse;
+              // An error will exist because the endpoint we're trying to log out of doesn't exist,
+              // but we can still test to make sure that everything is behaving as it should.
+              // should.not.exist(err);
+
+              var buffer = Buffer.from(encodedSamlResponse, 'base64');
+              if (check.config.skipRequestCompression)
+                helper(null, buffer);
+              else
+                zlib.inflateRaw( buffer, helper );
+
+              function helper(err, samlResponse) {
+                try {
+                  should.not.exist( err );
+                  parseString( samlResponse.toString(), function( err, doc ) {
+                    try {
+                      should.not.exist( err );
+                      delete doc['samlp:LogoutResponse']['$']["ID"];
+                      delete doc['samlp:LogoutResponse']['$']["IssueInstant"];
+                      doc.should.eql( check.result );
+                      done();
+                    } catch (err2) {
+                      done(err2);
+                    }
+                  });
+                } catch (err2) {
+                  done(err2);
+                }
+              }
+            } catch (err2) {
+              done(err2);
+            }
+          });
+        });
+      };
+    }
+
     for( var i = 0; i < capturedChecks.length; i++ ) {
       var check = capturedChecks[i];
       it( check.name, testForCheck( check ) );
+    }
+
+    for (var i = 0; i < logoutChecks.length; i++) {
+      var check = logoutChecks[i];
+      it(check.name, testForCheckLogout(check));
     }
 
     afterEach( function( done ) {
