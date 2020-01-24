@@ -53,6 +53,7 @@ var MultiSamlStrategy = require('passport-saml/multiSamlStrategy');
 
 passport.use(new MultiSamlStrategy(
   {
+    passReqToCallback: true, //makes req available in callback
     getSamlOptions: function(request, done) {
       findProvider(request, function(err, provider) {
         if (err) {
@@ -62,7 +63,7 @@ passport.use(new MultiSamlStrategy(
       });
     }
   },
-  function(profile, done) {
+  function(req, profile, done) {
     findByEmail(profile.email, function(err, user) {
       if (err) {
         return done(err);
