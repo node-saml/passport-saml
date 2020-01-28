@@ -1902,7 +1902,7 @@ write@1.0.3:
   dependencies:
     mkdirp "^0.5.1"
 
-xml-crypto@^1.1.4:
+xml-crypto@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-1.4.0.tgz#de1cec8cd31cbd689cd90d3d6e8a27d4ae807de7"
   integrity sha512-K8FRdRxICVulK4WhiTUcJrRyAIJFPVOqxfurA3x/JlmXBTxy+SkEENF6GeRt7p/rB6WSOUS9g0gXNQw5n+407g==
