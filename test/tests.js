@@ -117,7 +117,7 @@ describe( 'passport-saml /', function() {
           });
 
         app.use(function (err, req, res, next) {
-          console.log( err.stack );
+          // console.log( err.stack );
           res.status(500).send('500 Internal Server Error');
         });
 
@@ -171,7 +171,7 @@ describe( 'passport-saml /', function() {
             res.status(200).send("200 OK");
           });
         app.use(function (err, req, res, next) {
-          console.log( err.stack );
+          // console.log( err.stack );
           res.status(500).send('500 Internal Server Error');
         });
         server = app.listen(3033, function () {
@@ -557,7 +557,7 @@ describe( 'passport-saml /', function() {
           });
 
         app.use( function( err, req, res, next ) {
-          console.log( err.stack );
+          // console.log( err.stack );
           res.status(500).send('500 Internal Server Error');
         });
 
@@ -643,7 +643,7 @@ describe( 'passport-saml /', function() {
           });
 
         app.use( function( err, req, res, next ) {
-          console.log( err.stack );
+          // console.log( err.stack );
           res.status(500).send('500 Internal Server Error');
         });
 
