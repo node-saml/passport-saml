@@ -31,7 +31,7 @@
     "passport-strategy": "*",
     "q": "^1.5.0",
     "xml-crypto": "^1.4.0",
-    "xml-encryption": "^0.11.0",
+    "xml-encryption": "^1.0.0",
     "xml2js": "0.4.x",
     "xmlbuilder": "^11.0.0",
     "xmldom": "0.1.x"
