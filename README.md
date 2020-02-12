@@ -209,19 +209,12 @@ The `generateServiceProviderMetadata` method is also available on the `MultiSaml
 Passport-SAML uses the HTTP Redirect Binding for its `AuthnRequest`s (unless overridden with the `authnRequestBinding` parameter), and expects to receive the messages back via the HTTP POST binding.
 
 Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key. The certificate
-can start with `-----BEGIN PRIVATE KEY-----` on its own line and end with `-----END PRIVATE KEY-----` on its own line, or have these lines stripped out.
+should start with `-----BEGIN PRIVATE KEY-----` on its own line and end with `-----END PRIVATE KEY-----` on its own line.
 
 For example:
 
 ```javascript
     privateCert: fs.readFileSync('./cert.pem', 'utf-8')
-```
-
-Alternately:
-
-
-```javascript
-    privateCert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
 ```
 
 
