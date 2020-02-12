@@ -1390,38 +1390,6 @@ describe( 'passport-saml /', function() {
         });
       });
 
-      it( 'acme_tools request signed with sha256 when cert not in PEM format', function( done ) {
-        var privateCert = fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'utf-8')
-          .replace('-----BEGIN PRIVATE KEY-----', '')
-          .replace('-----END PRIVATE KEY-----', '')
-          .replace(/\n/g, '')
-        var samlConfig = {
-          entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
-          issuer: 'acme_tools_com',
-          callbackUrl: 'https://relyingparty/adfs/postResponse',
-          privateCert: privateCert,
-          authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
-          identifierFormat: null,
-          signatureAlgorithm: 'sha256',
-          additionalParams: {
-            customQueryStringParam: 'CustomQueryStringParamValue'
-          }
-        };
-        var samlObj = new SAML( samlConfig );
-        samlObj.generateUniqueID = function () { return '12345678901234567890' };
-        samlObj.getAuthorizeUrl({}, {}, function(err, url) {
-          try {
-            var qry = require('querystring').parse(require('url').parse(url).query);
-            qry.SigAlg.should.match('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256');
-            qry.Signature.should.match('hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA==');
-            qry.customQueryStringParam.should.match('CustomQueryStringParamValue');
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
-      });
-
       it( 'acme_tools request not signed if missing entry point', function( done ) {
         var samlConfig = {
           entryPoint: '',
@@ -2333,7 +2301,7 @@ describe( 'passport-saml /', function() {
         samlObj.requestToUrl(request, null, 'authorize', {}, function(err) {
           try {
             should.exist(err);
-            err.message.should.containEql('bad end line');
+            err.message.should.containEql('no start line');
             done();
           } catch (err2) {
             done(err2);
