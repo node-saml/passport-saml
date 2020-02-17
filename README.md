@@ -331,6 +331,14 @@ Passport-SAML has built in support for SLO including
 
 See [Releases](https://github.com/bergie/passport-saml/releases) to find the changes that go into each release.
 
+## Contributing
+
+PRs are welcome!
+
+We use `mocha` to run unit tests, and `c8` for test coverage instrumentation.
+In case you have idea on how to improve the code, make sure that all tests are still running before submitting changes.
+If you have an idea on how to improve particular piece of code, make sure that *all* branches of the code you are submitting for review are covered by running `npm run coverage` and inspecting coverage report.
+
 ## FAQ
 
 ### Is there an example I can look at?
