@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
+    "codecov": "^3.6.5",
     "eslint": "^6.5.1",
     "express": "^4.16.2",
     "mocha": "^6.0.2",
@@ -54,7 +55,8 @@
     "test": "npm run lint && mocha",
     "lint": "./node_modules/.bin/eslint lib",
     "lint:fix": "./node_modules/.bin/eslint --fix lib",
-    "coverage": "nyc mocha && nyc report --reporter=html"
+    "coverage": "nyc mocha && nyc report --reporter=html",
+    "codecov": "nyc --reporter=lcov npm test && codecov"
   },
   "eslintConfig": {
     "env": {
