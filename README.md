@@ -1,8 +1,10 @@
 Passport-SAML
 =============
 [![Build Status](https://travis-ci.org/bergie/passport-saml.svg?branch=master)](https://travis-ci.org/bergie/passport-saml) [![GitHub version](https://badge.fury.io/gh/bergie%2Fpassport-saml.svg)](https://badge.fury.io/gh/bergie%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![dependencies](https://david-dm.org/bergie/passport-saml.svg)](https://david-dm.org/bergie/passport-saml.svg) [![devDependencies](https://david-dm.org/bergie/passport-saml/dev-status.svg)](https://david-dm.org/bergie/passport-saml/dev-status.svg) [![peerDependencies](https://david-dm.org/bergie/passport-saml/peer-status.svg)](https://david-dm.org/bergie/passport-saml/peer-status.svg)
+[![coverage-status](https://codecov.io/gh/bergie/passport-saml/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/gh/bergie/passport-saml?branch=master)
 
 [![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/)
+
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
