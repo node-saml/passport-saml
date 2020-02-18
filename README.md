@@ -208,7 +208,19 @@ The `generateServiceProviderMetadata` method is also available on the `MultiSaml
 
 Passport-SAML uses the HTTP Redirect Binding for its `AuthnRequest`s (unless overridden with the `authnRequestBinding` parameter), and expects to receive the messages back via the HTTP POST binding.
 
-Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key.
+Authentication requests sent by Passport-SAML can be signed using RSA signature with SHA1, SHA256 or SHA512 hashing algorithms. 
+
+To select hashing algorithm, use:
+
+```js
+...
+  signatureAlgorithm: 'sha1' // (default, but not recommended anymore these days)
+  signatureAlgorithm: 'sha256', // (preffered - your IDP should support it, otherwise think about upgrading it)
+  signatureAlgorithm: 'sha512' // (most secure - check if your IDP supports it)
+...
+```
+
+To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key.
 
 Formats supported for `privateCert` field are,
 
