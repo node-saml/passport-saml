@@ -38,10 +38,10 @@
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
-    "c8": "^7.1.0",
     "eslint": "^6.5.1",
     "express": "^4.16.2",
     "mocha": "^6.0.2",
+    "nyc": "^15.0.0",
     "passport": "0.4.x",
     "request": "^2.83.0",
     "should": "*",
@@ -54,7 +54,7 @@
     "test": "npm run lint && mocha",
     "lint": "./node_modules/.bin/eslint lib",
     "lint:fix": "./node_modules/.bin/eslint --fix lib",
-    "coverage": "c8 mocha"
+    "coverage": "nyc mocha && nyc report --reporter=html"
   },
   "eslintConfig": {
     "env": {

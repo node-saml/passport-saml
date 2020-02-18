@@ -340,13 +340,13 @@ Great! We would love to see your contribution.
 
 Few things to note:
 
-We use `mocha` to run unit tests, and `c8` for test coverage instrumentation.
+We use `mocha` to run unit tests, and `nyc` for test coverage instrumentation.
 
 When you are happy with idea and you are ready to make a pull request, make sure that all tests are still running before submitting changes.
 
 You can ensure that is a case by running `npm test`.
 
-Also, in order to avoid regressions, we want to make sure that *all* relevant code branches that you are submitting for pull request review are covered by test via running `npm run coverage` and inspecting coverage report that can be found at `/coverage/lcov-report/index.html`
+Also, in order to avoid regressions, we want to make sure that *all* relevant code branches that you are submitting for pull request review are covered by test via running `npm run coverage` and inspecting coverage report that can be found at `/coverage/index.html`
 
 ## FAQ
 

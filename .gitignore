@@ -2,3 +2,4 @@ node_modules/
 .tern-port
 .idea
 coverage/
+.nyc_output
