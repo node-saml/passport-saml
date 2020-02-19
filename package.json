@@ -53,10 +53,11 @@
   },
   "scripts": {
     "test": "npm run lint && mocha",
+    "ci-test": "nyc --reporter=lcov mocha",
     "lint": "./node_modules/.bin/eslint lib",
     "lint:fix": "./node_modules/.bin/eslint --fix lib",
     "coverage": "nyc mocha && nyc report --reporter=html",
-    "codecov": "nyc --reporter=lcov npm test && codecov"
+    "codecov": "codecov"
   },
   "eslintConfig": {
     "env": {
