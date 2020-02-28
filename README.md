@@ -61,6 +61,7 @@ var MultiSamlStrategy = require('suomifi-passport-saml/multiSamlStrategy');
 
 passport.use(new MultiSamlStrategy(
   {
+    passReqToCallback: true, //makes req available in callback
     getSamlOptions: function(request, done) {
       findProvider(request, function(err, provider) {
         if (err) {
@@ -70,7 +71,7 @@ passport.use(new MultiSamlStrategy(
       });
     }
   },
-  function(profile, done) {
+  function(req, profile, done) {
     findByEmail(profile.email, function(err, user) {
       if (err) {
         return done(err);
@@ -123,6 +124,8 @@ type Profile = {
   * `privateCert`: see [Security and signatures](#security-and-signatures)
   * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
   * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
+  * `digestAlgorithm`: optionally set the digest algorithm used to provide a digest for the signed data object, valid values are 'sha1' (default), 'sha256', or 'sha512'
+  * `xmlSignatureTransforms`: optionally set an array of signature transforms to be used in HTTP-POST signatures. By default this is `[ 'http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/2001/10/xml-exc-c14n#' ]`
  * **Additional SAML behaviors**
   * `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
   * `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
@@ -131,7 +134,7 @@ type Profile = {
   * `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
   * `disableRequestedAuthnContext`: if truthy, do not request a specific authentication context. This is [known to help when authenticating against Active Directory](https://github.com/bergie/passport-saml/issues/226) (AD FS) servers.
   * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`); array of values is also supported
-  *  RACComparison: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
+  * `RACComparison`: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
 
   * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
   * `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
@@ -252,13 +255,47 @@ The `generateServiceProviderMetadata` method is also available on the `MultiSaml
 
 Passport-SAML uses the HTTP Redirect Binding for its `AuthnRequest`s (unless overridden with the `authnRequestBinding` parameter), and expects to receive the messages back via the HTTP POST binding.
 
-Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key. The certificate
-should start with `-----BEGIN PRIVATE KEY-----` on its own line and end with `-----END PRIVATE KEY-----` on its own line.
+Authentication requests sent by Passport-SAML can be signed using RSA signature with SHA1, SHA256 or SHA512 hashing algorithms. 
 
-For example:
+To select hashing algorithm, use:
+
+```js
+...
+  signatureAlgorithm: 'sha1' // (default, but not recommended anymore these days)
+  signatureAlgorithm: 'sha256', // (preffered - your IDP should support it, otherwise think about upgrading it)
+  signatureAlgorithm: 'sha512' // (most secure - check if your IDP supports it)
+...
+```
+
+To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key.
+
+Formats supported for `privateCert` field are,
+
+1. Well formatted PEM:
+
+```
+-----BEGIN PRIVATE KEY-----
+<private key contents here delimited at 64 characters per row>
+-----END PRIVATE KEY-----
+
+```
+```
+-----BEGIN RSA PRIVATE KEY-----
+<private key contents here delimited at 64 characters per row>
+-----END RSA PRIVATE KEY-----
+
+```
+(both versions work)
+See example from tests of the first version of [well formatted private key](test/static/acme_tools_com.key).
+
+2. Alternativelly a single line private key without start/end lines where all rows are joined into single line:
+
+See example from tests of [singleline private key](test/static/singleline_acme_tools_com.key).
+
+Add it to strategy options like this:
 
 ```javascript
-    privateCert: fs.readFileSync('./cert.pem', 'utf-8')
+    privateCert: fs.readFileSync('./privateCert.pem', 'utf-8')
 ```
 
 
@@ -367,6 +404,7 @@ Provide an instance of an object which has these functions passed to the `cacheP
 Passport-SAML has built in support for SLO including
 * Signature validation
 * IdP initiated and SP initiated logouts
+* Decryption of encrypted name identifiers in IdP initiated logout
 * `Redirect` and `POST` SAML Protocol Bindings
 
 
@@ -379,3 +417,15 @@ See [Releases](https://github.com/vrk-kpa/suomifi-passport-saml/releases) to fin
 ### Is there an example I can look at?
 
 Gerard Braad has provided an example app at https://github.com/gbraad/passport-saml-example/
+
+## Node Support Policy
+
+We only support [Long-Term Support](https://github.com/nodejs/Release) versions of Node.
+
+We specifically limit our support to LTS versions of Node, not because this package won't work on other versions, but because we have a limited amount of time, and supporting LTS offers the greatest return on that investment.
+
+It's possible this package will work correctly on newer versions of Node. It may even be possible to use this package on older versions of Node, though that's more unlikely as we'll make every effort to take advantage of features available in the oldest LTS version we support.
+
+As each Node LTS version reaches its end-of-life we will remove that version from the `node` `engines` property of our package's `package.json` file. Removing a Node version is considered a breaking change and will entail the publishing of a new major version of this package. We will not accept any requests to support an end-of-life version of Node. Any merge requests or issues supporting an end-of-life version of Node will be closed.
+
+We will accept code that allows this package to run on newer, non-LTS, versions of Node.
