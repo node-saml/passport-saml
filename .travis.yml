@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - "6.0"
+  - "8.10"
   - "stable"
 
 script:
   - npm test
-  - ./node_modules/.bin/jshint lib
+  - ./node_modules/.bin/eslint lib
