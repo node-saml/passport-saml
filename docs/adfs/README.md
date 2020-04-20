@@ -56,7 +56,8 @@ passport.use(new SamlStrategy(
     acceptedClockSkewMs: -1,
     identifierFormat: null,
   // this is configured under the Advanced tab in AD FS relying party
-    signatureAlgorithm: 'sha256'
+    signatureAlgorithm: 'sha256',
+    RACComparison: 'exact', // default to exact RequestedAuthnContext Comparison Type
   },
   function(profile, done) {
     return done(null,
@@ -109,3 +110,19 @@ module.exports = passport;
 
   var server = http.createServer(app);
 ```
+# Troubleshooting
+
+## ADFS 2016
+
+If you are setting up an ADFS 2016 server, you might run into the following issue with the previous settings:
+
+```
+An error occurred during an attempt to read the federation metadata. Verify that the specified URL or host name is a valid federation metadata endpoint.
+
+Verify your proxy server setting. For more information about how to verify you proxy sever setting, see the AD FS Troubleshooting Guide http://go.microsoft.com/fwlink/?LinkId=182180).
+Error message: EntityDescriptor 'acme_tools_com'. ID0014: The value 'NamelDFormat' must be an absolute URI.
+```
+
+![NamelDFormat Error Popup](./NameIDFormatError.jpg)
+
+If you remove the `identifierFormat`, it works as expected.

@@ -1,7 +1,7 @@
 {
   "name": "passport-saml",
-  "version": "0.20.2",
-  "license" : "MIT",
+  "version": "1.2.0",
+  "license": "MIT",
   "keywords": [
     "saml",
     "adfs",
@@ -18,7 +18,8 @@
     "Michael Bosworth",
     "Herbert Vojčík",
     "Peter Loer",
-    "Mark Stosberg"
+    "Mark Stosberg",
+    "Chris Barth"
   ],
   "repository": {
     "type": "git",
@@ -26,29 +27,49 @@
   },
   "main": "./lib/passport-saml",
   "dependencies": {
+    "debug": "^3.1.0",
     "passport-strategy": "*",
     "q": "^1.5.0",
-    "xml-crypto": "^0.10.1",
-    "xml-encryption": "^0.11.0",
+    "xml-crypto": "^1.4.0",
+    "xml-encryption": "^1.0.0",
     "xml2js": "0.4.x",
-    "xmlbuilder": "^9.0.4",
+    "xmlbuilder": "^11.0.0",
     "xmldom": "0.1.x"
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
+    "eslint": "^6.5.1",
     "express": "^4.16.2",
-    "jshint": "*",
-    "mocha": "*",
+    "mocha": "^6.0.2",
     "passport": "0.4.x",
     "request": "^2.83.0",
     "should": "*",
-    "sinon": "^2.1.0"
+    "sinon": "^7.2.7"
   },
   "engines": {
-    "node": ">= 4"
+    "node": ">= 8"
   },
   "scripts": {
-    "test": "mocha",
-    "jshint": "./node_modules/.bin/jshint lib"
+    "test": "npm run lint && mocha",
+    "lint": "./node_modules/.bin/eslint lib",
+    "lint:fix": "./node_modules/.bin/eslint --fix lib"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": false
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "rules": {
+      "no-undefined": "off",
+      "no-unused-vars": "off",
+      "semi": [
+        "error",
+        "always"
+      ]
+    }
   }
 }
