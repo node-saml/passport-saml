@@ -117,7 +117,14 @@ type Profile = {
   * `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
   * `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
   * `digestAlgorithm`: optionally set the digest algorithm used to provide a digest for the signed data object, valid values are 'sha1' (default), 'sha256', or 'sha512'
-  * `xmlSignatureTransforms`: optionally set an array of signature transforms to be used in HTTP-POST signatures. By default this is `[ 'http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/2001/10/xml-exc-c14n#' ]`
+  * `xmlSignatureTransforms`: optionally set an array of signature transforms to be used in HTTP-POST signatures. By 
+  * `attrValueMapper`: optionally set a function that maps attributes values into plain strings. By default this is:
+    ```js
+    attrValueMapper = function (value) {
+      return typeof value === 'string' ? value : value._;
+    };
+     ```
+  default this is `[ 'http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/2001/10/xml-exc-c14n#' ]`
  * **Additional SAML behaviors**
   * `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
   * `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
