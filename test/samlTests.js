@@ -1,8 +1,9 @@
 'use strict';
+var fs = require('fs');
+var url = require('url');
+var should = require('should');
 
 var SAML = require('../lib/passport-saml/saml.js').SAML;
-var should = require('should');
-var url = require('url');
 
 describe('SAML.js', function () {
   describe('get Urls', function () {
@@ -232,5 +233,40 @@ describe('SAML.js', function () {
         });
       });
     });
+
+    describe('keyToPEM', function () {
+      var [regular, singleline] = [
+        'acme_tools_com.key',
+        'singleline_acme_tools_com.key'
+      ].map(keyFromFile);
+
+      it('formats singleline keys properly', function (done) {
+        var result = saml.keyToPEM(singleline);
+        result.should.equal(regular);
+        done();
+      });
+
+      it('passes all other multiline keys', function (done) {
+        var result = saml.keyToPEM(regular);
+        result.should.equal(regular);
+        done();
+      });
+
+      it('does nothing to falsy', function (done) {
+        var result = saml.keyToPEM(null);
+        should.equal(result, null);
+        done();
+      });
+
+      it('does nothing to non strings', function (done) {
+        var result = saml.keyToPEM(1);
+        should.equal(result, 1);
+        done();
+      });
+    });
   });
 });
+
+function keyFromFile (file) {
+  return fs.readFileSync(`./test/static/${file}`).toString();
+}

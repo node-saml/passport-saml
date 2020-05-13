@@ -53,6 +53,7 @@ var MultiSamlStrategy = require('passport-saml/multiSamlStrategy');
 
 passport.use(new MultiSamlStrategy(
   {
+    passReqToCallback: true, //makes req available in callback
     getSamlOptions: function(request, done) {
       findProvider(request, function(err, provider) {
         if (err) {
@@ -62,7 +63,7 @@ passport.use(new MultiSamlStrategy(
       });
     }
   },
-  function(profile, done) {
+  function(req, profile, done) {
     findByEmail(profile.email, function(err, user) {
       if (err) {
         return done(err);
@@ -125,7 +126,7 @@ type Profile = {
   * `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
   * `disableRequestedAuthnContext`: if truthy, do not request a specific authentication context. This is [known to help when authenticating against Active Directory](https://github.com/bergie/passport-saml/issues/226) (AD FS) servers.
   * `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`); array of values is also supported
-  *  RACComparison: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
+  * `RACComparison`: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
 
   * `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
   * `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
@@ -207,20 +208,47 @@ The `generateServiceProviderMetadata` method is also available on the `MultiSaml
 
 Passport-SAML uses the HTTP Redirect Binding for its `AuthnRequest`s (unless overridden with the `authnRequestBinding` parameter), and expects to receive the messages back via the HTTP POST binding.
 
-Authentication requests sent by Passport-SAML can be signed using RSA-SHA1. To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key. The certificate
-can start with `-----BEGIN PRIVATE KEY-----` on its own line and end with `-----END PRIVATE KEY-----` on its own line, or have these lines stripped out.
+Authentication requests sent by Passport-SAML can be signed using RSA signature with SHA1, SHA256 or SHA512 hashing algorithms. 
 
-For example:
+To select hashing algorithm, use:
 
-```javascript
-    privateCert: fs.readFileSync('./cert.pem', 'utf-8')
+```js
+...
+  signatureAlgorithm: 'sha1' // (default, but not recommended anymore these days)
+  signatureAlgorithm: 'sha256', // (preffered - your IDP should support it, otherwise think about upgrading it)
+  signatureAlgorithm: 'sha512' // (most secure - check if your IDP supports it)
+...
 ```
 
-Alternately:
+To sign them you need to provide a private key in the PEM format via the `privateCert` configuration key.
 
+Formats supported for `privateCert` field are,
+
+1. Well formatted PEM:
+
+```
+-----BEGIN PRIVATE KEY-----
+<private key contents here delimited at 64 characters per row>
+-----END PRIVATE KEY-----
+
+```
+```
+-----BEGIN RSA PRIVATE KEY-----
+<private key contents here delimited at 64 characters per row>
+-----END RSA PRIVATE KEY-----
+
+```
+(both versions work)
+See example from tests of the first version of [well formatted private key](test/static/acme_tools_com.key).
+
+2. Alternativelly a single line private key without start/end lines where all rows are joined into single line:
+
+See example from tests of [singleline private key](test/static/singleline_acme_tools_com.key).
+
+Add it to strategy options like this:
 
 ```javascript
-    privateCert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W=='
+    privateCert: fs.readFileSync('./privateCert.pem', 'utf-8')
 ```
 
 
