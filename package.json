@@ -1,6 +1,6 @@
 {
-  "name": "passport-saml",
-  "version": "1.2.0",
+  "name": "passport-saml-next",
+  "version": "2.2.0",
   "license": "MIT",
   "keywords": [
     "saml",
@@ -8,7 +8,7 @@
     "sso",
     "shibboleth"
   ],
-  "description": "SAML 2.0 authentication strategy for Passport",
+  "description": "SAML 2.0 authentication strategy for Passport (temporary fork, which includes latest features)",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi",

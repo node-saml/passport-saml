@@ -1,69 +1,62 @@
-var util = require('util');
-var saml = require('./lib/passport-saml/saml');
-var InMemoryCacheProvider = require('./lib/passport-saml/inmemory-cache-provider').CacheProvider;
-var SamlStrategy = require('./lib/passport-saml/strategy');
+const saml = require('./lib/passport-saml/saml');
+const InMemoryCacheProvider = require('./lib/passport-saml/inmemory-cache-provider').CacheProvider;
+const SamlStrategy = require('./lib/passport-saml/strategy');
 
-function MultiSamlStrategy (options, verify) {
-  if (!options || typeof options.getSamlOptions != 'function') {
-    throw new Error('Please provide a getSamlOptions function');
+class MultiSamlStrategy extends SamlStrategy {
+  constructor(options, verify) {
+    if (!options || typeof options.getSamlOptions != 'function') {
+      throw new Error('Please provide a getSamlOptions function');
+    }
+
+    if(!options.requestIdExpirationPeriodMs){
+      options.requestIdExpirationPeriodMs = 28800000;  // 8 hours
+    }
+
+    if(!options.cacheProvider){
+        options.cacheProvider = new InMemoryCacheProvider(
+            {keyExpirationPeriodMs: options.requestIdExpirationPeriodMs });
+    }
+
+    super(options, verify);
+    this._options = options;
   }
 
-  if(!options.requestIdExpirationPeriodMs){
-    options.requestIdExpirationPeriodMs = 28800000;  // 8 hours
+  authenticate(req, options) {
+    this._options.getSamlOptions(req, (err, samlOptions) => {
+      if (err) {
+        return this.error(err);
+      }
+
+      this._saml = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      super.authenticate(req, options);
+    });
   }
 
-  if(!options.cacheProvider){
-      options.cacheProvider = new InMemoryCacheProvider(
-          {keyExpirationPeriodMs: options.requestIdExpirationPeriodMs });
+  logout(req, callback) {
+    this._options.getSamlOptions(req, (err, samlOptions) => {
+      if (err) {
+        return callback(err);
+      }
+
+      this._saml = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      super.logout(req, callback);
+    });
   }
 
-  SamlStrategy.call(this, options, verify);
-  this._options = options;
+  generateServiceProviderMetadata(req, decryptionCert, signingCert, callback) {
+    if (typeof callback !== 'function') {
+      throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
+    }
+
+    return this._options.getSamlOptions(req, (err, samlOptions) => {
+      if (err) {
+        return callback(err);
+      }
+
+      this._saml = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      return callback(null, super.generateServiceProviderMetadata(decryptionCert, signingCert ));
+    });
+  }
 }
-
-util.inherits(MultiSamlStrategy, SamlStrategy);
-
-MultiSamlStrategy.prototype.authenticate = function (req, options) {
-  var self = this;
-
-  this._options.getSamlOptions(req, function (err, samlOptions) {
-    if (err) {
-      return self.error(err);
-    }
-
-    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    self.constructor.super_.prototype.authenticate.call(self, req, options);
-  });
-};
-
-MultiSamlStrategy.prototype.logout = function (req, callback) {
-  var self = this;
-
-  this._options.getSamlOptions(req, function (err, samlOptions) {
-    if (err) {
-      return callback(err);
-    }
-
-    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    self.constructor.super_.prototype.logout.call(self, req, callback);
-  });
-};
-
-MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, decryptionCert, signingCert, callback ) {
-  if (typeof callback !== 'function') {
-    throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
-  }
-
-  var self = this;
-
-  return this._options.getSamlOptions(req, function (err, samlOptions) {
-    if (err) {
-      return callback(err);
-    }
-
-    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    return callback(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(self, decryptionCert, signingCert ));
-  });
-};
 
 module.exports = MultiSamlStrategy;
