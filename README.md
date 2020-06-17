@@ -148,6 +148,7 @@ type Profile = {
   * `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
   * `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
   * `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
+  * `singleLogoutServiceBinding`: if set to `HTTP-Redirect`, sets the @Binding attribute in the `SingleLogoutService` element to `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect`. Default is `urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST`.
 
 
 ### Provide the authentication callback
@@ -208,7 +209,7 @@ The `generateServiceProviderMetadata` method is also available on the `MultiSaml
 
 Passport-SAML uses the HTTP Redirect Binding for its `AuthnRequest`s (unless overridden with the `authnRequestBinding` parameter), and expects to receive the messages back via the HTTP POST binding.
 
-Authentication requests sent by Passport-SAML can be signed using RSA signature with SHA1, SHA256 or SHA512 hashing algorithms. 
+Authentication requests sent by Passport-SAML can be signed using RSA signature with SHA1, SHA256 or SHA512 hashing algorithms.
 
 To select hashing algorithm, use:
 
