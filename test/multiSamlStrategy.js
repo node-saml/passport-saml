@@ -68,6 +68,7 @@ describe('strategy#authenticate', function() {
   });
 
   it('uses given options to setup internal saml provider', function(done) {
+    var superAuthenticateStub = this.superAuthenticateStub;
     var samlOptions = {
       issuer: 'http://foo.issuer',
       callbackUrl: 'http://foo.callback',
@@ -84,7 +85,9 @@ describe('strategy#authenticate', function() {
     function getSamlOptions (req, fn) {
       try {
         fn(null, samlOptions);
-        strategy._saml.options.should.containEql(Object.assign({},
+        sinon.assert.calledOnce(superAuthenticateStub)
+        superAuthenticateStub.calledWith(Object.assign(
+          {},
           { cacheProvider: 'mock cache provider' },
           samlOptions
         ));
@@ -104,19 +107,19 @@ describe('strategy#authenticate', function() {
 
 describe('strategy#logout', function() {
   beforeEach(function() {
-    this.superAuthenticateStub = sinon.stub(SamlStrategy.prototype, 'logout');
+    this.superLogoutMock = sinon.stub(SamlStrategy.prototype, 'logout');
   });
 
   afterEach(function() {
-    this.superAuthenticateStub.restore();
+    this.superLogoutMock.restore();
   });
 
   it('calls super with request and auth options', function(done) {
-    var superAuthenticateStub = this.superAuthenticateStub;
+    var superLogoutMock = this.superLogoutMock;
     function getSamlOptions (req, fn) {
       try {
         fn();
-        sinon.assert.calledOnce(superAuthenticateStub);
+        sinon.assert.calledOnce(superLogoutMock);
         done();
       } catch (err2) {
         done(err2);
@@ -148,6 +151,7 @@ describe('strategy#logout', function() {
   });
 
   it('uses given options to setup internal saml provider', function(done) {
+    var superLogoutMock = this.superLogoutMock;
     var samlOptions = {
       issuer: 'http://foo.issuer',
       callbackUrl: 'http://foo.callback',
@@ -164,7 +168,11 @@ describe('strategy#logout', function() {
     function getSamlOptions (req, fn) {
       try {
         fn(null, samlOptions);
-        strategy._saml.options.should.containEql(samlOptions);
+        sinon.assert.calledOnce(superLogoutMock)
+        superLogoutMock.calledWith(Object.assign(
+          {},
+          samlOptions
+        ));
         done();
       } catch (err2) {
         done(err2);

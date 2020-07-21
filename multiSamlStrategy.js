@@ -31,8 +31,10 @@ MultiSamlStrategy.prototype.authenticate = function (req, options) {
       return self.error(err);
     }
 
-    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    self.constructor.super_.prototype.authenticate.call(self, req, options);
+    var samlService = new saml.SAML(Object.assign({}, self._options, samlOptions));
+    var strategy = Object.assign({}, self, {_saml: samlService});
+    Object.setPrototypeOf(strategy, self);
+    self.constructor.super_.prototype.authenticate.call(strategy, req, options);
   });
 };
 
@@ -44,8 +46,10 @@ MultiSamlStrategy.prototype.logout = function (req, callback) {
       return callback(err);
     }
 
-    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    self.constructor.super_.prototype.logout.call(self, req, callback);
+    var samlService = new saml.SAML(Object.assign({}, self._options, samlOptions));
+    var strategy = Object.assign({}, self, {_saml: samlService});
+    Object.setPrototypeOf(strategy, self);
+    self.constructor.super_.prototype.logout.call(strategy, req, callback);
   });
 };
 
@@ -61,8 +65,10 @@ MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, dec
       return callback(err);
     }
 
-    self._saml = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    return callback(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(self, decryptionCert, signingCert ));
+    var samlService = new saml.SAML(Object.assign({}, self._options, samlOptions));
+    var strategy = Object.assign({}, self, {_saml: samlService});
+    Object.setPrototypeOf(strategy, self);
+    return callback(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert));
   });
 };
 

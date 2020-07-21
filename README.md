@@ -79,6 +79,9 @@ You can override these defaults by passing a new value through the `getSamlOptio
 
 Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](!https://github.com/bergie/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
 
+> :warning: **There's a race condition [bug](https://github.com/bergie/passport-saml/issues/425) in versions < 1.3.3 which makes it vulnerable to DOS attacks**: Please use > 1.3.3 if you want to use this issue
+
+
 #### The profile object:
 
 The profile object referenced above contains the following:
