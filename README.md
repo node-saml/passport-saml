@@ -1,6 +1,3 @@
-
-*MOVED! Our new home is at https://github.com/node-saml/passport-saml/*
-
 Passport-SAML
 =============
 [![Build Status](https://travis-ci.org/bergie/passport-saml.svg?branch=master)](https://travis-ci.org/bergie/passport-saml) [![GitHub version](https://badge.fury.io/gh/bergie%2Fpassport-saml.svg)](https://badge.fury.io/gh/bergie%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![dependencies](https://david-dm.org/bergie/passport-saml.svg)](https://david-dm.org/bergie/passport-saml.svg) [![devDependencies](https://david-dm.org/bergie/passport-saml/dev-status.svg)](https://david-dm.org/bergie/passport-saml/dev-status.svg) [![peerDependencies](https://david-dm.org/bergie/passport-saml/peer-status.svg)](https://david-dm.org/bergie/passport-saml/peer-status.svg)
