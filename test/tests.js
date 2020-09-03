@@ -1348,6 +1348,40 @@ describe( 'passport-saml /', function() {
             }
           });
         });
+
+        it( 'XML AttributeValue should return object', function( done ) {
+          const nameid_opaque_string = '*******************************'
+          const nameQualifier = 'https://idp.example.org/idp/saml'
+          const spNameQualifier = 'https://sp.example.org/sp/entity'
+          const format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
+          const xml = 
+          '<Response>' +
+            '<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0">' +
+              '<saml2:AttributeStatement>' +
+                  '<saml2:Attribute FriendlyName="eduPersonTargetedID" Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">' +
+                      '<saml2:AttributeValue>' +
+                          '<saml2:NameID Format="'+format+'" NameQualifier="'+nameQualifier+'" SPNameQualifier="'+spNameQualifier+'">' +
+                          nameid_opaque_string +
+                          '</saml2:NameID>' +
+                      '</saml2:AttributeValue>' +
+                  '</saml2:Attribute>' +
+              '</saml2:AttributeStatement>' +
+            '</saml2:Assertion>' +
+          '</Response>';
+          var base64xml = Buffer.from( xml ).toString('base64');
+          var container = { SAMLResponse: base64xml };
+          var samlObj = new SAML();
+          samlObj.validatePostResponse( container, function( err, profile, logout ) {
+            should.not.exist( err );
+            const eptid = profile['urn:oid:1.3.6.1.4.1.5923.1.1.1.10'];
+            const nameid = eptid['NameID'][0]
+            nameid._.should.eql(nameid_opaque_string)
+            nameid.$.NameQualifier.should.equal(nameQualifier)
+            nameid.$.SPNameQualifier.should.equal(spNameQualifier)
+            nameid.$.Format.should.equal(format)
+            done();
+          });
+        });
       });
 
 
