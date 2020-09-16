@@ -1893,10 +1893,10 @@ xml-crypto@^1.4.0:
     xmldom "0.1.27"
     xpath "0.0.27"
 
-xml-encryption@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/xml-encryption/-/xml-encryption-1.0.0.tgz#fe50d3bbbe2ae06876d6aa95aa3bf958284e1612"
-  integrity sha512-xTqcgKPN3XOswvDPXrhtyvWZ96IFcO9Azv3vS060kOpBsK5T7OxbQDxb59bPLl4b4c2IgmSZC3kJB0n5WPr2Mw==
+xml-encryption@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/xml-encryption/-/xml-encryption-1.2.0.tgz#37c8b470beae88b4625ea8cad82f108ea0f9c364"
+  integrity sha512-J3NjGMY8jf6bTo15jURTYBLtsisbnyCeM+MuxtfiAkZEZBnSZpNKjUUORhiOScKvSi6tMOAaZ3r7bZOXOni+Ew==
   dependencies:
     escape-html "^1.0.3"
     node-forge "^0.7.0"
