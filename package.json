@@ -47,7 +47,7 @@
     "sinon": "^7.2.7"
   },
   "engines": {
-    "node": ">= 8"
+    "node": ">= 10"
   },
   "scripts": {
     "test": "npm run lint && mocha",
