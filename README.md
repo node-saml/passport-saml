@@ -11,6 +11,7 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 ## Installation
 
     $ npm install passport-saml
+    $ npm i xml2js
 
 ## Usage
 
