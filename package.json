@@ -53,7 +53,8 @@
   "scripts": {
     "test": "npm run lint && mocha",
     "lint": "./node_modules/.bin/eslint lib",
-    "lint:fix": "./node_modules/.bin/eslint --fix lib"
+    "lint:fix": "./node_modules/.bin/eslint --fix lib",
+    "prepublishOnly": "tsc"
   },
   "eslintConfig": {
     "env": {
