@@ -31,7 +31,7 @@
     "debug": "^3.1.0",
     "passport-strategy": "*",
     "q": "^1.5.0",
-    "xml-crypto": "^1.5.3",
+    "xml-crypto": "^2.0.0",
     "xml-encryption": "1.2.1",
     "xml2js": "0.4.x",
     "xmlbuilder": "^11.0.0",
