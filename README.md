@@ -216,7 +216,7 @@ To select hashing algorithm, use:
 ```js
 ...
   signatureAlgorithm: 'sha1' // (default, but not recommended anymore these days)
-  signatureAlgorithm: 'sha256', // (preffered - your IDP should support it, otherwise think about upgrading it)
+  signatureAlgorithm: 'sha256', // (preferred - your IDP should support it, otherwise think about upgrading it)
   signatureAlgorithm: 'sha512' // (most secure - check if your IDP supports it)
 ...
 ```
