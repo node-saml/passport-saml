@@ -1,7 +1,7 @@
 var util = require('util');
-var saml = require('./lib/passport-saml/saml');
-var InMemoryCacheProvider = require('./lib/passport-saml/inmemory-cache-provider').CacheProvider;
-var SamlStrategy = require('./lib/passport-saml/strategy');
+var saml = require('./saml');
+var InMemoryCacheProvider = require('./inmemory-cache-provider').CacheProvider;
+var SamlStrategy = require('./strategy');
 
 function MultiSamlStrategy (options, verify) {
   if (!options || typeof options.getSamlOptions != 'function') {

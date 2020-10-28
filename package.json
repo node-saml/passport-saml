@@ -54,9 +54,10 @@
     "node": ">= 10"
   },
   "scripts": {
-    "test": "npm run lint && mocha",
-    "lint": "./node_modules/.bin/eslint --ext .ts src || true",
-    "lint:fix": "./node_modules/.bin/eslint --ext .ts --fix src || true",
+    "test": "npm run lint && npm run tsc && mocha",
+    "tsc": "tsc",
+    "lint": "eslint --ext .ts src || true",
+    "lint:fix": "eslint --ext .ts --fix src || true",
     "prepublishOnly": "tsc"
   },
   "eslintConfig": {
