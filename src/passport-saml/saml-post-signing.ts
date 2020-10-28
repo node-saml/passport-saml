@@ -5,7 +5,7 @@ var authnRequestXPath = '/*[local-name(.)="AuthnRequest" and namespace-uri(.)="u
 var issuerXPath = '/*[local-name(.)="Issuer" and namespace-uri(.)="urn:oasis:names:tc:SAML:2.0:assertion"]';
 var defaultTransforms = [ 'http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/2001/10/xml-exc-c14n#' ];
 
-function signSamlPost(samlMessage, xpath, options) {
+export function signSamlPost(samlMessage, xpath, options) {
   if (!samlMessage) throw new Error('samlMessage is required');
   if (!xpath) throw new Error('xpath is required');
   if (!options || !options.privateCert) throw new Error('options.privateCert is required');
@@ -21,9 +21,6 @@ function signSamlPost(samlMessage, xpath, options) {
   return sig.getSignedXml();
 }
 
-function signAuthnRequestPost(authnRequest, options) {
+export function signAuthnRequestPost(authnRequest, options) {
   return signSamlPost(authnRequest, authnRequestXPath, options);
 }
-
-exports.signSamlPost = signSamlPost;
-exports.signAuthnRequestPost = signAuthnRequestPost;

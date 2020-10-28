@@ -25,7 +25,7 @@
     "type": "git",
     "url": "https://github.com/node-saml/passport-saml.git"
   },
-  "main": "./dist/passport-saml",
+  "main": "./lib/passport-saml",
   "dependencies": {
     "debug": "^3.1.0",
     "passport-strategy": "*",
@@ -37,6 +37,7 @@
     "xmldom": "0.1.x"
   },
   "devDependencies": {
+    "@types/node": "^14.14.5",
     "body-parser": "^1.17.1",
     "eslint": "^6.5.1",
     "express": "^4.16.2",
@@ -52,8 +53,8 @@
   },
   "scripts": {
     "test": "npm run lint && mocha",
-    "lint": "./node_modules/.bin/eslint lib",
-    "lint:fix": "./node_modules/.bin/eslint --fix lib",
+    "lint": "./node_modules/.bin/eslint src",
+    "lint:fix": "./node_modules/.bin/eslint --fix src",
     "prepublishOnly": "tsc"
   },
   "eslintConfig": {
