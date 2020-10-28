@@ -22,7 +22,7 @@ export function getDigestAlgorithm (shortName: string): string {
   }
 }
 
-export function getSigner (shortName: string): string {
+export function getSigner (shortName: string): crypto.Signer {
   switch(shortName) {
     case 'sha256':
       return crypto.createSign('RSA-SHA256');
