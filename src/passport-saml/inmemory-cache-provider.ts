@@ -63,7 +63,7 @@ export class CacheProvider {
      * @param id
      * @param value
      */
-    save(key, value, callback){
+    save(key: string, value: string, callback: (error: null, value: CacheValue) => void){
         if(!this.cacheKeys[key])
         {
             this.cacheKeys[key] = {
@@ -86,7 +86,7 @@ export class CacheProvider {
      * @param id
      * @returns {boolean}
      */
-    get(key, callback){
+    get(key: string, callback: (key: string | null, value: string) => void){
         if(this.cacheKeys[key]){
             callback(null, this.cacheKeys[key].value);
         }
@@ -102,7 +102,7 @@ export class CacheProvider {
      * Removes an item from the cache if it exists
      * @param key
      */
-    remove(key, callback){
+    remove(key: string, callback: (err: Error | null, key: string) => void){
         if(this.cacheKeys[key])
         {
             delete this.cacheKeys[key];
