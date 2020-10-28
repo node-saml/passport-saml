@@ -25,6 +25,7 @@
     "type": "git",
     "url": "https://github.com/node-saml/passport-saml.git"
   },
+  "files": ["lib", "test", "multiSamlStrategy.js", "docs", "package-lock.json"],
   "main": "./lib/passport-saml",
   "dependencies": {
     "debug": "^3.1.0",
