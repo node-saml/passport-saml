@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-export function getSigningAlgorithm (shortName: string) {
+export function getSigningAlgorithm (shortName: string): string {
   switch(shortName) {
     case 'sha256':
       return 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
@@ -11,7 +11,7 @@ export function getSigningAlgorithm (shortName: string) {
   }
 }
 
-export function getDigestAlgorithm (shortName: string) {
+export function getDigestAlgorithm (shortName: string): string {
   switch(shortName) {
     case 'sha256':
       return 'http://www.w3.org/2001/04/xmlenc#sha256';
@@ -22,7 +22,7 @@ export function getDigestAlgorithm (shortName: string) {
   }
 }
 
-export function getSigner (shortName: string) {
+export function getSigner (shortName: string): string {
   switch(shortName) {
     case 'sha256':
       return crypto.createSign('RSA-SHA256');
