@@ -1310,4 +1310,4 @@ SAML.prototype.keyToPEM = function (key) {
   return wrappedKey;
 };
 
-exports.SAML = SAML;
+export { SAML };
