@@ -614,8 +614,11 @@ class SAML {
   // See https://github.com/bergie/passport-saml/issues/19 for references to some of the attack
   //   vectors against SAML signature verification.
   validateSignature = function (fullXml, currentNode, certs) {
-    const xpathSigQuery = ".//*[local-name(.)='Signature' and " +
-                        "namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']";
+    const xpathSigQuery = ".//*[" +
+                        "local-name(.)='Signature' and " +
+                        "namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#' and " +
+                        "descendant::*[local-name(.)='Reference' and @URI='#"+currentNode.getAttribute('ID')+"']" +
+                        "]";
     const signatures = xpath(currentNode, xpathSigQuery);
     // This function is expecting to validate exactly one signature, so if we find more or fewer
     //   than that, reject.
