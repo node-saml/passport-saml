@@ -1,9 +1,16 @@
-var passport = require('passport-strategy');
-var util = require('util');
-var saml = require('./saml');
-var url = require('url');
+import passport from 'passport-strategy';
+import util from 'util';
+import * as saml from './saml';
+import url from 'url';
+import { AuthenticateOptions, AuthorizeOptions, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
+import type { Request } from 'express';
+import { Profile } from './types';
 
-function Strategy (options, verify) {
+interface SAMLRequest extends Request {
+  samlLogoutRequest?: Profile
+}
+
+function Strategy (options: SamlConfig, verify: VerifyWithRequest | VerifyWithoutRequest) {
   if (typeof options == 'function') {
     verify = options;
     options = {};
@@ -32,93 +39,92 @@ function Strategy (options, verify) {
 
 util.inherits(Strategy, passport.Strategy);
 
-Strategy.prototype.authenticate = function (req, options) {
-  var self = this;
+Strategy.prototype.authenticate = function (req: SAMLRequest, options: AuthenticateOptions & AuthorizeOptions): void {
 
   options.samlFallback = options.samlFallback || 'login-request';
 
-  function validateCallback(err, profile, loggedOut) {
+  const validateCallback = (err, profile: Profile, loggedOut) => {
       if (err) {
-        return self.error(err);
+        return this.error(err);
       }
 
       if (loggedOut) {
         req.logout();
         if (profile) {
           req.samlLogoutRequest = profile;
-          return self._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
+          return this._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
         }
-        return self.pass();
+        return this.pass();
       }
 
-      var verified = function (err, user, info) {
+      const verified = (err, user, info) => {
         if (err) {
-          return self.error(err);
+          return this.error(err);
         }
 
         if (!user) {
-          return self.fail(info);
+          return this.fail(info);
         }
 
-        self.success(user, info);
+        this.success(user, info);
       };
 
-      if (self._passReqToCallback) {
-        self._verify(req, profile, verified);
+      if (this._passReqToCallback) {
+        this._verify(req, profile, verified);
       } else {
-        self._verify(profile, verified);
+        this._verify(profile, verified);
       }
-  }
+  };
 
-  function redirectIfSuccess(err, url) {
+  const redirectIfSuccess = (err: Error | null, url: string | null) => {
     if (err) {
-      self.error(err);
+      this.error(err);
     } else {
-      self.redirect(url);
+      this.redirect(url);
     }
-  }
+  };
 
   if (req.query && (req.query.SAMLResponse || req.query.SAMLRequest)) {
-    var originalQuery = url.parse(req.url).query;
+    const originalQuery = url.parse(req.url).query;
     this._saml.validateRedirect(req.query, originalQuery, validateCallback);
   } else if (req.body && req.body.SAMLResponse) {
     this._saml.validatePostResponse(req.body, validateCallback);
   } else if (req.body && req.body.SAMLRequest) {
     this._saml.validatePostRequest(req.body, validateCallback);
   } else {
-    var requestHandler = {
-      'login-request': function() {
-        if (self._authnRequestBinding === 'HTTP-POST') {
-          this._saml.getAuthorizeForm(req, function(err, data) {
+    const requestHandler = {
+      'login-request': () => {
+        if (this._authnRequestBinding === 'HTTP-POST') {
+          this._saml.getAuthorizeForm(req, (err, data) => {
             if (err) {
-              self.error(err);
+              this.error(err);
             } else {
-              var res = req.res;
+              const res = req.res;
               res.send(data);
             }
           });
         } else { // Defaults to HTTP-Redirect
           this._saml.getAuthorizeUrl(req, options, redirectIfSuccess);
         }
-      }.bind(self),
-      'logout-request': function() {
+      },
+      'logout-request': () => {
           this._saml.getLogoutUrl(req, options, redirectIfSuccess);
-      }.bind(self)
+      }
     }[options.samlFallback];
 
     if (typeof requestHandler !== 'function') {
-      return self.fail();
+      return this.fail();
     }
 
     requestHandler();
   }
 };
 
-Strategy.prototype.logout = function(req, callback) {
+Strategy.prototype.logout = function(req: SAMLRequest, callback: (err: Error | null, url?: string) => void): void {
   this._saml.getLogoutUrl(req, {}, callback);
 };
 
-Strategy.prototype.generateServiceProviderMetadata = function( decryptionCert, signingCert ) {
+Strategy.prototype.generateServiceProviderMetadata = function( decryptionCert: string | null, signingCert?: string | null ): string {
   return this._saml.generateServiceProviderMetadata( decryptionCert, signingCert );
 };
 

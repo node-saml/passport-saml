@@ -113,5 +113,5 @@ export class CacheProvider {
             callback(null, null);
         }
 
-    };
+    }
 }

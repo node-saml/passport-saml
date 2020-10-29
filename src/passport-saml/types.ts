@@ -1,7 +1,16 @@
 import type express from 'express';
+import passport from 'passport';
 import type { CacheProvider } from './inmemory-cache-provider';
 
 export type CertCallback = (callback: (err: Error | null, cert?: string | string[]) => void) => void;
+
+export interface AuthenticateOptions extends passport.AuthenticateOptions {
+  additionalParams?: Record<string, any>;
+}
+
+export interface AuthorizeOptions extends AuthenticateOptions {
+  samlFallback?: string;
+}
 
 export interface SamlConfig {
     // Core
