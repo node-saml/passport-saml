@@ -2,21 +2,21 @@ import Debug from 'debug';
 const debug = Debug('passport-saml');
 import zlib from 'zlib';
 import xml2js from 'xml2js';
-import xmlCrypto from 'xml-crypto';
-import crypto from 'crypto';
+import xmlCrypto, { xpath } from 'xml-crypto';
+import crypto, { KeyLike } from 'crypto';
 import xmldom from 'xmldom';
 import url from 'url';
 import querystring from 'querystring';
 import xmlbuilder from 'xmlbuilder';
 import xmlenc from 'xml-encryption';
 import util from 'util';
-const { xpath } = xmlCrypto;
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
 import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
+import type { Request } from 'express';
 import Q from 'q';
 
-function processValidlySignedPostRequest(self, doc, dom, callback) {
+function processValidlySignedPostRequest(self: SAML, doc, dom, callback) {
   const request = doc.LogoutRequest;
   if (request) {
     const profile: Record<string, any> = {};
@@ -56,7 +56,7 @@ function processValidlySignedPostRequest(self, doc, dom, callback) {
 }
 
 
-function processValidlySignedSamlLogout(self, doc, dom, callback) {
+function processValidlySignedSamlLogout(self: SAML, doc, dom, callback) {
   const response = doc.LogoutResponse;
   const request = doc.LogoutRequest;
 
@@ -214,10 +214,9 @@ class SAML {
   }
 
   signRequest(samlMessage) {
-    let signer;
     const samlMessageToSign: Record<string, any> = {};
     samlMessage.SigAlg = algorithms.getSigningAlgorithm(this.options.signatureAlgorithm);
-    signer = algorithms.getSigner(this.options.signatureAlgorithm);
+    const signer = algorithms.getSigner(this.options.signatureAlgorithm);
     if (samlMessage.SAMLRequest) {
       samlMessageToSign.SAMLRequest = samlMessage.SAMLRequest;
     }
@@ -447,7 +446,7 @@ class SAML {
     }
   }
 
-  getAdditionalParams(req, operation, overrideParams?) {
+  getAdditionalParams(req: Request, operation, overrideParams?) {
     const additionalParams: Record<string, any> = {};
 
     const RelayState = req.query && req.query.RelayState || req.body && req.body.RelayState;
@@ -713,7 +712,6 @@ class SAML {
         const encryptedAssertionXml = encryptedAssertions[0].toString();
 
         const xmlencOptions = { key: this.options.decryptionPvk };
-        xmlenc
         return Q.ninvoke<string>(xmlenc, 'decrypt', encryptedAssertionXml, xmlencOptions)
         .then(decryptedXml => {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
@@ -941,7 +939,7 @@ class SAML {
 
       return Q(true);
     });
-  };
+  }
 
   verifyIssuer(samlMessage) {
     if(this.options.idpIssuer) {
@@ -1084,11 +1082,8 @@ class SAML {
 
       const attributeStatement = assertion.AttributeStatement;
       if (attributeStatement) {
-        const attributes = [].concat
-                          .apply([],
-                                  attributeStatement.filter(attr => Array.isArray(attr.Attribute))
-                                                    .map(attr => attr.Attribute)
-                                );
+        const attributes = [].concat(...attributeStatement.filter(attr => Array.isArray(attr.Attribute))
+                                                    .map(attr => attr.Attribute));
 
         const attrValueMapper = function(value) {
           const hasChildren = Object.keys(value).some((cur)=> { return (cur!=='_' && cur!=='$'); });
@@ -1127,7 +1122,7 @@ class SAML {
 
       callback(null, profile, false);
     })
-    .catch(err => callback(err))
+    .catch(err => callback(err));
   }
 
   checkTimestampsValidityError(nowMs, notBefore, notOnOrAfter) {
@@ -1169,7 +1164,7 @@ class SAML {
     return null;
   }
 
-  validatePostRequest = function (container, callback) {
+  validatePostRequest(container, callback) {
     const xml = Buffer.from(container.SAMLRequest, 'base64').toString('utf8');
     const dom = new xmldom.DOMParser().parseFromString(xml);
     const parserConfig = {
@@ -1328,7 +1323,7 @@ class SAML {
     return xmlbuilder.create(metadata).end({ pretty: true, indent: '  ', newline: '\n' });
   }
 
-  keyToPEM(key) {
+  keyToPEM(key: KeyLike) {
     if (!key || typeof key !== 'string') return key;
 
     const lines = key.split('\n');

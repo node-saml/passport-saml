@@ -1,7 +1,7 @@
-var util = require('util');
-var saml = require('./saml');
-var InMemoryCacheProvider = require('./inmemory-cache-provider').CacheProvider;
-var SamlStrategy = require('./strategy');
+import util from 'util';
+import * as saml from './saml';
+import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
+import SamlStrategy from './strategy';
 
 function MultiSamlStrategy (options, verify) {
   if (!options || typeof options.getSamlOptions != 'function') {
@@ -24,32 +24,28 @@ function MultiSamlStrategy (options, verify) {
 util.inherits(MultiSamlStrategy, SamlStrategy);
 
 MultiSamlStrategy.prototype.authenticate = function (req, options) {
-  var self = this;
-
-  this._options.getSamlOptions(req, function (err, samlOptions) {
+  this._options.getSamlOptions(req, (err, samlOptions) => {
     if (err) {
-      return self.error(err);
+      return this.error(err);
     }
 
-    var samlService = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    var strategy = Object.assign({}, self, {_saml: samlService});
-    Object.setPrototypeOf(strategy, self);
-    self.constructor.super_.prototype.authenticate.call(strategy, req, options);
+    const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+    const strategy = Object.assign({}, this, {_saml: samlService});
+    Object.setPrototypeOf(strategy, this);
+    this.constructor.super_.prototype.authenticate.call(strategy, req, options);
   });
 };
 
 MultiSamlStrategy.prototype.logout = function (req, callback) {
-  var self = this;
-
-  this._options.getSamlOptions(req, function (err, samlOptions) {
+  this._options.getSamlOptions(req, (err, samlOptions) => {
     if (err) {
       return callback(err);
     }
 
-    var samlService = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    var strategy = Object.assign({}, self, {_saml: samlService});
-    Object.setPrototypeOf(strategy, self);
-    self.constructor.super_.prototype.logout.call(strategy, req, callback);
+    const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+    const strategy = Object.assign({}, this, {_saml: samlService});
+    Object.setPrototypeOf(strategy, this);
+    this.constructor.super_.prototype.logout.call(strategy, req, callback);
   });
 };
 
@@ -58,17 +54,15 @@ MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, dec
     throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
   }
 
-  var self = this;
-
-  return this._options.getSamlOptions(req, function (err, samlOptions) {
+  return this._options.getSamlOptions(req, (err, samlOptions) => {
     if (err) {
       return callback(err);
     }
 
-    var samlService = new saml.SAML(Object.assign({}, self._options, samlOptions));
-    var strategy = Object.assign({}, self, {_saml: samlService});
-    Object.setPrototypeOf(strategy, self);
-    return callback(null, self.constructor.super_.prototype.generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert));
+    const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+    const strategy = Object.assign({}, this, {_saml: samlService});
+    Object.setPrototypeOf(strategy, this);
+    return callback(null, this.constructor.super_.prototype.generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert));
   });
 };
 
