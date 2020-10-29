@@ -9,12 +9,11 @@ import url from 'url';
 import querystring from 'querystring';
 import xmlbuilder from 'xmlbuilder';
 import xmlenc from 'xml-encryption';
-import util from 'util';
+import util, { promisify } from 'util';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
 import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
 import type { Request } from 'express';
-import Q from 'q';
 
 function processValidlySignedPostRequest(self: SAML, doc, dom, callback) {
   const request = doc.LogoutRequest;
@@ -100,6 +99,8 @@ interface SAMLOptions {
   decryptionPvk: string;
   logoutCallbackUrl: string;
   validateInResponseTo: boolean;
+  requestIdExpirationPeriodMs: number;
+  audience: string;
 }
 
 
@@ -238,13 +239,13 @@ class SAML {
     const instant = this.generateInstant();
     const forceAuthn = this.options.forceAuthn || false;
 
-    Q.fcall(() => {
+    (async () => {
       if(this.options.validateInResponseTo) {
-        return Q.ninvoke(this.cacheProvider, 'save', id, instant);
+        return promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant);
       } else {
-        return Q();
+        return;
       }
-    })
+    })()
     .then(() => {
       const request = {
         'samlp:AuthnRequest': {
@@ -310,10 +311,9 @@ class SAML {
       }
       callback(null, stringRequest);
     })
-    .fail(function(err){
+    .catch(function(err){
       callback(err);
-    })
-    .done();
+    });
   }
 
   generateLogoutRequest(req) {
@@ -354,7 +354,7 @@ class SAML {
       };
     }
 
-    return Q.ninvoke(this.cacheProvider, 'save', id, instant)
+    return util.promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant)
       .then(function() {
         return xmlbuilder.create(request).end();
       });
@@ -662,7 +662,7 @@ class SAML {
   validatePostResponse(container, callback) {
     let xml, doc, inResponseTo;
 
-    Q.fcall(() => {
+    (async() => {
       xml = Buffer.from(container.SAMLResponse, 'base64').toString('utf8');
       doc = new xmldom.DOMParser({
       }).parseFromString(xml);
@@ -677,7 +677,7 @@ class SAML {
 
         return this.validateInResponseTo(inResponseTo);
       }
-    })
+    })()
     .then(() => this.certsToCheck())
     .then(certs => {
       // Check if this document has a valid top-level signature
@@ -712,7 +712,7 @@ class SAML {
         const encryptedAssertionXml = encryptedAssertions[0].toString();
 
         const xmlencOptions = { key: this.options.decryptionPvk };
-        return Q.ninvoke<string>(xmlenc, 'decrypt', encryptedAssertionXml, xmlencOptions)
+        return util.promisify(xmlenc.decrypt).bind(xmlenc)(encryptedAssertionXml, xmlencOptions)
         .then(decryptedXml => {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
           const decryptedAssertions = xpath(decryptedDoc, "/*[local-name()='Assertion']");
@@ -797,31 +797,30 @@ class SAML {
     .catch(err => {
       debug('validatePostResponse resulted in an error: %s', err);
       if (this.options.validateInResponseTo) {
-        Q.ninvoke(this.cacheProvider, 'remove', inResponseTo)
+        util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(inResponseTo)
         .then(function() {
           callback(err);
         });
       } else {
         callback(err);
       }
-    })
-    .done();
+    });
   }
 
   validateInResponseTo(inResponseTo) {
     if (this.options.validateInResponseTo) {
       if (inResponseTo) {
-        return Q.ninvoke(this.cacheProvider, 'get', inResponseTo)
+        return util.promisify(this.cacheProvider.get).bind(this.cacheProvider)(inResponseTo)
           .then(result => {
             if (!result)
               throw new Error('InResponseTo is not valid');
-            return Q();
+            return Promise.resolve();
           });
       } else {
         throw new Error('InResponseTo is missing from response');
       }
     } else {
-      return Q();
+      return Promise.resolve();
     }
   }
 
@@ -846,13 +845,13 @@ class SAML {
           return callback(err);
         }
 
-        Q.fcall(() => {
+        (async () => {
           return samlMessageType === 'SAMLResponse' ?
             this.verifyLogoutResponse(doc) : this.verifyLogoutRequest(doc);
-        })
+        })()
         .then(() => this.hasValidSignatureForRedirect(container, originalQuery))
         .then(() => processValidlySignedSamlLogout(this, doc, dom, callback))
-        .fail(err => callback(err));
+        .catch(err => callback(err));
       });
     });
   }
@@ -886,7 +885,7 @@ class SAML {
           }
         });
     } else {
-      return Q(true);
+      return Promise.resolve(true);
     }
   }
 
@@ -926,7 +925,7 @@ class SAML {
   }
 
   verifyLogoutResponse(doc) {
-    return Q.fcall(() => {
+    return (async () => {
       const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
       if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
         throw 'Bad status code: ' + statusCode;
@@ -937,8 +936,8 @@ class SAML {
         return this.validateInResponseTo(inResponseTo);
       }
 
-      return Q(true);
-    });
+      return Promise.resolve(true);
+    })();
   }
 
   verifyIssuer(samlMessage) {
@@ -953,7 +952,7 @@ class SAML {
     }
   }
 
-  processValidlySignedAssertion = function(xml, samlResponseXml, inResponseTo, callback) {
+  processValidlySignedAssertion(xml, samlResponseXml, inResponseTo, callback) {
     let msg;
     const parserConfig = {
       explicitRoot: true,
@@ -1030,34 +1029,34 @@ class SAML {
           if (confirmData && confirmData.$) {
             const subjectInResponseTo = confirmData.$.InResponseTo;
             if (inResponseTo && subjectInResponseTo && subjectInResponseTo != inResponseTo) {
-              return Q.ninvoke(this.cacheProvider, 'remove', inResponseTo)
+              return util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(inResponseTo)
                 .then(() => {
                   throw new Error('InResponseTo is not valid');
                 });
             } else if (subjectInResponseTo) {
               let foundValidInResponseTo = false;
-              return Q.ninvoke<string>(this.cacheProvider, 'get', subjectInResponseTo)
+              return util.promisify(this.cacheProvider.get).bind(this.cacheProvider)(subjectInResponseTo)
                 .then(result => {
                   if (result) {
                     const createdAt = new Date(result);
                     if (nowMs < createdAt.getTime() + this.options.requestIdExpirationPeriodMs)
                       foundValidInResponseTo = true;
                   }
-                  return Q.ninvoke(this.cacheProvider, 'remove', inResponseTo );
+                  return util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(inResponseTo);
                 })
                 .then(() => {
                   if (!foundValidInResponseTo) {
                     throw new Error('InResponseTo is not valid');
                   }
-                  return Q();
+                  return Promise.resolve();
                 });
             }
           }
         } else {
-          return Q.ninvoke(this.cacheProvider, 'remove', inResponseTo);
+          return util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(inResponseTo);
         }
       } else {
-        return Q();
+        return Promise.resolve();
       }
     })
     .then(() => {
@@ -1215,7 +1214,7 @@ class SAML {
       const encryptedDataXml = encryptedDatas[0].toString();
 
       const xmlencOptions = { key: self.options.decryptionPvk };
-      return Q.ninvoke<string>(xmlenc, 'decrypt', encryptedDataXml, xmlencOptions)
+      return util.promisify(xmlenc.decrypt).bind(xmlenc)(encryptedDataXml, xmlencOptions)
         .then(function (decryptedXml) {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
           const decryptedIds = xpath(decryptedDoc, "/*[local-name()='NameID']");
