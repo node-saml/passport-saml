@@ -9,7 +9,7 @@ export interface AuthenticateOptions extends passport.AuthenticateOptions {
 }
 
 export interface AuthorizeOptions extends AuthenticateOptions {
-  samlFallback?: string;
+  samlFallback?: 'login-request' | 'logout-request';
 }
 
 export interface SamlConfig {

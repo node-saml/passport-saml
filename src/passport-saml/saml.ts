@@ -8,14 +8,18 @@ import xmldom from 'xmldom';
 import url from 'url';
 import querystring from 'querystring';
 import xmlbuilder from 'xmlbuilder';
+// @ts-expect-error no typings for xml-encryption
 import xmlenc from 'xml-encryption';
 import util, { promisify } from 'util';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
 import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
 import type { Request } from 'express';
+import { ParsedQs } from 'qs';
+import { AuthenticateOptions, AuthorizeOptions, Profile } from './types';
+import type { SelectedValue } from 'xpath';
 
-function processValidlySignedPostRequest(self: SAML, doc, dom, callback) {
+function processValidlySignedPostRequest(self: SAML, doc: any, dom: Document, callback) {
   const request = doc.LogoutRequest;
   if (request) {
     const profile: Record<string, any> = {};
@@ -77,6 +81,12 @@ function callBackWithNameID(nameid, callback) {
 }
 
 interface SAMLOptions {
+  providerName: string;
+  attributeConsumingServiceIndex: null;
+  RACComparison: any;
+  authnContext: string[];
+  disableRequestedAuthnContext: boolean;
+  disableRequestACSUrl: boolean;
   acceptedClockSkewMs: number;
   protocol: string;
   host: string;
@@ -94,13 +104,14 @@ interface SAMLOptions {
   cacheProvider: InMemoryCacheProvider;
   issuer: string;
   identifierFormat: string;
-  cert: string | string[];
+  cert: string | string[] | (() => string[]);
   passive: boolean;
   decryptionPvk: string;
   logoutCallbackUrl: string;
   validateInResponseTo: boolean;
   requestIdExpirationPeriodMs: number;
   audience: string;
+  forceAuthn: boolean;
 }
 
 
@@ -187,11 +198,11 @@ class SAML {
     return options;
   }
 
-  getProtocol(req) {
+  getProtocol(req: Request) {
     return this.options.protocol || (req.protocol || 'http').concat('://');
   }
 
-  getCallbackUrl(req) {
+  getCallbackUrl(req: Request) {
     // Post-auth destination
     if (this.options.callbackUrl) {
       return this.options.callbackUrl;
@@ -234,7 +245,7 @@ class SAML {
     samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateCert), 'base64');
   }
 
-  generateAuthorizeRequest = function (req, isPassive, isHttpPostBinding, callback) {
+  generateAuthorizeRequest(req: Request, isPassive: boolean, isHttpPostBinding: boolean, callback) {
     const id = "_" + this.generateUniqueID();
     const instant = this.generateInstant();
     const forceAuthn = this.options.forceAuthn || false;
@@ -247,7 +258,7 @@ class SAML {
       }
     })()
     .then(() => {
-      const request = {
+      const request: any = {
         'samlp:AuthnRequest': {
           '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
           '@ID': id,
@@ -282,7 +293,7 @@ class SAML {
       }
 
       if (!this.options.disableRequestedAuthnContext) {
-        const authnContextClassRefs = [];
+        const authnContextClassRefs: any[] = [];
         this.options.authnContext.forEach(function(value) {
           authnContextClassRefs.push({
               '@xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
@@ -316,7 +327,7 @@ class SAML {
     });
   }
 
-  generateLogoutRequest(req) {
+  generateLogoutRequest(req: Request) {
     const id = "_" + this.generateUniqueID();
     const instant = this.generateInstant();
 
@@ -360,7 +371,7 @@ class SAML {
       });
   }
 
-  generateLogoutResponse = function (req, logoutRequest) {
+  generateLogoutResponse(req: Request, logoutRequest) {
     const id = "_" + this.generateUniqueID();
     const instant = this.generateInstant();
 
@@ -387,9 +398,9 @@ class SAML {
     return xmlbuilder.create(request).end();
   }
 
-  requestToUrl(request, response, operation, additionalParameters, callback) {
+  requestToUrl(request: string | null, response: string | null, operation: string, additionalParameters: Record<string, any>, callback) {
 
-    const requestToUrlHelper = (err, buffer) => {
+    const requestToUrlHelper = (err: Error | null, buffer: Buffer) => {
       if (err) {
         return callback(err);
       }
@@ -446,7 +457,7 @@ class SAML {
     }
   }
 
-  getAdditionalParams(req: Request, operation, overrideParams?) {
+  getAdditionalParams(req: Request, operation: string, overrideParams?: Record<string, any> | undefined) {
     const additionalParams: Record<string, any> = {};
 
     const RelayState = req.query && req.query.RelayState || req.body && req.body.RelayState;
@@ -459,7 +470,7 @@ class SAML {
       additionalParams[k] = optionsAdditionalParams[k];
     });
 
-    let optionsAdditionalParamsForThisOperation = {};
+    let optionsAdditionalParamsForThisOperation: Record<string, string> = {};
     if (operation == "authorize") {
       optionsAdditionalParamsForThisOperation = this.options.additionalAuthorizeParams || {};
     }
@@ -479,8 +490,8 @@ class SAML {
     return additionalParams;
   }
 
-  getAuthorizeUrl(req, options, callback) {
-    this.generateAuthorizeRequest(req, this.options.passive, false, (err, request) => {
+  getAuthorizeUrl(req: Request, options: AuthenticateOptions & AuthorizeOptions, callback: (err: Error | null, url?: string | null) => void) {
+    this.generateAuthorizeRequest(req, this.options.passive, false, (err: Error | null, request) => {
       if (err)
         return callback(err);
       const operation = 'authorize';
@@ -489,12 +500,12 @@ class SAML {
     });
   }
 
-  getAuthorizeForm(req, callback) {
+  getAuthorizeForm(req: Request, callback) {
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
     // but must be interpreted by an XML or HTML parser, and it must absolutely avoid breaking the syntax
     // of an element attribute.
-    const quoteattr = function(s, preserveCR?) {
-      preserveCR = preserveCR ? '&#13;' : '\n';
+    const quoteattr = function(s: string | number, preserveCR?: boolean) {
+      const preserveCRChar = preserveCR ? '&#13;' : '\n';
       return ('' + s) // Forces the conversion to string.
         .replace(/&/g, '&amp;') // This MUST be the 1st replacement.
         .replace(/'/g, '&apos;') // The 4 other predefined entities, required.
@@ -503,8 +514,8 @@ class SAML {
         .replace(/>/g, '&gt;')
         // Add other replacements here for HTML only
         // Or for XML, only if the named entities are defined in its DTD.
-        .replace(/\r\n/g, preserveCR) // Must be before the next replacement.
-        .replace(/[\r\n]/g, preserveCR);
+        .replace(/\r\n/g, preserveCRChar) // Must be before the next replacement.
+        .replace(/[\r\n]/g, preserveCRChar);
     };
 
     const getAuthorizeFormHelper = (err, buffer) => {
@@ -514,7 +525,7 @@ class SAML {
 
       const operation = 'authorize';
       const additionalParameters = this.getAdditionalParams(req, operation);
-      const samlMessage = {
+      const samlMessage: Record<string, string | number> = {
         SAMLRequest: buffer.toString('base64')
       };
 
@@ -561,7 +572,7 @@ class SAML {
 
   }
 
-  getLogoutUrl(req, options, callback) {
+  getLogoutUrl(req: Request, options: AuthenticateOptions & AuthorizeOptions, callback: (err: Error | null, url?: string | null) => void) {
     return this.generateLogoutRequest(req)
       .then(request => {
         const operation = 'logout';
@@ -570,15 +581,15 @@ class SAML {
       });
   }
 
-  getLogoutResponseUrl(req, options, callback) {
+  getLogoutResponseUrl(req: Request, options: AuthenticateOptions & AuthorizeOptions, callback: (err: Error | null, url: string | null) => void) {
     const response = this.generateLogoutResponse(req, req.samlLogoutRequest);
     const operation = 'logout';
     const overrideParams = options ? options.additionalParams || {} : {};
     this.requestToUrl(null, response, operation, this.getAdditionalParams(req, operation, overrideParams), callback);
   }
 
-  certToPEM(cert) {
-    cert = cert.match(/.{1,64}/g).join('\n');
+  certToPEM(cert: string): string {
+    cert = cert.match(/.{1,64}/g)!.join('\n');
 
     if (cert.indexOf('-BEGIN CERTIFICATE-') === -1)
       cert = "-----BEGIN CERTIFICATE-----\n" + cert;
@@ -588,12 +599,12 @@ class SAML {
     return cert;
   }
 
-  certsToCheck() {
+  certsToCheck(): Promise<undefined | string[]> {
     if (!this.options.cert) {
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     }
     if (typeof(this.options.cert) === 'function') {
-      return util.promisify(this.options.cert)()
+      return util.promisify<string | string[]>(this.options.cert)()
       .then(certs => {
         if (!Array.isArray(certs)) {
           certs = [certs];
@@ -613,7 +624,7 @@ class SAML {
   //
   // See https://github.com/bergie/passport-saml/issues/19 for references to some of the attack
   //   vectors against SAML signature verification.
-  validateSignature = function (fullXml, currentNode, certs) {
+  validateSignature(fullXml: string, currentNode, certs: string[]) {
     const xpathSigQuery = ".//*[local-name(.)='Signature' and " +
                         "namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']";
     const signatures = xpath(currentNode, xpathSigQuery);
@@ -625,12 +636,12 @@ class SAML {
 
     const signature = signatures[0];
     return certs.some(certToCheck => {
-      return this.validateSignatureForCert(signature, certToCheck, fullXml, currentNode);
+      return this.validateSignatureForCert(signature as string, certToCheck, fullXml, currentNode);
     });
   }
 
 // This function checks that the |signature| is signed with a given |cert|.
-  validateSignatureForCert(signature, cert, fullXml, currentNode) {
+  validateSignatureForCert(signature: string | Node, cert: string, fullXml: string, currentNode) {
     const sig = new xmlCrypto.SignedXml();
     sig.keyInfoProvider = {
       file: undefined,
@@ -642,7 +653,7 @@ class SAML {
     //   are validating, so if we see anything else, reject.
     if (sig.references.length != 1 )
       return false;
-    const refUri = sig.references[0].uri;
+    const refUri = sig.references[0].uri!;
     const refId = (refUri[0] === '#') ? refUri.substring(1) : refUri;
     // If we can't find the reference at the top level, reject
     const idAttribute = currentNode.getAttribute('ID') ? 'ID' : 'Id';
@@ -659,8 +670,8 @@ class SAML {
     return sig.checkSignature(fullXml);
   }
 
-  validatePostResponse(container, callback) {
-    let xml, doc, inResponseTo;
+  validatePostResponse(container: any, callback: (err: Error | null, profile: Profile, loggedOut: boolean) => void) {
+    let xml: string, doc: Document, inResponseTo: SelectedValue[];
 
     (async() => {
       xml = Buffer.from(container.SAMLResponse, 'base64').toString('utf8');
@@ -682,7 +693,7 @@ class SAML {
     .then(certs => {
       // Check if this document has a valid top-level signature
       let validSignature = false;
-      if (this.options.cert && this.validateSignature(xml, doc.documentElement, certs)) {
+      if (this.options.cert && this.validateSignature(xml, doc.documentElement, certs!)) {
         validSignature = true;
       }
 
@@ -713,9 +724,9 @@ class SAML {
 
         const xmlencOptions = { key: this.options.decryptionPvk };
         return util.promisify(xmlenc.decrypt).bind(xmlenc)(encryptedAssertionXml, xmlencOptions)
-        .then(decryptedXml => {
+        .then((decryptedXml: string) => {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
-          const decryptedAssertions = xpath(decryptedDoc, "/*[local-name()='Assertion']");
+          const decryptedAssertions = xpath(decryptedDoc, "/*[local-name()='Assertion']") as Node[];
           if (decryptedAssertions.length != 1)
             throw new Error('Invalid EncryptedAssertion content');
 
@@ -807,7 +818,7 @@ class SAML {
     });
   }
 
-  validateInResponseTo(inResponseTo) {
+  validateInResponseTo(inResponseTo: string) {
     if (this.options.validateInResponseTo) {
       if (inResponseTo) {
         return util.promisify(this.cacheProvider.get).bind(this.cacheProvider)(inResponseTo)
@@ -824,10 +835,10 @@ class SAML {
     }
   }
 
-  validateRedirect(container, originalQuery, callback) {
+  validateRedirect(container: ParsedQs, originalQuery: string | null, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
     const samlMessageType = container.SAMLRequest ? 'SAMLRequest' : 'SAMLResponse';
 
-    const data = Buffer.from(container[samlMessageType], "base64");
+    const data = Buffer.from(container[samlMessageType] as string, "base64");
     zlib.inflateRaw(data, (err, inflated) => {
       if (err) {
         return callback(err);
@@ -840,7 +851,7 @@ class SAML {
         tagNameProcessors: [xml2js.processors.stripPrefix]
       };
       const parser = new xml2js.Parser(parserConfig);
-      parser.parseString(inflated, (err, doc) => {
+      parser.parseString(inflated, (err: Error | null, doc: any) => {
         if (err) {
           return callback(err);
         }
@@ -856,9 +867,9 @@ class SAML {
     });
   }
 
-  hasValidSignatureForRedirect(container, originalQuery) {
-    const tokens = originalQuery.split('&');
-    const getParam = key => {
+  hasValidSignatureForRedirect(container: ParsedQs, originalQuery: string | null): Promise<boolean | void> {
+    const tokens = originalQuery!.split('&');
+    const getParam = (key: string) => {
       const exists = tokens.filter(t => { return new RegExp(key).test(t); });
       return exists[0];
     };
@@ -874,9 +885,9 @@ class SAML {
 
       return this.certsToCheck()
         .then(certs => {
-          const hasValidQuerySignature = certs.some(cert => {
+          const hasValidQuerySignature = certs!.some(cert => {
             return this.validateSignatureForRedirect(
-              urlString, container.Signature, container.SigAlg, cert
+              urlString, container.Signature as string, container.SigAlg as string, cert
             );
           });
 
@@ -889,9 +900,9 @@ class SAML {
     }
   }
 
-  validateSignatureForRedirect(urlString, signature, alg, cert) {
+  validateSignatureForRedirect(urlString: crypto.BinaryLike, signature: string, alg: string, cert: string) {
     // See if we support a matching algorithm, case-insensitive. Otherwise, throw error.
-    function hasMatch (ourAlgo) {
+    function hasMatch (ourAlgo: string) {
       // The incoming algorithm is forwarded as a URL.
       // We trim everything before the last # get something we can compare to the Node.js list
       const algFromURI = alg.toLowerCase().replace(/.*#(.*)$/,'$1');
@@ -912,7 +923,7 @@ class SAML {
     return verifier.verify(this.certToPEM(cert), signature, 'base64');
   }
 
-  verifyLogoutRequest(doc) {
+  verifyLogoutRequest(doc: any) {
     this.verifyIssuer(doc.LogoutRequest);
     const nowMs = new Date().getTime();
     const conditions = doc.LogoutRequest.$;
@@ -924,7 +935,7 @@ class SAML {
     }
   }
 
-  verifyLogoutResponse(doc) {
+  verifyLogoutResponse(doc: any) {
     return (async () => {
       const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
       if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
@@ -940,7 +951,7 @@ class SAML {
     })();
   }
 
-  verifyIssuer(samlMessage) {
+  verifyIssuer(samlMessage: any) {
     if(this.options.idpIssuer) {
       const issuer = samlMessage.Issuer;
       if (issuer) {
@@ -952,7 +963,7 @@ class SAML {
     }
   }
 
-  processValidlySignedAssertion(xml, samlResponseXml, inResponseTo, callback) {
+  processValidlySignedAssertion(xml: xml2js.convertableToString, samlResponseXml: string, inResponseTo: string, callback: (arg0: null, arg1?: Record<string, any> | undefined, arg2?: boolean | undefined) => void) {
     let msg;
     const parserConfig = {
       explicitRoot: true,
@@ -965,7 +976,7 @@ class SAML {
     let parsedAssertion;
     const parser = new xml2js.Parser(parserConfig);
     parser.parseStringPromise(xml)
-    .then(doc => {
+    .then((doc: any) => {
       parsedAssertion = doc;
       assertion = doc.Assertion;
 
@@ -1124,7 +1135,7 @@ class SAML {
     .catch(err => callback(err));
   }
 
-  checkTimestampsValidityError(nowMs, notBefore, notOnOrAfter) {
+  checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
     if (this.options.acceptedClockSkewMs == -1)
         return null;
 
@@ -1142,7 +1153,7 @@ class SAML {
     return null;
   }
 
-  checkAudienceValidityError(expectedAudience, audienceRestrictions) {
+  checkAudienceValidityError(expectedAudience: string, audienceRestrictions: any[]) {
     if (!audienceRestrictions || audienceRestrictions.length < 1) {
       return new Error('SAML assertion has no AudienceRestriction');
     }
@@ -1163,7 +1174,7 @@ class SAML {
     return null;
   }
 
-  validatePostRequest(container, callback) {
+  validatePostRequest(container: any, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
     const xml = Buffer.from(container.SAMLRequest, 'base64').toString('utf8');
     const dom = new xmldom.DOMParser().parseFromString(xml);
     const parserConfig = {
@@ -1172,7 +1183,7 @@ class SAML {
       tagNameProcessors: [xml2js.processors.stripPrefix]
     };
     const parser = new xml2js.Parser(parserConfig);
-    parser.parseString(xml, (err, doc) => {
+    parser.parseString(xml, (err: Error | null, doc: any) => {
       if (err) {
         return callback(err);
       }
@@ -1190,7 +1201,7 @@ class SAML {
     });
   }
 
-  getNameID(self, doc, callback) {
+  getNameID(self: SAML, doc: Node, callback: (err: Error | null, nameID?: any) => void) {
     const nameIds = xpath(doc, "/*[local-name()='LogoutRequest']/*[local-name()='NameID']");
     const encryptedIds = xpath(doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='EncryptedID']") as Node[];
@@ -1215,7 +1226,7 @@ class SAML {
 
       const xmlencOptions = { key: self.options.decryptionPvk };
       return util.promisify(xmlenc.decrypt).bind(xmlenc)(encryptedDataXml, xmlencOptions)
-        .then(function (decryptedXml) {
+        .then(function (decryptedXml: string) {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
           const decryptedIds = xpath(decryptedDoc, "/*[local-name()='NameID']");
           if (decryptedIds.length !== 1) {
@@ -1223,14 +1234,14 @@ class SAML {
           }
           return callBackWithNameID(decryptedIds[0], callback);
         })
-        .catch(function (err) {
+        .catch((err: Error) => {
           callback(err);
         });
     }
     callback(new Error('Missing SAML NameID'));
   }
 
-  generateServiceProviderMetadata( decryptionCert, signingCert ) {
+  generateServiceProviderMetadata( decryptionCert: string, signingCert: string ) {
     const metadata: Record<string, any> = {
       'EntityDescriptor' : {
         '@xmlns': 'urn:oasis:names:tc:SAML:2.0:metadata',
@@ -1330,7 +1341,7 @@ class SAML {
 
     const wrappedKey = [
       '-----BEGIN PRIVATE KEY-----',
-      ...key.match(/.{1,64}/g),
+      ...key.match(/.{1,64}/g)!,
       '-----END PRIVATE KEY-----',
       ''
     ].join('\n');
