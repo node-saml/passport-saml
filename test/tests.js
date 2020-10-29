@@ -1384,7 +1384,29 @@ describe( 'passport-saml /', function() {
         });
       });
 
-
+      it( 'An undefined value given with an object should still be undefined', function( done ) {
+        const xml = 
+        '<Response>' +
+          '<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0">' +
+            '<saml2:AttributeStatement>' +
+              '<saml2:Attribute Name="attributeName" ' +
+                  'NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified">' +
+                '<saml2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" ' +
+                  'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+                  'xsi:type="xs:string"/>' +
+              '</saml2:Attribute>' +
+            '</saml2:AttributeStatement>' +
+          '</saml2:Assertion>' +
+        '</Response>';
+        var base64xml = Buffer.from( xml ).toString('base64');
+        var container = { SAMLResponse: base64xml };
+        var samlObj = new SAML();
+        samlObj.validatePostResponse( container, function( err, profile, logout ) {
+          should.not.exist( err );
+          should(profile['attributeName']).be.undefined();
+          done();
+        });
+      });
     });
 
     describe( 'getAuthorizeUrl request signature checks /', function() {
@@ -2301,7 +2323,24 @@ describe( 'passport-saml /', function() {
         }
       });
     });
-	  it('errors if bad privateCert to requestToURL', function(done){
+  });
+  it('validatePostRequest errors for encrypted nameID with wrong decryptionPvk', function(done) {
+    var samlObj = new SAML({
+      cert: fs.readFileSync(__dirname + '/static/cert.pem', 'ascii'),
+      decryptionPvk: fs.readFileSync(__dirname + '/static/acme_tools_com.key', 'ascii')
+    });
+    var body = {
+      SAMLRequest: fs.readFileSync(__dirname + '/static/logout_request_with_encrypted_name_id.xml', 'base64')
+    };
+    samlObj.validatePostRequest(body, function(err) {
+      try {
+        should.exist(err);
+        done();
+      } catch (err2) {
+        done(err2);
+      }
+    });
+    it('errors if bad privateCert to requestToURL', function(done){
 		  var samlObj = new SAML({
               entryPoint: "foo",
               privateCert: "-----BEGIN CERTIFICATE-----\n"+

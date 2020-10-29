@@ -123,7 +123,7 @@ SAML.prototype.generateInstant = function () {
 
 SAML.prototype.signRequest = function (samlMessage) {
   var signer;
-  var samlMessageToSign = {};
+  var samlMessageToSign: Record<string, any> = {};
   samlMessage.SigAlg = algorithms.getSigningAlgorithm(this.options.signatureAlgorithm);
   signer = algorithms.getSigner(this.options.signatureAlgorithm);
   if (samlMessage.SAMLRequest) {
@@ -356,7 +356,7 @@ SAML.prototype.requestToUrl = function (request, response, operation, additional
 };
 
 SAML.prototype.getAdditionalParams = function (req, operation, overrideParams) {
-  var additionalParams = {};
+  var additionalParams: Record<string, any> = {};
 
   var RelayState = req.query && req.query.RelayState || req.body && req.body.RelayState;
   if (RelayState) {
@@ -402,7 +402,7 @@ SAML.prototype.getAuthorizeForm = function (req, callback) {
   // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
   // but must be interpreted by an XML or HTML parser, and it must absolutely avoid breaking the syntax
   // of an element attribute.
-  var quoteattr = function(s, preserveCR) {
+  var quoteattr = function(s, preserveCR?) {
     preserveCR = preserveCR ? '&#13;' : '\n';
     return ('' + s) // Forces the conversion to string.
       .replace(/&/g, '&amp;') // This MUST be the 1st replacement.
@@ -684,6 +684,7 @@ SAML.prototype.validatePostResponse = function (container, callback) {
                     rootName: 'Status',
                     headless: true
                   };
+                  // @ts-expect-error adding extra attr to default Error object
                   error.statusXml = new xml2js.Builder(builderOpts).buildObject(status[0]);
                   throw error;
                 }
@@ -884,7 +885,7 @@ SAML.prototype.processValidlySignedAssertion = function(xml, samlResponseXml, in
     tagNameProcessors: [xml2js.processors.stripPrefix]
   };
   var nowMs = new Date().getTime();
-  var profile = {};
+  var profile: Record<string, any> = {};
   var assertion;
   var parsedAssertion;
   var parser = new xml2js.Parser(parserConfig);
@@ -1012,7 +1013,8 @@ SAML.prototype.processValidlySignedAssertion = function(xml, samlResponseXml, in
                                );
 
       var attrValueMapper = function(value) {
-        return value._ ? value._ : value;
+        const hasChildren = Object.keys(value).some((cur)=> { return (cur!=='_' && cur!=='$'); });
+        return (hasChildren) ? value : value._;
       };
 
       if (attributes) {
@@ -1157,6 +1159,9 @@ SAML.prototype.getNameID = function(self, doc, callback) {
           return callback(new Error('Invalid EncryptedAssertion content'));
         }
         return callBackWithNameID(decryptedIds[0], callback);
+      })
+      .catch(function (err) {
+        callback(err);
       });
   }
   callback(new Error('Missing SAML NameID'));
@@ -1165,7 +1170,7 @@ SAML.prototype.getNameID = function(self, doc, callback) {
 function processValidlySignedPostRequest(self, doc, dom, callback) {
     var request = doc.LogoutRequest;
     if (request) {
-      var profile = {};
+      var profile: Record<string, any> = {};
       if (request.$.ID) {
           profile.ID = request.$.ID;
       } else {
@@ -1202,7 +1207,7 @@ function processValidlySignedPostRequest(self, doc, dom, callback) {
 }
 
 SAML.prototype.generateServiceProviderMetadata = function( decryptionCert, signingCert ) {
-  var metadata = {
+  var metadata: Record<string, any> = {
     'EntityDescriptor' : {
       '@xmlns': 'urn:oasis:names:tc:SAML:2.0:metadata',
       '@xmlns:ds': 'http://www.w3.org/2000/09/xmldsig#',
@@ -1308,4 +1313,4 @@ SAML.prototype.keyToPEM = function (key) {
   return wrappedKey;
 };
 
-exports.SAML = SAML;
+export { SAML };

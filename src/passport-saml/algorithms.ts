@@ -1,6 +1,6 @@
-var crypto = require('crypto');
+import crypto from 'crypto';
 
-exports.getSigningAlgorithm = function getSigningAlgorithm (shortName) {
+export function getSigningAlgorithm (shortName: string): string {
   switch(shortName) {
     case 'sha256':
       return 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
@@ -9,9 +9,9 @@ exports.getSigningAlgorithm = function getSigningAlgorithm (shortName) {
     default:
       return 'http://www.w3.org/2000/09/xmldsig#rsa-sha1';
   }
-};
+}
 
-exports.getDigestAlgorithm = function getDigestAlgorithm (shortName) {
+export function getDigestAlgorithm (shortName: string): string {
   switch(shortName) {
     case 'sha256':
       return 'http://www.w3.org/2001/04/xmlenc#sha256';
@@ -20,9 +20,9 @@ exports.getDigestAlgorithm = function getDigestAlgorithm (shortName) {
     default:
       return 'http://www.w3.org/2000/09/xmldsig#sha1';
   }
-};
+}
 
-exports.getSigner = function getSigner (shortName) {
+export function getSigner (shortName: string): crypto.Signer {
   switch(shortName) {
     case 'sha256':
       return crypto.createSign('RSA-SHA256');
@@ -31,4 +31,4 @@ exports.getSigner = function getSigner (shortName) {
     default:
       return crypto.createSign('RSA-SHA1');
   }
-};
+}
