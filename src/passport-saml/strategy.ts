@@ -122,4 +122,4 @@ Strategy.prototype.generateServiceProviderMetadata = function( decryptionCert, s
   return this._saml.generateServiceProviderMetadata( decryptionCert, signingCert );
 };
 
-export = Strategy;
+export = Strategy as any;

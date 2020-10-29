@@ -13,7 +13,7 @@
  * @constructor
  */
 
-interface CacheValue {
+export interface CacheItem {
     value: string;
     createdAt: number;
 }
@@ -23,7 +23,7 @@ interface CacheProviderOptions {
 }
 
 export class CacheProvider {
-    cacheKeys: Record<string, CacheValue>;
+    cacheKeys: Record<string, CacheItem>;
     options: CacheProviderOptions;
 
     constructor(options: Partial<CacheProviderOptions>) {
@@ -63,7 +63,7 @@ export class CacheProvider {
      * @param id
      * @param value
      */
-    save(key: string, value: string, callback: (error: null, value: CacheValue) => void){
+    save(key: string, value: string, callback: (error: null, value: CacheItem) => void){
         if(!this.cacheKeys[key])
         {
             this.cacheKeys[key] = {
