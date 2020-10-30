@@ -2,13 +2,8 @@ import passport, { Strategy as PassportStrategy } from 'passport-strategy';
 import util from 'util';
 import * as saml from './saml';
 import url from 'url';
-import { AuthenticateOptions, AuthorizeOptions, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
-import type { Request } from 'express';
+import { AuthenticateOptions, AuthorizeOptions, RequestWithUser, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
 import { Profile } from './types';
-
-interface SAMLRequest extends Request {
-  samlLogoutRequest?: Profile
-}
 
 class Strategy extends PassportStrategy {
   name: string;
@@ -44,7 +39,7 @@ class Strategy extends PassportStrategy {
     this._authnRequestBinding = options.authnRequestBinding || 'HTTP-Redirect';
   }
 
-  authenticate(req: SAMLRequest, options: AuthenticateOptions & AuthorizeOptions): void {
+  authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions): void {
 
     options.samlFallback = options.samlFallback || 'login-request';
 
@@ -125,7 +120,7 @@ class Strategy extends PassportStrategy {
     }
   }
 
-  logout(req: SAMLRequest, callback: (err: Error | null, url?: string) => void): void {
+  logout(req: RequestWithUser, callback: (err: Error | null, url?: string | null) => void): void {
     this._saml.getLogoutUrl(req, {}, callback);
   }
 

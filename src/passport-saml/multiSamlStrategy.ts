@@ -3,7 +3,7 @@ import * as saml from './saml';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
 import SamlStrategy from './strategy';
 import type { Request } from 'express';
-import { AuthenticateOptions, AuthorizeOptions, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
+import { AuthenticateOptions, AuthorizeOptions, RequestWithUser, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
 
 type SamlOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
 
@@ -31,7 +31,7 @@ class MultiSamlStrategy extends SamlStrategy {
     this._options = options;
   }
 
-  authenticate(req: Request, options: AuthenticateOptions & AuthorizeOptions) {
+  authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return this.error(err);
@@ -44,7 +44,7 @@ class MultiSamlStrategy extends SamlStrategy {
     });
   }
 
-  logout(req: Request, callback: (err: Error | null, url?: string | undefined) => void) {
+  logout(req: RequestWithUser, callback: (err: Error | null, url?: string | null | undefined) => void) {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return callback(err);

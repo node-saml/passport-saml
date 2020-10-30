@@ -67,16 +67,22 @@ export type Profile = {
     ID?: string;
     mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
     email?: string; // `mail` if not present in the assertion
+    ['urn:oid:0.9.2342.19200300.100.1.3']?: string;
     getAssertionXml(): string; // get the raw assertion XML
     getAssertion(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
     getSamlResponseXml(): string; // get the raw SAML response XML
   } & {
     [attributeName: string]: unknown; // arbitrary `AttributeValue`s
   };
+
+  export interface RequestWithUser extends express.Request {
+    samlLogoutRequest: any;
+    user?: Profile
+}
   
 export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => void;
 
 export type VerifyWithRequest = (req: express.Request, profile: Profile | null | undefined, done: VerifiedCallback) => void;
 
-export type VerifyWithoutRequest = (profile: Profile, done: VerifiedCallback) => void;
+export type VerifyWithoutRequest = (profile: Profile | null | undefined, done: VerifiedCallback) => void;
   
