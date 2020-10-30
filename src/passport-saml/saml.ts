@@ -92,7 +92,9 @@ function callBackWithNameID(nameid: Node, callback: (err: Error | null, value: N
   });
 }
 
-interface SAMLOptions {
+export interface SAMLOptions {
+  xmlSignatureTransforms: string[];
+  digestAlgorithm: string;
   providerName: string;
   attributeConsumingServiceIndex: string | null;
   RACComparison: any;
