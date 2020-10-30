@@ -1359,7 +1359,7 @@ class SAML {
 
     const wrappedKey = [
       '-----BEGIN PRIVATE KEY-----',
-      ...key.match(/.{1,64}/g)!,
+      ...(key.match(/.{1,64}/g) ?? []),
       '-----END PRIVATE KEY-----',
       ''
     ].join('\n');
