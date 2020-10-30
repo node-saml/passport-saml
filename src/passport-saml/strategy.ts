@@ -127,6 +127,6 @@ class Strategy extends PassportStrategy {
   generateServiceProviderMetadata( decryptionCert: string | null, signingCert?: string | null ): string {
     return this._saml.generateServiceProviderMetadata( decryptionCert, signingCert );
   }
-};
+}
 
 export = Strategy;
