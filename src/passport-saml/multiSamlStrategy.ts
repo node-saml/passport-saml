@@ -1,7 +1,7 @@
-import util from 'util';
+import * as util from 'util';
 import * as saml from './saml';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
-import SamlStrategy from './strategy';
+import SamlStrategy = require('./strategy');
 import type { Request } from 'express';
 import { AuthenticateOptions, AuthorizeOptions, RequestWithUser, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
 

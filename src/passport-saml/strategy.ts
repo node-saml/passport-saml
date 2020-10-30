@@ -1,6 +1,6 @@
 import { Strategy as PassportStrategy } from 'passport-strategy';
 import * as saml from './saml';
-import url from 'url';
+import * as url from 'url';
 import { AuthenticateOptions, AuthorizeOptions, RequestWithUser, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
 import { Profile } from './types';
 

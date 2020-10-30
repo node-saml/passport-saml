@@ -1,22 +1,23 @@
 import Debug from 'debug';
 const debug = Debug('passport-saml');
-import zlib from 'zlib';
-import xml2js from 'xml2js';
-import xmlCrypto, { xpath } from 'xml-crypto';
-import crypto, { KeyLike } from 'crypto';
-import xmldom from 'xmldom';
-import url from 'url';
-import querystring from 'querystring';
-import xmlbuilder from 'xmlbuilder';
+import * as zlib from 'zlib';
+import * as xml2js from 'xml2js';
+import * as xmlCrypto from 'xml-crypto';
+import * as crypto from 'crypto';
+import * as xmldom from 'xmldom';
+import * as url from 'url';
+import * as querystring from 'querystring';
+import * as xmlbuilder from 'xmlbuilder';
 // @ts-expect-error no typings for xml-encryption
-import xmlenc from 'xml-encryption';
-import util, { promisify } from 'util';
+import * as xmlenc from 'xml-encryption';
+import * as util from 'util';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
 import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
 import type { Request } from 'express';
 import { ParsedQs } from 'qs';
 import { AuthenticateOptions, AuthorizeOptions, CertCallback, Profile, RequestWithUser } from './types';
+const { xpath } = xmlCrypto;
 
 interface SAMLUser {
     sessionIndex: any;
@@ -85,7 +86,7 @@ function processValidlySignedSamlLogout(self: SAML, doc: any, dom: Document, cal
 }
 
 function callBackWithNameID(nameid: Node, callback: (err: Error | null, value: NameID) => void) {
-  const format = xpath(nameid, "@Format") as Node[];
+  const format = xmlCrypto.xpath(nameid, "@Format") as Node[];
   return callback(null, {
     value: nameid.textContent,
     format: format && format[0] && format[0].nodeValue
@@ -266,7 +267,7 @@ class SAML {
 
     (async () => {
       if(this.options.validateInResponseTo) {
-        return promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant);
+        return util.promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant);
       } else {
         return;
       }
@@ -644,7 +645,7 @@ class SAML {
                         "namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#' and " +
                         "descendant::*[local-name(.)='Reference' and @URI='#"+currentNode.getAttribute('ID')+"']" +
                         "]";
-    const signatures = xpath(currentNode, xpathSigQuery);
+    const signatures = xmlCrypto.xpath(currentNode, xpathSigQuery);
     // This function is expecting to validate exactly one signature, so if we find more or fewer
     //   than that, reject.
     if (signatures.length != 1) {
@@ -678,7 +679,7 @@ class SAML {
       return false;
     // If we find any extra referenced nodes, reject.  (xml-crypto only verifies one digest, so
     //   multiple candidate references is bad news)
-    const totalReferencedNodes = xpath(currentNode.ownerDocument,
+    const totalReferencedNodes = xmlCrypto.xpath(currentNode.ownerDocument,
                                     "//*[@" + idAttribute + "='" + refId + "']");
 
     if (totalReferencedNodes.length > 1) {
@@ -698,7 +699,7 @@ class SAML {
       if (!Object.prototype.hasOwnProperty.call(doc, 'documentElement'))
         throw new Error('SAMLResponse is not valid base64-encoded XML');
 
-      const inResponseToNodes = xpath(doc, "/*[local-name()='Response']/@InResponseTo") as Node[];
+      const inResponseToNodes = xmlCrypto.xpath(doc, "/*[local-name()='Response']/@InResponseTo") as Node[];
 
       if (inResponseToNodes) {
         inResponseTo = inResponseToNodes.length ? inResponseToNodes[0].nodeValue : null;
@@ -714,8 +715,8 @@ class SAML {
         validSignature = true;
       }
 
-      const assertions = xpath(doc, "/*[local-name()='Response']/*[local-name()='Assertion']") as HTMLElement[];
-      const encryptedAssertions = xpath(doc,
+      const assertions = xmlCrypto.xpath(doc, "/*[local-name()='Response']/*[local-name()='Assertion']") as HTMLElement[];
+      const encryptedAssertions = xmlCrypto.xpath(doc,
                                       "/*[local-name()='Response']/*[local-name()='EncryptedAssertion']");
 
       if (assertions.length + encryptedAssertions.length > 1) {
@@ -743,7 +744,7 @@ class SAML {
         return util.promisify(xmlenc.decrypt).bind(xmlenc)(encryptedAssertionXml, xmlencOptions)
         .then((decryptedXml: string) => {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
-          const decryptedAssertions = xpath(decryptedDoc, "/*[local-name()='Assertion']") as HTMLElement[];
+          const decryptedAssertions = xmlCrypto.xpath(decryptedDoc, "/*[local-name()='Assertion']") as HTMLElement[];
           if (decryptedAssertions.length != 1)
             throw new Error('Invalid EncryptedAssertion content');
 
@@ -1220,8 +1221,8 @@ class SAML {
   }
 
   getNameID(self: SAML, doc: Node, callback: (err: Error | null, nameID?: any) => void) {
-    const nameIds = xpath(doc, "/*[local-name()='LogoutRequest']/*[local-name()='NameID']") as Node[];
-    const encryptedIds = xpath(doc,
+    const nameIds = xmlCrypto.xpath(doc, "/*[local-name()='LogoutRequest']/*[local-name()='NameID']") as Node[];
+    const encryptedIds = xmlCrypto.xpath(doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='EncryptedID']") as Node[];
 
     if (nameIds.length + encryptedIds.length > 1) {
@@ -1235,7 +1236,7 @@ class SAML {
         return callback(new Error('No decryption key for encrypted SAML response'));
       }
 
-      const encryptedDatas = xpath(encryptedIds[0], "./*[local-name()='EncryptedData']");
+      const encryptedDatas = xmlCrypto.xpath(encryptedIds[0], "./*[local-name()='EncryptedData']");
 
       if (encryptedDatas.length !== 1) {
         return callback(new Error('Invalid LogoutRequest'));
@@ -1246,7 +1247,7 @@ class SAML {
       return util.promisify(xmlenc.decrypt).bind(xmlenc)(encryptedDataXml, xmlencOptions)
         .then(function (decryptedXml: string) {
           const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
-          const decryptedIds = xpath(decryptedDoc, "/*[local-name()='NameID']") as Node[];
+          const decryptedIds = xmlCrypto.xpath(decryptedDoc, "/*[local-name()='NameID']") as Node[];
           if (decryptedIds.length !== 1) {
             return callback(new Error('Invalid EncryptedAssertion content'));
           }
@@ -1351,7 +1352,7 @@ class SAML {
     return xmlbuilder.create(metadata).end({ pretty: true, indent: '  ', newline: '\n' });
   }
 
-  keyToPEM(key: KeyLike) {
+  keyToPEM(key: crypto.KeyLike) {
     if (!key || typeof key !== 'string') return key;
 
     const lines = key.split('\n');
