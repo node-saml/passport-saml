@@ -1,7 +1,7 @@
-import util from 'util';
+import * as util from 'util';
 import * as saml from './saml';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
-import SamlStrategy from './strategy';
+import SamlStrategy = require('./strategy');
 
 function MultiSamlStrategy (options, verify) {
   if (!options || typeof options.getSamlOptions != 'function') {

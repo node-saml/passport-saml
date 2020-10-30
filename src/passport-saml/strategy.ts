@@ -1,7 +1,7 @@
-import passport from 'passport-strategy';
-import util from 'util';
+import * as passport from 'passport-strategy';
+import * as util from 'util';
 import * as saml from './saml';
-import url from 'url';
+import * as url from 'url';
 import { AuthenticateOptions, AuthorizeOptions, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
 import type { Request } from 'express';
 import { Profile } from './types';

@@ -1,5 +1,5 @@
-import type express from 'express';
-import passport from 'passport';
+import type * as express from 'express';
+import * as passport from 'passport';
 import type { CacheProvider } from './inmemory-cache-provider';
 
 export type CertCallback = (callback: (err: Error | null, cert?: string | string[]) => void) => void;
@@ -73,10 +73,9 @@ export type Profile = {
   } & {
     [attributeName: string]: unknown; // arbitrary `AttributeValue`s
   };
-  
+
 export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => void;
 
 export type VerifyWithRequest = (req: express.Request, profile: Profile, done: VerifiedCallback) => void;
 
 export type VerifyWithoutRequest = (profile: Profile, done: VerifiedCallback) => void;
-  
