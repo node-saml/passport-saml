@@ -48,7 +48,7 @@ class Strategy extends PassportStrategy {
 
     options.samlFallback = options.samlFallback || 'login-request';
 
-    const validateCallback = (err: Error | null, profile: Profile, loggedOut: boolean) => {
+    const validateCallback = (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => {
         if (err) {
           return this.error(err);
         }
@@ -81,7 +81,7 @@ class Strategy extends PassportStrategy {
         }
     };
 
-    const redirectIfSuccess = (err: Error | null, url: string | null) => {
+    const redirectIfSuccess = (err: Error | null, url?: string | null) => {
       if (err) {
         this.error(err);
       } else {

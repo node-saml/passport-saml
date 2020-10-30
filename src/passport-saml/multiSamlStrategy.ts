@@ -37,7 +37,7 @@ class MultiSamlStrategy extends SamlStrategy {
         return this.error(err);
       }
 
-      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      const samlService = new saml.SAML({...this._options, ...samlOptions});
       const strategy = Object.assign({}, this, {_saml: samlService});
       Object.setPrototypeOf(strategy, this);
       super.authenticate.call(strategy, req, options);

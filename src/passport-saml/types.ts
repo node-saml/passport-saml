@@ -30,7 +30,7 @@ export interface SamlConfig {
     additionalAuthorizeParams?: any;
     identifierFormat?: string;
     acceptedClockSkewMs?: number;
-    attributeConsumingServiceIndex?: string;
+    attributeConsumingServiceIndex?: string | null;
     disableRequestedAuthnContext?: boolean;
     authnContext?: string;
     forceAuthn?: boolean;
@@ -76,7 +76,7 @@ export type Profile = {
   
 export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => void;
 
-export type VerifyWithRequest = (req: express.Request, profile: Profile, done: VerifiedCallback) => void;
+export type VerifyWithRequest = (req: express.Request, profile: Profile | null | undefined, done: VerifiedCallback) => void;
 
 export type VerifyWithoutRequest = (profile: Profile, done: VerifiedCallback) => void;
   
