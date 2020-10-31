@@ -9,7 +9,7 @@ export interface AuthenticateOptions extends passport.AuthenticateOptions {
 }
 
 export interface AuthorizeOptions extends AuthenticateOptions {
-  samlFallback?: string;
+  samlFallback?: 'login-request' | 'logout-request';
 }
 
 export interface SamlConfig {
@@ -30,7 +30,7 @@ export interface SamlConfig {
     additionalAuthorizeParams?: any;
     identifierFormat?: string;
     acceptedClockSkewMs?: number;
-    attributeConsumingServiceIndex?: string;
+    attributeConsumingServiceIndex?: string | null;
     disableRequestedAuthnContext?: boolean;
     authnContext?: string;
     forceAuthn?: boolean;
@@ -64,6 +64,38 @@ export interface SamlScopingConfig {
   requesterId?: string[];
 }
 
+export type XMLValue = string | number | boolean | null | XMLObject | XMLValue[];
+
+export type XMLObject = {
+  [key: string]: XMLValue;
+};
+
+export type XMLInput = XMLObject;
+
+export interface AuthorizeRequestXML {
+  'samlp:AuthnRequest': XMLInput;
+}
+
+export interface LogoutRequestXML {
+  'samlp:LogoutRequest': {
+    'saml:NameID': XMLInput;
+    [key: string]: XMLValue;
+  };
+}
+
+export interface ServiceMetadataXML {
+  EntityDescriptor: {
+    [key: string]: XMLValue;
+    SPSSODescriptor: XMLObject;
+  };
+}
+
+export interface AudienceRestrictionXML {
+  Audience?: XMLObject[];
+}
+
+export type XMLOutput = Record<string, any>;
+
 export interface SamlIDPListConfig {
   entries: SamlIDPEntryConfig[];
   getComplete?: string;
@@ -85,6 +117,7 @@ export type Profile = {
     ID?: string;
     mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
     email?: string; // `mail` if not present in the assertion
+    ['urn:oid:0.9.2342.19200300.100.1.3']?: string;
     getAssertionXml(): string; // get the raw assertion XML
     getAssertion(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
     getSamlResponseXml(): string; // get the raw SAML response XML
@@ -92,8 +125,13 @@ export type Profile = {
     [attributeName: string]: unknown; // arbitrary `AttributeValue`s
   };
 
+  export interface RequestWithUser extends express.Request {
+    samlLogoutRequest: any;
+    user?: Profile
+}
+  
 export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => void;
 
-export type VerifyWithRequest = (req: express.Request, profile: Profile, done: VerifiedCallback) => void;
+export type VerifyWithRequest = (req: express.Request, profile: Profile | null | undefined, done: VerifiedCallback) => void;
 
-export type VerifyWithoutRequest = (profile: Profile, done: VerifiedCallback) => void;
+export type VerifyWithoutRequest = (profile: Profile | null | undefined, done: VerifiedCallback) => void;
