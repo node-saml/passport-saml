@@ -14,6 +14,7 @@ import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider'
 import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
 import type { Request } from 'express';
+import { SamlIDPEntryConfig, SamlIDPListConfig } from './types';
 
 function processValidlySignedPostRequest(self: SAML, doc, dom, callback) {
   const request = doc.LogoutRequest;
@@ -303,6 +304,56 @@ class SAML {
 
       if (this.options.providerName) {
         request['samlp:AuthnRequest']['@ProviderName'] = this.options.providerName;
+      }
+
+      if (this.options.scoping) {
+        const scoping = {
+          '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+        };
+
+        if (typeof this.options.scoping.proxyCount === 'number') {
+          scoping['@ProxyCount'] = this.options.scoping.proxyCount;
+        }
+
+        if (this.options.scoping.idpList) {
+          scoping['samlp:IDPList'] = this.options.scoping.idpList.map((idpListItem: SamlIDPListConfig) => {
+            const formattedIdpListItem = {
+              '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+            };
+
+            if (idpListItem.entries) {
+              formattedIdpListItem['samlp:IDPEntry'] = idpListItem.entries.map((entry: SamlIDPEntryConfig) => {
+                const formattedEntry = {
+                  '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                };
+
+                formattedEntry['@ProviderID'] = entry.providerId;
+
+                if (entry.name) {
+                  formattedEntry['@Name'] = entry.name;
+                }
+
+                if (entry.loc) {
+                  formattedEntry['@Loc'] = entry.loc;
+                }
+
+                return formattedEntry;
+              });
+            }
+
+            if (idpListItem.getComplete) {
+              formattedIdpListItem['samlp:GetComplete'] = idpListItem.getComplete;
+            }
+
+            return formattedIdpListItem;
+          });
+        }
+
+        if (this.options.scoping.requesterId) {
+          scoping['samlp:RequesterID'] = this.options.scoping.requesterId;
+        }
+
+        request['samlp:AuthnRequest']['samlp:Scoping'] = scoping;
       }
 
       let stringRequest = xmlbuilder.create(request).end();
