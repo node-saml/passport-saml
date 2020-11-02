@@ -31,6 +31,7 @@ interface NameID {
     value: string | null;
     format: string | null;
 }
+import { SamlIDPEntryConfig, SamlIDPListConfig } from './types';
 
 function processValidlySignedPostRequest(self: SAML, doc: any, dom: Document, callback: (err: Error | null, profile?: Profile | undefined, loggedOut?: boolean | undefined) => void) {
   const request = doc.LogoutRequest;
@@ -329,6 +330,56 @@ class SAML {
 
       if (this.options.providerName) {
         request['samlp:AuthnRequest']['@ProviderName'] = this.options.providerName;
+      }
+
+      if (this.options.scoping) {
+        const scoping = {
+          '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+        };
+
+        if (typeof this.options.scoping.proxyCount === 'number') {
+          scoping['@ProxyCount'] = this.options.scoping.proxyCount;
+        }
+
+        if (this.options.scoping.idpList) {
+          scoping['samlp:IDPList'] = this.options.scoping.idpList.map((idpListItem: SamlIDPListConfig) => {
+            const formattedIdpListItem = {
+              '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+            };
+
+            if (idpListItem.entries) {
+              formattedIdpListItem['samlp:IDPEntry'] = idpListItem.entries.map((entry: SamlIDPEntryConfig) => {
+                const formattedEntry = {
+                  '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                };
+
+                formattedEntry['@ProviderID'] = entry.providerId;
+
+                if (entry.name) {
+                  formattedEntry['@Name'] = entry.name;
+                }
+
+                if (entry.loc) {
+                  formattedEntry['@Loc'] = entry.loc;
+                }
+
+                return formattedEntry;
+              });
+            }
+
+            if (idpListItem.getComplete) {
+              formattedIdpListItem['samlp:GetComplete'] = idpListItem.getComplete;
+            }
+
+            return formattedIdpListItem;
+          });
+        }
+
+        if (this.options.scoping.requesterId) {
+          scoping['samlp:RequesterID'] = this.options.scoping.requesterId;
+        }
+
+        request['samlp:AuthnRequest']['samlp:Scoping'] = scoping;
       }
 
       let stringRequest = xmlbuilder.create(request).end();
@@ -910,7 +961,7 @@ class SAML {
           });
 
           if (!hasValidQuerySignature) {
-            throw 'Invalid signature';
+            throw new Error('Invalid signature');
           }
         });
     } else {
@@ -932,7 +983,7 @@ class SAML {
       matchingAlgo = crypto.getHashes()[i];
     }
     else {
-      throw alg + ' is not supported';
+      throw new Error(alg + ' is not supported');
     }
 
     const verifier = crypto.createVerify(matchingAlgo);
@@ -957,7 +1008,7 @@ class SAML {
     return (async () => {
       const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
       if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
-        throw 'Bad status code: ' + statusCode;
+        throw new Error('Bad status code: ' + statusCode);
 
       this.verifyIssuer(doc.LogoutResponse);
       const inResponseTo = doc.LogoutResponse.$.InResponseTo;
@@ -974,9 +1025,9 @@ class SAML {
       const issuer = samlMessage.Issuer;
       if (issuer) {
         if (issuer[0]._ !== this.options.idpIssuer)
-          throw 'Unknown SAML issuer. Expected: ' + this.options.idpIssuer + ' Received: ' + issuer[0]._;
+          throw new Error('Unknown SAML issuer. Expected: ' + this.options.idpIssuer + ' Received: ' + issuer[0]._);
       } else {
-        throw 'Missing SAML issuer';
+        throw new Error('Missing SAML issuer');
       }
     }
   }
