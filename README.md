@@ -11,7 +11,7 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 ## Installation
 
     $ npm install passport-saml
-
+/
 ## Usage
 
 The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
@@ -134,7 +134,7 @@ type Profile = {
   * `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
   * `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
   * `disableRequestACSUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
-  * `scoping`: An optional configuration which implements the functionality [explained in the saml spec paragraph "3.4.1.2 Element <Scoping>"](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf). The config object is structured as following:
+  * `scoping`: An optional configuration which implements the functionality [explained in the SAML spec paragraph "3.4.1.2 Element <Scoping>"](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf). The config object is structured as following:
 ```javascript
 {
   idpList: { // optional
