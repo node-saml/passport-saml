@@ -41,6 +41,7 @@ export interface SamlConfig {
     passive?: boolean;
     idpIssuer?: string;
     audience?: string;
+    scoping? : SamlScopingConfig;
 
     // InResponseTo Validation
     validateInResponseTo?: boolean;
@@ -55,6 +56,23 @@ export interface SamlConfig {
     logoutUrl?: string;
     additionalLogoutParams?: any;
     logoutCallbackUrl?: string;
+}
+
+export interface SamlScopingConfig {
+  idpList: SamlIDPListConfig[];
+  proxyCount?: number;
+  requesterId?: string[];
+}
+
+export interface SamlIDPListConfig {
+  entries: SamlIDPEntryConfig[];
+  getComplete?: string;
+}
+
+export interface SamlIDPEntryConfig {
+  providerId: string;
+  name?: string;
+  loc?: string;
 }
 
 export type Profile = {
@@ -73,10 +91,9 @@ export type Profile = {
   } & {
     [attributeName: string]: unknown; // arbitrary `AttributeValue`s
   };
-  
+
 export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => void;
 
 export type VerifyWithRequest = (req: express.Request, profile: Profile, done: VerifiedCallback) => void;
 
 export type VerifyWithoutRequest = (profile: Profile, done: VerifiedCallback) => void;
-  

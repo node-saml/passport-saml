@@ -524,7 +524,457 @@ describe( 'passport-saml /', function() {
            'saml:Issuer':
             [ { _: 'onelogin_saml',
                 '$': { 'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion' } } ] } }
-      }
+      },
+      { name: "Config with full Scoping config",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          scoping: {
+            proxyCount: 2,
+            requesterId: 'fooBarRequesterId',
+            idpList: [
+              {
+                entries: [
+                  {
+                    providerId: 'myScopingProviderId',
+                    name: 'myScopingProviderName',
+                    loc: 'myScopingProviderLoc',
+                  },
+                ],
+                getComplete: 'https://www.getcompleteidplist.com',
+              },
+            ],
+          },
+        },
+        result: {
+          'samlp:AuthnRequest': {
+            '$': {
+              AssertionConsumerServiceURL: 'http://localhost:3033/login',
+              Destination: 'https://wwwexampleIdp.com/saml',
+              ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+              Version: '2.0',
+              'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+            },
+            'saml:Issuer': [
+              {
+                '$': {
+                  'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+                },
+                '_': 'http://exampleSp.com/saml',
+              }
+            ],
+            'samlp:NameIDPolicy': [
+              {
+                '$': {
+                  AllowCreate: 'true',
+                  Format: 'alternateIdentifier',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                }
+              }
+            ],
+            'samlp:RequestedAuthnContext': [
+              {
+                '$': {
+                  Comparison: 'exact',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                },
+                'saml:AuthnContextClassRef': [
+                  {
+                    '$': {
+                      'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion'
+                    },
+                    '_': 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+                  }
+                ]
+              }
+            ],
+            'samlp:Scoping': [
+              {
+                '$': {
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                  ProxyCount: '2',
+                },
+                'samlp:IDPList': [
+                  {
+                    '$': {
+                      'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                    },
+                    'samlp:GetComplete': [
+                      'https://www.getcompleteidplist.com'
+                    ],
+                    'samlp:IDPEntry': [
+                      {
+                        '$': {
+                          Loc: 'myScopingProviderLoc',
+                          Name: 'myScopingProviderName',
+                          ProviderID: 'myScopingProviderId',
+                          'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                        }
+                      }
+                    ]
+                  }
+                ],
+                'samlp:RequesterID': [
+                  'fooBarRequesterId'
+                ]
+              }
+            ]
+          }
+        } },
+      { name: "Config with Scoping config without proxyCount and requesterId",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          scoping: {
+            idpList: [
+              {
+                entries: [
+                  {
+                    providerId: 'myScopingProviderId',
+                    name: 'myScopingProviderName',
+                    loc: 'myScopingProviderLoc',
+                  },
+                ],
+                getComplete: 'https://www.getcompleteidplist.com',
+              },
+            ],
+          },
+        },
+        result: {
+          'samlp:AuthnRequest': {
+            '$': {
+              AssertionConsumerServiceURL: 'http://localhost:3033/login',
+              Destination: 'https://wwwexampleIdp.com/saml',
+              ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+              Version: '2.0',
+              'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+            },
+            'saml:Issuer': [
+              {
+                '$': {
+                  'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+                },
+                '_': 'http://exampleSp.com/saml',
+              }
+            ],
+            'samlp:NameIDPolicy': [
+              {
+                '$': {
+                  AllowCreate: 'true',
+                  Format: 'alternateIdentifier',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                }
+              }
+            ],
+            'samlp:RequestedAuthnContext': [
+              {
+                '$': {
+                  Comparison: 'exact',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                },
+                'saml:AuthnContextClassRef': [
+                  {
+                    '$': {
+                      'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion'
+                    },
+                    '_': 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+                  }
+                ]
+              }
+            ],
+            'samlp:Scoping': [
+              {
+                '$': {
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                },
+                'samlp:IDPList': [
+                  {
+                    '$': {
+                      'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                    },
+                    'samlp:GetComplete': [
+                      'https://www.getcompleteidplist.com'
+                    ],
+                    'samlp:IDPEntry': [
+                      {
+                        '$': {
+                          Loc: 'myScopingProviderLoc',
+                          Name: 'myScopingProviderName',
+                          ProviderID: 'myScopingProviderId',
+                          'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        } },
+      { name: "Config with Scoping config without proxyCount, requesterId, getComplete",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          scoping: {
+            idpList: [
+              {
+                entries: [
+                  {
+                    providerId: 'myScopingProviderId',
+                    name: 'myScopingProviderName',
+                    loc: 'myScopingProviderLoc',
+                  },
+                ]
+              },
+            ],
+          },
+        },
+        result: {
+          'samlp:AuthnRequest': {
+            '$': {
+              AssertionConsumerServiceURL: 'http://localhost:3033/login',
+              Destination: 'https://wwwexampleIdp.com/saml',
+              ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+              Version: '2.0',
+              'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+            },
+            'saml:Issuer': [
+              {
+                '$': {
+                  'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+                },
+                '_': 'http://exampleSp.com/saml',
+              }
+            ],
+            'samlp:NameIDPolicy': [
+              {
+                '$': {
+                  AllowCreate: 'true',
+                  Format: 'alternateIdentifier',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                }
+              }
+            ],
+            'samlp:RequestedAuthnContext': [
+              {
+                '$': {
+                  Comparison: 'exact',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                },
+                'saml:AuthnContextClassRef': [
+                  {
+                    '$': {
+                      'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion'
+                    },
+                    '_': 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+                  }
+                ]
+              }
+            ],
+            'samlp:Scoping': [
+              {
+                '$': {
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                },
+                'samlp:IDPList': [
+                  {
+                    '$': {
+                      'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                    },
+                    'samlp:IDPEntry': [
+                      {
+                        '$': {
+                          Loc: 'myScopingProviderLoc',
+                          Name: 'myScopingProviderName',
+                          ProviderID: 'myScopingProviderId',
+                          'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        } },
+      { name: "Config with Scoping config without proxyCount, requesterId, idpList getComplete, entry name, entry loc",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          scoping: {
+            idpList: [
+              {
+                entries: [
+                  {
+                    providerId: 'myScopingProviderId'
+                  },
+                ]
+              },
+            ],
+          },
+        },
+        result: {
+          'samlp:AuthnRequest': {
+            '$': {
+              AssertionConsumerServiceURL: 'http://localhost:3033/login',
+              Destination: 'https://wwwexampleIdp.com/saml',
+              ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+              Version: '2.0',
+              'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+            },
+            'saml:Issuer': [
+              {
+                '$': {
+                  'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+                },
+                '_': 'http://exampleSp.com/saml',
+              }
+            ],
+            'samlp:NameIDPolicy': [
+              {
+                '$': {
+                  AllowCreate: 'true',
+                  Format: 'alternateIdentifier',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                }
+              }
+            ],
+            'samlp:RequestedAuthnContext': [
+              {
+                '$': {
+                  Comparison: 'exact',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                },
+                'saml:AuthnContextClassRef': [
+                  {
+                    '$': {
+                      'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion'
+                    },
+                    '_': 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+                  }
+                ]
+              }
+            ],
+            'samlp:Scoping': [
+              {
+                '$': {
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                },
+                'samlp:IDPList': [
+                  {
+                    '$': {
+                      'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                    },
+                    'samlp:IDPEntry': [
+                      {
+                        '$': {
+                          ProviderID: 'myScopingProviderId',
+                          'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        } },
+      { name: "Config with Scoping and multiple IDPList entries",
+        config: {
+          issuer: 'http://exampleSp.com/saml',
+          identifierFormat: 'alternateIdentifier',
+          scoping: {
+            idpList: [
+              {
+                entries: [
+                  {
+                    providerId: 'myScopingProviderId'
+                  },
+                  {
+                    providerId: 'myOtherScopingProviderId'
+                  },
+                ]
+              },
+            ],
+          },
+        },
+        result: {
+          'samlp:AuthnRequest': {
+            '$': {
+              AssertionConsumerServiceURL: 'http://localhost:3033/login',
+              Destination: 'https://wwwexampleIdp.com/saml',
+              ProtocolBinding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+              Version: '2.0',
+              'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+            },
+            'saml:Issuer': [
+              {
+                '$': {
+                  'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
+                },
+                '_': 'http://exampleSp.com/saml',
+              }
+            ],
+            'samlp:NameIDPolicy': [
+              {
+                '$': {
+                  AllowCreate: 'true',
+                  Format: 'alternateIdentifier',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                }
+              }
+            ],
+            'samlp:RequestedAuthnContext': [
+              {
+                '$': {
+                  Comparison: 'exact',
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                },
+                'saml:AuthnContextClassRef': [
+                  {
+                    '$': {
+                      'xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion'
+                    },
+                    '_': 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
+                  }
+                ]
+              }
+            ],
+            'samlp:Scoping': [
+              {
+                '$': {
+                  'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
+                },
+                'samlp:IDPList': [
+                  {
+                    '$': {
+                      'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                    },
+                    'samlp:IDPEntry': [
+                      {
+                        '$': {
+                          ProviderID: 'myScopingProviderId',
+                          'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                        }
+                      },
+                      {
+                        '$': {
+                          ProviderID: 'myOtherScopingProviderId',
+                          'xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol'
+                        }
+                      }
+                    ]
+                  },
+                ]
+              }
+            ]
+          }
+        } }
+
+
+
+
+
     ];
 
     var server;
@@ -1354,7 +1804,7 @@ describe( 'passport-saml /', function() {
           const nameQualifier = 'https://idp.example.org/idp/saml'
           const spNameQualifier = 'https://sp.example.org/sp/entity'
           const format = 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
-          const xml = 
+          const xml =
           '<Response>' +
             '<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0">' +
               '<saml2:AttributeStatement>' +
@@ -1385,7 +1835,7 @@ describe( 'passport-saml /', function() {
       });
 
       it( 'An undefined value given with an object should still be undefined', function( done ) {
-        const xml = 
+        const xml =
         '<Response>' +
           '<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0">' +
             '<saml2:AttributeStatement>' +
