@@ -2865,7 +2865,7 @@ describe( 'passport-saml /', function() {
         samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
-            err.should.eql(
+            err.message.should.eql(
               'Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php'
             );
             done();
@@ -2891,7 +2891,7 @@ describe( 'passport-saml /', function() {
         samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
-            err.should.eql('Invalid signature');
+            err.message.should.eql('Invalid signature');
             done();
           } catch (err2) {
             done(err2);
@@ -2949,7 +2949,7 @@ describe( 'passport-saml /', function() {
         samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
-            err.should.eql(
+            err.message.should.eql(
               'Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php'
             );
             done();
@@ -2963,7 +2963,7 @@ describe( 'passport-saml /', function() {
         samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
-            err.should.eql(
+            err.message.should.eql(
               'Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester'
             );
             done();
@@ -2989,7 +2989,7 @@ describe( 'passport-saml /', function() {
         samlObj.validateRedirect(this.request, this.request.originalQuery, function(err) {
           try {
             should.exist(err);
-            err.should.eql('Invalid signature');
+            err.message.should.eql('Invalid signature');
             done();
           } catch (err2) {
             done(err2);

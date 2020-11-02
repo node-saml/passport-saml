@@ -935,7 +935,7 @@ class SAML {
           });
 
           if (!hasValidQuerySignature) {
-            throw 'Invalid signature';
+            throw new Error('Invalid signature');
           }
         });
     } else {
@@ -957,7 +957,7 @@ class SAML {
       matchingAlgo = crypto.getHashes()[i];
     }
     else {
-      throw alg + ' is not supported';
+      throw new Error(alg + ' is not supported');
     }
 
     const verifier = crypto.createVerify(matchingAlgo);
@@ -982,7 +982,7 @@ class SAML {
     return (async () => {
       const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
       if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
-        throw 'Bad status code: ' + statusCode;
+        throw new Error('Bad status code: ' + statusCode);
 
       this.verifyIssuer(doc.LogoutResponse);
       const inResponseTo = doc.LogoutResponse.$.InResponseTo;
@@ -999,9 +999,9 @@ class SAML {
       const issuer = samlMessage.Issuer;
       if (issuer) {
         if (issuer[0]._ !== this.options.idpIssuer)
-          throw 'Unknown SAML issuer. Expected: ' + this.options.idpIssuer + ' Received: ' + issuer[0]._;
+          throw new Error('Unknown SAML issuer. Expected: ' + this.options.idpIssuer + ' Received: ' + issuer[0]._);
       } else {
-        throw 'Missing SAML issuer';
+        throw new Error('Missing SAML issuer');
       }
     }
   }
