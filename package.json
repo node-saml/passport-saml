@@ -34,7 +34,7 @@
     "docs",
     "package-lock.json"
   ],
-  "main": "./lib/passport-saml",
+  "main": "./lib/passport-saml/index.js",
   "dependencies": {
     "debug": "^3.1.0",
     "passport-strategy": "*",
