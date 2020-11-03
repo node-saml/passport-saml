@@ -26,8 +26,7 @@ class Strategy extends PassportStrategy {
     // Unlike other options, this one gets deleted instead of passed along.
     if  (options.name) {
       this.name  = options.name;
-    }
-    else {
+    } else {
       this.name = 'saml';
     }
 
