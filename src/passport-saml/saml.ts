@@ -760,7 +760,7 @@ class SAML {
       if (!Object.prototype.hasOwnProperty.call(doc, 'documentElement'))
         throw new Error('SAMLResponse is not valid base64-encoded XML');
 
-      const inResponseToNodes = xmlCrypto.xpath(doc, "/*[local-name()='Response']/@InResponseTo") as Node[];
+      const inResponseToNodes = xmlCrypto.xpath(doc, "/*[local-name()='Response']/@InResponseTo") as Attr[];
 
       if (inResponseToNodes) {
         inResponseTo = inResponseToNodes.length ? inResponseToNodes[0].nodeValue : null;
