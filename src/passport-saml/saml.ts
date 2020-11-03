@@ -117,7 +117,7 @@ export interface SAMLOptions {
   callbackUrl: string;
   signatureAlgorithm: string;
   path: string;
-  privateCert: string;
+  privateCert?: string;
   privateKey: string;
   logoutUrl: string;
   entryPoint: string;
@@ -151,6 +151,14 @@ class SAML {
   initialize(options: Partial<SAMLOptions>): SAMLOptions {
     if (!options) {
       options = {};
+    }
+
+    if (options.privateCert) {
+      console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
+
+      if (!options.privateKey) {
+        options.privateKey = options.privateCert;
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(options, 'cert') && !options.cert) {
@@ -267,7 +275,7 @@ class SAML {
       samlMessageToSign.SigAlg = samlMessage.SigAlg;
     }
     signer.update(querystring.stringify(samlMessageToSign));
-    samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateCert) || this.options.privateKey, 'base64');
+    samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateKey), 'base64');
   }
 
   generateAuthorizeRequest(req: Request, isPassive: boolean, isHttpPostBinding: boolean, callback: (err: Error | null, request?: string) => void) {
@@ -392,8 +400,7 @@ class SAML {
       }
 
       let stringRequest = xmlbuilder.create(request as unknown as Record<string, any>).end();
-      const privateKey = this.options.privateCert || this.options.privateKey;
-      if (isHttpPostBinding && privateKey) {
+      if (isHttpPostBinding && this.options.privateKey) {
         stringRequest = signAuthnRequestPost(stringRequest, this.options);
       }
       callback(null, stringRequest);
@@ -500,8 +507,7 @@ class SAML {
       Object.keys(additionalParameters).forEach(k => {
         samlMessage[k] = additionalParameters[k];
       });
-      const privateKey = this.options.privateCert || this.options.privateKey;
-      if (privateKey) {
+      if (this.options.privateKey) {
         try {
           if (!this.options.entryPoint) {
             throw new Error('"entryPoint" config parameter is required for signed messages');
@@ -1340,17 +1346,16 @@ class SAML {
           "Missing decryptionCert while generating metadata for decrypting service provider");
       }
     }
-    const privateKey = this.options.privateCert || this.options.privateKey;
-    if(privateKey){
+    if(this.options.privateKey){
       if(!signingCert){
         throw new Error(
           "Missing signingCert while generating metadata for signing service provider messages");
       }
     }
 
-    if(this.options.decryptionPvk || privateKey){
+    if(this.options.decryptionPvk || this.options.privateKey){
       metadata.EntityDescriptor.SPSSODescriptor.KeyDescriptor=[];
-      if (privateKey) {
+      if (this.options.privateKey) {
 
         signingCert = signingCert!.replace( /-+BEGIN CERTIFICATE-+\r?\n?/, '' );
         signingCert = signingCert.replace( /-+END CERTIFICATE-+\r?\n?/, '' );
