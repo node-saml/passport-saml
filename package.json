@@ -29,6 +29,7 @@
     "lib",
     "test",
     "multiSamlStrategy.js",
+    "multiSamlStrategy.d.ts",
     "docs",
     "package-lock.json"
   ],
