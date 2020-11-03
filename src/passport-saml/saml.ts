@@ -16,16 +16,8 @@ import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
 import type { Request } from 'express';
 import { ParsedQs } from 'qs';
-import { AuthenticateOptions, AuthorizeOptions, CertCallback, Profile, RequestWithUser } from './types';
+import { AuthenticateOptions, AuthorizeOptions, CertCallback, Profile, RequestWithUser, SamlScopingConfig } from './types';
 const { xpath } = xmlCrypto;
-
-interface SAMLUser {
-    sessionIndex: any;
-    spNameQualifier: any;
-    nameIDFormat: any;
-    nameID: any;
-    nameQualifier: null;
-}
 
 interface NameID {
     value: string | null;
@@ -33,7 +25,7 @@ interface NameID {
 }
 import { SamlIDPEntryConfig, SamlIDPListConfig } from './types';
 
-function processValidlySignedPostRequest(self: SAML, doc: any, dom: Document, callback: (err: Error | null, profile?: Profile | undefined, loggedOut?: boolean | undefined) => void) {
+function processValidlySignedPostRequest(self: SAML, doc: any, dom: Document, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
   const request = doc.LogoutRequest;
   if (request) {
     const profile = {} as Profile;
@@ -95,6 +87,7 @@ function callBackWithNameID(nameid: Node, callback: (err: Error | null, value: N
 }
 
 export interface SAMLOptions {
+  scoping: SamlScopingConfig;
   xmlSignatureTransforms: string[];
   digestAlgorithm: string;
   providerName: string;
@@ -333,7 +326,7 @@ class SAML {
       }
 
       if (this.options.scoping) {
-        const scoping = {
+        const scoping: Record<string, any> = {
           '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
         };
 
@@ -343,13 +336,13 @@ class SAML {
 
         if (this.options.scoping.idpList) {
           scoping['samlp:IDPList'] = this.options.scoping.idpList.map((idpListItem: SamlIDPListConfig) => {
-            const formattedIdpListItem = {
+            const formattedIdpListItem: Record<string, any> = {
               '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
             };
 
             if (idpListItem.entries) {
               formattedIdpListItem['samlp:IDPEntry'] = idpListItem.entries.map((entry: SamlIDPEntryConfig) => {
-                const formattedEntry = {
+                const formattedEntry: Record<string, any> = {
                   '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 };
 
