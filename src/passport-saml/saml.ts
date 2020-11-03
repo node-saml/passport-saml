@@ -1020,20 +1020,18 @@ class SAML {
     }
   }
 
-  verifyLogoutResponse(doc: XMLOutput) {
-    return (async () => {
-      const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
-      if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
-        throw new Error('Bad status code: ' + statusCode);
+  async verifyLogoutResponse(doc: XMLOutput) {
+    const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
+    if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
+      throw new Error('Bad status code: ' + statusCode);
 
-      this.verifyIssuer(doc.LogoutResponse);
-      const inResponseTo = doc.LogoutResponse.$.InResponseTo;
-      if (inResponseTo) {
-        return this.validateInResponseTo(inResponseTo);
-      }
+    this.verifyIssuer(doc.LogoutResponse);
+    const inResponseTo = doc.LogoutResponse.$.InResponseTo;
+    if (inResponseTo) {
+      return this.validateInResponseTo(inResponseTo);
+    }
 
-      return Promise.resolve(true);
-    })();
+    return true;
   }
 
   verifyIssuer(samlMessage: XMLOutput) {
