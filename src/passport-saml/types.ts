@@ -64,6 +64,38 @@ export interface SamlScopingConfig {
   requesterId?: string[];
 }
 
+export type XMLValue = string | number | boolean | null | XMLObject | XMLValue[];
+
+export type XMLObject = {
+  [key: string]: XMLValue;
+};
+
+export type XMLInput = XMLObject;
+
+export interface AuthorizeRequestXML {
+  'samlp:AuthnRequest': XMLInput;
+}
+
+export interface LogoutRequestXML {
+  'samlp:LogoutRequest': {
+    'saml:NameID': XMLInput;
+    [key: string]: XMLValue;
+  };
+}
+
+export interface ServiceMetadataXML {
+  EntityDescriptor: {
+    [key: string]: XMLValue;
+    SPSSODescriptor: XMLObject;
+  };
+}
+
+export interface AudienceRestrictionXML {
+  Audience?: XMLObject[];
+}
+
+export type XMLOutput = Record<string, any>;
+
 export interface SamlIDPListConfig {
   entries: SamlIDPEntryConfig[];
   getComplete?: string;

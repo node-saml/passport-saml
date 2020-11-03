@@ -16,7 +16,7 @@ import * as algorithms from './algorithms';
 import { signAuthnRequestPost } from './saml-post-signing';
 import type { Request } from 'express';
 import { ParsedQs } from 'qs';
-import { AuthenticateOptions, AuthorizeOptions, CertCallback, Profile, RequestWithUser, SamlScopingConfig } from './types';
+import { AudienceRestrictionXML, AuthenticateOptions, AuthorizeOptions, AuthorizeRequestXML, CertCallback, LogoutRequestXML, Profile, RequestWithUser, SamlScopingConfig, ServiceMetadataXML, XMLInput, XMLObject, XMLOutput, XMLValue } from './types';
 const { xpath } = xmlCrypto;
 
 interface NameID {
@@ -25,7 +25,7 @@ interface NameID {
 }
 import { SamlIDPEntryConfig, SamlIDPListConfig } from './types';
 
-function processValidlySignedPostRequest(self: SAML, doc: any, dom: Document, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
+function processValidlySignedPostRequest(self: SAML, doc: XMLOutput, dom: Document, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
   const request = doc.LogoutRequest;
   if (request) {
     const profile = {} as Profile;
@@ -65,7 +65,7 @@ function processValidlySignedPostRequest(self: SAML, doc: any, dom: Document, ca
 }
 
 
-function processValidlySignedSamlLogout(self: SAML, doc: any, dom: Document, callback: (err: Error | null, profile?: Profile | null | undefined, loggedOut?: boolean | undefined) => void) {
+function processValidlySignedSamlLogout(self: SAML, doc: XMLOutput, dom: Document, callback: (err: Error | null, profile?: Profile | null | undefined, loggedOut?: boolean | undefined) => void) {
   const response = doc.LogoutResponse;
   const request = doc.LogoutRequest;
 
@@ -92,7 +92,7 @@ export interface SAMLOptions {
   digestAlgorithm: string;
   providerName: string;
   attributeConsumingServiceIndex: string | null;
-  RACComparison: any;
+  RACComparison: string;
   authnContext: string | string[];
   disableRequestedAuthnContext: boolean;
   disableRequestACSUrl: boolean;
@@ -234,8 +234,8 @@ class SAML {
     return new Date().toISOString();
   }
 
-  signRequest(samlMessage: Record<string, any>) {
-    const samlMessageToSign: Record<string, any> = {};
+  signRequest(samlMessage: querystring.ParsedUrlQueryInput) {
+    const samlMessageToSign: querystring.ParsedUrlQueryInput = {};
     samlMessage.SigAlg = algorithms.getSigningAlgorithm(this.options.signatureAlgorithm);
     const signer = algorithms.getSigner(this.options.signatureAlgorithm);
     if (samlMessage.SAMLRequest) {
@@ -267,7 +267,7 @@ class SAML {
       }
     })()
     .then(() => {
-      const request: any = {
+      const request: AuthorizeRequestXML = {
         'samlp:AuthnRequest': {
           '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
           '@ID': id,
@@ -302,7 +302,7 @@ class SAML {
       }
 
       if (!this.options.disableRequestedAuthnContext) {
-        const authnContextClassRefs: any[] = [];
+        const authnContextClassRefs: XMLInput[] = [];
         (this.options.authnContext as string[]).forEach(function(value) {
           authnContextClassRefs.push({
               '@xmlns:saml': 'urn:oasis:names:tc:SAML:2.0:assertion',
@@ -326,7 +326,7 @@ class SAML {
       }
 
       if (this.options.scoping) {
-        const scoping: Record<string, any> = {
+        const scoping: XMLInput = {
           '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
         };
 
@@ -336,13 +336,13 @@ class SAML {
 
         if (this.options.scoping.idpList) {
           scoping['samlp:IDPList'] = this.options.scoping.idpList.map((idpListItem: SamlIDPListConfig) => {
-            const formattedIdpListItem: Record<string, any> = {
+            const formattedIdpListItem: XMLInput = {
               '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
             };
 
             if (idpListItem.entries) {
               formattedIdpListItem['samlp:IDPEntry'] = idpListItem.entries.map((entry: SamlIDPEntryConfig) => {
-                const formattedEntry: Record<string, any> = {
+                const formattedEntry: XMLInput = {
                   '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
                 };
 
@@ -375,7 +375,7 @@ class SAML {
         request['samlp:AuthnRequest']['samlp:Scoping'] = scoping;
       }
 
-      let stringRequest = xmlbuilder.create(request).end();
+      let stringRequest = xmlbuilder.create(request as unknown as Record<string, any>).end();
       if (isHttpPostBinding && this.options.privateCert) {
         stringRequest = signAuthnRequestPost(stringRequest, this.options);
       }
@@ -407,7 +407,7 @@ class SAML {
           '#text': req.user!.nameID
         }
       }
-    } as Record<string, any>;
+    } as LogoutRequestXML;
 
     if (req.user!.nameQualifier != null) {
       request['samlp:LogoutRequest']['saml:NameID']['@NameQualifier'] = req.user!.nameQualifier;
@@ -426,7 +426,7 @@ class SAML {
 
     return util.promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant)
       .then(function() {
-        return xmlbuilder.create(request).end();
+        return xmlbuilder.create(request as unknown as Record<string, any>).end();
       });
   }
 
@@ -457,7 +457,7 @@ class SAML {
     return xmlbuilder.create(request).end();
   }
 
-  requestToUrl(request: string | null | undefined, response: string | null, operation: string, additionalParameters: Record<string, any>, callback: (err: Error | null, url?: string | null | undefined) => void) {
+  requestToUrl(request: string | null | undefined, response: string | null, operation: string, additionalParameters: querystring.ParsedUrlQuery, callback: (err: Error | null, url?: string | null | undefined) => void) {
 
     const requestToUrlHelper = (err: Error | null, buffer: Buffer) => {
       if (err) {
@@ -475,7 +475,7 @@ class SAML {
           return callback(new Error("Unknown operation: "+operation));
       }
 
-      const samlMessage: Record<string, any> = request ? {
+      const samlMessage: querystring.ParsedUrlQuery = request ? {
         SAMLRequest: base64
       } : {
         SAMLResponse: base64
@@ -516,8 +516,8 @@ class SAML {
     }
   }
 
-  getAdditionalParams(req: Request, operation: string, overrideParams?: Record<string, any> | undefined) {
-    const additionalParams: Record<string, any> = {};
+  getAdditionalParams(req: Request, operation: string, overrideParams?: querystring.ParsedUrlQuery) {
+    const additionalParams: querystring.ParsedUrlQuery = {};
 
     const RelayState = req.query && req.query.RelayState || req.body && req.body.RelayState;
     if (RelayState) {
@@ -559,11 +559,11 @@ class SAML {
     });
   }
 
-  getAuthorizeForm(req: Request, callback: (err: Error | null, data?: any) => void) {
+  getAuthorizeForm(req: Request, callback: (err: Error | null, data?: unknown) => void) {
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
     // but must be interpreted by an XML or HTML parser, and it must absolutely avoid breaking the syntax
     // of an element attribute.
-    const quoteattr = function(s: string | number, preserveCR?: boolean) {
+    const quoteattr = function(s: string | number | boolean | undefined | null | readonly string[] | readonly number[] | readonly boolean[], preserveCR?: boolean) {
       const preserveCRChar = preserveCR ? '&#13;' : '\n';
       return ('' + s) // Forces the conversion to string.
         .replace(/&/g, '&amp;') // This MUST be the 1st replacement.
@@ -584,7 +584,7 @@ class SAML {
 
       const operation = 'authorize';
       const additionalParameters = this.getAdditionalParams(req, operation);
-      const samlMessage: Record<string, string | number> = {
+      const samlMessage: querystring.ParsedUrlQueryInput = {
         SAMLRequest: buffer!.toString('base64')
       };
 
@@ -732,7 +732,7 @@ class SAML {
     return sig.checkSignature(fullXml);
   }
 
-  validatePostResponse(container: any, callback: (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => void) {
+  validatePostResponse(container: Record<string, string>, callback: (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => void) {
     let xml: string, doc: Document, inResponseTo: string | null;
 
     (async() => {
@@ -913,7 +913,7 @@ class SAML {
         tagNameProcessors: [xml2js.processors.stripPrefix]
       };
       const parser = new xml2js.Parser(parserConfig);
-      parser.parseString(inflated, (err: Error | null, doc: any) => {
+      parser.parseString(inflated, (err: Error | null, doc: XMLOutput) => {
         if (err) {
           return callback(err);
         }
@@ -985,7 +985,7 @@ class SAML {
     return verifier.verify(this.certToPEM(cert), signature, 'base64');
   }
 
-  verifyLogoutRequest(doc: any) {
+  verifyLogoutRequest(doc: XMLOutput) {
     this.verifyIssuer(doc.LogoutRequest);
     const nowMs = new Date().getTime();
     const conditions = doc.LogoutRequest.$;
@@ -997,7 +997,7 @@ class SAML {
     }
   }
 
-  verifyLogoutResponse(doc: any) {
+  verifyLogoutResponse(doc: XMLOutput) {
     return (async () => {
       const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
       if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
@@ -1013,7 +1013,7 @@ class SAML {
     })();
   }
 
-  verifyIssuer(samlMessage: any) {
+  verifyIssuer(samlMessage: XMLOutput) {
     if(this.options.idpIssuer) {
       const issuer = samlMessage.Issuer;
       if (issuer) {
@@ -1034,11 +1034,11 @@ class SAML {
     };
     const nowMs = new Date().getTime();
     const profile = {} as Profile;
-    let assertion: any;
-    let parsedAssertion: any;
+    let assertion: XMLOutput;
+    let parsedAssertion: XMLOutput;
     const parser = new xml2js.Parser(parserConfig);
     parser.parseStringPromise(xml)
-    .then((doc: any) => {
+    .then((doc: XMLOutput) => {
       parsedAssertion = doc;
       assertion = doc.Assertion;
 
@@ -1155,10 +1155,10 @@ class SAML {
 
       const attributeStatement = assertion.AttributeStatement;
       if (attributeStatement) {
-        const attributes: any[] = [].concat(...attributeStatement.filter((attr: any) => Array.isArray(attr.Attribute))
-                                                    .map((attr: any) => attr.Attribute));
+        const attributes: XMLOutput[] = [].concat(...attributeStatement.filter((attr: XMLObject) => Array.isArray(attr.Attribute))
+                                                    .map((attr: XMLObject) => attr.Attribute));
 
-        const attrValueMapper = function(value: any) {
+        const attrValueMapper = (value: XMLObject) => {
           const hasChildren = Object.keys(value).some((cur)=> { return (cur!=='_' && cur!=='$'); });
           return (hasChildren) ? value : value._;
         };
@@ -1216,11 +1216,11 @@ class SAML {
     return null;
   }
 
-  checkAudienceValidityError(expectedAudience: string, audienceRestrictions: any[]) {
+  checkAudienceValidityError(expectedAudience: string, audienceRestrictions: AudienceRestrictionXML[]) {
     if (!audienceRestrictions || audienceRestrictions.length < 1) {
       return new Error('SAML assertion has no AudienceRestriction');
     }
-    const errors = audienceRestrictions.map(function(restriction) {
+    const errors = audienceRestrictions.map((restriction) => {
       if (!restriction.Audience || !restriction.Audience[0] || !restriction.Audience[0]._) {
         return new Error('SAML assertion AudienceRestriction has no Audience value');
       }
@@ -1237,7 +1237,7 @@ class SAML {
     return null;
   }
 
-  validatePostRequest(container: any, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
+  validatePostRequest(container: Record<string, string>, callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void) {
     const xml = Buffer.from(container.SAMLRequest, 'base64').toString('utf8');
     const dom = new xmldom.DOMParser().parseFromString(xml);
     const parserConfig = {
@@ -1246,7 +1246,7 @@ class SAML {
       tagNameProcessors: [xml2js.processors.stripPrefix]
     };
     const parser = new xml2js.Parser(parserConfig);
-    parser.parseString(xml, (err: Error | null, doc: any) => {
+    parser.parseString(xml, (err: Error | null, doc: XMLOutput) => {
       if (err) {
         return callback(err);
       }
@@ -1264,7 +1264,7 @@ class SAML {
     });
   }
 
-  getNameID(self: SAML, doc: Node, callback: (err: Error | null, nameID?: any) => void) {
+  getNameID(self: SAML, doc: Node, callback: (err: Error | null, nameID?: XMLOutput) => void) {
     const nameIds = xmlCrypto.xpath(doc, "/*[local-name()='LogoutRequest']/*[local-name()='NameID']") as Node[];
     const encryptedIds = xmlCrypto.xpath(doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='EncryptedID']") as Node[];
@@ -1305,7 +1305,7 @@ class SAML {
   }
 
   generateServiceProviderMetadata( decryptionCert: string | null, signingCert?: string | null ) {
-    const metadata: Record<string, any> = {
+    const metadata: ServiceMetadataXML = {
       'EntityDescriptor' : {
         '@xmlns': 'urn:oasis:names:tc:SAML:2.0:metadata',
         '@xmlns:ds': 'http://www.w3.org/2000/09/xmldsig#',
@@ -1393,7 +1393,7 @@ class SAML {
       '@Binding': 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
       '@Location': this.getCallbackUrl({})
     };
-    return xmlbuilder.create(metadata).end({ pretty: true, indent: '  ', newline: '\n' });
+    return xmlbuilder.create(metadata as unknown as Record<string, any>).end({ pretty: true, indent: '  ', newline: '\n' });
   }
 
   keyToPEM(key: crypto.KeyLike) {
