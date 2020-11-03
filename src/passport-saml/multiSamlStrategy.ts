@@ -66,4 +66,4 @@ MultiSamlStrategy.prototype.generateServiceProviderMetadata = function( req, dec
   });
 };
 
-module.exports = MultiSamlStrategy;
+export = MultiSamlStrategy as any;
