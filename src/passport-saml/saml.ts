@@ -85,6 +85,7 @@ interface SAMLOptions {
   signatureAlgorithm: string;
   path: string;
   privateCert: string;
+  privateKey: string;
   logoutUrl: string;
   entryPoint: string;
   skipRequestCompression: boolean;
@@ -232,7 +233,7 @@ class SAML {
       samlMessageToSign.SigAlg = samlMessage.SigAlg;
     }
     signer.update(querystring.stringify(samlMessageToSign));
-    samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateCert), 'base64');
+    samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateCert) || this.options.privateKey, 'base64');
   }
 
   generateAuthorizeRequest = function (req, isPassive, isHttpPostBinding, callback) {
@@ -357,7 +358,8 @@ class SAML {
       }
 
       let stringRequest = xmlbuilder.create(request).end();
-      if (isHttpPostBinding && this.options.privateCert) {
+      const privateKey = this.options.privateCert || this.options.privateKey;
+      if (isHttpPostBinding && privateKey) {
         stringRequest = signAuthnRequestPost(stringRequest, this.options);
       }
       callback(null, stringRequest);
@@ -464,8 +466,8 @@ class SAML {
       Object.keys(additionalParameters).forEach(k => {
         samlMessage[k] = additionalParameters[k];
       });
-
-      if (this.options.privateCert) {
+      const privateKey = this.options.privateCert || this.options.privateKey;
+      if (privateKey) {
         try {
           if (!this.options.entryPoint) {
             throw new Error('"entryPoint" config parameter is required for signed messages');
@@ -1303,17 +1305,17 @@ class SAML {
           "Missing decryptionCert while generating metadata for decrypting service provider");
       }
     }
-
-    if(this.options.privateCert){
+    const privateKey = this.options.privateCert || this.options.privateKey;
+    if(privateKey){
       if(!signingCert){
         throw new Error(
           "Missing signingCert while generating metadata for signing service provider messages");
       }
     }
 
-    if(this.options.decryptionPvk || this.options.privateCert){
+    if(this.options.decryptionPvk || privateKey){
       metadata.EntityDescriptor.SPSSODescriptor.KeyDescriptor=[];
-      if (this.options.privateCert) {
+      if (privateKey) {
 
         signingCert = signingCert.replace( /-+BEGIN CERTIFICATE-+\r?\n?/, '' );
         signingCert = signingCert.replace( /-+END CERTIFICATE-+\r?\n?/, '' );
