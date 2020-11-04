@@ -20,6 +20,10 @@ export interface SamlConfig {
     host?: string;
     entryPoint?: string;
     issuer?: string;
+    privateKey?: string;
+    /**
+     * @deprecated Use `privateKey` instead
+     */
     privateCert?: string;
     cert?: string | string[] | CertCallback;
     decryptionPvk?: string;
