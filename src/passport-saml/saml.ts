@@ -752,6 +752,7 @@ class SAML {
     if (totalReferencedNodes.length > 1) {
       return false;
     }
+    fullXml = fullXml.replace(/\r\n?/g, '\n');
     return sig.checkSignature(fullXml);
   }
 
