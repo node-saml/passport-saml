@@ -74,6 +74,11 @@
     "lint:fix": "eslint --ext .ts --fix src",
     "prepublishOnly": "tsc"
   },
+  "release-it": {
+   "github": {
+     "release": true
+    }
+  },
   "eslintConfig": {
     "env": {
       "node": true,
