@@ -1,6 +1,6 @@
 {
   "name": "passport-saml",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "MIT",
   "keywords": [
     "saml",
@@ -75,8 +75,8 @@
     "prepublishOnly": "tsc"
   },
   "release-it": {
-   "github": {
-     "release": true
+    "github": {
+      "release": true
     }
   },
   "eslintConfig": {
