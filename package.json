@@ -58,6 +58,7 @@
     "express": "^4.16.2",
     "mocha": "^6.0.2",
     "passport": "0.4.x",
+    "release-it": "^14.2.1",
     "request": "^2.83.0",
     "should": "*",
     "sinon": "^7.2.7",
