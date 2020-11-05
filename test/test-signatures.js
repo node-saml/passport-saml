@@ -17,15 +17,15 @@ describe('Signatures', function() {
             done(ex);
           }
         },
-        testOneResponse        = ( pathToXml, shouldErrorWith, amountOfSignatureChecks = 1 ) => {
+        testOneResponseBody    = ( samlResponseBody, shouldErrorWith, amountOfSignatureChecks = 1 ) => {
           return done => {
             //== Instantiate new instance before every test
             const samlObj              = new SAML({ cert });
             //== Spy on `validateSignature` to be able to count how many times it has been called
             const validateSignatureSpy = sinon.spy(samlObj, 'validateSignature');
 
-            //== Create a body bases on an XML an run the test in `func`
-            samlObj.validatePostResponse(createBody(pathToXml), tryCatchTest(done, function( error ) {
+            //== Run the test in `func`
+            samlObj.validatePostResponse(samlResponseBody, tryCatchTest(done, function( error ) {
               //== Assert error. If the error is `SAML assertion expired` we made it past the certificate validation
               shouldErrorWith ? error.should.eql(new Error(shouldErrorWith)) : error.should.eql(new Error('SAML assertion expired'));
               //== Assert times `validateSignature` was called
@@ -33,6 +33,10 @@ describe('Signatures', function() {
               done();
             }));
           };
+        },
+        testOneResponse        = ( pathToXml, ...args ) => {
+          //== Create a body based on an XML and run the test
+          return testOneResponseBody(createBody(pathToXml), ...args);
         };
 
   describe('Signatures on saml:Response - Only 1 saml:Assertion', () => {
@@ -77,6 +81,22 @@ describe('Signatures', function() {
     it('R1A2Ad - signed root+asrt+advi => error', testOneResponse('/invalid/response.root-signed.assertion-signed.2advice-signed.xml', INVALID_SIGNATURE, 2));
     it('R1A2Ad - signed root+asrt => error', testOneResponse('/invalid/response.root-signed.assertion-signed.2advice-unsigned.xml', INVALID_SIGNATURE, 2));
     it('R1A2Ad - signed root => error', testOneResponse('/invalid/response.root-signed.assertion-unsigned.2advice-unsigned.xml', INVALID_SIGNATURE, 2));
+
+  });
+
+  describe('Signature on saml:Response with non-LF line endings', () => {
+    const samlResponseXml = fs.readFileSync(__dirname + '/static/signatures/valid/response.root-signed.assertion-signed.xml').toString();
+    const makeBody = str => ({ SAMLResponse: Buffer.from(str).toString('base64') });
+
+    it('CRLF line endings', done => {
+      const body = makeBody(samlResponseXml.replace(/\n/g, '\r\n'));
+      testOneResponseBody(body, false, 1)(done);
+    });
+
+    it('CR line endings', done => {
+      const body = makeBody(samlResponseXml.replace(/\n/g, '\r'));
+      testOneResponseBody(body, false, 1)(done);
+    });
 
   });
 
