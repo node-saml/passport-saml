@@ -1,6 +1,6 @@
 Passport-SAML
 =============
-[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status) [![GitHub version](https://badge.fury.io/gh/node-saml%2Fpassport-saml.svg)](https://badge.fury.io/gh/node-saml%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/)
+[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status) [![GitHub version](https://badge.fury.io/gh/node-saml%2Fpassport-saml.svg)](https://badge.fury.io/gh/node-saml%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
