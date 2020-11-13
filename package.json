@@ -1,14 +1,18 @@
 {
   "name": "passport-saml",
   "version": "2.0.2",
-  "license": "MIT",
+  "description": "SAML 2.0 authentication strategy for Passport",
   "keywords": [
     "saml",
     "adfs",
     "sso",
     "shibboleth"
   ],
-  "description": "SAML 2.0 authentication strategy for Passport",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/node-saml/passport-saml.git"
+  },
+  "license": "MIT",
   "author": {
     "name": "Henri Bergius",
     "email": "henri.bergius@iki.fi",
@@ -22,10 +26,7 @@
     "Chris Barth",
     "Andrii Kostenko"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/node-saml/passport-saml.git"
-  },
+  "main": "./lib/passport-saml",
   "files": [
     "lib",
     "test",
@@ -34,7 +35,20 @@
     "docs",
     "package-lock.json"
   ],
-  "main": "./lib/passport-saml",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint --ext .ts src",
+    "lint-watch": "onchange 'src/**/*.ts' -- eslint {{file}}",
+    "lint:fix": "eslint --ext .ts --fix src",
+    "prepublishOnly": "tsc",
+    "prettier-check": "prettier --config .prettierrc --check .",
+    "prettier-format": "prettier --config .prettierrc --write .",
+    "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{file}}",
+    "test": "npm run lint && npm run tsc && mocha",
+    "tsc": "tsc",
+    "tsc-watch": "tsc && tsc --watch",
+    "watch": "concurrently --kill-others \"npm:*-watch\""
+  },
   "dependencies": {
     "debug": "^3.1.0",
     "passport-strategy": "*",
@@ -51,13 +65,19 @@
     "@types/xml-crypto": "^1.4.1",
     "@types/xml2js": "^0.4.5",
     "@types/xmldom": "^0.1.30",
-    "@typescript-eslint/eslint-plugin": "^4.6.0",
-    "@typescript-eslint/parser": "^4.6.0",
+    "@typescript-eslint/eslint-plugin": "^4.6.1",
+    "@typescript-eslint/parser": "^4.6.1",
     "body-parser": "^1.17.1",
+    "concurrently": "^5.3.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "express": "^4.16.2",
     "mocha": "^6.0.2",
+    "onchange": "^7.1.0",
     "passport": "0.4.x",
+    "prettier": "2.1.2",
+    "prettier-plugin-packagejson": "^2.2.7",
     "release-it": "^14.2.1",
     "request": "^2.83.0",
     "should": "*",
@@ -67,41 +87,9 @@
   "engines": {
     "node": ">= 10"
   },
-  "scripts": {
-    "test": "npm run lint && npm run tsc && mocha",
-    "tsc": "tsc",
-    "lint": "eslint --ext .ts src",
-    "lint:fix": "eslint --ext .ts --fix src",
-    "prepublishOnly": "tsc"
-  },
   "release-it": {
     "github": {
       "release": true
-    }
-  },
-  "eslintConfig": {
-    "env": {
-      "node": true,
-      "es6": false
-    },
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 6
-    },
-    "rules": {
-      "no-undefined": "off",
-      "no-unused-vars": "off",
-      "semi": [
-        "error",
-        "always"
-      ]
     }
   }
 }
