@@ -1422,7 +1422,7 @@ class SAML {
   keyToPEM(key: crypto.KeyLike) {
     if (!key || typeof key !== 'string') return key;
 
-    const lines = key.split('\n');
+    const lines = key.split(/\r?\n/);
     if (lines.length !== 1) return key;
 
     const wrappedKey = [
