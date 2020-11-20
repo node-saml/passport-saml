@@ -59,7 +59,7 @@ export interface SamlConfig {
 }
 
 export interface SamlScopingConfig {
-  idpList: SamlIDPListConfig[];
+  idpList?: SamlIDPListConfig[];
   proxyCount?: number;
   requesterId?: string[];
 }
@@ -129,7 +129,7 @@ export type Profile = {
     samlLogoutRequest: any;
     user?: Profile
 }
-  
+
 export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => void;
 
 export type VerifyWithRequest = (req: express.Request, profile: Profile | null | undefined, done: VerifiedCallback) => void;
