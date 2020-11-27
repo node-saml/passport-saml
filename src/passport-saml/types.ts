@@ -135,3 +135,9 @@ export type VerifiedCallback = (err: Error | null, user?: Record<string, unknown
 export type VerifyWithRequest = (req: express.Request, profile: Profile | null | undefined, done: VerifiedCallback) => void;
 
 export type VerifyWithoutRequest = (profile: Profile | null | undefined, done: VerifiedCallback) => void;
+
+export type SamlOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
+
+export interface MultiSamlConfig extends SamlConfig {
+  getSamlOptions(req: express.Request, callback: SamlOptionsCallback): void;
+}
