@@ -63,7 +63,7 @@ export class CacheProvider {
      * @param id
      * @param value
      */
-    save(key: string, value: string, callback: (error: null, value: CacheItem | null) => void){
+    save(key: string, value: string, callback: (error: Error | null, value: CacheItem | null) => void){
         if(!this.cacheKeys[key])
         {
             this.cacheKeys[key] = {
@@ -86,7 +86,7 @@ export class CacheProvider {
      * @param id
      * @returns {boolean}
      */
-    get(key: string, callback: (key: string | null, value: string | null) => void){
+    get(key: string, callback: (err: Error | null, value: string | null) => void){
         if(this.cacheKeys[key]){
             callback(null, this.cacheKeys[key].value);
         }
