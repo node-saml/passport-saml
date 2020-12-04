@@ -40,7 +40,7 @@
     "lint": "eslint --ext .ts src",
     "lint-watch": "onchange 'src/**/*.ts' -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
-    "prepublishOnly": "tsc",
+    "prepare": "tsc",
     "prettier-check": "prettier --config .prettierrc --check .",
     "prettier-format": "prettier --config .prettierrc --write .",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{file}}",
