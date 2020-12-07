@@ -57,18 +57,24 @@ class MultiSamlStrategy extends SamlStrategy {
     });
   }
 
-  /** @ts-expect-error typescript disallows changing method signature in a subclass */
+  generateServiceProviderMetadata( decryptionCert: string | null, signingCert?: string | null ): never
   generateServiceProviderMetadata(
     req: Request,
     decryptionCert: string | null,
     signingCert: string | null,
     callback: (err: Error | null, metadata?: string) => void
-  ) {
+  ): void
+  generateServiceProviderMetadata(
+    req: Request | string | null,
+    decryptionCert?: any,
+    signingCert?: any,
+    callback?: (err: Error | null, metadata?: string) => void
+  ): void {
     if (typeof callback !== 'function') {
       throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
     }
 
-    return this._options.getSamlOptions(req, (err, samlOptions) => {
+    return this._options.getSamlOptions(req as Request, (err, samlOptions) => {
       if (err) {
         return callback(err);
       }
