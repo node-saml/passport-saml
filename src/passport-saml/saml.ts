@@ -733,6 +733,7 @@ class SAML {
       getKeyInfo: key => "<X509Data></X509Data>",
       getKey: keyInfo => Buffer.from(this.certToPEM(cert)),
     };
+    signature = this.normalizeNewlines(signature.toString());
     sig.loadSignature(signature);
     // We expect each signature to contain exactly one reference to the top level of the xml we
     //   are validating, so if we see anything else, reject.
@@ -752,7 +753,7 @@ class SAML {
     if (totalReferencedNodes.length > 1) {
       return false;
     }
-    fullXml = fullXml.replace(/\r\n?/g, '\n');
+    fullXml = this.normalizeNewlines(fullXml);
     return sig.checkSignature(fullXml);
   }
 
@@ -1432,6 +1433,13 @@ class SAML {
       ''
     ].join('\n');
     return wrappedKey;
+  }
+
+  normalizeNewlines(xml : string) : string {
+    // we can use this utility before passing XML to `xml-crypto`
+    // we are considered the XML processor and are responsible for newline normalization
+    // https://github.com/node-saml/passport-saml/issues/431#issuecomment-718132752
+    return xml.replace(/\r\n?/g, "\n");
   }
 }
 
