@@ -102,41 +102,49 @@ function callBackWithNameID(nameid: Node, callback: (err: Error | null, value: N
 }
 
 export interface SAMLOptions {
-  scoping: SamlScopingConfig;
-  xmlSignatureTransforms: string[];
-  digestAlgorithm: string;
-  providerName: string;
-  attributeConsumingServiceIndex: string | null;
-  RACComparison: string;
-  authnContext: string | string[];
-  disableRequestedAuthnContext: boolean;
-  disableRequestACSUrl: boolean;
-  acceptedClockSkewMs: number;
+  callbackUrl: string;
+  path: string;
   protocol: string;
   host: string;
-  callbackUrl: string;
-  signatureAlgorithm: string;
-  path: string;
+  entryPoint: string;
+  issuer: string;
   privateCert?: string;
   privateKey: string;
-  logoutUrl: string;
-  entryPoint: string;
-  skipRequestCompression: boolean;
-  idpIssuer: string;
+  cert: string | string[] | CertCallback;
+  decryptionPvk: string;
+  signatureAlgorithm: string;
+
   additionalParams: Record<string, string>;
   additionalAuthorizeParams: Record<string, string>;
-  additionalLogoutParams: Record<string, string>;
-  cacheProvider: InMemoryCacheProvider;
-  issuer: string;
   identifierFormat: string;
-  cert: string | string[] | CertCallback;
+  acceptedClockSkewMs: number;
+  attributeConsumingServiceIndex: string | null;
+  disableRequestedAuthnContext: boolean;
+  authnContext: string | string[];
+  forceAuthn: boolean;
+  skipRequestCompression: boolean;
+  // no authnRequestBinding
+  RACComparison: string;
+  providerName: string;
   passive: boolean;
-  decryptionPvk: string;
-  logoutCallbackUrl: string;
+  idpIssuer: string;
+  audience: string;
+  scoping: SamlScopingConfig;
+
   validateInResponseTo: boolean;
   requestIdExpirationPeriodMs: number;
-  audience: string;
-  forceAuthn: boolean;
+  cacheProvider: InMemoryCacheProvider;
+
+  // no passport fields (name, passReqToCallback)
+
+  logoutUrl: string;
+  additionalLogoutParams: Record<string, string>;
+  logoutCallbackUrl: string;
+
+  // extras
+  xmlSignatureTransforms: string[];
+  digestAlgorithm: string;
+  disableRequestACSUrl: boolean;
 }
 
 
