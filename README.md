@@ -137,16 +137,18 @@ type Profile = {
   * `scoping`: An optional configuration which implements the functionality [explained in the SAML spec paragraph "3.4.1.2 Element <Scoping>"](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf). The config object is structured as following:
 ```javascript
 {
-  idpList: { // optional
-    entries: [ // required
-      {
-        providerId: 'yourProviderId', // required for each entry
-        name: 'yourName', // optional
-        loc: 'yourLoc', // optional
-      }
-    ],
-    getComplete: 'URI to your complete IDP list', // optional
-  },
+  idpList: [ // optional
+    { 
+      entries: [ // required
+        {
+          providerId: 'yourProviderId', // required for each entry
+          name: 'yourName', // optional
+          loc: 'yourLoc', // optional
+        }
+      ],
+      getComplete: 'URI to your complete IDP list', // optional
+    },
+  ],
   proxyCount: 2, // optional
   requesterId: 'requesterId', // optional
 }
