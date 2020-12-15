@@ -26,13 +26,13 @@ export interface SamlConfig {
     signatureAlgorithm?: 'sha1' | 'sha256' | 'sha512';
 
     // Additional SAML behaviors
-    additionalParams?: any;
-    additionalAuthorizeParams?: any;
+    additionalParams?: Record<string, string>;
+    additionalAuthorizeParams?: Record<string, string>;
     identifierFormat?: string;
     acceptedClockSkewMs?: number;
     attributeConsumingServiceIndex?: string | null;
     disableRequestedAuthnContext?: boolean;
-    authnContext?: string;
+    authnContext?: string | string[];
     forceAuthn?: boolean;
     skipRequestCompression?: boolean;
     authnRequestBinding?: string;
@@ -54,7 +54,7 @@ export interface SamlConfig {
 
     // Logout
     logoutUrl?: string;
-    additionalLogoutParams?: any;
+    additionalLogoutParams?: Record<string, string>;
     logoutCallbackUrl?: string;
 }
 
