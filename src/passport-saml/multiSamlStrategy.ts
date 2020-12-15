@@ -3,13 +3,7 @@ import * as saml from './saml';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
 import SamlStrategy = require('./strategy');
 import type { Request } from 'express';
-import { AuthenticateOptions, AuthorizeOptions, RequestWithUser, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
-
-type SamlOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
-
-interface MultiSamlConfig extends SamlConfig {
-  getSamlOptions(req: Request, callback: SamlOptionsCallback): void;
-}
+import { AuthenticateOptions, AuthorizeOptions, MultiSamlConfig, RequestWithUser, VerifyWithoutRequest, VerifyWithRequest } from './types';
 
 class MultiSamlStrategy extends SamlStrategy {
   _options: MultiSamlConfig
