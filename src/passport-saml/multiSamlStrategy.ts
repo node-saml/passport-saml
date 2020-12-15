@@ -57,7 +57,7 @@ class MultiSamlStrategy extends SamlStrategy {
     });
   }
 
-  // @ts-expect-error typescript disallows changing method signature in a subclass
+  /** @ts-expect-error typescript disallows changing method signature in a subclass */
   generateServiceProviderMetadata(
     req: Request,
     decryptionCert: string | null,
