@@ -1,6 +1,6 @@
 import { SignedXml } from 'xml-crypto';
 import * as algorithms from './algorithms';
-import { SAMLOptions } from './saml';
+import { SAMLOptions } from './types';
 
 const authnRequestXPath = '/*[local-name(.)="AuthnRequest" and namespace-uri(.)="urn:oasis:names:tc:SAML:2.0:protocol"]';
 const issuerXPath = '/*[local-name(.)="Issuer" and namespace-uri(.)="urn:oasis:names:tc:SAML:2.0:assertion"]';
