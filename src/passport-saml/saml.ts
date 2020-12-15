@@ -24,6 +24,7 @@ import { AudienceRestrictionXML,
          LogoutRequestXML,
          Profile,
          RequestWithUser,
+         SAMLOptions,
          SamlIDPListConfig,
          SamlIDPEntryConfig,
          SamlScopingConfig,
@@ -100,53 +101,6 @@ function callBackWithNameID(nameid: Node, callback: (err: Error | null, value: N
     format: format && format[0] && format[0].nodeValue
   });
 }
-
-export interface SAMLOptions {
-  callbackUrl: string;
-  path: string;
-  protocol: string;
-  host: string;
-  entryPoint: string;
-  issuer: string;
-  privateCert?: string;
-  privateKey: string;
-  cert: string | string[] | CertCallback;
-  decryptionPvk: string;
-  signatureAlgorithm: string;
-
-  additionalParams: Record<string, string>;
-  additionalAuthorizeParams: Record<string, string>;
-  identifierFormat: string;
-  acceptedClockSkewMs: number;
-  attributeConsumingServiceIndex: string | null;
-  disableRequestedAuthnContext: boolean;
-  authnContext: string | string[];
-  forceAuthn: boolean;
-  skipRequestCompression: boolean;
-  // no authnRequestBinding
-  RACComparison: string;
-  providerName: string;
-  passive: boolean;
-  idpIssuer: string;
-  audience: string;
-  scoping: SamlScopingConfig;
-
-  validateInResponseTo: boolean;
-  requestIdExpirationPeriodMs: number;
-  cacheProvider: InMemoryCacheProvider;
-
-  // no passport fields (name, passReqToCallback)
-
-  logoutUrl: string;
-  additionalLogoutParams: Record<string, string>;
-  logoutCallbackUrl: string;
-
-  // extras
-  xmlSignatureTransforms: string[];
-  digestAlgorithm: string;
-  disableRequestACSUrl: boolean;
-}
-
 
 class SAML {
   options: SAMLOptions;
