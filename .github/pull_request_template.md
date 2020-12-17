@@ -1,6 +1,6 @@
 # Description
 
-Thank you for taking the time to create a PR to support this commuity-maintained project. We are all volunteers here, so features are only added by contributers like you. Please also be patient while the maintainers work to review your proposed changes for quality and effacy.
+Thank you for taking the time to create a PR to support this community-maintained project. We are all volunteers here, so features are only added by contributers like you. Please also be patient while the maintainers work to review your proposed changes for quality and effacy.
 
 Please include a _summary of the change_ and, where appropriate, _which issue is addressed_.
 
