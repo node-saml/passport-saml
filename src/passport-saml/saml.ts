@@ -8,7 +8,6 @@ import * as xmldom from 'xmldom';
 import * as url from 'url';
 import * as querystring from 'querystring';
 import * as xmlbuilder from 'xmlbuilder';
-// @ts-expect-error no typings for xml-encryption
 import * as xmlenc from 'xml-encryption';
 import * as util from 'util';
 import {CacheProvider as InMemoryCacheProvider} from './inmemory-cache-provider';
