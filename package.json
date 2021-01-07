@@ -37,6 +37,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "changelog": "gren changelog --override --generate",
     "lint": "eslint --ext .ts src",
     "lint-watch": "onchange 'src/**/*.ts' -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
@@ -74,6 +75,7 @@
     "eslint-config-prettier": "^7.0.0",
     "eslint-plugin-prettier": "^3.2.0",
     "express": "^4.17.1",
+    "github-release-notes": "^0.17.3",
     "mocha": "^8.2.1",
     "onchange": "^7.1.0",
     "passport": "0.4.x",
