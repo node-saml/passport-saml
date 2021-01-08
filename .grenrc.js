@@ -7,7 +7,7 @@ module.exports = {
   groupBy: false,
   changelogFilename: "CHANGELOG.md",
   template: {
-    release: function (placeholders, body) {
+    release: function (placeholders) {
       let dateParts = placeholders.date.split("/");
       let placeholdersDate = new Date(
         Number(dateParts[2]),
