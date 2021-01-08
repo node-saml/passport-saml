@@ -6,6 +6,8 @@ module.exports = {
   tags: "all",
   groupBy: false,
   changelogFilename: "CHANGELOG.md",
+  username: "node-saml",
+  repo: "passport-saml",
   template: {
     release: function (placeholders) {
       let dateParts = placeholders.date.split("/");
