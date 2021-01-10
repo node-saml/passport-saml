@@ -1,6 +1,6 @@
 {
   "name": "passport-saml",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "SAML 2.0 authentication strategy for Passport",
   "keywords": [
     "saml",
@@ -37,12 +37,13 @@
   ],
   "scripts": {
     "build": "tsc",
+    "changelog": "gren changelog --override --generate",
     "lint": "eslint --ext .ts src",
     "lint-watch": "onchange 'src/**/*.ts' -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
     "prepare": "tsc",
-    "prettier-check": "prettier --config .prettierrc --check .",
-    "prettier-format": "prettier --config .prettierrc --write .",
+    "prettier-check": "prettier --config .prettierrc.json --check .",
+    "prettier-format": "prettier --config .prettierrc.json --write .",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{file}}",
     "test": "npm run lint && npm run tsc && mocha",
     "tsc": "tsc",
@@ -74,6 +75,7 @@
     "eslint-config-prettier": "^7.0.0",
     "eslint-plugin-prettier": "^3.2.0",
     "express": "^4.17.1",
+    "github-release-notes": "^0.17.3",
     "mocha": "^8.2.1",
     "onchange": "^7.1.0",
     "passport": "0.4.x",
