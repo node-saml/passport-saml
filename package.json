@@ -29,7 +29,6 @@
   "main": "./lib/passport-saml",
   "files": [
     "lib",
-    "test",
     "multiSamlStrategy.js",
     "multiSamlStrategy.d.ts",
     "docs",
