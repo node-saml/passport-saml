@@ -1,2 +1,2 @@
-import * as MultiSAMLStrategy from './lib/passport-saml/multiSamlStrategy';
+import * as MultiSAMLStrategy from "./lib/passport-saml/multiSamlStrategy";
 export = MultiSAMLStrategy;

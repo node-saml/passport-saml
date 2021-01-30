@@ -3,8 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: "[BUG]"
 labels: bug
-assignees: ''
-
+assignees: ""
 ---
 
 <!--
@@ -39,5 +38,6 @@ Steps to reproduce the behavior. Ideally, expressesd through an automated test.
 A clear and concise description of what you expected to happen.
 
 **Environment**
- - Node.js version:
- - passport-saml version:
+
+- Node.js version:
+- passport-saml version:
