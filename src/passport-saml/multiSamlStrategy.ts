@@ -14,10 +14,7 @@ import {
 
 class MultiSamlStrategy extends SamlStrategy {
   _options: MultiSamlConfig;
-  constructor(
-    options: MultiSamlConfig,
-    verify: VerifyWithRequest | VerifyWithoutRequest
-  ) {
+  constructor(options: MultiSamlConfig, verify: VerifyWithRequest | VerifyWithoutRequest) {
     if (!options || typeof options.getSamlOptions != "function") {
       throw new Error("Please provide a getSamlOptions function");
     }
@@ -36,10 +33,7 @@ class MultiSamlStrategy extends SamlStrategy {
     this._options = options;
   }
 
-  authenticate(
-    req: RequestWithUser,
-    options: AuthenticateOptions & AuthorizeOptions
-  ) {
+  authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return this.error(err);
@@ -61,9 +55,7 @@ class MultiSamlStrategy extends SamlStrategy {
         return callback(err);
       }
 
-      const samlService = new saml.SAML(
-        Object.assign({}, this._options, samlOptions)
-      );
+      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.logout.call(strategy, req, callback);
@@ -78,9 +70,7 @@ class MultiSamlStrategy extends SamlStrategy {
     callback: (err: Error | null, metadata?: string) => void
   ) {
     if (typeof callback !== "function") {
-      throw new Error(
-        "Metadata can't be provided synchronously for MultiSamlStrategy."
-      );
+      throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
     }
 
     return this._options.getSamlOptions(req, (err, samlOptions) => {
@@ -88,18 +78,12 @@ class MultiSamlStrategy extends SamlStrategy {
         return callback(err);
       }
 
-      const samlService = new saml.SAML(
-        Object.assign({}, this._options, samlOptions)
-      );
+      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       return callback(
         null,
-        super.generateServiceProviderMetadata.call(
-          strategy,
-          decryptionCert,
-          signingCert
-        )
+        super.generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert)
       );
     });
   }

@@ -12,10 +12,7 @@ describe("Strategy()", function () {
     function getSamlOptions() {
       return {};
     }
-    var strategy = new MultiSamlStrategy(
-      { getSamlOptions: getSamlOptions },
-      verify
-    );
+    var strategy = new MultiSamlStrategy({ getSamlOptions: getSamlOptions }, verify);
     strategy.should.be.an.instanceOf(SamlStrategy);
   });
 
@@ -29,10 +26,7 @@ describe("Strategy()", function () {
 
 describe("strategy#authenticate", function () {
   beforeEach(function () {
-    this.superAuthenticateStub = sinon.stub(
-      SamlStrategy.prototype,
-      "authenticate"
-    );
+    this.superAuthenticateStub = sinon.stub(SamlStrategy.prototype, "authenticate");
   });
 
   afterEach(function () {
@@ -88,8 +82,7 @@ describe("strategy#authenticate", function () {
       cert: "deadbeef",
       host: "lvh",
       acceptedClockSkewMs: -1,
-      identifierFormat:
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+      identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
       path: "/saml/callback",
       logoutUrl: "http://foo.slo",
       signatureAlgorithm: "sha256",
@@ -100,11 +93,7 @@ describe("strategy#authenticate", function () {
         fn(null, samlOptions);
         sinon.assert.calledOnce(superAuthenticateStub);
         superAuthenticateStub.calledWith(
-          Object.assign(
-            {},
-            { cacheProvider: "mock cache provider" },
-            samlOptions
-          )
+          Object.assign({}, { cacheProvider: "mock cache provider" }, samlOptions)
         );
         done();
       } catch (err2) {
@@ -141,10 +130,7 @@ describe("strategy#logout", function () {
       }
     }
 
-    var strategy = new MultiSamlStrategy(
-      { getSamlOptions: getSamlOptions },
-      verify
-    );
+    var strategy = new MultiSamlStrategy({ getSamlOptions: getSamlOptions }, verify);
     strategy.logout();
   });
 
@@ -176,8 +162,7 @@ describe("strategy#logout", function () {
       cert: "deadbeef",
       host: "lvh",
       acceptedClockSkewMs: -1,
-      identifierFormat:
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+      identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
       path: "/saml/callback",
       logoutUrl: "http://foo.slo",
       signatureAlgorithm: "sha256",
@@ -194,10 +179,7 @@ describe("strategy#logout", function () {
       }
     }
 
-    var strategy = new MultiSamlStrategy(
-      { getSamlOptions: getSamlOptions },
-      verify
-    );
+    var strategy = new MultiSamlStrategy({ getSamlOptions: getSamlOptions }, verify);
     strategy.logout();
   });
 });
@@ -214,8 +196,7 @@ describe("strategy#generateServiceProviderMetadata", function () {
   });
 
   it("calls super with request and generateServiceProviderMetadata options", function (done) {
-    var superGenerateServiceProviderMetadata = this
-      .superGenerateServiceProviderMetadata;
+    var superGenerateServiceProviderMetadata = this.superGenerateServiceProviderMetadata;
     function getSamlOptions(req, fn) {
       try {
         fn();
@@ -228,16 +209,8 @@ describe("strategy#generateServiceProviderMetadata", function () {
       }
     }
 
-    var strategy = new MultiSamlStrategy(
-      { getSamlOptions: getSamlOptions },
-      verify
-    );
-    strategy.generateServiceProviderMetadata(
-      "foo",
-      "bar",
-      "baz",
-      function () {}
-    );
+    var strategy = new MultiSamlStrategy({ getSamlOptions: getSamlOptions }, verify);
+    strategy.generateServiceProviderMetadata("foo", "bar", "baz", function () {});
   });
 
   it("passes options on to saml strategy", function (done) {
@@ -257,12 +230,7 @@ describe("strategy#generateServiceProviderMetadata", function () {
     };
 
     var strategy = new MultiSamlStrategy(passportOptions, verify);
-    strategy.generateServiceProviderMetadata(
-      "foo",
-      "bar",
-      "baz",
-      function () {}
-    );
+    strategy.generateServiceProviderMetadata("foo", "bar", "baz", function () {});
   });
 
   it("should pass error to callback function", function (done) {
@@ -273,19 +241,14 @@ describe("strategy#generateServiceProviderMetadata", function () {
     };
 
     var strategy = new MultiSamlStrategy(passportOptions, verify);
-    strategy.generateServiceProviderMetadata(
-      "foo",
-      "bar",
-      "baz",
-      function (error, result) {
-        try {
-          should(error).equal("My error");
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+    strategy.generateServiceProviderMetadata("foo", "bar", "baz", function (error, result) {
+      try {
+        should(error).equal("My error");
+        done();
+      } catch (err2) {
+        done(err2);
       }
-    );
+    });
   });
 
   it("should pass result to callback function", function (done) {
@@ -296,18 +259,13 @@ describe("strategy#generateServiceProviderMetadata", function () {
     };
 
     var strategy = new MultiSamlStrategy(passportOptions, verify);
-    strategy.generateServiceProviderMetadata(
-      "foo",
-      "bar",
-      "baz",
-      function (error, result) {
-        try {
-          should(result).equal("My Metadata Result");
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+    strategy.generateServiceProviderMetadata("foo", "bar", "baz", function (error, result) {
+      try {
+        should(result).equal("My Metadata Result");
+        done();
+      } catch (err2) {
+        done(err2);
       }
-    );
+    });
   });
 });

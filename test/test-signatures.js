@@ -8,10 +8,7 @@ describe("Signatures", function () {
   const INVALID_ROOT_SIGNATURE = "Invalid signature on documentElement",
     INVALID_SIGNATURE = "Invalid signature",
     createBody = (pathToXml) => ({
-      SAMLResponse: fs.readFileSync(
-        __dirname + "/static/signatures" + pathToXml,
-        "base64"
-      ),
+      SAMLResponse: fs.readFileSync(__dirname + "/static/signatures" + pathToXml, "base64"),
     }),
     tryCatchTest = (done, func) => (...args) => {
       try {
@@ -20,11 +17,7 @@ describe("Signatures", function () {
         done(ex);
       }
     },
-    testOneResponseBody = (
-      samlResponseBody,
-      shouldErrorWith,
-      amountOfSignatureChecks = 1
-    ) => {
+    testOneResponseBody = (samlResponseBody, shouldErrorWith, amountOfSignatureChecks = 1) => {
       return (done) => {
         //== Instantiate new instance before every test
         const samlObj = new SAML({ cert });
@@ -55,27 +48,15 @@ describe("Signatures", function () {
     //== VALID
     it(
       "R1A - both signed => valid",
-      testOneResponse(
-        "/valid/response.root-signed.assertion-signed.xml",
-        false,
-        1
-      )
+      testOneResponse("/valid/response.root-signed.assertion-signed.xml", false, 1)
     );
     it(
       "R1A - root signed => valid",
-      testOneResponse(
-        "/valid/response.root-signed.assertion-unsigned.xml",
-        false,
-        1
-      )
+      testOneResponse("/valid/response.root-signed.assertion-unsigned.xml", false, 1)
     );
     it(
       "R1A - asrt signed => valid",
-      testOneResponse(
-        "/valid/response.root-unsigned.assertion-signed.xml",
-        false,
-        2
-      )
+      testOneResponse("/valid/response.root-unsigned.assertion-signed.xml", false, 2)
     );
 
     //== INVALID
@@ -89,27 +70,15 @@ describe("Signatures", function () {
     );
     it(
       "R1A - both signed => error",
-      testOneResponse(
-        "/invalid/response.root-signed.assertion-signed.xml",
-        INVALID_SIGNATURE,
-        2
-      )
+      testOneResponse("/invalid/response.root-signed.assertion-signed.xml", INVALID_SIGNATURE, 2)
     );
     it(
       "R1A - root signed => error",
-      testOneResponse(
-        "/invalid/response.root-signed.assertion-unsigned.xml",
-        INVALID_SIGNATURE,
-        2
-      )
+      testOneResponse("/invalid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2)
     );
     it(
       "R1A - asrt signed => error",
-      testOneResponse(
-        "/invalid/response.root-unsigned.assertion-signed.xml",
-        INVALID_SIGNATURE,
-        2
-      )
+      testOneResponse("/invalid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 2)
     );
   });
 
@@ -117,27 +86,15 @@ describe("Signatures", function () {
     //== VALID
     it(
       "R1A1Ad - signed root+asrt+advi => valid",
-      testOneResponse(
-        "/valid/response.root-signed.assertion-signed.1advice-signed.xml",
-        false,
-        1
-      )
+      testOneResponse("/valid/response.root-signed.assertion-signed.1advice-signed.xml", false, 1)
     );
     it(
       "R1A1Ad - signed root+asrt => valid",
-      testOneResponse(
-        "/valid/response.root-signed.assertion-signed.1advice-unsigned.xml",
-        false,
-        1
-      )
+      testOneResponse("/valid/response.root-signed.assertion-signed.1advice-unsigned.xml", false, 1)
     );
     it(
       "R1A1Ad - signed asrt+advi => valid",
-      testOneResponse(
-        "/valid/response.root-unsigned.assertion-signed.1advice-signed.xml",
-        false,
-        2
-      )
+      testOneResponse("/valid/response.root-unsigned.assertion-signed.1advice-signed.xml", false, 2)
     );
     it(
       "R1A1Ad - signed root => valid",
@@ -211,19 +168,11 @@ describe("Signatures", function () {
     //== VALID
     it(
       "R1A2Ad - signed root+asrt+advi => error",
-      testOneResponse(
-        "/valid/response.root-signed.assertion-signed.2advice-signed.xml",
-        false,
-        1
-      )
+      testOneResponse("/valid/response.root-signed.assertion-signed.2advice-signed.xml", false, 1)
     );
     it(
       "R1A2Ad - signed root+asrt => error",
-      testOneResponse(
-        "/valid/response.root-signed.assertion-signed.2advice-unsigned.xml",
-        false,
-        1
-      )
+      testOneResponse("/valid/response.root-signed.assertion-signed.2advice-unsigned.xml", false, 1)
     );
     it(
       "R1A2Ad - signed root => error",
@@ -272,13 +221,10 @@ describe("Signatures", function () {
   describe("Signature on saml:Response with non-LF line endings", () => {
     const samlResponseXml = fs
       .readFileSync(
-        __dirname +
-          "/static/signatures/valid/response.root-signed.assertion-signed.xml"
+        __dirname + "/static/signatures/valid/response.root-signed.assertion-signed.xml"
       )
       .toString();
-    const makeBody = (str) => ({
-      SAMLResponse: Buffer.from(str).toString("base64"),
-    });
+    const makeBody = (str) => ({ SAMLResponse: Buffer.from(str).toString("base64") });
 
     it("CRLF line endings", (done) => {
       const body = makeBody(samlResponseXml.replace(/\n/g, "\r\n"));

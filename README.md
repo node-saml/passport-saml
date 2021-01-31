@@ -294,10 +294,7 @@ If you have a certificate in the binary DER encoding, you can convert it to the 
 If the Identity Provider has multiple signing certificates that are valid (such as during the rolling from an old key to a new key and responses signed with either key are valid) then the `cert` configuration key can be an array:
 
 ```javascript
-cert: [
-  "MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==",
-  "MIIEOTCCAyGgAwIBAgIJAKZgJdKdCdL6M ... g=",
-];
+cert: ["MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==", "MIIEOTCCAyGgAwIBAgIJAKZgJdKdCdL6M ... g="];
 ```
 
 The `cert` configuration key can also be a function that receives a callback as argument calls back a possible error and a certificate or array of certificates. This allows the Identity Provider to be polled for valid certificates and the new certificate can be used if it is changed:

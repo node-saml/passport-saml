@@ -76,13 +76,7 @@ export interface SamlScopingConfig {
   requesterId?: string[];
 }
 
-export type XMLValue =
-  | string
-  | number
-  | boolean
-  | null
-  | XMLObject
-  | XMLValue[];
+export type XMLValue = string | number | boolean | null | XMLObject | XMLValue[];
 
 export type XMLObject = {
   [key: string]: XMLValue;
@@ -165,10 +159,7 @@ export type VerifyWithoutRequest = (
   done: VerifiedCallback
 ) => void;
 
-export type SamlOptionsCallback = (
-  err: Error | null,
-  samlOptions?: SamlConfig
-) => void;
+export type SamlOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
 
 export interface MultiSamlConfig extends SamlConfig {
   getSamlOptions(req: express.Request, callback: SamlOptionsCallback): void;

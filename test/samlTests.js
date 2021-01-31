@@ -80,9 +80,7 @@ describe("SAML.js", function () {
             Object.keys(url.parse(target, true).query).should.have.length(3);
             url.parse(target, true).query["key"].should.equal("value");
             url.parse(target, true).query["SAMLRequest"].should.not.be.empty();
-            url
-              .parse(target, true)
-              .query["additionalKey"].should.equal("additionalValue");
+            url.parse(target, true).query["additionalKey"].should.equal("additionalValue");
             done();
           } catch (err2) {
             done(err2);
@@ -149,9 +147,7 @@ describe("SAML.js", function () {
             Object.keys(url.parse(target, true).query).should.have.length(3);
             url.parse(target, true).query["key"].should.equal("value");
             url.parse(target, true).query["SAMLRequest"].should.not.be.empty();
-            url
-              .parse(target, true)
-              .query["additionalKey"].should.equal("additionalValue");
+            url.parse(target, true).query["additionalKey"].should.equal("additionalValue");
             done();
           } catch (err2) {
             done(err2);
@@ -218,9 +214,7 @@ describe("SAML.js", function () {
             Object.keys(url.parse(target, true).query).should.have.length(3);
             url.parse(target, true).query["key"].should.equal("value");
             url.parse(target, true).query["SAMLResponse"].should.not.be.empty();
-            url
-              .parse(target, true)
-              .query["additionalKey"].should.equal("additionalValue");
+            url.parse(target, true).query["additionalKey"].should.equal("additionalValue");
             done();
           } catch (err2) {
             done(err2);
@@ -241,10 +235,9 @@ describe("SAML.js", function () {
     });
 
     describe("keyToPEM", function () {
-      var [regular, singleline] = [
-        "acme_tools_com.key",
-        "singleline_acme_tools_com.key",
-      ].map(keyFromFile);
+      var [regular, singleline] = ["acme_tools_com.key", "singleline_acme_tools_com.key"].map(
+        keyFromFile
+      );
 
       it("formats singleline keys properly", function () {
         var result = saml.keyToPEM(singleline);
@@ -256,16 +249,14 @@ describe("SAML.js", function () {
         result.should.equal(regular);
       });
 
-      it("does nothing to falsy", function (done) {
+      it("does nothing to falsy", function () {
         var result = saml.keyToPEM(null);
         should.equal(result, null);
-        done();
       });
 
-      it("does nothing to non strings", function (done) {
+      it("does nothing to non strings", function () {
         var result = saml.keyToPEM(1);
         should.equal(result, 1);
-        done();
       });
     });
   });

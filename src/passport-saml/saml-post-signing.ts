@@ -11,11 +11,7 @@ const defaultTransforms = [
   "http://www.w3.org/2001/10/xml-exc-c14n#",
 ];
 
-export function signSamlPost(
-  samlMessage: string,
-  xpath: string,
-  options: SAMLOptions
-) {
+export function signSamlPost(samlMessage: string, xpath: string, options: SAMLOptions) {
   if (!samlMessage) throw new Error("samlMessage is required");
   if (!xpath) throw new Error("xpath is required");
   if (!options) {
@@ -23,9 +19,7 @@ export function signSamlPost(
   }
 
   if (options.privateCert) {
-    console.warn(
-      "options.privateCert has been deprecated; use options.privateKey instead."
-    );
+    console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
 
     if (!options.privateKey) {
       options.privateKey = options.privateCert;
@@ -37,15 +31,9 @@ export function signSamlPost(
   const transforms = options.xmlSignatureTransforms || defaultTransforms;
   const sig = new SignedXml();
   if (options.signatureAlgorithm) {
-    sig.signatureAlgorithm = algorithms.getSigningAlgorithm(
-      options.signatureAlgorithm
-    );
+    sig.signatureAlgorithm = algorithms.getSigningAlgorithm(options.signatureAlgorithm);
   }
-  sig.addReference(
-    xpath,
-    transforms,
-    algorithms.getDigestAlgorithm(options.digestAlgorithm)
-  );
+  sig.addReference(xpath, transforms, algorithms.getDigestAlgorithm(options.digestAlgorithm));
   sig.signingKey = options.privateKey;
   sig.computeSignature(samlMessage, {
     location: { reference: xpath + issuerXPath, action: "after" },
@@ -53,9 +41,6 @@ export function signSamlPost(
   return sig.getSignedXml();
 }
 
-export function signAuthnRequestPost(
-  authnRequest: string,
-  options: SAMLOptions
-) {
+export function signAuthnRequestPost(authnRequest: string, options: SAMLOptions) {
   return signSamlPost(authnRequest, authnRequestXPath, options);
 }

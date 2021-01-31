@@ -46,8 +46,7 @@ export class CacheProvider {
       keys.forEach((key) => {
         if (
           nowMs >=
-          new Date(this.cacheKeys[key].createdAt).getTime() +
-            this.options.keyExpirationPeriodMs
+          new Date(this.cacheKeys[key].createdAt).getTime() + this.options.keyExpirationPeriodMs
         ) {
           this.remove(key, () => undefined);
         }
@@ -57,8 +56,7 @@ export class CacheProvider {
     // we only want this to run if the process is still open; it shouldn't hold the process open (issue #68)
     //   (unref only introduced in node 0.9, so check whether we have it)
     // Skip this in 0.10.34 due to https://github.com/joyent/node/issues/8900
-    if (expirationTimer.unref && process.version !== "v0.10.34")
-      expirationTimer.unref();
+    if (expirationTimer.unref && process.version !== "v0.10.34") expirationTimer.unref();
   }
 
   /**
@@ -67,11 +65,7 @@ export class CacheProvider {
    * @param id
    * @param value
    */
-  save(
-    key: string,
-    value: string,
-    callback: (error: null, value: CacheItem | null) => void
-  ) {
+  save(key: string, value: string, callback: (error: null, value: CacheItem | null) => void) {
     if (!this.cacheKeys[key]) {
       this.cacheKeys[key] = {
         createdAt: new Date().getTime(),
@@ -89,10 +83,7 @@ export class CacheProvider {
    * @param id
    * @returns {boolean}
    */
-  get(
-    key: string,
-    callback: (key: string | null, value: string | null) => void
-  ) {
+  get(key: string, callback: (key: string | null, value: string | null) => void) {
     if (this.cacheKeys[key]) {
       callback(null, this.cacheKeys[key].value);
     } else {
@@ -104,10 +95,7 @@ export class CacheProvider {
    * Removes an item from the cache if it exists
    * @param key
    */
-  remove(
-    key: string,
-    callback: (err: Error | null, key: string | null) => void
-  ) {
+  remove(key: string, callback: (err: Error | null, key: string | null) => void) {
     if (this.cacheKeys[key]) {
       delete this.cacheKeys[key];
       callback(null, key);

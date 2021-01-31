@@ -59,8 +59,7 @@ passport.use(
     },
     function (profile, done) {
       return done(null, {
-        upn:
-          profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"],
+        upn: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"],
         // e.g. if you added a Group claim
         group: profile["http://schemas.xmlsoap.org/claims/Group"],
       });

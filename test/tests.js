@@ -51,9 +51,7 @@ describe("passport-saml /", function () {
             "https://frontapp.oktapreview.com/app/frontdev584714_front_1/exk7xdi6axPfombzx0h7/sso/saml",
           cert:
             "MIIDoDCCAoigAwIBAgIGAVaZ04POMA0GCSqGSIb3DQEBBQUAMIGQMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxETAPBgNVBAMMCGZyb250YXBwMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE2MDgxNzE4NDUzMVoXDTI2MDgxNzE4NDYzMVowgZAxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjERMA8GA1UEAwwIZnJvbnRhcHAxHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvplQONVwknRy1iBnaoZtsOz28A7XW2tRpFW+0La7RJexbziIwEy1bPZENhfwjPZA1oHHZqi5l315BxXKWJqmmNmbDCFDo+/FYFCoHXliiLm9vqDbR1br6ByqeY0GfxyTPKHZxb2FSes30TffDknpMQd/8kA9YWaW5xDlu2ivWJI+sfcOJOMd6t+gcfXj58a5fP8Mwm6Y220KeZSvrVpEV2KDp9hln7fhhoxHZ7K/BYbidqdwLzeUQXpb6LIrxtKdug2FofS+ONs6yLIQRmrbCB7SVX1QA8JInMn+fzrGtZmFiHR0aFbyhiO78v/ufDa6S+XpYyp2b6D4SnzeggnobAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAJ2wcFVffFHSd9pj6RgoNHXZBsWp0HUZrNekiSbgomr4tSDefWtKb04nFIlRytfVs/k74wmbNiRCE8nDVBrBDFA/+Tv/3PowZXHjXKBofUuScTP4/Tw1N/ywf7V+XY5kV3VmLBL6ax+ULJauR/YGIIMsIc/rS2D04aAcScU9pqVh2ML7nTH7gFqYrxypavmVk6K94vLjs0ggF2TGp7tXCRjeOlPPJS+MOJHJhTBWYFWvBLclU3zcri3ws7GqJMpeiHa7rMoHV0onxWsZTZW57ybaIWKLt1goAooC7hq0rx7oNlOvrys5lllhBySYYC3ycqca/D0+GxXLcEr9QwP7TVw=",
-          decryptionPvk: fs.readFileSync(
-            __dirname + "/static/testshib encryption pvk.pem"
-          ),
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
         },
         expectedStatusCode: 200,
         expectedNameIDStartsWith: "xavier",
@@ -81,8 +79,7 @@ describe("passport-saml /", function () {
             "PHNhbWxwOlJlc3BvbnNlIHhtbG5zOnNhbWw9InVybjpvYXNpczpuYW1lczp0\r\nYzpTQU1MOjIuMDphc3NlcnRpb24iIHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6\r\nbmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIElEPSJSNjg5YjA3MzNiY2Nj\r\nYTIyYTEzN2UzNjU0ODMwMzEyMzMyOTQwYjFiZSIgVmVyc2lvbj0iMi4wIiBJ\r\nc3N1ZUluc3RhbnQ9IjIwMTQtMDUtMjhUMDA6MTY6MDhaIiBEZXN0aW5hdGlv\r\nbj0ie3JlY2lwaWVudH0iIEluUmVzcG9uc2VUbz0iX2E2ZmM0NmJlODRlMWUz\r\nY2YzYzUwIj48c2FtbDpJc3N1ZXI+aHR0cHM6Ly9hcHAub25lbG9naW4uY29t\r\nL3NhbWwvbWV0YWRhdGEvMzcxNzU1PC9zYW1sOklzc3Vlcj48c2FtbHA6U3Rh\r\ndHVzPjxzYW1scDpTdGF0dXNDb2RlIFZhbHVlPSJ1cm46b2FzaXM6bmFtZXM6\r\ndGM6U0FNTDoyLjA6c3RhdHVzOlN1Y2Nlc3MiLz48L3NhbWxwOlN0YXR1cz48\r\nc2FtbDpBc3NlcnRpb24geG1sbnM6eHM9Imh0dHA6Ly93d3cudzMub3JnLzIw\r\nMDEvWE1MU2NoZW1hIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIw\r\nMDEvWE1MU2NoZW1hLWluc3RhbmNlIiBWZXJzaW9uPSIyLjAiIElEPSJwZngz\r\nYjYzYzdiZS1mZTg2LTYyZmQtOGNiNS0xNmFiNjI3M2VmYWEiIElzc3VlSW5z\r\ndGFudD0iMjAxNC0wNS0yOFQwMDoxNjowOFoiPjxzYW1sOklzc3Vlcj5odHRw\r\nczovL2FwcC5vbmVsb2dpbi5jb20vc2FtbC9tZXRhZGF0YS8zNzE3NTU8L3Nh\r\nbWw6SXNzdWVyPjxkczpTaWduYXR1cmUgeG1sbnM6ZHM9Imh0dHA6Ly93d3cu\r\ndzMub3JnLzIwMDAvMDkveG1sZHNpZyMiPjxkczpTaWduZWRJbmZvPjxkczpD\r\nYW5vbmljYWxpemF0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53\r\nMy5vcmcvMjAwMS8xMC94bWwtZXhjLWMxNG4jIi8+PGRzOlNpZ25hdHVyZU1l\r\ndGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1s\r\nZHNpZyNyc2Etc2hhMSIvPjxkczpSZWZlcmVuY2UgVVJJPSIjcGZ4M2I2M2M3\r\nYmUtZmU4Ni02MmZkLThjYjUtMTZhYjYyNzNlZmFhIj48ZHM6VHJhbnNmb3Jt\r\ncz48ZHM6VHJhbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcv\r\nMjAwMC8wOS94bWxkc2lnI2VudmVsb3BlZC1zaWduYXR1cmUiLz48ZHM6VHJh\r\nbnNmb3JtIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8xMC94\r\nbWwtZXhjLWMxNG4jIi8+PC9kczpUcmFuc2Zvcm1zPjxkczpEaWdlc3RNZXRo\r\nb2QgQWxnb3JpdGhtPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwLzA5L3htbGRz\r\naWcjc2hhMSIvPjxkczpEaWdlc3RWYWx1ZT5EQ25QVFFZQmIxaEtzcGJlNmZn\r\nMVUzcTh4bjQ9PC9kczpEaWdlc3RWYWx1ZT48L2RzOlJlZmVyZW5jZT48L2Rz\r\nOlNpZ25lZEluZm8+PGRzOlNpZ25hdHVyZVZhbHVlPmUwK2FGb21BMCtKQVkw\r\nZjl0S3F6SXVxSVZTU3c3TGlGVXNuZUVES1BCV2RpVHoxc01kZ3IvMnkxZTkr\r\ncmphUzJtUm1DaS92U1FMWTN6VFl6MGhwNm5KTlUxOStUV29YbzlrSFF5V1Q0\r\nS2tlUUw0WHMvZ1ovQW9LQzIwaUhWS3RwUHBzMElRME1sL3FSb291U2l0dDZT\r\nZi9XRHoyTFYvcFdjSDJoeDV0djN4U3czNmhLMk5RYzdxdzdyMW1FWG52Y2pY\r\nUmVZbzhyclZmN1hIR0d4Tm9SSUVJQ1VJaTExMHV2c1dlbVNYZjBaMGR5YjBG\r\nVllPV3VTc1FNRGx6TnBoZUFEQmlmRk80VVRmU0VoRlp2bjhrVkNHWlVJd3Ji\r\nT2haMmQvK1lFdGd5dVRnK3F0c2xnZnk0ZHdkNFR2RWNmdVJ6UVRhemVlZnBy\r\nU0Z5aVFja0FYT2pjdz09PC9kczpTaWduYXR1cmVWYWx1ZT48ZHM6S2V5SW5m\r\nbz48ZHM6WDUwOURhdGE+PGRzOlg1MDlDZXJ0aWZpY2F0ZT5NSUlFRnpDQ0F2\r\nK2dBd0lCQWdJVUZKc1VqUE03QW1Xdk50RXZVTFNIbFRUTWlMUXdEUVlKS29a\r\nSWh2Y05BUUVGQlFBd1dERUxNQWtHQTFVRUJoTUNWVk14RVRBUEJnTlZCQW9N\r\nQ0ZOMVluTndZV05sTVJVd0V3WURWUVFMREF4UGJtVk1iMmRwYmlCSlpGQXhI\r\nekFkQmdOVkJBTU1Gazl1WlV4dloybHVJRUZqWTI5MWJuUWdOREl6TkRrd0ho\r\nY05NVFF3TlRFek1UZ3dOakV5V2hjTk1Ua3dOVEUwTVRnd05qRXlXakJZTVFz\r\nd0NRWURWUVFHRXdKVlV6RVJNQThHQTFVRUNnd0lVM1ZpYzNCaFkyVXhGVEFU\r\nQmdOVkJBc01ERTl1WlV4dloybHVJRWxrVURFZk1CMEdBMVVFQXd3V1QyNWxU\r\nRzluYVc0Z1FXTmpiM1Z1ZENBME1qTTBPVENDQVNJd0RRWUpLb1pJaHZjTkFR\r\nRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFLckF6SmRZOUZ6Rkx0NWJsQXJKZlB6\r\nZ2k4N0VuRkdsVGZjVjVUMVRVRHdMQmxEa1kvMFpHS25NT3BmM0Q3aWUyQzRw\r\nUEZPSW1Pb2djTTVrcERETDdxeFRYWjFld1hWeWpCZE11MjlORzJDNk56V2VR\r\nVFVNVWppMDFFY0hrQzhvK1B0czhBTmlOT1ljanhFZXloRXl6SktnRWl6YmxZ\r\nek1NS3pkck9FVDZRdXFXbzNDODNLKzUrNWRzakRuMW9vS0dSd2ozSHZnc1lj\r\nRnJRbDlOb2pnUUZqb29id3NpRS83QStPSmhMcEJjeS9uU1Znbm9KYU1mck8r\r\nSnNudWtaUHp0Ym50THZPbDU2K1ZyYTBOOG41TkFZaGFTYXlQaXYvYXloalZn\r\namZYZDF0ak1WVE9pRGtuVU93aXpadUoxWTNRSDk0dlV0QmdwMFdCcEJTcy94\r\nTXlUczhDQXdFQUFhT0IyRENCMVRBTUJnTlZIUk1CQWY4RUFqQUFNQjBHQTFV\r\nZERnUVdCQlJRTzRXcE01Zld3eGliNDlXVHVKa2ZZRGJ4T0RDQmxRWURWUjBq\r\nQklHTk1JR0tnQlJRTzRXcE01Zld3eGliNDlXVHVKa2ZZRGJ4T0tGY3BGb3dX\r\nREVMTUFrR0ExVUVCaE1DVlZNeEVUQVBCZ05WQkFvTUNGTjFZbk53WVdObE1S\r\nVXdFd1lEVlFRTERBeFBibVZNYjJkcGJpQkpaRkF4SHpBZEJnTlZCQU1NRms5\r\ndVpVeHZaMmx1SUVGalkyOTFiblFnTkRJek5EbUNGQlNiRkl6ek93SmxyemJS\r\nTDFDMGg1VTB6SWkwTUE0R0ExVWREd0VCL3dRRUF3SUhnREFOQmdrcWhraUc5\r\ndzBCQVFVRkFBT0NBUUVBQ2REQUFvYVpGQ0VZNXBtZndiS3VLclh0TzVpRThs\r\nV3RpQ1BqQ1pFVXVUNmJYUk5jcXJkbnVWL0VBZlg5V1FvWGphbFBpMGVNNzh6\r\nS21idlJHU1RVSHdXdzQ5UkhqRmZlSlVLdkhOZU5uRmdUWERqRVBOaE12aDY5\r\na0htNDUzbEZSbUIra2s2eWp0WFJaYVFFd1M4VXVvMk90K2tyZ05ibDZvVEJa\r\nSjBBSEgxTXRaRUNEbG9tczFLbTd6c0s4d0FpNWk4VFZJS2tWcjViMlZsaHJM\r\nZ0ZNdnpaNVZpQXhJTUdCNnc0N3lZNFFHUUIvNVE4eWE5aEJzOXZrbit3dWJB\r\nK3lyNGoxNEpYWjdibFZLRFNUWXZhNjVFYStQcUh5cnArV25tbmJ3Mk9iUzdp\r\nV2V4aVR5MWpEM0cwUjJhdkRCRmpNOEZqNURiZnVmc0UxYjBVMTBSVHRnPT08\r\nL2RzOlg1MDlDZXJ0aWZpY2F0ZT48L2RzOlg1MDlEYXRhPjwvZHM6S2V5SW5m\r\nbz48L2RzOlNpZ25hdHVyZT48c2FtbDpTdWJqZWN0PjxzYW1sOk5hbWVJRCBG\r\nb3JtYXQ9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpuYW1laWQtZm9y\r\nbWF0OnRyYW5zaWVudCI+cGxvZXJAc3Vic3BhY2Vzdy5jb208L3NhbWw6TmFt\r\nZUlEPjxzYW1sOlN1YmplY3RDb25maXJtYXRpb24gTWV0aG9kPSJ1cm46b2Fz\r\naXM6bmFtZXM6dGM6U0FNTDoyLjA6Y206YmVhcmVyIj48c2FtbDpTdWJqZWN0\r\nQ29uZmlybWF0aW9uRGF0YSBOb3RPbk9yQWZ0ZXI9IjIwMTQtMDUtMjhUMDA6\r\nMTk6MDhaIiBSZWNpcGllbnQ9IntyZWNpcGllbnR9IiBJblJlc3BvbnNlVG89\r\nIl9hNmZjNDZiZTg0ZTFlM2NmM2M1MCIvPjwvc2FtbDpTdWJqZWN0Q29uZmly\r\nbWF0aW9uPjwvc2FtbDpTdWJqZWN0PjxzYW1sOkNvbmRpdGlvbnMgTm90QmVm\r\nb3JlPSIyMDE0LTA1LTI4VDAwOjEzOjA4WiIgTm90T25PckFmdGVyPSIyMDE0\r\nLTA1LTI4VDAwOjE5OjA4WiI+PHNhbWw6QXVkaWVuY2VSZXN0cmljdGlvbj48\r\nc2FtbDpBdWRpZW5jZT57YXVkaWVuY2V9PC9zYW1sOkF1ZGllbmNlPjwvc2Ft\r\nbDpBdWRpZW5jZVJlc3RyaWN0aW9uPjwvc2FtbDpDb25kaXRpb25zPjxzYW1s\r\nOkF1dGhuU3RhdGVtZW50IEF1dGhuSW5zdGFudD0iMjAxNC0wNS0yOFQwMDox\r\nNjowN1oiIFNlc3Npb25Ob3RPbk9yQWZ0ZXI9IjIwMTQtMDUtMjlUMDA6MTY6\r\nMDhaIiBTZXNzaW9uSW5kZXg9Il8zMGE0YWY1MC1jODJiLTAxMzEtZjhiNS03\r\nODJiY2I1NmZjYWEiPjxzYW1sOkF1dGhuQ29udGV4dD48c2FtbDpBdXRobkNv\r\nbnRleHRDbGFzc1JlZj51cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YWM6\r\nY2xhc3NlczpQYXNzd29yZFByb3RlY3RlZFRyYW5zcG9ydDwvc2FtbDpBdXRo\r\nbkNvbnRleHRDbGFzc1JlZj48L3NhbWw6QXV0aG5Db250ZXh0Pjwvc2FtbDpB\r\ndXRoblN0YXRlbWVudD48L3NhbWw6QXNzZXJ0aW9uPjwvc2FtbHA6UmVzcG9u\r\nc2U+Cgo=\r\n",
         },
         config: {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: TEST_CERT,
         },
         expectedStatusCode: 200,
@@ -99,11 +96,8 @@ describe("passport-saml /", function () {
           entryPoint: "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
           cert:
             "MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzEVMBMGA1UECBMMUGVubnN5bHZhbmlhMRMwEQYDVQQHEwpQaXR0c2J1cmdoMREwDwYDVQQKEwhUZXN0U2hpYjEZMBcGA1UEAxMQaWRwLnRlc3RzaGliLm9yZzAeFw0wNjA4MzAyMTEyMjVaFw0xNjA4MjcyMTEyMjVaMGcxCzAJBgNVBAYTAlVTMRUwEwYDVQQIEwxQZW5uc3lsdmFuaWExEzARBgNVBAcTClBpdHRzYnVyZ2gxETAPBgNVBAoTCFRlc3RTaGliMRkwFwYDVQQDExBpZHAudGVzdHNoaWIub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYkCGuTmJp9eAOSGHwRJo1SNatB5ZOKqDM9ysg7CyVTDClcpu93gSP10nH4gkCZOlnESNgttg0r+MqL8tfJC6ybddEFB3YBo8PZajKSe3OQ01Ow3yT4I+Wdg1tsTpSge9gEz7SrC07EkYmHuPtd71CHiUaCWDv+xVfUQX0aTNPFmDixzUjoYzbGDrtAyCqA8f9CN2txIfJnpHE6q6CmKcoLADS4UrNPlhHSzd614kR/JYiks0K4kbRqCQF0Dv0P5Di+rEfefC6glV8ysC8dB5/9nb0yh/ojRuJGmgMWHgWk6h0ihjihqiu4jACovUZ7vVOCgSE5Ipn7OIwqd93zp2wIDAQABo4HEMIHBMB0GA1UdDgQWBBSsBQ869nh83KqZr5jArr4/7b+QazCBkQYDVR0jBIGJMIGGgBSsBQ869nh83KqZr5jArr4/7b+Qa6FrpGkwZzELMAkGA1UEBhMCVVMxFTATBgNVBAgTDFBlbm5zeWx2YW5pYTETMBEGA1UEBxMKUGl0dHNidXJnaDERMA8GA1UEChMIVGVzdFNoaWIxGTAXBgNVBAMTEGlkcC50ZXN0c2hpYi5vcmeCAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAjR29PhrCbk8qLN5MFfSVk98t3CT9jHZoYxd8QMRLI4j7iYQxXiGJTT1FXs1nd4Rha9un+LqTfeMMYqISdDDI6tv8iNpkOAvZZUosVkUo93pv1T0RPz35hcHHYq2yee59HJOco2bFlcsH8JBXRSRrJ3Q7Eut+z9uo80JdGNJ4/SJy5UorZ8KazGj16lfJhOBXldgrhppQBb0Nq6HKHguqmwRfJ+WkxemZXzhediAjGeka8nz8JjwxpUjAiSWYKLtJhGEaTqCYxCCX2Dw+dOTqUzHOZ7WKv4JXPK5G/Uhr8K/qhmFT2nIQi538n6rVYLeWj8Bbnl+ev0peYzxFyF5sQA==",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(
-            __dirname + "/static/testshib encryption pvk.pem"
-          ),
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
         },
         expectedStatusCode: 200,
         mockDate: "2014-06-02T17:48:56.820Z",
@@ -159,9 +153,7 @@ describe("passport-saml /", function () {
               if (response.statusCode == 200) {
                 userSerialized.should.be.true;
                 if (check.expectedNameIDStartsWith)
-                  profile.nameID.should.startWith(
-                    check.expectedNameIDStartsWith
-                  );
+                  profile.nameID.should.startWith(check.expectedNameIDStartsWith);
               }
               done();
             } catch (err2) {
@@ -246,8 +238,7 @@ describe("passport-saml /", function () {
           skipRequestCompression: true,
           entryPoint: "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
           cert: fs.readFileSync(__dirname + "/static/cert.pem", "ascii"),
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
         },
         samlRequest: {
           SAMLRequest: fs.readFileSync(
@@ -297,34 +288,24 @@ describe("passport-saml /", function () {
               Destination: "https://wwwexampleIdp.com/saml",
             },
             "saml:Issuer": [
-              {
-                _: "onelogin_saml",
-                $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-              },
+              { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
             ],
             "samlp:NameIDPolicy": [
               {
                 $: {
                   "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Format:
-                    "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+                  Format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
                   AllowCreate: "true",
                 },
               },
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -345,34 +326,24 @@ describe("passport-saml /", function () {
               Destination: "https://wwwexampleIdp.com/saml",
             },
             "saml:Issuer": [
-              {
-                _: "onelogin_saml",
-                $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-              },
+              { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
             ],
             "samlp:NameIDPolicy": [
               {
                 $: {
                   "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Format:
-                    "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+                  Format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
                   AllowCreate: "true",
                 },
               },
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -417,17 +388,11 @@ describe("passport-saml /", function () {
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -472,17 +437,11 @@ describe("passport-saml /", function () {
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -568,16 +527,11 @@ describe("passport-saml /", function () {
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
                     _: "myAuthnContext",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -622,22 +576,15 @@ describe("passport-saml /", function () {
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
                     _: "myAuthnContext",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                   {
                     _: "myAuthnContext2",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -679,17 +626,11 @@ describe("passport-saml /", function () {
             ],
             "samlp:RequestedAuthnContext": [
               {
-                $: {
-                  "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-                  Comparison: "exact",
-                },
+                $: { "xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol", Comparison: "exact" },
                 "saml:AuthnContextClassRef": [
                   {
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
-                    $: {
-                      "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
-                    },
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
                   },
                 ],
               },
@@ -698,8 +639,7 @@ describe("passport-saml /", function () {
         },
       },
       {
-        name:
-          "Remove NameIDPolicy, AuthnRequest, and AssertionConsumerServiceURL Config",
+        name: "Remove NameIDPolicy, AuthnRequest, and AssertionConsumerServiceURL Config",
         config: {
           identifierFormat: null,
           disableRequestedAuthnContext: true,
@@ -714,10 +654,7 @@ describe("passport-saml /", function () {
               Destination: "https://wwwexampleIdp.com/saml",
             },
             "saml:Issuer": [
-              {
-                _: "onelogin_saml",
-                $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-              },
+              { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
             ],
           },
         },
@@ -781,8 +718,7 @@ describe("passport-saml /", function () {
                     $: {
                       "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
                     },
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
                   },
                 ],
               },
@@ -874,8 +810,7 @@ describe("passport-saml /", function () {
                     $: {
                       "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
                     },
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
                   },
                 ],
               },
@@ -909,8 +844,7 @@ describe("passport-saml /", function () {
         },
       },
       {
-        name:
-          "Config with Scoping config without proxyCount, requesterId, getComplete",
+        name: "Config with Scoping config without proxyCount, requesterId, getComplete",
         config: {
           issuer: "http://exampleSp.com/saml",
           identifierFormat: "alternateIdentifier",
@@ -965,8 +899,7 @@ describe("passport-saml /", function () {
                     $: {
                       "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
                     },
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
                   },
                 ],
               },
@@ -1053,8 +986,7 @@ describe("passport-saml /", function () {
                     $: {
                       "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
                     },
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
                   },
                 ],
               },
@@ -1141,8 +1073,7 @@ describe("passport-saml /", function () {
                     $: {
                       "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion",
                     },
-                    _:
-                      "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+                    _: "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
                   },
                 ],
               },
@@ -1206,10 +1137,7 @@ describe("passport-saml /", function () {
 
         app.get(
           "/login",
-          passport.authenticate("saml", {
-            samlFallback: "login-request",
-            session: false,
-          }),
+          passport.authenticate("saml", { samlFallback: "login-request", session: false }),
           function (req, res) {
             res.status(200).send("200 OK");
           }
@@ -1234,17 +1162,11 @@ describe("passport-saml /", function () {
               var encodedSamlRequest;
               if (check.config.authnRequestBinding === "HTTP-POST") {
                 response.statusCode.should.equal(200);
-                body.should.match(
-                  /<!DOCTYPE html>[^]*<input.*name="SAMLRequest"[^]*<\/html>/
-                );
-                encodedSamlRequest = body.match(
-                  /<input.*name="SAMLRequest" value="([^"]*)"/
-                )[1];
+                body.should.match(/<!DOCTYPE html>[^]*<input.*name="SAMLRequest"[^]*<\/html>/);
+                encodedSamlRequest = body.match(/<input.*name="SAMLRequest" value="([^"]*)"/)[1];
               } else {
                 response.statusCode.should.equal(302);
-                var query = response.headers.location.match(
-                  /^[^\?]*\?(.*)$/
-                )[1];
+                var query = response.headers.location.match(/^[^\?]*\?(.*)$/)[1];
                 encodedSamlRequest = querystring.parse(query).SAMLRequest;
               }
 
@@ -1318,8 +1240,7 @@ describe("passport-saml /", function () {
 
           request(requestOpts, function (err, response, body) {
             try {
-              var encodedSamlResponse = querystring.parse(this.uri.query)
-                .SAMLResponse;
+              var encodedSamlResponse = querystring.parse(this.uri.query).SAMLResponse;
               // An error will exist because the endpoint we're trying to log out of doesn't exist,
               // but we can still test to make sure that everything is behaving as it should.
               // should.not.exist(err);
@@ -1395,10 +1316,7 @@ describe("passport-saml /", function () {
             Destination: "foo",
           },
           "saml:Issuer": [
-            {
-              _: "onelogin_saml",
-              $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-            },
+            { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
           ],
           "saml:NameID": [{ _: "bar", $: { Format: "foo" } }],
         },
@@ -1438,10 +1356,7 @@ describe("passport-saml /", function () {
             Destination: "foo",
           },
           "saml:Issuer": [
-            {
-              _: "onelogin_saml",
-              $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-            },
+            { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
           ],
           "saml:NameID": [
             {
@@ -1495,9 +1410,7 @@ describe("passport-saml /", function () {
           "saml:Issuer": ["onelogin_saml"],
           "samlp:Status": [
             {
-              "samlp:StatusCode": [
-                { $: { Value: "urn:oasis:names:tc:SAML:2.0:status:Success" } },
-              ],
+              "samlp:StatusCode": [{ $: { Value: "urn:oasis:names:tc:SAML:2.0:status:Success" } }],
             },
           ],
         },
@@ -1529,17 +1442,11 @@ describe("passport-saml /", function () {
             Destination: "foo",
           },
           "saml:Issuer": [
-            {
-              _: "onelogin_saml",
-              $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-            },
+            { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
           ],
           "saml:NameID": [{ _: "bar", $: { Format: "foo" } }],
           "saml2p:SessionIndex": [
-            {
-              _: "session-id",
-              $: { "xmlns:saml2p": "urn:oasis:names:tc:SAML:2.0:protocol" },
-            },
+            { _: "session-id", $: { "xmlns:saml2p": "urn:oasis:names:tc:SAML:2.0:protocol" } },
           ],
         },
       };
@@ -1579,17 +1486,11 @@ describe("passport-saml /", function () {
             Destination: "foo",
           },
           "saml:Issuer": [
-            {
-              _: "onelogin_saml",
-              $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" },
-            },
+            { _: "onelogin_saml", $: { "xmlns:saml": "urn:oasis:names:tc:SAML:2.0:assertion" } },
           ],
           "saml:NameID": [{ _: "bar", $: { Format: "foo" } }],
           "saml2p:SessionIndex": [
-            {
-              _: "session-id",
-              $: { "xmlns:saml2p": "urn:oasis:names:tc:SAML:2.0:protocol" },
-            },
+            { _: "session-id", $: { "xmlns:saml2p": "urn:oasis:names:tc:SAML:2.0:protocol" } },
           ],
         },
       };
@@ -1629,19 +1530,13 @@ describe("passport-saml /", function () {
           __dirname + "/static/testshib encryption cert.pem",
           "utf-8"
         );
-        var metadata = samlObj.generateServiceProviderMetadata(
-          decryptionCert,
-          signingCert
-        );
+        var metadata = samlObj.generateServiceProviderMetadata(decryptionCert, signingCert);
         // splits are to get a nice diff if they don't match for some reason
         metadata.split("\n").should.eql(expectedMetadata.split("\n"));
 
         // verify that we are exposed through Strategy as well
         var strategy = new SamlStrategy(samlConfig, function () {});
-        metadata = strategy.generateServiceProviderMetadata(
-          decryptionCert,
-          signingCert
-        );
+        metadata = strategy.generateServiceProviderMetadata(decryptionCert, signingCert);
         metadata.split("\n").should.eql(expectedMetadata.split("\n"));
       }
 
@@ -1649,11 +1544,8 @@ describe("passport-saml /", function () {
         var samlConfig = {
           issuer: "http://example.serviceprovider.com",
           callbackUrl: "http://example.serviceprovider.com/saml/callback",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(
-            __dirname + "/static/testshib encryption pvk.pem"
-          ),
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
         };
         var expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata.xml",
@@ -1667,8 +1559,7 @@ describe("passport-saml /", function () {
         var samlConfig = {
           issuer: "http://example.serviceprovider.com",
           callbackUrl: "http://example.serviceprovider.com/saml/callback",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
         };
         var expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata without key.xml",
@@ -1684,11 +1575,8 @@ describe("passport-saml /", function () {
           protocol: "http://",
           host: "example.serviceprovider.com",
           path: "/saml/callback",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(
-            __dirname + "/static/testshib encryption pvk.pem"
-          ),
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
         };
         var expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata.xml",
@@ -1704,8 +1592,7 @@ describe("passport-saml /", function () {
           protocol: "http://",
           host: "example.serviceprovider.com",
           path: "/saml/callback",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
         };
         var expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata without key.xml",
@@ -1721,22 +1608,15 @@ describe("passport-saml /", function () {
           protocol: "http://",
           host: "example.serviceprovider.com",
           path: "/saml/callback",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(
-            __dirname + "/static/testshib encryption pvk.pem"
-          ),
-          privateCert: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key"
-          ),
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
         };
         var expectedMetadata = fs.readFileSync(
           __dirname + "/static/expectedMetadataWithBothKeys.xml",
           "utf-8"
         );
-        var signingCert = fs
-          .readFileSync(__dirname + "/static/acme_tools_com.cert")
-          .toString();
+        var signingCert = fs.readFileSync(__dirname + "/static/acme_tools_com.cert").toString();
 
         testMetadata(samlConfig, expectedMetadata, signingCert);
       });
@@ -1747,20 +1627,15 @@ describe("passport-saml /", function () {
           protocol: "http://",
           host: "example.serviceprovider.com",
           path: "/saml/callback",
-          identifierFormat:
-            "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(
-            __dirname + "/static/testshib encryption pvk.pem"
-          ),
+          identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
         };
         var expectedMetadata = fs.readFileSync(
           __dirname + "/static/expectedMetadataWithBothKeys.xml",
           "utf-8"
         );
-        var signingCert = fs
-          .readFileSync(__dirname + "/static/acme_tools_com.cert")
-          .toString();
+        var signingCert = fs.readFileSync(__dirname + "/static/acme_tools_com.cert").toString();
 
         testMetadata(samlConfig, expectedMetadata, signingCert);
       });
@@ -1771,9 +1646,7 @@ describe("passport-saml /", function () {
         issuer: "http://example.serviceprovider.com",
         callbackUrl: "http://example.serviceprovider.com/saml/callback",
         identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-        decryptionPvk: fs.readFileSync(
-          __dirname + "/static/testshib encryption pvk.pem"
-        ),
+        decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
         logoutCallbackUrl: "http://example.serviceprovider.com/logout",
       };
 
@@ -1790,19 +1663,13 @@ describe("passport-saml /", function () {
     it("#certToPEM should generate valid certificate", function (done) {
       var samlConfig = {
         entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
-        cert:
-          "-----BEGIN CERTIFICATE-----" +
-          TEST_CERT +
-          "-----END CERTIFICATE-----",
+        cert: "-----BEGIN CERTIFICATE-----" + TEST_CERT + "-----END CERTIFICATE-----",
         acceptedClockSkewMs: -1,
       };
       var samlObj = new SAML(samlConfig);
       var certificate = samlObj.certToPEM(samlConfig.cert);
 
-      if (
-        certificate.match(/BEGIN/g).length == 1 &&
-        certificate.match(/END/g).length == 1
-      ) {
+      if (certificate.match(/BEGIN/g).length == 1 && certificate.match(/END/g).length == 1) {
         done();
       } else {
         done("Certificate should have only 1 BEGIN and 1 END block");
@@ -1812,20 +1679,15 @@ describe("passport-saml /", function () {
     describe("validatePostResponse checks /", function () {
       it("response with junk content should explain the XML or base64 is not valid", function (done) {
         var samlObj = new SAML({ cert: TEST_CERT });
-        samlObj.validatePostResponse(
-          { SAMLResponse: "BOOM" },
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match(
-                /SAMLResponse is not valid base64-encoded XML/
-              );
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse({ SAMLResponse: "BOOM" }, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match(/SAMLResponse is not valid base64-encoded XML/);
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("response with error status message should generate appropriate error", function (done) {
         var xml =
@@ -1833,25 +1695,19 @@ describe("passport-saml /", function () {
         var base64xml = Buffer.from(xml).toString("base64");
         var container = { SAMLResponse: base64xml };
         var samlObj = new SAML({
-          cert:
-            "-----BEGIN CERTIFICATE-----" +
-            TEST_CERT +
-            "-----END CERTIFICATE-----",
+          cert: "-----BEGIN CERTIFICATE-----" + TEST_CERT + "-----END CERTIFICATE-----",
         });
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match(/Responder/);
-              err.message.should.match(/Required NameID format not supported/);
-              should.exist(err.statusXml);
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match(/Responder/);
+            err.message.should.match(/Required NameID format not supported/);
+            should.exist(err.statusXml);
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("response with error status code should generate appropriate error", function (done) {
@@ -1860,31 +1716,24 @@ describe("passport-saml /", function () {
         var base64xml = Buffer.from(xml).toString("base64");
         var container = { SAMLResponse: base64xml };
         var samlObj = new SAML({});
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match(/Responder/);
-              err.message.should.match(/InvalidNameIDPolicy/);
-              should.exist(err.statusXml);
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match(/Responder/);
+            err.message.should.match(/InvalidNameIDPolicy/);
+            should.exist(err.statusXml);
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("accept response with an attributeStatement element without attributeValue", function (done) {
-        var fakeClock = sinon.useFakeTimers(
-          Date.parse("2015-08-31T08:55:00+00:00")
-        );
+        var fakeClock = sinon.useFakeTimers(Date.parse("2015-08-31T08:55:00+00:00"));
         var container = {
           SAMLResponse: fs
-            .readFileSync(
-              __dirname + "/static/response-with-uncomplete-attribute.xml"
-            )
+            .readFileSync(__dirname + "/static/response-with-uncomplete-attribute.xml")
             .toString("base64"),
         };
         var samlObj = new SAML();
@@ -1894,9 +1743,7 @@ describe("passport-saml /", function () {
             should.not.exist(err);
             profile.issuer.should.eql("https://evil-corp.com");
             profile.nameID.should.eql("vincent.vega@evil-corp.com");
-            should(profile)
-              .have.property("evil-corp.egroupid")
-              .eql("vincent.vega@evil-corp.com");
+            should(profile).have.property("evil-corp.egroupid").eql("vincent.vega@evil-corp.com");
             // attributes without attributeValue child should be ignored
             should(profile).not.have.property("evilcorp.roles");
 
@@ -1920,43 +1767,32 @@ describe("passport-saml /", function () {
         var base64xml = Buffer.from(xml).toString("base64");
         var container = { SAMLResponse: base64xml };
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: TEST_CERT,
           validateInResponseTo: true,
         };
         var samlObj = new SAML(samlConfig);
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(
-          requestId,
-          new Date().toISOString(),
-          function () {}
-        );
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("Invalid signature");
+          } catch (err2) {
+            done(err2);
+          }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
             try {
               should.exist(err);
-              err.message.should.match("Invalid signature");
+              err.message.should.match("InResponseTo is not valid");
+              done();
             } catch (err2) {
               done(err2);
             }
-            samlObj.validatePostResponse(
-              container,
-              function (err, profile, logout) {
-                try {
-                  should.exist(err);
-                  err.message.should.match("InResponseTo is not valid");
-                  done();
-                } catch (err2) {
-                  done(err2);
-                }
-              }
-            );
-          }
-        );
+          });
+        });
       });
 
       describe("validatePostResponse xml signature checks /", function () {
@@ -1969,8 +1805,7 @@ describe("passport-saml /", function () {
         });
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: TEST_CERT,
         };
         it("valid onelogin xml document should validate", function (done) {
@@ -1983,18 +1818,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(samlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.not.exist(err);
-                profile.nameID.should.startWith("ploer");
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.not.exist(err);
+              profile.nameID.should.startWith("ploer");
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("onelogin xml document with altered assertion should fail", function (done) {
@@ -2007,18 +1839,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(samlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.exist(err);
-                err.message.should.match(/Invalid signature/);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.exist(err);
+              err.message.should.match(/Invalid signature/);
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("onelogin xml document with duplicate altered assertion should fail", function (done) {
@@ -2034,18 +1863,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(samlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.exist(err);
-                err.message.should.match(/Invalid signature/);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.exist(err);
+              err.message.should.match(/Invalid signature/);
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("onelogin xml document with extra unsigned & altered assertion should fail", function (done) {
@@ -2059,18 +1885,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(samlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.exist(err);
-                err.message.should.match(/Invalid signature/);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.exist(err);
+              err.message.should.match(/Invalid signature/);
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("onelogin xml document with extra nexted assertion should fail", function (done) {
@@ -2087,18 +1910,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(samlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.exist(err);
-                err.message.should.match(/Invalid signature/);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.exist(err);
+              err.message.should.match(/Invalid signature/);
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("multiple certs should validate with one of the certs", function (done) {
@@ -2115,18 +1935,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(multiCertSamlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.not.exist(err);
-                profile.nameID.should.startWith("ploer");
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.not.exist(err);
+              profile.nameID.should.startWith("ploer");
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("cert as a function should validate with the returned cert", function (done) {
@@ -2145,18 +1962,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(functionCertSamlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.not.exist(err);
-                profile.nameID.should.startWith("ploer");
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.not.exist(err);
+              profile.nameID.should.startWith("ploer");
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("cert as a function should validate with one of the returned certs", function (done) {
@@ -2175,18 +1989,15 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(functionMultiCertSamlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                should.not.exist(err);
-                profile.nameID.should.startWith("ploer");
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              should.not.exist(err);
+              profile.nameID.should.startWith("ploer");
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("cert as a function should return an error if the cert function returns an error", function (done) {
@@ -2206,17 +2017,14 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML(functionErrorCertSamlConfig);
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              try {
-                err.should.eql(errorToReturn);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            try {
+              err.should.eql(errorToReturn);
+              done();
+            } catch (err2) {
+              done(err2);
             }
-          );
+          });
         });
 
         it("XML AttributeValue should return object", function (done) {
@@ -2247,19 +2055,16 @@ describe("passport-saml /", function () {
           var base64xml = Buffer.from(xml).toString("base64");
           var container = { SAMLResponse: base64xml };
           var samlObj = new SAML();
-          samlObj.validatePostResponse(
-            container,
-            function (err, profile, logout) {
-              should.not.exist(err);
-              const eptid = profile["urn:oid:1.3.6.1.4.1.5923.1.1.1.10"];
-              const nameid = eptid["NameID"][0];
-              nameid._.should.eql(nameid_opaque_string);
-              nameid.$.NameQualifier.should.equal(nameQualifier);
-              nameid.$.SPNameQualifier.should.equal(spNameQualifier);
-              nameid.$.Format.should.equal(format);
-              done();
-            }
-          );
+          samlObj.validatePostResponse(container, function (err, profile, logout) {
+            should.not.exist(err);
+            const eptid = profile["urn:oid:1.3.6.1.4.1.5923.1.1.1.10"];
+            const nameid = eptid["NameID"][0];
+            nameid._.should.eql(nameid_opaque_string);
+            nameid.$.NameQualifier.should.equal(nameQualifier);
+            nameid.$.SPNameQualifier.should.equal(spNameQualifier);
+            nameid.$.Format.should.equal(format);
+            done();
+          });
         });
       });
 
@@ -2280,14 +2085,11 @@ describe("passport-saml /", function () {
         var base64xml = Buffer.from(xml).toString("base64");
         var container = { SAMLResponse: base64xml };
         var samlObj = new SAML();
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            should.not.exist(err);
-            should(profile["attributeName"]).be.undefined();
-            done();
-          }
-        );
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          should.not.exist(err);
+          should(profile["attributeName"]).be.undefined();
+          done();
+        });
       });
     });
 
@@ -2305,10 +2107,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateCert: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key",
-            "utf-8"
-          ),
+          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
@@ -2323,18 +2122,12 @@ describe("passport-saml /", function () {
         };
         samlObj.getAuthorizeUrl({}, {}, function (err, url) {
           try {
-            var qry = require("querystring").parse(
-              require("url").parse(url).query
-            );
-            qry.SigAlg.should.match(
-              "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-            );
+            var qry = require("querystring").parse(require("url").parse(url).query);
+            qry.SigAlg.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
             qry.Signature.should.match(
               "hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA=="
             );
-            qry.customQueryStringParam.should.match(
-              "CustomQueryStringParamValue"
-            );
+            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2346,10 +2139,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key",
-            "utf-8"
-          ),
+          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
@@ -2364,18 +2154,12 @@ describe("passport-saml /", function () {
         };
         samlObj.getAuthorizeUrl({}, {}, function (err, url) {
           try {
-            var qry = require("querystring").parse(
-              require("url").parse(url).query
-            );
-            qry.SigAlg.should.match(
-              "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-            );
+            var qry = require("querystring").parse(require("url").parse(url).query);
+            qry.SigAlg.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
             qry.Signature.should.match(
               "hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA=="
             );
-            qry.customQueryStringParam.should.match(
-              "CustomQueryStringParamValue"
-            );
+            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2387,10 +2171,7 @@ describe("passport-saml /", function () {
           entryPoint: "",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateCert: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key",
-            "utf-8"
-          ),
+          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           signatureAlgorithm: "sha256",
@@ -2408,9 +2189,7 @@ describe("passport-saml /", function () {
         samlObj.requestToUrl(request, null, "authorize", {}, function (err) {
           try {
             should.exist(err);
-            err.message.should.eql(
-              '"entryPoint" config parameter is required for signed messages'
-            );
+            err.message.should.eql('"entryPoint" config parameter is required for signed messages');
             done();
           } catch (err2) {
             done(err2);
@@ -2422,10 +2201,7 @@ describe("passport-saml /", function () {
           entryPoint: "",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key",
-            "utf-8"
-          ),
+          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           signatureAlgorithm: "sha256",
@@ -2443,9 +2219,7 @@ describe("passport-saml /", function () {
         samlObj.requestToUrl(request, null, "authorize", {}, function (err) {
           try {
             should.exist(err);
-            err.message.should.eql(
-              '"entryPoint" config parameter is required for signed messages'
-            );
+            err.message.should.eql('"entryPoint" config parameter is required for signed messages');
             done();
           } catch (err2) {
             done(err2);
@@ -2457,10 +2231,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateCert: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key",
-            "utf-8"
-          ),
+          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
@@ -2475,18 +2246,12 @@ describe("passport-saml /", function () {
         };
         samlObj.getAuthorizeUrl({}, {}, function (err, url) {
           try {
-            var qry = require("querystring").parse(
-              require("url").parse(url).query
-            );
-            qry.SigAlg.should.match(
-              "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-            );
+            var qry = require("querystring").parse(require("url").parse(url).query);
+            qry.SigAlg.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
             qry.Signature.should.match(
               "MeFo+LjufxP5A+sCRwzR/YH/RV6W14aYSFjUdie62JxkI6hDcVhoSZQUJ3wtWMhL59gJj05tTFnXAZRqUQVsavyy41cmUZVeCsat0gaHBQOILXpp9deB0iSJt1EVQTOJkVx8uu2/WYu/bBiH7w2bpwuCf1gJhlqZb/ca3B6yjHSMjnnVfc2LbNPWHpE5464lrs79VjDXf9GQWfrBr95dh3P51IAb7C+77KDWQUl9WfZfyyuEgS83vyZ0UGOxT4AObJ6NOcLs8+iidDdWJJkBaKQev6U+AghCjLQUYOrflivLIIyqATKu2q9PbOse6Phmnxok50+broXSG23+e+742Q=="
             );
-            qry.customQueryStringParam.should.match(
-              "CustomQueryStringParamValue"
-            );
+            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2498,10 +2263,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.key",
-            "utf-8"
-          ),
+          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
@@ -2516,18 +2278,12 @@ describe("passport-saml /", function () {
         };
         samlObj.getAuthorizeUrl({}, {}, function (err, url) {
           try {
-            var qry = require("querystring").parse(
-              require("url").parse(url).query
-            );
-            qry.SigAlg.should.match(
-              "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-            );
+            var qry = require("querystring").parse(require("url").parse(url).query);
+            qry.SigAlg.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
             qry.Signature.should.match(
               "MeFo+LjufxP5A+sCRwzR/YH/RV6W14aYSFjUdie62JxkI6hDcVhoSZQUJ3wtWMhL59gJj05tTFnXAZRqUQVsavyy41cmUZVeCsat0gaHBQOILXpp9deB0iSJt1EVQTOJkVx8uu2/WYu/bBiH7w2bpwuCf1gJhlqZb/ca3B6yjHSMjnnVfc2LbNPWHpE5464lrs79VjDXf9GQWfrBr95dh3P51IAb7C+77KDWQUl9WfZfyyuEgS83vyZ0UGOxT4AObJ6NOcLs8+iidDdWJJkBaKQev6U+AghCjLQUYOrflivLIIyqATKu2q9PbOse6Phmnxok50+broXSG23+e+742Q=="
             );
-            qry.customQueryStringParam.should.match(
-              "CustomQueryStringParamValue"
-            );
+            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2539,8 +2295,7 @@ describe("passport-saml /", function () {
     describe("getAdditionalParams checks /", function () {
       it("should not pass any additional params by default", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
         };
         var samlObj = new SAML(samlConfig);
 
@@ -2552,8 +2307,7 @@ describe("passport-saml /", function () {
 
       it("should not pass any additional params by default apart from the RelayState in request query", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
         };
         var samlObj = new SAML(samlConfig);
 
@@ -2570,8 +2324,7 @@ describe("passport-saml /", function () {
 
       it("should not pass any additional params by default apart from the RelayState in request body", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
         };
         var samlObj = new SAML(samlConfig);
 
@@ -2588,8 +2341,7 @@ describe("passport-saml /", function () {
 
       it("should pass additional params with all operations if set in additionalParams", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalParams: {
             queryParam: "queryParamValue",
           },
@@ -2605,22 +2357,16 @@ describe("passport-saml /", function () {
 
       it('should pass additional params with "authorize" operations if set in additionalAuthorizeParams', function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalAuthorizeParams: {
             queryParam: "queryParamValue",
           },
         };
         var samlObj = new SAML(samlConfig);
 
-        var additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {},
-          "authorize"
-        );
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(1);
-        additionalAuthorizeParams.should.containEql({
-          queryParam: "queryParamValue",
-        });
+        additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValue" });
 
         var additionalLogoutParams = samlObj.getAdditionalParams({}, "logout");
         additionalLogoutParams.should.be.empty;
@@ -2628,31 +2374,24 @@ describe("passport-saml /", function () {
 
       it('should pass additional params with "logout" operations if set in additionalLogoutParams', function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalLogoutParams: {
             queryParam: "queryParamValue",
           },
         };
         var samlObj = new SAML(samlConfig);
 
-        var additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {},
-          "authorize"
-        );
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, "authorize");
         additionalAuthorizeParams.should.be.empty;
 
         var additionalLogoutParams = samlObj.getAdditionalParams({}, "logout");
         Object.keys(additionalLogoutParams).should.have.length(1);
-        additionalLogoutParams.should.containEql({
-          queryParam: "queryParamValue",
-        });
+        additionalLogoutParams.should.containEql({ queryParam: "queryParamValue" });
       });
 
       it("should merge additionalLogoutParams and additionalAuthorizeParams with additionalParams", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalParams: {
             queryParam1: "queryParamValue",
           },
@@ -2665,10 +2404,7 @@ describe("passport-saml /", function () {
         };
         var samlObj = new SAML(samlConfig);
 
-        var additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {},
-          "authorize"
-        );
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(2);
         additionalAuthorizeParams.should.containEql({
           queryParam1: "queryParamValue",
@@ -2685,8 +2421,7 @@ describe("passport-saml /", function () {
 
       it("should merge run-time params additionalLogoutParams and additionalAuthorizeParams with additionalParams", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalParams: {
             queryParam1: "queryParamValue",
           },
@@ -2731,8 +2466,7 @@ describe("passport-saml /", function () {
 
       it("should prioritize additionalLogoutParams and additionalAuthorizeParams over additionalParams", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalParams: {
             queryParam: "queryParamValue",
           },
@@ -2745,26 +2479,18 @@ describe("passport-saml /", function () {
         };
         var samlObj = new SAML(samlConfig);
 
-        var additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {},
-          "authorize"
-        );
+        var additionalAuthorizeParams = samlObj.getAdditionalParams({}, "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(1);
-        additionalAuthorizeParams.should.containEql({
-          queryParam: "queryParamValueAuthorize",
-        });
+        additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValueAuthorize" });
 
         var additionalLogoutParams = samlObj.getAdditionalParams({}, "logout");
         Object.keys(additionalLogoutParams).should.have.length(1);
-        additionalLogoutParams.should.containEql({
-          queryParam: "queryParamValueLogout",
-        });
+        additionalLogoutParams.should.containEql({ queryParam: "queryParamValueLogout" });
       });
 
       it("should prioritize run-time params over all other params", function () {
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           additionalParams: {
             queryParam: "queryParamValue",
           },
@@ -2788,9 +2514,7 @@ describe("passport-saml /", function () {
           options.additionalParams
         );
         Object.keys(additionalAuthorizeParams).should.have.length(1);
-        additionalAuthorizeParams.should.containEql({
-          queryParam: "queryParamRuntimeValue",
-        });
+        additionalAuthorizeParams.should.containEql({ queryParam: "queryParamRuntimeValue" });
 
         var additionalLogoutParams = samlObj.getAdditionalParams(
           {},
@@ -2798,9 +2522,7 @@ describe("passport-saml /", function () {
           options.additionalParams
         );
         Object.keys(additionalLogoutParams).should.have.length(1);
-        additionalLogoutParams.should.containEql({
-          queryParam: "queryParamRuntimeValue",
-        });
+        additionalLogoutParams.should.containEql({ queryParam: "queryParamRuntimeValue" });
       });
 
       it("should check the value of the option `RACComparison`", function () {
@@ -2812,13 +2534,8 @@ describe("passport-saml /", function () {
         var validComparisonTypes = ["exact", "minimum", "maximum", "better"],
           samlObjValidComparisonType;
         validComparisonTypes.forEach(function (RACComparison) {
-          samlObjValidComparisonType = new SAML({
-            RACComparison: RACComparison,
-          });
-          should.equal(
-            samlObjValidComparisonType.options.RACComparison,
-            RACComparison
-          );
+          samlObjValidComparisonType = new SAML({ RACComparison: RACComparison });
+          should.equal(samlObjValidComparisonType.options.RACComparison, RACComparison);
         });
       });
     });
@@ -2845,8 +2562,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: TEST_CERT,
           validateInResponseTo: true,
         };
@@ -2855,27 +2571,20 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:09Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(
-          requestId,
-          new Date().toISOString(),
-          function () {}
-        );
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            should.not.exist(err);
-            profile.nameID.should.startWith("ploer");
-            samlObj.cacheProvider.get(requestId, function (err, value) {
-              try {
-                should.not.exist(value);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
-            });
-          }
-        );
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          should.not.exist(err);
+          profile.nameID.should.startWith("ploer");
+          samlObj.cacheProvider.get(requestId, function (err, value) {
+            try {
+              should.not.exist(value);
+              done();
+            } catch (err2) {
+              done(err2);
+            }
+          });
+        });
       });
 
       it("onelogin xml document without InResponseTo from request should fail", function (done) {
@@ -2890,8 +2599,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: TEST_CERT,
           validateInResponseTo: true,
         };
@@ -2899,18 +2607,15 @@ describe("passport-saml /", function () {
 
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:09Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match("InResponseTo is not valid");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("InResponseTo is not valid");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("xml document with SubjectConfirmation InResponseTo from request should be valid", function (done) {
@@ -2921,8 +2626,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert:
             "MIIC7TCCAdmgAwIBAgIQuIdqos+9yKBC4oygbhtdfzAJBgUrDgMCHQUAMBIxEDAOBgNVBAMTB1Rlc3RTVFMwHhcNMTQwNDE2MTIyMTEwWhcNMzkxMjMxMjM1OTU5WjASMRAwDgYDVQQDEwdUZXN0U1RTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmhReamVYbeOWwrrAvHPvS9KKBwv4Tj7wOSGDXbNgfjhSvVyXsnpYRcuoJkvE8b9tCjFTbXCfbhnaVrpoXaWFtP1YvUIZvCJGdOOTXltMNDlNIaFmsIsomza8IyOHXe+3xHWVtxO8FG3qnteSkkVIQuAvBqpPfQtxrXCZOlbQZm7q69QIQ64JvLJfRwHN1EywMBVwbJgrV8gBdE3RITI76coSOK13OBTlGtB0kGKLDrF2JW+5mB+WnFR7GlXUj+V0R9WStBomVipJEwr6Q3fU0deKZ5lLw0+qJ0T6APInwN5TIN/AbFCHd51aaf3zEP+tZacQ9fbZqy9XBAtL2pCAJQIDAQABo0cwRTBDBgNVHQEEPDA6gBDECazhZ8Ar+ULXb0YTs5MvoRQwEjEQMA4GA1UEAxMHVGVzdFNUU4IQuIdqos+9yKBC4oygbhtdfzAJBgUrDgMCHQUAA4IBAQAioMSOU9QFw+yhVxGUNK0p/ghVsHnYdeOE3vSRhmFPsetBt8S35sI4QwnQNiuiEYqp++FabiHgePOiqq5oeY6ekJik1qbs7fgwnaQXsxxSucHvc4BU81x24aKy6jeJzxmFxo3mh6y/OI1peCMSH48iUzmhnoSulp0+oAs3gMEFI0ONbgAA/XoAHaVEsrPj10i3gkztoGdpH0DYUe9rABOJxX/3mNF+dCVJG7t7BoSlNAWlSDErKciNNax1nBskFqNWNIKzUKBIb+GVKkIB2QpATMQB6Oe7inUdT9kkZ/Q7oPBATZk+3mFsIoWr8QRFSqvToOhun7EY2/VtuiV1d932",
           validateInResponseTo: true,
@@ -2932,27 +2636,20 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(
-          requestId,
-          new Date().toISOString(),
-          function () {}
-        );
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            should.not.exist(err);
-            profile.nameID.should.startWith("UIS/jochen-work");
-            samlObj.cacheProvider.get(requestId, function (err, value) {
-              try {
-                should.not.exist(value);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
-            });
-          }
-        );
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          should.not.exist(err);
+          profile.nameID.should.startWith("UIS/jochen-work");
+          samlObj.cacheProvider.get(requestId, function (err, value) {
+            try {
+              should.not.exist(value);
+              done();
+            } catch (err2) {
+              done(err2);
+            }
+          });
+        });
       });
 
       it("xml document with SubjectConfirmation and missing InResponseTo from request should not be valid", function (done) {
@@ -2963,8 +2660,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert:
             "MIICrjCCAZYCCQDWybyUsLVkXzANBgkqhkiG9w0BAQsFADAZMRcwFQYDVQQDFA5hY21lX3Rvb2xzLmNvbTAeFw0xNTA4MTgwODQ3MzZaFw0yNTA4MTcwODQ3MzZaMBkxFzAVBgNVBAMUDmFjbWVfdG9vbHMuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyT+OzEymhaZFNfx4+HFxZbBP3egvcUgPvGa7wWCV7vyuCauLBqwO1FQqzaRDxkEihkHqmUz63D25v2QixLxXyqaFQ8TxDFKwYATtSL7x5G2Gww56H0L1XGgYdNW1akPx90P+USmVn1Wb//7AwU+TV+u4jIgKZyTaIFWdFlwBhlp4OBEHCyYwngFgMyVoCBsSmwb4if7Mi5T746J9ZMQpC+ts+kfzley59Nz55pa5fRLwu4qxFUv2oRdXAf2ZLuxB7DPQbRH82/ewZZ8N4BUGiQyAwOsHgp0sb9JJ8uEM/qhyS1dXXxjo+kxsI5HXhxp4P5R9VADuOquaLIo8ptIrQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBW/Y7leJnV76+6bzeqqi+buTLyWc1mASi5LVH68mdailg2WmGfKlSMLGzFkNtg8fJnfaRZ/GtxmSxhpQRHn63ZlyzqVrFcJa0qzPG21PXPHG/ny8pN+BV8fk74CIb/+YN7NvDUrV7jlsPxNT2rQk8G2fM7jsTMYvtz0MBkrZZsUzTv4rZkF/v44J/ACDirKJiE+TYArm70yQPweX6RvYHNZLSzgg4o+hoyBXo5BGQetAjmcIhC6ZOwN3iVhGjp0YpWM0pkqStPy3sIR0//LZbskWWlSRb0fX1c4632Xb+zikfec4DniYV6CxkB2U+plHpOX1rt1R+UiTEIhTSXPNt/",
           validateInResponseTo: true,
@@ -2974,24 +2670,17 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(
-          requestId,
-          new Date().toISOString(),
-          function () {}
-        );
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.eql("InResponseTo is missing from response");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.eql("InResponseTo is missing from response");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("xml document with SubjectConfirmation and missing InResponseTo from request should be not problematic if not validated", function (done) {
@@ -3002,8 +2691,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert:
             "MIICrjCCAZYCCQDWybyUsLVkXzANBgkqhkiG9w0BAQsFADAZMRcwFQYDVQQDFA5hY21lX3Rvb2xzLmNvbTAeFw0xNTA4MTgwODQ3MzZaFw0yNTA4MTcwODQ3MzZaMBkxFzAVBgNVBAMUDmFjbWVfdG9vbHMuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyT+OzEymhaZFNfx4+HFxZbBP3egvcUgPvGa7wWCV7vyuCauLBqwO1FQqzaRDxkEihkHqmUz63D25v2QixLxXyqaFQ8TxDFKwYATtSL7x5G2Gww56H0L1XGgYdNW1akPx90P+USmVn1Wb//7AwU+TV+u4jIgKZyTaIFWdFlwBhlp4OBEHCyYwngFgMyVoCBsSmwb4if7Mi5T746J9ZMQpC+ts+kfzley59Nz55pa5fRLwu4qxFUv2oRdXAf2ZLuxB7DPQbRH82/ewZZ8N4BUGiQyAwOsHgp0sb9JJ8uEM/qhyS1dXXxjo+kxsI5HXhxp4P5R9VADuOquaLIo8ptIrQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBW/Y7leJnV76+6bzeqqi+buTLyWc1mASi5LVH68mdailg2WmGfKlSMLGzFkNtg8fJnfaRZ/GtxmSxhpQRHn63ZlyzqVrFcJa0qzPG21PXPHG/ny8pN+BV8fk74CIb/+YN7NvDUrV7jlsPxNT2rQk8G2fM7jsTMYvtz0MBkrZZsUzTv4rZkF/v44J/ACDirKJiE+TYArm70yQPweX6RvYHNZLSzgg4o+hoyBXo5BGQetAjmcIhC6ZOwN3iVhGjp0YpWM0pkqStPy3sIR0//LZbskWWlSRb0fX1c4632Xb+zikfec4DniYV6CxkB2U+plHpOX1rt1R+UiTEIhTSXPNt/",
           validateInResponseTo: false,
@@ -3013,28 +2701,21 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(
-          requestId,
-          new Date().toISOString(),
-          function () {}
-        );
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            should.not.exist(err);
-            profile.nameID.should.startWith("UIS/jochen-work");
-            samlObj.cacheProvider.get(requestId, function (err, value) {
-              try {
-                should.exist(value);
-                value.should.eql("2014-06-05T12:07:07.662Z");
-                done();
-              } catch (err2) {
-                done(err2);
-              }
-            });
-          }
-        );
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          should.not.exist(err);
+          profile.nameID.should.startWith("UIS/jochen-work");
+          samlObj.cacheProvider.get(requestId, function (err, value) {
+            try {
+              should.exist(value);
+              value.should.eql("2014-06-05T12:07:07.662Z");
+              done();
+            } catch (err2) {
+              done(err2);
+            }
+          });
+        });
       });
 
       it("xml document with multiple AttributeStatements should have all attributes present on profile", function (done) {
@@ -3045,8 +2726,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert:
             "MIIDtTCCAp2gAwIBAgIJAKg4VeVcIDz1MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwHhcNMTUwODEzMDE1NDIwWhcNMTUwOTEyMDE1NDIwWjBFMQswCQYDVQQGEwJVUzETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxG3ouM7U+fXbJt69X1H6d4UNg/uRr06pFuU9RkfIwNC+yaXyptqB3ynXKsL7BFt4DCd0fflRvJAx3feJIDp16wN9GDVHcufWMYPhh2j5HcTW/j9JoIJzGhJyvO00YKBt+hHy83iN1SdChKv5y0iSyiPP5GnqFw+ayyHoM6hSO0PqBou1Xb0ZSIE+DHosBnvVna5w2AiPY4xrJl9yZHZ4Q7DfMiYTgstjETio4bX+6oLiBnYktn7DjdEslqhffVme4PuBxNojI+uCeg/sn4QVLd/iogMJfDWNuLD8326Mi/FE9cCRvFlvAiMSaebMI3zPaySsxTK7Zgj5TpEbmbHI9wIDAQABo4GnMIGkMB0GA1UdDgQWBBSVGgvoW4MhMuzBGce29PY8vSzHFzB1BgNVHSMEbjBsgBSVGgvoW4MhMuzBGce29PY8vSzHF6FJpEcwRTELMAkGA1UEBhMCVVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAKg4VeVcIDz1MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAJu1rqs+anD74dbdwgd3CnqnQsQDJiEXmBhG2leaGt3ve9b/9gKaJg2pyb2NyppDe1uLqh6nNXDuzg1oNZrPz5pJL/eCXPl7FhxhMUi04TtLf8LeNTCIWYZiFuO4pmhohHcv8kRvYR1+6SkLTC8j/TZerm7qvesSiTQFNapa1eNdVQ8nFwVkEtWl+JzKEM1BlRcn42sjJkijeFp7DpI7pU+PnYeiaXpRv5pJo8ogM1iFxN+SnfEs0EuQ7fhKIG9aHKi7bKZ7L6SyX7MDIGLeulEU6lf5D9BfXNmcMambiS0pXhL2QXajt96UBq8FT2KNXY8XNtR4y6MyyCzhaiZZcc8=",
           validateInResponseTo: true,
@@ -3056,35 +2736,26 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(
-          requestId,
-          new Date().toISOString(),
-          function () {}
-        );
+        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            should.not.exist(err);
-            profile.nameID.should.startWith("UIS/jochen-work");
-            profile["vz::identity"].should.equal("UIS/jochen-work");
-            profile["vz::subjecttype"].should.equal("UIS user");
-            profile["vz::account"].should.equal(
-              "e9aba0c4-ece8-4b44-9526-d24418aa95dc"
-            );
-            profile["vz::org"].should.equal("testorg");
-            profile["vz::name"].should.equal("Test User");
-            profile["net::ip"].should.equal("::1");
-            samlObj.cacheProvider.get(requestId, function (err, value) {
-              try {
-                should.not.exist(value);
-                done();
-              } catch (err2) {
-                done(err2);
-              }
-            });
-          }
-        );
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          should.not.exist(err);
+          profile.nameID.should.startWith("UIS/jochen-work");
+          profile["vz::identity"].should.equal("UIS/jochen-work");
+          profile["vz::subjecttype"].should.equal("UIS user");
+          profile["vz::account"].should.equal("e9aba0c4-ece8-4b44-9526-d24418aa95dc");
+          profile["vz::org"].should.equal("testorg");
+          profile["vz::name"].should.equal("Test User");
+          profile["net::ip"].should.equal("::1");
+          samlObj.cacheProvider.get(requestId, function (err, value) {
+            try {
+              should.not.exist(value);
+              done();
+            } catch (err2) {
+              done(err2);
+            }
+          });
+        });
       });
 
       describe("InResponseTo server cache expiration tests /", function () {
@@ -3098,11 +2769,7 @@ describe("passport-saml /", function () {
           var samlObj = new SAML(samlConfig);
 
           // Mock the SAML request being passed through Passport-SAML
-          samlObj.cacheProvider.save(
-            requestId,
-            new Date().toISOString(),
-            function () {}
-          );
+          samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
           setTimeout(function () {
             samlObj.cacheProvider.get(requestId, function (err, value) {
@@ -3127,24 +2794,12 @@ describe("passport-saml /", function () {
           };
           var samlObj = new SAML(samlConfig);
 
-          samlObj.cacheProvider.save(
-            expiredRequestId1,
-            new Date().toISOString(),
-            function () {}
-          );
-          samlObj.cacheProvider.save(
-            expiredRequestId2,
-            new Date().toISOString(),
-            function () {}
-          );
+          samlObj.cacheProvider.save(expiredRequestId1, new Date().toISOString(), function () {});
+          samlObj.cacheProvider.save(expiredRequestId2, new Date().toISOString(), function () {});
 
           setTimeout(function () {
             // Add one more that shouldn't expire
-            samlObj.cacheProvider.save(
-              requestId,
-              new Date().toISOString(),
-              function () {}
-            );
+            samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
 
             samlObj.cacheProvider.get(expiredRequestId1, function (err, value) {
               should.not.exist(value);
@@ -3202,18 +2857,15 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:09Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.not.exist(err);
-              profile.nameID.should.startWith("ploer");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.not.exist(err);
+            profile.nameID.should.startWith("ploer");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with current time equal to NotBefore (plus default clock skew)  time should validate", function (done) {
@@ -3231,18 +2883,15 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:08Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.not.exist(err);
-              profile.nameID.should.startWith("ploer");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.not.exist(err);
+            profile.nameID.should.startWith("ploer");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with current time before NotBefore time should fail", function (done) {
@@ -3260,18 +2909,15 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:07Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match("SAML assertion not yet valid");
-              done();
-            } catch (erro2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("SAML assertion not yet valid");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with current time equal to NotOnOrAfter (minus default clock skew) time should fail", function (done) {
@@ -3289,18 +2935,15 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:19:08Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match("SAML assertion expired");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("SAML assertion expired");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with current time after NotOnOrAfter time (minus default clock skew) should fail", function (done) {
@@ -3318,18 +2961,15 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:19:09Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match("SAML assertion expired");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("SAML assertion expired");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with current time after NotOnOrAfter time with accepted clock skew equal to -1 should pass", function (done) {
@@ -3343,8 +2983,7 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: TEST_CERT,
           acceptedClockSkewMs: -1,
         };
@@ -3354,18 +2993,15 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:20:09Z"));
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.not.exist(err);
-              profile.nameID.should.startWith("ploer");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.not.exist(err);
+            profile.nameID.should.startWith("ploer");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with audience and no AudienceRestriction should not pass", function (done) {
@@ -3379,27 +3015,21 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           audience: "http://sp.example.com",
           acceptedClockSkewMs: -1,
         };
         var samlObj = new SAML(samlConfig);
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match(
-                "SAML assertion has no AudienceRestriction"
-              );
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("SAML assertion has no AudienceRestriction");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with audience not matching AudienceRestriction should not pass", function (done) {
@@ -3413,25 +3043,21 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           audience: "http://sp.example.com",
           acceptedClockSkewMs: -1,
         };
         var samlObj = new SAML(samlConfig);
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.exist(err);
-              err.message.should.match("SAML assertion audience mismatch");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.exist(err);
+            err.message.should.match("SAML assertion audience mismatch");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("onelogin xml document with audience matching AudienceRestriction should pass", function (done) {
@@ -3445,25 +3071,21 @@ describe("passport-saml /", function () {
         var container = { SAMLResponse: base64xml };
 
         var samlConfig = {
-          entryPoint:
-            "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           audience: "http://sp.example.com",
           acceptedClockSkewMs: -1,
         };
         var samlObj = new SAML(samlConfig);
 
-        samlObj.validatePostResponse(
-          container,
-          function (err, profile, logout) {
-            try {
-              should.not.exist(err);
-              profile.nameID.should.startWith("ploer");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validatePostResponse(container, function (err, profile, logout) {
+          try {
+            should.not.exist(err);
+            profile.nameID.should.startWith("ploer");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
     });
   });
@@ -3581,10 +3203,7 @@ describe("passport-saml /", function () {
   it("validatePostRequest errors for encrypted nameID with wrong decryptionPvk", function (done) {
     var samlObj = new SAML({
       cert: fs.readFileSync(__dirname + "/static/cert.pem", "ascii"),
-      decryptionPvk: fs.readFileSync(
-        __dirname + "/static/acme_tools_com.key",
-        "ascii"
-      ),
+      decryptionPvk: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "ascii"),
     });
     var body = {
       SAMLRequest: fs.readFileSync(
@@ -3693,10 +3312,7 @@ describe("passport-saml /", function () {
       var samlObj;
       beforeEach(function () {
         samlObj = new SAML({
-          cert: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.cert",
-            "ascii"
-          ),
+          cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
           idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
         });
         this.request = Object.assign({}, require("./static/idp_slo_redirect"));
@@ -3709,100 +3325,76 @@ describe("passport-saml /", function () {
         var body = {
           SAMLRequest: "asdf",
         };
-        samlObj.validateRedirect(
-          body,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(body, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("errors if idpIssuer is set and issuer is wrong", function (done) {
         samlObj.options.idpIssuer = "foo";
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql(
-                "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php"
-              );
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql(
+              "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php"
+            );
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("errors if request has expired", function (done) {
         this.clock.restore();
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql("SAML assertion expired");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql("SAML assertion expired");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("errors if request has a bad signature", function (done) {
         this.request.Signature = "foo";
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql("Invalid signature");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql("Invalid signature");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("returns profile for valid signature including session index", function (done) {
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err, profile) {
-            try {
-              should.not.exist(err);
-              profile.should.eql({
-                ID: "_8f0effde308adfb6ae7f1e29b414957fc320f5636f",
-                issuer: "http://localhost:20000/saml2/idp/metadata.php",
-                nameID: "stavros@workable.com",
-                nameIDFormat:
-                  "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-                sessionIndex: "_00bf7b2d5d9d3c970217eecefb1194bef3362a618e",
-              });
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err, profile) {
+          try {
+            should.not.exist(err);
+            profile.should.eql({
+              ID: "_8f0effde308adfb6ae7f1e29b414957fc320f5636f",
+              issuer: "http://localhost:20000/saml2/idp/metadata.php",
+              nameID: "stavros@workable.com",
+              nameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+              sessionIndex: "_00bf7b2d5d9d3c970217eecefb1194bef3362a618e",
+            });
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
     });
     describe("sp slo", function () {
       var samlObj;
       beforeEach(function () {
         samlObj = new SAML({
-          cert: fs.readFileSync(
-            __dirname + "/static/acme_tools_com.cert",
-            "ascii"
-          ),
+          cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
           idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
           validateInResponseTo: true,
         });
@@ -3828,54 +3420,40 @@ describe("passport-saml /", function () {
       });
       it("errors if idpIssuer is set and wrong issuer", function (done) {
         samlObj.options.idpIssuer = "foo";
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql(
-                "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php"
-              );
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql(
+              "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php"
+            );
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("errors if unsuccessful", function (done) {
         this.request = require("./static/sp_slo_redirect_failure");
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql(
-                "Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester"
-              );
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql("Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("errors if InResponseTo is not found", function (done) {
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql("InResponseTo is not valid");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql("InResponseTo is not valid");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
       it("errors if bad signature", function (done) {
         samlObj.cacheProvider.save(
@@ -3884,19 +3462,15 @@ describe("passport-saml /", function () {
           function () {}
         );
         this.request.Signature = "foo";
-        samlObj.validateRedirect(
-          this.request,
-          this.request.originalQuery,
-          function (err) {
-            try {
-              should.exist(err);
-              err.message.should.eql("Invalid signature");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
+        samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
+          try {
+            should.exist(err);
+            err.message.should.eql("Invalid signature");
+            done();
+          } catch (err2) {
+            done(err2);
           }
-        );
+        });
       });
 
       it("returns true for valid signature", function (done) {
