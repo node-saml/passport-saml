@@ -69,6 +69,7 @@ describe('strategy#authenticate', function() {
     var superAuthenticateStub = this.superAuthenticateStub;
     var samlOptions = {
       issuer: 'http://foo.issuer',
+      authnRequestBinding: 'HTTP-POST',
       callbackUrl: 'http://foo.callback',
       cert: 'deadbeef',
       host: 'lvh',
@@ -150,6 +151,7 @@ describe('strategy#logout', function() {
     var superLogoutMock = this.superLogoutMock;
     var samlOptions = {
       issuer: 'http://foo.issuer',
+      authnRequestBinding: 'HTTP-POST',
       callbackUrl: 'http://foo.callback',
       cert: 'deadbeef',
       host: 'lvh',
