@@ -50,12 +50,10 @@ describe('strategy#authenticate', function() {
   it('passes options on to saml strategy', function(done) {
     var passportOptions = {
       passReqToCallback: true,
-      authnRequestBinding: 'HTTP-POST',
       getSamlOptions: function (req, fn) {
         try {
           fn();
           strategy._passReqToCallback.should.eql(true);
-          strategy._authnRequestBinding.should.eql('HTTP-POST');
           done();
         } catch (err2) {
           done(err2);
@@ -133,12 +131,10 @@ describe('strategy#logout', function() {
   it('passes options on to saml strategy', function(done) {
     var passportOptions = {
       passReqToCallback: true,
-      authnRequestBinding: 'HTTP-POST',
       getSamlOptions: function (req, fn) {
         try {
           fn();
           strategy._passReqToCallback.should.eql(true);
-          strategy._authnRequestBinding.should.eql('HTTP-POST');
           done();
         } catch (err2) {
           done(err2);
@@ -218,12 +214,10 @@ describe('strategy#generateServiceProviderMetadata', function() {
   it('passes options on to saml strategy', function(done) {
     var passportOptions = {
       passReqToCallback: true,
-      authnRequestBinding: 'HTTP-POST',
       getSamlOptions: function (req, fn) {
         try {
           fn();
           strategy._passReqToCallback.should.eql(true);
-          strategy._authnRequestBinding.should.eql('HTTP-POST');
           done();
         } catch (err2) {
           done(err2);

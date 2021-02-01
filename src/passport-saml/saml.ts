@@ -189,6 +189,8 @@ class SAML {
       options.RACComparison = 'exact';
     }
 
+    options.authnRequestBinding = options.authnRequestBinding || 'HTTP-Redirect';
+
     return options as SAMLOptions;
   }
 
