@@ -1,5 +1,4 @@
-Active Directory Federation Services
-====================================
+# Active Directory Federation Services
 
 This document attempts to describe a complete solution for integrating with AD FS.
 
@@ -11,13 +10,13 @@ Download [mellon_create_metadata.sh](https://github.com/UNINETT/mod_auth_mellon/
 
 Create a new key, certificate and relying party XML as follows:
 
-  ./mellon_create_metadata.sh acme_tools_com https://acme_tools.com/adfs/postResponse
+./mellon_create_metadata.sh acme_tools_com https://acme_tools.com/adfs/postResponse
 
 ## Retrieve AD FS Certificate
 
 Use retrieve_adfs_certificate.sh to get your AD FS server's signing certificate:
 
-  ./retrieve_adfs_certificate.sh https://adfs.acme_tools.com/ > adfs.acme_tools.com.crt
+./retrieve_adfs_certificate.sh https://adfs.acme_tools.com/ > adfs.acme_tools.com.crt
 
 # Create Relying Party
 
@@ -30,44 +29,43 @@ This example assumes you will pass in the UPN.
 Create a separate file for passport configuration (assumed to be config/passport.js).
 
 ```javascript
-var
-  fs = require('fs')
-  , passport = require('passport')
-  , SamlStrategy = require('passport-saml').Strategy
-;
-
-passport.serializeUser(function(user, done) {
+var fs = require("fs"),
+  passport = require("passport"),
+  SamlStrategy = require("passport-saml").Strategy;
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.use(new SamlStrategy(
-  {
-    entryPoint: 'https://adfs.acme_tools.com/adfs/ls/',
-    issuer: 'acme_tools_com',
-    callbackUrl: 'https://acme_tools.com/adfs/postResponse',
-    privateCert: fs.readFileSync('/path/to/acme_tools_com.key', 'utf-8'),
-    cert: fs.readFileSync('/path/to/adfs.acme_tools.com.crt', 'utf-8'),
-  // other authn contexts are available e.g. windows single sign-on
-    authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password',
-  // not sure if this is necessary?
-    acceptedClockSkewMs: -1,
-    identifierFormat: null,
-  // this is configured under the Advanced tab in AD FS relying party
-    signatureAlgorithm: 'sha256',
-    RACComparison: 'exact', // default to exact RequestedAuthnContext Comparison Type
-  },
-  function(profile, done) {
-    return done(null,
-      {
-        upn: profile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn'],
+passport.use(
+  new SamlStrategy(
+    {
+      entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
+      issuer: "acme_tools_com",
+      callbackUrl: "https://acme_tools.com/adfs/postResponse",
+      privateCert: fs.readFileSync("/path/to/acme_tools_com.key", "utf-8"),
+      cert: fs.readFileSync("/path/to/adfs.acme_tools.com.crt", "utf-8"),
+      // other authn contexts are available e.g. windows single sign-on
+      authnContext:
+        "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
+      // not sure if this is necessary?
+      acceptedClockSkewMs: -1,
+      identifierFormat: null,
+      // this is configured under the Advanced tab in AD FS relying party
+      signatureAlgorithm: "sha256",
+      RACComparison: "exact", // default to exact RequestedAuthnContext Comparison Type
+    },
+    function (profile, done) {
+      return done(null, {
+        upn: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn"],
         // e.g. if you added a Group claim
-        group: profile['http://schemas.xmlsoap.org/claims/Group']
-    });
-  }
-));
+        group: profile["http://schemas.xmlsoap.org/claims/Group"],
+      });
+    }
+  )
+);
 
 module.exports = passport;
 ```
@@ -110,6 +108,7 @@ module.exports = passport;
 
   var server = http.createServer(app);
 ```
+
 # Troubleshooting
 
 ## ADFS 2016
