@@ -98,7 +98,7 @@ class Strategy extends PassportStrategy {
       this._saml.validatePostRequest(req.body, validateCallback);
     } else {
       const requestHandler = {
-        'login-request': () => {
+        "login-request": () => {
           if (this._saml.options.authnRequestBinding === "HTTP-POST") {
             this._saml.getAuthorizeForm(req, (err: Error | null, data?: any) => {
               if (err) {
