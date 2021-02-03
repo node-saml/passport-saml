@@ -2,12 +2,13 @@
 
 var sinon = require("sinon");
 var should = require("should");
+var saml = require("../lib/passport-saml/saml.js");
 var SamlStrategy = require("../lib/passport-saml/index.js").Strategy;
-var MultiSamlStrategy = require("../multiSamlStrategy");
+var MultiSamlStrategy = require("../lib/passport-saml/multiSamlStrategy.js");
 
 function verify() {}
 
-describe("Strategy()", function () {
+describe("MultiSamlStrategy()", function () {
   it("extends passport Strategy", function () {
     function getSamlOptions() {
       return {};
@@ -24,13 +25,17 @@ describe("Strategy()", function () {
   });
 });
 
-describe("strategy#authenticate", function () {
+describe.only("strategy#authenticate", function () {
   beforeEach(function () {
     this.superAuthenticateStub = sinon.stub(SamlStrategy.prototype, "authenticate");
+    this.getAuthorizeFormStub = sinon.stub(saml.SAML.prototype, "getAuthorizeForm");
+    this.getAuthorizeUrlStub = sinon.stub(saml.SAML.prototype, "getAuthorizeUrl");
   });
 
   afterEach(function () {
     this.superAuthenticateStub.restore();
+    this.getAuthorizeFormStub.restore();
+    this.getAuthorizeUrlStub.restore();
   });
 
   it("calls super with request and auth options", function (done) {
@@ -106,6 +111,24 @@ describe("strategy#authenticate", function () {
     );
     strategy.authenticate();
   });
+
+  it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
+    function getSamlOptions(req, fn) {
+      fn(null, { authnRequestBinding: "HTTP-POST" });
+    }
+    var strategy = new MultiSamlStrategy({ getSamlOptions }, verify);
+    strategy.authenticate({}, {});
+    sinon.assert.calledOnce(this.getAuthorizeFormStub);
+  })
+
+  it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
+    function getSamlOptions(req, fn) {
+      fn(null, {});
+    }
+    var strategy = new MultiSamlStrategy({ getSamlOptions }, verify);
+    strategy.authenticate({}, {});
+    sinon.assert.calledOnce(this.getAuthorizeUrlStub);
+  })
 });
 
 describe("strategy#logout", function () {
