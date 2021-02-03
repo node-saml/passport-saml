@@ -12,7 +12,7 @@ _Please include tests._ Doing so will ensure that the changes made in this PR ar
 
 # Checklist:
 
- - Issue Addressed: [ ]
- - Link to SAML spec: [ ]
- - Tests included? [ ]
- - Documentation updated? [ ]
+- Issue Addressed: [ ]
+- Link to SAML spec: [ ]
+- Tests included? [ ]
+- Documentation updated? [ ]
