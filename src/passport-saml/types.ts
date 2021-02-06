@@ -45,6 +45,7 @@ export interface SAMLOptions {
   idpIssuer: string;
   audience: string;
   scoping: SamlScopingConfig;
+  authnRequestBinding?: string;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;
@@ -67,7 +68,6 @@ export type SamlConfig = Partial<SAMLOptions> & StrategyOptions;
 interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
-  authnRequestBinding?: string;
 }
 
 export interface SamlScopingConfig {
