@@ -1496,7 +1496,7 @@ describe("passport-saml /", function () {
       };
 
       var samlObj = new SAML({ entryPoint: "foo" });
-      var cacheSaveSpy = sinon.spy(samlObj.cacheProvider, "save");
+      var cacheSaveSpy = sinon.spy(samlObj.cacheProvider, "saveAsync");
       var logoutRequestPromise = samlObj.generateLogoutRequest({
         user: {
           nameIDFormat: "foo",
@@ -1774,7 +1774,7 @@ describe("passport-saml /", function () {
         var samlObj = new SAML(samlConfig);
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+        samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString(), function () {});
 
         samlObj.validatePostResponse(container, function (err, profile, logout) {
           try {
@@ -2550,7 +2550,7 @@ describe("passport-saml /", function () {
         }
       });
 
-      it("onelogin xml document with InResponseTo from request should validate", function (done) {
+      it("onelogin xml document with InResponseTo from request should validate", async () => {
         var requestId = "_a6fc46be84e1e3cf3c50";
         var xml =
           '<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="R689b0733bccca22a137e3654830312332940b1be" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>' +
@@ -2571,20 +2571,12 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:09Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+        await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
-        samlObj.validatePostResponse(container, function (err, profile, logout) {
-          should.not.exist(err);
-          profile.nameID.should.startWith("ploer");
-          samlObj.cacheProvider.get(requestId, function (err, value) {
-            try {
-              should.not.exist(value);
-              done();
-            } catch (err2) {
-              done(err2);
-            }
-          });
-        });
+        const { profile, loggedOut } = await samlObj.validatePostResponseAsync(container);
+        profile.nameID.should.startWith("ploer");
+        const value = await samlObj.cacheProvider.getAsync(requestId);
+        should.not.exist(value);
       });
 
       it("onelogin xml document without InResponseTo from request should fail", function (done) {
@@ -2618,7 +2610,7 @@ describe("passport-saml /", function () {
         });
       });
 
-      it("xml document with SubjectConfirmation InResponseTo from request should be valid", function (done) {
+      it("xml document with SubjectConfirmation InResponseTo from request should be valid", async () => {
         var requestId = "_dfab47d5d46374cd4b71";
         var xml =
           '<samlp:Response ID="_f6c28a7d-9c82-4ae8-ba14-fc42c85081d3" InResponseTo="_dfab47d5d46374cd4b71" Version="2.0" IssueInstant="2014-06-05T12:07:07.662Z" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Verizon IDP Hub</saml:Issuer><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI="#_f6c28a7d-9c82-4ae8-ba14-fc42c85081d3"><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"><InclusiveNamespaces PrefixList="#default samlp saml ds xs xsi" xmlns="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transform></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>QecaVjMY/2M4VMJsakvX8uh2Mrg=</DigestValue></Reference></SignedInfo><SignatureValue>QTJ//ZHEQRe9/nA5qTkhECZc2u6M1dHzTkujKBedskLSRPL8LRBb4Yftla0zu848sYvLd3SXzEysYu/jrAjaVDevYZIAdyj/3HCw8pS0ZnQDaCgYuAkH4JmYxBfW1Sc9Kr0vbR58ihwWOZd4xHIn/b8xLs8WNsyTHix2etrLGznioLwTOBO3+SgjwSiSP9NUhrlOvolbuu/6xhLi37/L08JaBvOw3o0k4V8xS87SFczhm4f6wvQM5mP6sZAreoNcWZqQM7vIHFjL0/H9vTaLAN8+fQOc81xFtateTKwFQlJMUmdWKZ8L7ns0Uf1xASQjXtSAACbXI+PuVLjz8nnm3g==</SignatureValue><KeyInfo><X509Data><X509Certificate>MIIC7TCCAdmgAwIBAgIQuIdqos+9yKBC4oygbhtdfzAJBgUrDgMCHQUAMBIxEDAOBgNVBAMTB1Rlc3RTVFMwHhcNMTQwNDE2MTIyMTEwWhcNMzkxMjMxMjM1OTU5WjASMRAwDgYDVQQDEwdUZXN0U1RTMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmhReamVYbeOWwrrAvHPvS9KKBwv4Tj7wOSGDXbNgfjhSvVyXsnpYRcuoJkvE8b9tCjFTbXCfbhnaVrpoXaWFtP1YvUIZvCJGdOOTXltMNDlNIaFmsIsomza8IyOHXe+3xHWVtxO8FG3qnteSkkVIQuAvBqpPfQtxrXCZOlbQZm7q69QIQ64JvLJfRwHN1EywMBVwbJgrV8gBdE3RITI76coSOK13OBTlGtB0kGKLDrF2JW+5mB+WnFR7GlXUj+V0R9WStBomVipJEwr6Q3fU0deKZ5lLw0+qJ0T6APInwN5TIN/AbFCHd51aaf3zEP+tZacQ9fbZqy9XBAtL2pCAJQIDAQABo0cwRTBDBgNVHQEEPDA6gBDECazhZ8Ar+ULXb0YTs5MvoRQwEjEQMA4GA1UEAxMHVGVzdFNUU4IQuIdqos+9yKBC4oygbhtdfzAJBgUrDgMCHQUAA4IBAQAioMSOU9QFw+yhVxGUNK0p/ghVsHnYdeOE3vSRhmFPsetBt8S35sI4QwnQNiuiEYqp++FabiHgePOiqq5oeY6ekJik1qbs7fgwnaQXsxxSucHvc4BU81x24aKy6jeJzxmFxo3mh6y/OI1peCMSH48iUzmhnoSulp0+oAs3gMEFI0ONbgAA/XoAHaVEsrPj10i3gkztoGdpH0DYUe9rABOJxX/3mNF+dCVJG7t7BoSlNAWlSDErKciNNax1nBskFqNWNIKzUKBIb+GVKkIB2QpATMQB6Oe7inUdT9kkZ/Q7oPBATZk+3mFsIoWr8QRFSqvToOhun7EY2/VtuiV1d932</X509Certificate></X509Data></KeyInfo></Signature><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" /></samlp:Status><saml:Assertion Version="2.0" ID="_ea67f283-0afb-465a-ba78-5abe7b7f8584" IssueInstant="2014-06-05T12:07:07.663Z" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Issuer>Verizon IDP Hub</saml:Issuer><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">UIS/jochen-work</saml:NameID><saml:SubjectConfirmation><saml:SubjectConfirmationData NotBefore="2014-06-05T12:06:07.664Z" NotOnOrAfter="2014-06-05T12:10:07.664Z" InResponseTo="_dfab47d5d46374cd4b71" /></saml:SubjectConfirmation></saml:Subject><saml:AttributeStatement><saml:Attribute Name="vz::identity" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">UIS/jochen-work</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::subjecttype" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">UIS user</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::account" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">e9aba0c4-ece8-4b44-9526-d24418aa95dc</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::org" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">testorg</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">Test User</saml:AttributeValue></saml:Attribute><saml:Attribute Name="net::ip" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">::1</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response>';
@@ -2636,20 +2628,12 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+        await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
-        samlObj.validatePostResponse(container, function (err, profile, logout) {
-          should.not.exist(err);
-          profile.nameID.should.startWith("UIS/jochen-work");
-          samlObj.cacheProvider.get(requestId, function (err, value) {
-            try {
-              should.not.exist(value);
-              done();
-            } catch (err2) {
-              done(err2);
-            }
-          });
-        });
+        const { profile } = await samlObj.validatePostResponseAsync(container);
+        profile.nameID.should.startWith("UIS/jochen-work");
+        const value = await samlObj.cacheProvider.getAsync(requestId);
+        should.not.exist(value);
       });
 
       it("xml document with SubjectConfirmation and missing InResponseTo from request should not be valid", function (done) {
@@ -2670,7 +2654,7 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+        samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString(), function () {});
 
         samlObj.validatePostResponse(container, function (err, profile, logout) {
           try {
@@ -2683,7 +2667,7 @@ describe("passport-saml /", function () {
         });
       });
 
-      it("xml document with SubjectConfirmation and missing InResponseTo from request should be not problematic if not validated", function (done) {
+      it("xml document with SubjectConfirmation and missing InResponseTo from request should be not problematic if not validated", async () => {
         var requestId = "_dfab47d5d46374cd4b71";
         var xml =
           '<samlp:Response ID="_f6c28a7d-9c82-4ae8-ba14-fc42c85081d3" Version="2.0" IssueInstant="2014-06-05T12:07:07.662Z" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Verizon IDP Hub</saml:Issuer><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI="#_f6c28a7d-9c82-4ae8-ba14-fc42c85081d3"><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"><InclusiveNamespaces PrefixList="#default samlp saml ds xs xsi" xmlns="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transform></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>c8xR7YMU8KAYbkV7Jx3WEBhIqso=</DigestValue></Reference></SignedInfo><SignatureValue>jPOrsXdG/YVyGrykXYUbgVK7iX+tNFjMJnOA2iFWOjjtWco9M5DT9tyUsYAag4o4oDUEJribGWhCYn6nvQ24zfW+eJYGwbxO0TSZ26J0iuhnxr+MMFmJVGjxArD70dea0kITssqCxJNKUwmTqteAQ73+qk91H9E9IDoOjMwQERoyD4sAtvfJErRrRontvg9xeQ0BFtyMzJZkwU24QqHvoHyw9/dVO8/NFPydwjaI9uZMu6/QUYKKvkbf6VUXXQUHIiZgX0GCudpB908BqWIcj0dWv8oKGGajQWp+d8Jlx/nxbUTAs8vL1f0dxW3LYCZsDExHmjRQTBhM0pQVMT+HlA==</SignatureValue><KeyInfo><X509Data><X509Certificate>MIICrjCCAZYCCQDWybyUsLVkXzANBgkqhkiG9w0BAQsFADAZMRcwFQYDVQQDFA5hY21lX3Rvb2xzLmNvbTAeFw0xNTA4MTgwODQ3MzZaFw0yNTA4MTcwODQ3MzZaMBkxFzAVBgNVBAMUDmFjbWVfdG9vbHMuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyT+OzEymhaZFNfx4+HFxZbBP3egvcUgPvGa7wWCV7vyuCauLBqwO1FQqzaRDxkEihkHqmUz63D25v2QixLxXyqaFQ8TxDFKwYATtSL7x5G2Gww56H0L1XGgYdNW1akPx90P+USmVn1Wb//7AwU+TV+u4jIgKZyTaIFWdFlwBhlp4OBEHCyYwngFgMyVoCBsSmwb4if7Mi5T746J9ZMQpC+ts+kfzley59Nz55pa5fRLwu4qxFUv2oRdXAf2ZLuxB7DPQbRH82/ewZZ8N4BUGiQyAwOsHgp0sb9JJ8uEM/qhyS1dXXxjo+kxsI5HXhxp4P5R9VADuOquaLIo8ptIrQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBW/Y7leJnV76+6bzeqqi+buTLyWc1mASi5LVH68mdailg2WmGfKlSMLGzFkNtg8fJnfaRZ/GtxmSxhpQRHn63ZlyzqVrFcJa0qzPG21PXPHG/ny8pN+BV8fk74CIb/+YN7NvDUrV7jlsPxNT2rQk8G2fM7jsTMYvtz0MBkrZZsUzTv4rZkF/v44J/ACDirKJiE+TYArm70yQPweX6RvYHNZLSzgg4o+hoyBXo5BGQetAjmcIhC6ZOwN3iVhGjp0YpWM0pkqStPy3sIR0//LZbskWWlSRb0fX1c4632Xb+zikfec4DniYV6CxkB2U+plHpOX1rt1R+UiTEIhTSXPNt/</X509Certificate></X509Data></KeyInfo></Signature><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" /></samlp:Status><saml:Assertion Version="2.0" ID="_ea67f283-0afb-465a-ba78-5abe7b7f8584" IssueInstant="2014-06-05T12:07:07.663Z" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Issuer>Verizon IDP Hub</saml:Issuer><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">UIS/jochen-work</saml:NameID><saml:SubjectConfirmation><saml:SubjectConfirmationData NotBefore="2014-06-05T12:06:07.664Z" NotOnOrAfter="2014-06-05T12:10:07.664Z" /></saml:SubjectConfirmation></saml:Subject><saml:AttributeStatement><saml:Attribute Name="vz::identity" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">UIS/jochen-work</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::subjecttype" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">UIS user</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::account" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">e9aba0c4-ece8-4b44-9526-d24418aa95dc</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::org" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">testorg</saml:AttributeValue></saml:Attribute><saml:Attribute Name="vz::name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">Test User</saml:AttributeValue></saml:Attribute><saml:Attribute Name="net::ip" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">::1</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response>';
@@ -2701,24 +2685,16 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+        await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
-        samlObj.validatePostResponse(container, function (err, profile, logout) {
-          should.not.exist(err);
-          profile.nameID.should.startWith("UIS/jochen-work");
-          samlObj.cacheProvider.get(requestId, function (err, value) {
-            try {
-              should.exist(value);
-              value.should.eql("2014-06-05T12:07:07.662Z");
-              done();
-            } catch (err2) {
-              done(err2);
-            }
-          });
-        });
+        const { profile } = await samlObj.validatePostResponseAsync(container);
+        profile.nameID.should.startWith("UIS/jochen-work");
+        const value = await samlObj.cacheProvider.getAsync(requestId);
+        should.exist(value);
+        value.should.eql("2014-06-05T12:07:07.662Z");
       });
 
-      it("xml document with multiple AttributeStatements should have all attributes present on profile", function (done) {
+      it("xml document with multiple AttributeStatements should have all attributes present on profile", async () => {
         var requestId = "_dfab47d5d46374cd4b71";
         var xml =
           '<samlp:Response ID="_f6c28a7d-9c82-4ae8-ba14-fc42c85081d3" InResponseTo="_dfab47d5d46374cd4b71" Version="2.0" IssueInstant="2014-06-05T12:07:07.662Z" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">Verizon IDP Hub</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion Version="2.0" ID="_ea67f283-0afb-465a-ba78-5abe7b7f8584" IssueInstant="2014-06-05T12:07:07.663Z" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Issuer>Verizon IDP Hub</saml:Issuer><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">UIS/jochen-work</saml:NameID><saml:SubjectConfirmation><saml:SubjectConfirmationData NotBefore="2014-06-05T12:06:07.664Z" NotOnOrAfter="2014-06-05T12:10:07.664Z" InResponseTo="_dfab47d5d46374cd4b71"/></saml:SubjectConfirmation></saml:Subject><saml:AttributeStatement><saml:Attribute Name="vz::identity" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">UIS/jochen-work</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><saml:AttributeStatement><saml:Attribute Name="vz::subjecttype" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">UIS user</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><saml:AttributeStatement><saml:Attribute Name="vz::account" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">e9aba0c4-ece8-4b44-9526-d24418aa95dc</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><saml:AttributeStatement><saml:Attribute Name="vz::org" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">testorg</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><saml:AttributeStatement><saml:Attribute Name="vz::name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">Test User</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><saml:AttributeStatement><saml:Attribute Name="net::ip" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xsi:type="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">::1</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><Reference URI="#_f6c28a7d-9c82-4ae8-ba14-fc42c85081d3"><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><DigestValue>qD+sVCaEdy1dTJoUQdo6o+tYsuU=</DigestValue></Reference></SignedInfo><SignatureValue>aLl+1yT7zdT4WnRXKh9cx7WWZnUi/NoxMJWhXP5d+Zu9A4/fjKApSywimU0MTTQxYpvZLjOZPsSwmvc1boJOlXveDsL7A3YWi/f7/zqlVWOfXLE8TVLqUE4jtLsJHFWIJXmh8CI0loqQNf6QcYi9BwCK82FhhXC+qWA5WCZIIWUUMxjxnPbunQ7mninEeW568wqyhb9pLV8QkThzZrZINCqxNvWyGuK/XGPx7ciD6ywbBkdOjlDbwRMaKQ9YeCzZGGzJwOe/NuCXj+oUyzfmzUCobIIR0HYLc4B5UplL7XIKQzpOA2lDDsLe6ZzdTv1qjxSm+dlVfo24onmiPlQUgA==</SignatureValue></Signature></samlp:Response>';
@@ -2736,30 +2712,22 @@ describe("passport-saml /", function () {
         fakeClock = sinon.useFakeTimers(Date.parse("2014-06-05T12:07:07.662Z"));
 
         // Mock the SAML request being passed through Passport-SAML
-        samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+        await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
-        samlObj.validatePostResponse(container, function (err, profile, logout) {
-          should.not.exist(err);
-          profile.nameID.should.startWith("UIS/jochen-work");
-          profile["vz::identity"].should.equal("UIS/jochen-work");
-          profile["vz::subjecttype"].should.equal("UIS user");
-          profile["vz::account"].should.equal("e9aba0c4-ece8-4b44-9526-d24418aa95dc");
-          profile["vz::org"].should.equal("testorg");
-          profile["vz::name"].should.equal("Test User");
-          profile["net::ip"].should.equal("::1");
-          samlObj.cacheProvider.get(requestId, function (err, value) {
-            try {
-              should.not.exist(value);
-              done();
-            } catch (err2) {
-              done(err2);
-            }
-          });
-        });
+        const { profile } = await samlObj.validatePostResponseAsync(container);
+        profile.nameID.should.startWith("UIS/jochen-work");
+        profile["vz::identity"].should.equal("UIS/jochen-work");
+        profile["vz::subjecttype"].should.equal("UIS user");
+        profile["vz::account"].should.equal("e9aba0c4-ece8-4b44-9526-d24418aa95dc");
+        profile["vz::org"].should.equal("testorg");
+        profile["vz::name"].should.equal("Test User");
+        profile["net::ip"].should.equal("::1");
+        const value = await samlObj.cacheProvider.getAsync(requestId);
+        should.not.exist(value);
       });
 
       describe("InResponseTo server cache expiration tests /", function () {
-        it("should expire a cached request id after the time", function (done) {
+        it("should expire a cached request id after the time", async () => {
           var requestId = "_dfab47d5d46374cd4b71";
 
           var samlConfig = {
@@ -2769,10 +2737,10 @@ describe("passport-saml /", function () {
           var samlObj = new SAML(samlConfig);
 
           // Mock the SAML request being passed through Passport-SAML
-          samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+          await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
           setTimeout(function () {
-            samlObj.cacheProvider.get(requestId, function (err, value) {
+            samlObj.cacheProvider.getAsync(requestId, function (err, value) {
               try {
                 should.not.exist(value);
                 done();
@@ -2783,7 +2751,7 @@ describe("passport-saml /", function () {
           }, 300);
         });
 
-        it("should expire many cached request ids after the time", function (done) {
+        it("should expire many cached request ids after the time", async () => {
           var expiredRequestId1 = "_dfab47d5d46374cd4b71";
           var expiredRequestId2 = "_dfab47d5d46374cd4b72";
           var requestId = "_dfab47d5d46374cd4b73";
@@ -2794,35 +2762,22 @@ describe("passport-saml /", function () {
           };
           var samlObj = new SAML(samlConfig);
 
-          samlObj.cacheProvider.save(expiredRequestId1, new Date().toISOString(), function () {});
-          samlObj.cacheProvider.save(expiredRequestId2, new Date().toISOString(), function () {});
+          await samlObj.cacheProvider.saveAsync(expiredRequestId1, new Date().toISOString());
+          await samlObj.cacheProvider.saveAsync(expiredRequestId2, new Date().toISOString());
 
-          setTimeout(function () {
-            // Add one more that shouldn't expire
-            samlObj.cacheProvider.save(requestId, new Date().toISOString(), function () {});
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          // Add one more that shouldn't expire
+          await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
-            samlObj.cacheProvider.get(expiredRequestId1, function (err, value) {
-              should.not.exist(value);
-            });
-            samlObj.cacheProvider.get(expiredRequestId2, function (err, value) {
-              should.not.exist(value);
-            });
-            samlObj.cacheProvider.get(requestId, function (err, value) {
-              should.exist(value);
-            });
-
-            // Let the expiration timer run again and we should have no more cached
-            setTimeout(function () {
-              samlObj.cacheProvider.get(requestId, function (err, value) {
-                try {
-                  should.not.exist(value);
-                  done();
-                } catch (err2) {
-                  done(err2);
-                }
-              });
-            }, 300);
-          }, 300);
+          const value1 = await samlObj.cacheProvider.getAsync(expiredRequestId1);
+          should.not.exist(value1);
+          const value2 = await samlObj.cacheProvider.getAsync(expiredRequestId2);
+          should.not.exist(value2);
+          const value3 = await samlObj.cacheProvider.getAsync(requestId);
+          should.exist(value3);
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          const value4 = await samlObj.cacheProvider.getAsync(requestId);
+          should.not.exist(value4);
         });
       });
     });
@@ -3401,9 +3356,9 @@ describe("passport-saml /", function () {
         this.request = Object.assign({}, require("./static/sp_slo_redirect"));
         this.clock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
-      afterEach(function (done) {
+      afterEach(async function () {
         this.clock.restore();
-        samlObj.cacheProvider.remove("_79db1e7ad12ca1d63e5b", done);
+        await samlObj.cacheProvider.removeAsync("_79db1e7ad12ca1d63e5b");
       });
       it("errors if bad xml", function (done) {
         var body = {
@@ -3456,7 +3411,7 @@ describe("passport-saml /", function () {
         });
       });
       it("errors if bad signature", function (done) {
-        samlObj.cacheProvider.save(
+        samlObj.cacheProvider.saveAsync(
           "_79db1e7ad12ca1d63e5b",
           new Date().toISOString(),
           function () {}
@@ -3474,7 +3429,7 @@ describe("passport-saml /", function () {
       });
 
       it("returns true for valid signature", function (done) {
-        samlObj.cacheProvider.save(
+        samlObj.cacheProvider.saveAsync(
           "_79db1e7ad12ca1d63e5b",
           new Date().toISOString(),
           function () {}
@@ -3499,7 +3454,7 @@ describe("passport-saml /", function () {
           __dirname + "/static/acme_tools_com_without_header_and_footer.cert",
           "ascii"
         );
-        samlObj.cacheProvider.save(
+        samlObj.cacheProvider.saveAsync(
           "_79db1e7ad12ca1d63e5b",
           new Date().toISOString(),
           function () {}

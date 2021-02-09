@@ -48,7 +48,7 @@ export class CacheProvider {
           nowMs >=
           new Date(this.cacheKeys[key].createdAt).getTime() + this.options.keyExpirationPeriodMs
         ) {
-          this.remove(key, () => undefined);
+          this.removeAsync(key);
         }
       });
     }, this.options.keyExpirationPeriodMs);
@@ -56,7 +56,7 @@ export class CacheProvider {
     // we only want this to run if the process is still open; it shouldn't hold the process open (issue #68)
     //   (unref only introduced in node 0.9, so check whether we have it)
     // Skip this in 0.10.34 due to https://github.com/joyent/node/issues/8900
-    if (expirationTimer.unref && process.version !== "v0.10.34") expirationTimer.unref();
+    if (expirationTimer.unref) expirationTimer.unref();
   }
 
   /**
@@ -65,16 +65,15 @@ export class CacheProvider {
    * @param id
    * @param value
    */
-  save(key: string, value: string, callback: (error: null, value: CacheItem | null) => void) {
+  async saveAsync(key: string, value: string) {
     if (!this.cacheKeys[key]) {
       this.cacheKeys[key] = {
         createdAt: new Date().getTime(),
         value: value,
       };
-
-      callback(null, this.cacheKeys[key]);
+      return this.cacheKeys[key];
     } else {
-      callback(null, null);
+      return null;
     }
   }
 
@@ -83,11 +82,11 @@ export class CacheProvider {
    * @param id
    * @returns {boolean}
    */
-  get(key: string, callback: (key: string | null, value: string | null) => void) {
+  async getAsync(key: string) {
     if (this.cacheKeys[key]) {
-      callback(null, this.cacheKeys[key].value);
+      return this.cacheKeys[key].value;
     } else {
-      callback(null, null);
+      return null;
     }
   }
 
@@ -95,12 +94,12 @@ export class CacheProvider {
    * Removes an item from the cache if it exists
    * @param key
    */
-  remove(key: string, callback: (err: Error | null, key: string | null) => void) {
+  async removeAsync(key: string) {
     if (this.cacheKeys[key]) {
       delete this.cacheKeys[key];
-      callback(null, key);
+      return key;
     } else {
-      callback(null, null);
+      return null;
     }
   }
 }
