@@ -1,2 +1,3 @@
 --reporter spec
 --require choma
+--require ts-node/register

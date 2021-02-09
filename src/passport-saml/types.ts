@@ -23,10 +23,10 @@ export interface SAMLOptions {
   entryPoint: string;
   issuer: string;
   /** @deprecated use privateKey field instead */
-  privateCert?: string;
-  privateKey: string;
+  privateCert?: string | Buffer;
+  privateKey: string | Buffer;
   cert: string | string[] | CertCallback;
-  decryptionPvk: string;
+  decryptionPvk: string | Buffer;
   signatureAlgorithm: "sha1" | "sha256" | "sha512";
 
   // Additional SAML behaviors
