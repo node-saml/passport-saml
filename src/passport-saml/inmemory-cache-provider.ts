@@ -54,9 +54,7 @@ export class CacheProvider {
     }, this.options.keyExpirationPeriodMs);
 
     // we only want this to run if the process is still open; it shouldn't hold the process open (issue #68)
-    //   (unref only introduced in node 0.9, so check whether we have it)
-    // Skip this in 0.10.34 due to https://github.com/joyent/node/issues/8900
-    if (expirationTimer.unref) expirationTimer.unref();
+    expirationTimer.unref();
   }
 
   /**
@@ -65,7 +63,7 @@ export class CacheProvider {
    * @param id
    * @param value
    */
-  async saveAsync(key: string, value: string) {
+  async saveAsync(key: string, value: string): Promise<CacheItem | null> {
     if (!this.cacheKeys[key]) {
       this.cacheKeys[key] = {
         createdAt: new Date().getTime(),
@@ -82,7 +80,7 @@ export class CacheProvider {
    * @param id
    * @returns {boolean}
    */
-  async getAsync(key: string) {
+  async getAsync(key: string): Promise<string | null> {
     if (this.cacheKeys[key]) {
       return this.cacheKeys[key].value;
     } else {
@@ -94,7 +92,7 @@ export class CacheProvider {
    * Removes an item from the cache if it exists
    * @param key
    */
-  async removeAsync(key: string) {
+  async removeAsync(key: string): Promise<string | null> {
     if (this.cacheKeys[key]) {
       delete this.cacheKeys[key];
       return key;
