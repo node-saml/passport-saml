@@ -244,7 +244,7 @@ describe("strategy#generateServiceProviderMetadata", function () {
     const strategy = new MultiSamlStrategy(passportOptions, verify);
     strategy.generateServiceProviderMetadata("foo" as any, "bar", "baz", function (error, result) {
       try {
-        should(error).equal("My error");
+        should(error?.message).equal("My error");
         done();
       } catch (err2) {
         done(err2);

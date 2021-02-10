@@ -32,7 +32,7 @@ export interface SAMLOptions {
   // Additional SAML behaviors
   additionalParams: Record<string, string>;
   additionalAuthorizeParams: Record<string, string>;
-  identifierFormat: string;
+  identifierFormat: string | null;
   acceptedClockSkewMs: number;
   attributeConsumingServiceIndex: string | null;
   disableRequestedAuthnContext: boolean;
@@ -73,7 +73,7 @@ interface StrategyOptions {
 export interface SamlScopingConfig {
   idpList?: SamlIDPListConfig[];
   proxyCount?: number;
-  requesterId?: string[];
+  requesterId?: string[] | string;
 }
 
 export type XMLValue = string | number | boolean | null | XMLObject | XMLValue[];

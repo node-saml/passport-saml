@@ -2,9 +2,9 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as passport from "passport";
-import { Strategy as SamlStrategy, SAML } from "../src/passport-saml/index.js";
+import { Strategy as SamlStrategy, SAML } from "../src/passport-saml";
 // @ts-ignore no typings for request, TODO: we need to remove this dependency instead of adding typings
-import request from "request";
+import request = require("request");
 import "should";
 import * as zlib from "zlib";
 import * as querystring from "querystring";
@@ -17,6 +17,8 @@ import {
   SamlConfig,
   SAMLOptions,
   VerifiedCallback,
+  VerifyWithoutRequest,
+  VerifyWithRequest,
 } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
@@ -28,19 +30,23 @@ const ALT_TEST_CERT =
   "MIIEOTCCAyGgAwIBAgIJAKZgJdKdCdL6MA0GCSqGSIb3DQEBBQUAMHAxCzAJBgNVBAYTAkFVMREwDwYDVQQIEwhWaWN0b3JpYTESMBAGA1UEBxMJTWVsYm91cm5lMSEwHwYDVQQKExhUYWJjb3JwIEhvbGRpbmdzIExpbWl0ZWQxFzAVBgNVBAMTDnN0cy50YWIuY29tLmF1MB4XDTE3MDUzMDA4NTQwOFoXDTI3MDUyODA4NTQwOFowcDELMAkGA1UEBhMCQVUxETAPBgNVBAgTCFZpY3RvcmlhMRIwEAYDVQQHEwlNZWxib3VybmUxITAfBgNVBAoTGFRhYmNvcnAgSG9sZGluZ3MgTGltaXRlZDEXMBUGA1UEAxMOc3RzLnRhYi5jb20uYXUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD0NuMcflq3rtupKYDf4a7lWmsXy66fYe9n8jB2DuLMakEJBlzn9j6B98IZftrilTq21VR7wUXROxG8BkN8IHY+l8X7lATmD28fFdZJj0c8Qk82eoq48faemth4fBMx2YrpnhU00jeXeP8dIIaJTPCHBTNgZltMMhphklN1YEPlzefJs3YD+Ryczy1JHbwETxt+BzO1JdjBe1fUTyl6KxAwWvtsNBURmQRYlDOk4GRgdkQnfxBuCpOMeOpV8wiBAi3h65Lab9C5avu4AJlA9e4qbOmWt6otQmgy5fiJVy6bH/d8uW7FJmSmePX9sqAWa9szhjdn36HHVQsfHC+IUEX7AgMBAAGjgdUwgdIwHQYDVR0OBBYEFN6z6cuxY7FTkg1S/lIjnS4x5ARWMIGiBgNVHSMEgZowgZeAFN6z6cuxY7FTkg1S/lIjnS4x5ARWoXSkcjBwMQswCQYDVQQGEwJBVTERMA8GA1UECBMIVmljdG9yaWExEjAQBgNVBAcTCU1lbGJvdXJuZTEhMB8GA1UEChMYVGFiY29ycCBIb2xkaW5ncyBMaW1pdGVkMRcwFQYDVQQDEw5zdHMudGFiLmNvbS5hdYIJAKZgJdKdCdL6MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAMi5HyvXgRa4+kKz3dk4SwAEXzeZRcsbeDJWVUxdb6a+JQxIoG7L9rSbd6yZvP/Xel5TrcwpCpl5eikzXB02/C0wZKWicNmDEBlOfw0Pc5ngdoh6ntxHIWm5QMlAfjR0dgTlojN4Msw2qk7cP1QEkV96e2BJUaqaNnM3zMvd7cfRjPNfbsbwl6hCCCAdwrALKYtBnjKVrCGPwO+xiw5mUJhZ1n6ZivTOdQEWbl26UO60J9ItiWP8VK0d0aChn326Ovt7qC4S3AgDlaJwcKe5Ifxl/UOWePGRwXj2UUuDWFhjtVmRntMmNZbe5yE8MkEvU+4/c6LqGwTCgDenRbK53Dg=";
 
 interface CapturedCheck {
+  samlRequest?: any;
+  result?: any;
   name: string;
   expectedStatusCode: number;
-  samlResponse: any;
+  samlResponse?: any;
   config: Partial<SamlConfig>;
   expectedNameIDStartsWith?: string;
   mockDate: string;
 }
 
-interface LogoutCheck {
+interface SAMLCheck {
+  samlRequest?: any;
+  result?: any;
   name: string;
-  result: any;
-  samlRequest: any;
-  config: any;
+  samlResponse?: any;
+  config: Partial<SamlConfig>;
+  expectedNameIDStartsWith?: string;
 }
 
 describe("passport-saml /", function () {
@@ -139,12 +145,12 @@ describe("passport-saml /", function () {
         app.use(pp.initialize());
         const config = check.config;
         config.callbackUrl = "http://localhost:3033/login";
-        let profile: Profile = null;
+        let profile: Profile | null = null;
         pp.use(
           new SamlStrategy(config, function (_profile: Profile, done: VerifiedCallback) {
             profile = _profile;
             done(null, { id: profile.nameID });
-          })
+          } as VerifyWithoutRequest)
         );
 
         let userSerialized = false;
@@ -203,15 +209,16 @@ describe("passport-saml /", function () {
         const config = check.config;
         config.callbackUrl = "http://localhost:3033/login";
         config.passReqToCallback = true;
-        let passedRequest: express.Request = null;
+        let passedRequest: express.Request | null = null;
         pp.use(
-          new SamlStrategy(
-            config,
-            function (req: express.Request, _profile: Profile, done: VerifiedCallback) {
-              passedRequest = req;
-              done(null, { id: _profile!.nameID });
-            }
-          )
+          new SamlStrategy(config, function (
+            req: express.Request,
+            _profile: Profile,
+            done: VerifiedCallback
+          ) {
+            passedRequest = req;
+            done(null, { id: _profile!.nameID });
+          } as VerifyWithRequest)
         );
         pp.serializeUser(function (user, done) {
           done(null, user);
@@ -242,9 +249,9 @@ describe("passport-saml /", function () {
               response.statusCode.should.equal(check.expectedStatusCode);
               if (response.statusCode == 200) {
                 should.exist(passedRequest);
-                passedRequest.url.should.eql("/login");
-                passedRequest.method.should.eql("POST");
-                should(passedRequest.body).match(check.samlResponse);
+                passedRequest!.url!.should.eql("/login");
+                passedRequest!.method!.should.eql("POST");
+                should(passedRequest!.body).match(check.samlResponse);
               } else {
                 should.not.exist(passedRequest);
               }
@@ -270,7 +277,7 @@ describe("passport-saml /", function () {
   });
 
   describe("captured SAML requests /", function () {
-    const logoutChecks: LogoutCheck[] = [
+    const logoutChecks: CapturedCheck[] = [
       {
         name: "Logout",
         config: {
@@ -313,7 +320,7 @@ describe("passport-saml /", function () {
       },
     ];
 
-    const capturedChecks = [
+    const capturedChecks: SAMLCheck[] = [
       {
         name: "Empty Config",
         config: {},
@@ -396,7 +403,7 @@ describe("passport-saml /", function () {
           issuer: "http://exampleSp.com/saml",
           identifierFormat: "alternateIdentifier",
           passive: true,
-          attributeConsumingServiceIndex: 123,
+          attributeConsumingServiceIndex: "123",
           forceAuthn: false,
         },
         result: {
@@ -445,7 +452,7 @@ describe("passport-saml /", function () {
           issuer: "http://exampleSp.com/saml",
           identifierFormat: "alternateIdentifier",
           passive: true,
-          attributeConsumingServiceIndex: 123,
+          attributeConsumingServiceIndex: "123",
           skipRequestCompression: true,
         },
         result: {
@@ -494,7 +501,7 @@ describe("passport-saml /", function () {
           issuer: "http://exampleSp.com/saml",
           identifierFormat: "alternateIdentifier",
           passive: true,
-          attributeConsumingServiceIndex: 123,
+          attributeConsumingServiceIndex: "123",
           skipRequestCompression: true,
           disableRequestedAuthnContext: true,
           forceAuthn: true,
@@ -535,7 +542,7 @@ describe("passport-saml /", function () {
           issuer: "http://exampleSp.com/saml",
           identifierFormat: "alternateIdentifier",
           passive: true,
-          attributeConsumingServiceIndex: 123,
+          attributeConsumingServiceIndex: "123",
           authnContext: "myAuthnContext",
         },
         result: {
@@ -584,7 +591,7 @@ describe("passport-saml /", function () {
           issuer: "http://exampleSp.com/saml",
           identifierFormat: "alternateIdentifier",
           passive: true,
-          attributeConsumingServiceIndex: 123,
+          attributeConsumingServiceIndex: "123",
           authnContext: ["myAuthnContext", "myAuthnContext2"],
         },
         result: {
@@ -1152,8 +1159,8 @@ describe("passport-saml /", function () {
 
     let server: Server;
 
-    function testForCheck(check) {
-      return function (done) {
+    function testForCheck(check: SAMLCheck) {
+      return function (done: Mocha.Done) {
         const app = express();
         app.use(bodyParser.urlencoded({ extended: false }));
         app.use(passport.initialize());
@@ -1162,10 +1169,10 @@ describe("passport-saml /", function () {
         config.entryPoint = "https://wwwexampleIdp.com/saml";
         let profile = null;
         passport.use(
-          new SamlStrategy(config, function (_profile, done: VerifiedCallback) {
+          new SamlStrategy(config, function (_profile: Profile, done: VerifiedCallback) {
             profile = _profile;
             done(null, profile);
-          })
+          } as VerifyWithoutRequest)
         );
 
         let userSerialized = false;
@@ -1245,7 +1252,7 @@ describe("passport-saml /", function () {
       };
     }
 
-    function testForCheckLogout(check: LogoutCheck) {
+    function testForCheckLogout(check: CapturedCheck) {
       return function (done: Mocha.Done) {
         const app = express();
         app.use(bodyParser.urlencoded({ extended: false }));
@@ -1255,10 +1262,10 @@ describe("passport-saml /", function () {
         config.entryPoint = "https://wwwexampleIdp.com/saml";
         let profile = null;
         passport.use(
-          new SamlStrategy(config, function (_profile, done: VerifiedCallback) {
+          new SamlStrategy(config, function (_profile: Profile, done: VerifiedCallback) {
             profile = _profile;
             done(null, profile);
-          })
+          } as VerifyWithoutRequest)
         );
 
         let userSerialized = false;
@@ -2165,7 +2172,7 @@ describe("passport-saml /", function () {
           privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          identifierFormat: undefined,
+          identifierFormat: null,
           signatureAlgorithm: "sha256",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
@@ -2197,7 +2204,7 @@ describe("passport-saml /", function () {
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          identifierFormat: undefined,
+          identifierFormat: null,
           signatureAlgorithm: "sha256" as const,
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
@@ -2293,7 +2300,7 @@ describe("passport-saml /", function () {
           privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          identifierFormat: undefined,
+          identifierFormat: null,
           signatureAlgorithm: "sha1" as const,
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
@@ -2325,7 +2332,7 @@ describe("passport-saml /", function () {
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          identifierFormat: undefined,
+          identifierFormat: null,
           signatureAlgorithm: "sha1",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
@@ -2810,7 +2817,7 @@ describe("passport-saml /", function () {
           await samlObj.cacheProvider.saveAsync(requestId, new Date().toISOString());
 
           await new Promise((resolve) => setTimeout(resolve, 300));
-          const value = samlObj.cacheProvider.getAsync(requestId);
+          const value = await samlObj.cacheProvider.getAsync(requestId);
           should.not.exist(value);
         });
 
@@ -3479,7 +3486,7 @@ describe("passport-saml /", function () {
           }
         });
       });
-      it("errors if bad signature", async function (done) {
+      it("errors if bad signature", async function () {
         await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
         this.request.Signature = "foo";
         try {
