@@ -63,11 +63,7 @@ export class CacheProvider {
    * @param id
    * @param value
    */
-<<<<<<< HEAD
   async saveAsync(key: string, value: string): Promise<CacheItem | null> {
-=======
-  async saveAsync(key: string, value: string) {
->>>>>>> async / await in cache interface
     if (!this.cacheKeys[key]) {
       this.cacheKeys[key] = {
         createdAt: new Date().getTime(),
@@ -84,11 +80,7 @@ export class CacheProvider {
    * @param id
    * @returns {boolean}
    */
-<<<<<<< HEAD
   async getAsync(key: string): Promise<string | null> {
-=======
-  async getAsync(key: string) {
->>>>>>> async / await in cache interface
     if (this.cacheKeys[key]) {
       return this.cacheKeys[key].value;
     } else {
@@ -100,11 +92,7 @@ export class CacheProvider {
    * Removes an item from the cache if it exists
    * @param key
    */
-<<<<<<< HEAD
   async removeAsync(key: string): Promise<string | null> {
-=======
-  async removeAsync(key: string) {
->>>>>>> async / await in cache interface
     if (this.cacheKeys[key]) {
       delete this.cacheKeys[key];
       return key;
