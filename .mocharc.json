@@ -1,0 +1,9 @@
+{
+  "diff": true,
+  "extension": "spec.ts",
+  "package": "./package.json",
+  "reporter": "spec",
+  "require": ["choma", "ts-node/register"],
+  "files": "test/**/*.spec.ts",
+  "watch-files": "test/**/*.spec.ts"
+}

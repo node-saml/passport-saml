@@ -37,14 +37,14 @@
   "scripts": {
     "build": "tsc",
     "changelog": "gren changelog --override --generate",
-    "lint": "eslint --ext .ts src",
+    "lint": "eslint --ext .ts **/*.ts --cache",
     "lint-watch": "onchange -k -p 100 \"**/*.ts\" -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
     "prepare": "tsc",
     "prettier-check": "prettier --config .prettierrc.json --check .",
     "prettier-format": "prettier --config .prettierrc.json --write .",
     "prettier-watch": "onchange -k -p 100 \".\" -- prettier --config .prettierrc.json --write {{file}}",
-    "test": "npm run prettier-check && npm run lint && npm run tsc && mocha --extension ts --require ts-node/register",
+    "test": "npm run prettier-check && npm run lint && npm run tsc && mocha",
     "tsc": "tsc",
     "tsc-watch": "tsc --watch",
     "watch": "concurrently --kill-others \"npm:*-watch\""

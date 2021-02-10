@@ -5,6 +5,8 @@ import type { CacheProvider } from "./inmemory-cache-provider";
 export type CertCallback = (
   callback: (err: Error | null, cert?: string | string[]) => void
 ) => void;
+export type RACComparision = "exact" | "minimum" | "maximum" | "better";
+export type SignatureAlgorithm = "sha1" | "sha256" | "sha512";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   additionalParams?: Record<string, any>;
@@ -27,7 +29,7 @@ export interface SAMLOptions {
   privateKey: string | Buffer;
   cert: string | string[] | CertCallback;
   decryptionPvk: string | Buffer;
-  signatureAlgorithm: "sha1" | "sha256" | "sha512";
+  signatureAlgorithm: SignatureAlgorithm;
 
   // Additional SAML behaviors
   additionalParams: Record<string, string>;
@@ -39,7 +41,7 @@ export interface SAMLOptions {
   authnContext: string | string[];
   forceAuthn: boolean;
   skipRequestCompression: boolean;
-  RACComparison: "exact" | "minimum" | "maximum" | "better";
+  RACComparison: RACComparision;
   providerName: string;
   passive: boolean;
   idpIssuer: string;

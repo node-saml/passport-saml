@@ -13,6 +13,7 @@ import * as fs from "fs";
 import * as sinon from "sinon";
 import {
   Profile,
+  RACComparision,
   RequestWithUser,
   SamlConfig,
   SAMLOptions,
@@ -2611,7 +2612,7 @@ describe("passport-saml /", function () {
           "the default value of the option `RACComparison` must be exact"
         );
 
-        const validComparisonTypes = ["exact", "minimum", "maximum", "better"] as const;
+        const validComparisonTypes: RACComparision[] = ["exact", "minimum", "maximum", "better"];
         let samlObjValidComparisonType: SAML;
         validComparisonTypes.forEach(function (RACComparison) {
           samlObjValidComparisonType = new SAML({ RACComparison: RACComparison });
