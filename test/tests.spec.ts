@@ -17,6 +17,7 @@ import {
   RequestWithUser,
   SamlConfig,
   SAMLOptions,
+  SignatureAlgorithm,
   VerifiedCallback,
   VerifyWithoutRequest,
   VerifyWithRequest,
@@ -2206,7 +2207,7 @@ describe("passport-saml /", function () {
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
-          signatureAlgorithm: "sha256" as const,
+          signatureAlgorithm: "sha256" as SignatureAlgorithm,
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
@@ -2237,7 +2238,7 @@ describe("passport-saml /", function () {
           privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          signatureAlgorithm: "sha256" as const,
+          signatureAlgorithm: "sha256" as SignatureAlgorithm,
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
@@ -2269,7 +2270,7 @@ describe("passport-saml /", function () {
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          signatureAlgorithm: "sha256" as const,
+          signatureAlgorithm: "sha256" as SignatureAlgorithm,
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
@@ -2302,7 +2303,7 @@ describe("passport-saml /", function () {
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
-          signatureAlgorithm: "sha1" as const,
+          signatureAlgorithm: "sha1" as SignatureAlgorithm,
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
