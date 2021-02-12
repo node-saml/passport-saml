@@ -3,7 +3,7 @@ import * as express from "express";
 import * as sinon from "sinon";
 import * as should from "should";
 import { Strategy as SamlStrategy, MultiSamlStrategy } from "../src/passport-saml";
-import { SamlOptionsCallback } from "../src/passport-saml/types";
+import { MultiSamlConfig, SamlOptionsCallback } from "../src/passport-saml/types";
 
 function verify() {}
 
@@ -18,7 +18,7 @@ describe("Strategy()", function () {
 
   it("throws if wrong finder is provided", function () {
     function createStrategy() {
-      return new MultiSamlStrategy({} as any, verify);
+      return new MultiSamlStrategy({} as MultiSamlConfig, verify);
     }
     should.throws(createStrategy);
   });
