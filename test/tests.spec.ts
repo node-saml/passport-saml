@@ -1745,6 +1745,24 @@ describe("passport-saml /", function () {
       metadata.should.containEql(samlConfig.logoutCallbackUrl);
     });
 
+    it("generateServiceProviderMetadata contains WantAssertionsSigned", function () {
+      var samlConfig = {
+        issuer: "http://example.serviceprovider.com",
+        callbackUrl: "http://example.serviceprovider.com/saml/callback",
+        identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+        decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+        wantAssertionsSigned: true,
+      };
+
+      var samlObj = new SAML(samlConfig);
+      var decryptionCert = fs.readFileSync(
+        __dirname + "/static/testshib encryption cert.pem",
+        "utf-8"
+      );
+      var metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
+      metadata.should.containEql('WantAssertionsSigned="true"');
+    });
+
     it("#certToPEM should generate valid certificate", function (done) {
       const samlConfig = {
         entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
