@@ -1554,6 +1554,10 @@ class SAML {
       metadata.EntityDescriptor.SPSSODescriptor.NameIDFormat = this.options.identifierFormat;
     }
 
+    if (this.options.wantAssertionsSigned) {
+      metadata.EntityDescriptor.SPSSODescriptor.wantAssertionsSigned = this.options.wantAssertionsSigned;
+    }
+
     metadata.EntityDescriptor.SPSSODescriptor.AssertionConsumerService = {
       "@index": "1",
       "@isDefault": "true",
