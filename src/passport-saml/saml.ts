@@ -1553,9 +1553,7 @@ class SAML {
     }
 
     if (this.options.wantAssertionsSigned) {
-      metadata.EntityDescriptor.SPSSODescriptor[
-        "@WantAssertionsSigned"
-      ] = this.options.wantAssertionsSigned;
+      metadata.EntityDescriptor.SPSSODescriptor["@WantAssertionsSigned"] = true;
     }
 
     metadata.EntityDescriptor.SPSSODescriptor.AssertionConsumerService = {
