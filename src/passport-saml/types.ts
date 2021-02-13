@@ -45,6 +45,7 @@ export interface SAMLOptions {
   idpIssuer: string;
   audience: string;
   scoping: SamlScopingConfig;
+  wantAssertionsSigned: boolean;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;
