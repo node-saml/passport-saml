@@ -25,17 +25,13 @@ describe("MultiSamlStrategy()", function () {
   });
 });
 
-describe.only("strategy#authenticate", function () {
+describe("MultiSamlStrategy#authenticate", function () {
   beforeEach(function () {
     this.superAuthenticateStub = sinon.stub(SamlStrategy.prototype, "authenticate");
-    this.getAuthorizeFormStub = sinon.stub(saml.SAML.prototype, "getAuthorizeForm");
-    this.getAuthorizeUrlStub = sinon.stub(saml.SAML.prototype, "getAuthorizeUrl");
   });
 
   afterEach(function () {
     this.superAuthenticateStub.restore();
-    this.getAuthorizeFormStub.restore();
-    this.getAuthorizeUrlStub.restore();
   });
 
   it("calls super with request and auth options", function (done) {
@@ -111,6 +107,18 @@ describe.only("strategy#authenticate", function () {
     );
     strategy.authenticate();
   });
+});
+
+describe("MultiSamlStrategy#authorize", function () {
+  beforeEach(function () {
+    this.getAuthorizeFormStub = sinon.stub(saml.SAML.prototype, "getAuthorizeForm");
+    this.getAuthorizeUrlStub = sinon.stub(saml.SAML.prototype, "getAuthorizeUrl");
+  });
+
+  afterEach(function () {
+    this.getAuthorizeFormStub.restore();
+    this.getAuthorizeUrlStub.restore();
+  });
 
   it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
     function getSamlOptions(req, fn) {
@@ -119,7 +127,7 @@ describe.only("strategy#authenticate", function () {
     var strategy = new MultiSamlStrategy({ getSamlOptions }, verify);
     strategy.authenticate({}, {});
     sinon.assert.calledOnce(this.getAuthorizeFormStub);
-  })
+  });
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
     function getSamlOptions(req, fn) {
@@ -128,7 +136,7 @@ describe.only("strategy#authenticate", function () {
     var strategy = new MultiSamlStrategy({ getSamlOptions }, verify);
     strategy.authenticate({}, {});
     sinon.assert.calledOnce(this.getAuthorizeUrlStub);
-  })
+  });
 });
 
 describe("strategy#logout", function () {
