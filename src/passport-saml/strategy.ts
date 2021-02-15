@@ -16,7 +16,6 @@ class Strategy extends PassportStrategy {
   _verify: VerifyWithRequest | VerifyWithoutRequest;
   _saml: saml.SAML;
   _passReqToCallback?: boolean;
-  _authnRequestBinding?: string;
 
   constructor(options: SamlConfig, verify: VerifyWithRequest | VerifyWithoutRequest) {
     super();
@@ -40,7 +39,6 @@ class Strategy extends PassportStrategy {
     this._verify = verify;
     this._saml = new saml.SAML(options);
     this._passReqToCallback = !!options.passReqToCallback;
-    this._authnRequestBinding = options.authnRequestBinding || "HTTP-Redirect";
   }
 
   authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions): void {
@@ -101,7 +99,7 @@ class Strategy extends PassportStrategy {
     } else {
       const requestHandler = {
         "login-request": () => {
-          if (this._authnRequestBinding === "HTTP-POST") {
+          if (this._saml.options.authnRequestBinding === "HTTP-POST") {
             this._saml.getAuthorizeForm(req, (err: Error | null, data?: any) => {
               if (err) {
                 this.error(err);

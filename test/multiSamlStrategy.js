@@ -2,12 +2,13 @@
 
 var sinon = require("sinon");
 var should = require("should");
+var saml = require("../lib/passport-saml/saml.js");
 var SamlStrategy = require("../lib/passport-saml/index.js").Strategy;
-var MultiSamlStrategy = require("../lib/passport-saml/multiSamlStrategy");
+var MultiSamlStrategy = require("../lib/passport-saml/multiSamlStrategy.js");
 
 function verify() {}
 
-describe("Strategy()", function () {
+describe("MultiSamlStrategy()", function () {
   it("extends passport Strategy", function () {
     function getSamlOptions() {
       return {};
@@ -24,7 +25,7 @@ describe("Strategy()", function () {
   });
 });
 
-describe("strategy#authenticate", function () {
+describe("MultiSamlStrategy#authenticate", function () {
   beforeEach(function () {
     this.superAuthenticateStub = sinon.stub(SamlStrategy.prototype, "authenticate");
   });
@@ -57,12 +58,10 @@ describe("strategy#authenticate", function () {
   it("passes options on to saml strategy", function (done) {
     var passportOptions = {
       passReqToCallback: true,
-      authnRequestBinding: "HTTP-POST",
       getSamlOptions: function (req, fn) {
         try {
           fn();
           strategy._passReqToCallback.should.eql(true);
-          strategy._authnRequestBinding.should.eql("HTTP-POST");
           done();
         } catch (err2) {
           done(err2);
@@ -78,6 +77,7 @@ describe("strategy#authenticate", function () {
     var superAuthenticateStub = this.superAuthenticateStub;
     var samlOptions = {
       issuer: "http://foo.issuer",
+      authnRequestBinding: "HTTP-POST",
       callbackUrl: "http://foo.callback",
       cert: "deadbeef",
       host: "lvh",
@@ -109,7 +109,37 @@ describe("strategy#authenticate", function () {
   });
 });
 
-describe("strategy#logout", function () {
+describe("MultiSamlStrategy#authorize", function () {
+  beforeEach(function () {
+    this.getAuthorizeFormStub = sinon.stub(saml.SAML.prototype, "getAuthorizeForm");
+    this.getAuthorizeUrlStub = sinon.stub(saml.SAML.prototype, "getAuthorizeUrl");
+  });
+
+  afterEach(function () {
+    this.getAuthorizeFormStub.restore();
+    this.getAuthorizeUrlStub.restore();
+  });
+
+  it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
+    function getSamlOptions(req, fn) {
+      fn(null, { authnRequestBinding: "HTTP-POST" });
+    }
+    var strategy = new MultiSamlStrategy({ getSamlOptions }, verify);
+    strategy.authenticate({}, {});
+    sinon.assert.calledOnce(this.getAuthorizeFormStub);
+  });
+
+  it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
+    function getSamlOptions(req, fn) {
+      fn(null, {});
+    }
+    var strategy = new MultiSamlStrategy({ getSamlOptions }, verify);
+    strategy.authenticate({}, {});
+    sinon.assert.calledOnce(this.getAuthorizeUrlStub);
+  });
+});
+
+describe("MultiSamlStrategy#logout", function () {
   beforeEach(function () {
     this.superLogoutMock = sinon.stub(SamlStrategy.prototype, "logout");
   });
@@ -137,12 +167,10 @@ describe("strategy#logout", function () {
   it("passes options on to saml strategy", function (done) {
     var passportOptions = {
       passReqToCallback: true,
-      authnRequestBinding: "HTTP-POST",
       getSamlOptions: function (req, fn) {
         try {
           fn();
           strategy._passReqToCallback.should.eql(true);
-          strategy._authnRequestBinding.should.eql("HTTP-POST");
           done();
         } catch (err2) {
           done(err2);
@@ -159,6 +187,7 @@ describe("strategy#logout", function () {
     var samlOptions = {
       issuer: "http://foo.issuer",
       callbackUrl: "http://foo.callback",
+      authnRequestBinding: "HTTP-POST",
       cert: "deadbeef",
       host: "lvh",
       acceptedClockSkewMs: -1,
@@ -184,7 +213,7 @@ describe("strategy#logout", function () {
   });
 });
 
-describe("strategy#generateServiceProviderMetadata", function () {
+describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
   beforeEach(function () {
     this.superGenerateServiceProviderMetadata = sinon
       .stub(SamlStrategy.prototype, "generateServiceProviderMetadata")
@@ -216,12 +245,10 @@ describe("strategy#generateServiceProviderMetadata", function () {
   it("passes options on to saml strategy", function (done) {
     var passportOptions = {
       passReqToCallback: true,
-      authnRequestBinding: "HTTP-POST",
       getSamlOptions: function (req, fn) {
         try {
           fn();
           strategy._passReqToCallback.should.eql(true);
-          strategy._authnRequestBinding.should.eql("HTTP-POST");
           done();
         } catch (err2) {
           done(err2);

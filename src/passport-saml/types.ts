@@ -39,6 +39,7 @@ export interface SAMLOptions {
   authnContext: string | string[];
   forceAuthn: boolean;
   skipRequestCompression: boolean;
+  authnRequestBinding?: string;
   RACComparison: "exact" | "minimum" | "maximum" | "better";
   providerName: string;
   passive: boolean;
@@ -67,7 +68,6 @@ export type SamlConfig = Partial<SAMLOptions> & StrategyOptions;
 interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
-  authnRequestBinding?: string;
 }
 
 export interface SamlScopingConfig {
