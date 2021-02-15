@@ -139,7 +139,7 @@ describe("MultiSamlStrategy#authorize", function () {
   });
 });
 
-describe("strategy#logout", function () {
+describe("MultiSamlStrategy#logout", function () {
   beforeEach(function () {
     this.superLogoutMock = sinon.stub(SamlStrategy.prototype, "logout");
   });
@@ -213,7 +213,7 @@ describe("strategy#logout", function () {
   });
 });
 
-describe("strategy#generateServiceProviderMetadata", function () {
+describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
   beforeEach(function () {
     this.superGenerateServiceProviderMetadata = sinon
       .stub(SamlStrategy.prototype, "generateServiceProviderMetadata")
