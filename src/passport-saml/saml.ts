@@ -870,8 +870,7 @@ class SAML {
 
       if (assertions.length == 1) {
         if (
-          this.options.cert &&
-          !validSignature &&
+          (this.options.wantAssertionsSigned || (this.options.cert && !validSignature)) &&
           !this.validateSignature(xml, assertions[0], certs!)
         ) {
           throw new Error("Invalid signature");
@@ -902,8 +901,7 @@ class SAML {
         if (decryptedAssertions.length != 1) throw new Error("Invalid EncryptedAssertion content");
 
         if (
-          this.options.cert &&
-          !validSignature &&
+          (this.options.wantAssertionsSigned || (this.options.cert && !validSignature)) &&
           !this.validateSignature(decryptedXml, decryptedAssertions[0], certs!)
         )
           throw new Error("Invalid signature from encrypted assertion");
