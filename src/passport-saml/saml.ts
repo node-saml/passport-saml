@@ -275,7 +275,7 @@ class SAML {
     const forceAuthn = this.options.forceAuthn || false;
 
     if (this.options.validateInResponseTo) {
-      await util.promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant);
+      await this.cacheProvider.saveAsync(id, instant);
     }
     const request: AuthorizeRequestXML = {
       "samlp:AuthnRequest": {
@@ -435,7 +435,7 @@ class SAML {
       };
     }
 
-    await util.promisify(this.cacheProvider.save).bind(this.cacheProvider)(id, instant);
+    await this.cacheProvider.saveAsync(id, instant);
     return xmlbuilder.create((request as unknown) as Record<string, any>).end();
   }
 
@@ -987,7 +987,7 @@ class SAML {
     } catch (err) {
       debug("validatePostResponse resulted in an error: %s", err);
       if (this.options.validateInResponseTo) {
-        await util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(inResponseTo!);
+        await this.cacheProvider.removeAsync(inResponseTo!);
       }
       throw err;
     }
@@ -996,9 +996,7 @@ class SAML {
   async validateInResponseTo(inResponseTo: string | null) {
     if (this.options.validateInResponseTo) {
       if (inResponseTo) {
-        const result = await util.promisify(this.cacheProvider.get).bind(this.cacheProvider)(
-          inResponseTo
-        );
+        const result = await this.cacheProvider.getAsync(inResponseTo);
         if (!result) throw new Error("InResponseTo is not valid");
         return;
       } else {
@@ -1255,23 +1253,17 @@ class SAML {
           if (confirmData && confirmData.$) {
             const subjectInResponseTo = confirmData.$.InResponseTo;
             if (inResponseTo && subjectInResponseTo && subjectInResponseTo != inResponseTo) {
-              await util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(
-                inResponseTo
-              );
+              await this.cacheProvider.removeAsync(inResponseTo);
               throw new Error("InResponseTo is not valid");
             } else if (subjectInResponseTo) {
               let foundValidInResponseTo = false;
-              const result = await util.promisify(this.cacheProvider.get).bind(this.cacheProvider)(
-                subjectInResponseTo
-              );
+              const result = await this.cacheProvider.getAsync(subjectInResponseTo);
               if (result) {
                 const createdAt = new Date(result);
                 if (nowMs < createdAt.getTime() + this.options.requestIdExpirationPeriodMs)
                   foundValidInResponseTo = true;
               }
-              await util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(
-                inResponseTo
-              );
+              await this.cacheProvider.removeAsync(inResponseTo);
               if (!foundValidInResponseTo) {
                 throw new Error("InResponseTo is not valid");
               }
@@ -1279,7 +1271,7 @@ class SAML {
             }
           }
         } else {
-          await util.promisify(this.cacheProvider.remove).bind(this.cacheProvider)(inResponseTo);
+          await this.cacheProvider.removeAsync(inResponseTo);
           break getInResponseTo;
         }
       } else {
