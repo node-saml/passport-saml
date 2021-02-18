@@ -63,6 +63,7 @@
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.13",
     "@types/passport-strategy": "^0.2.35",
+    "@types/request": "^2.48.5",
     "@types/sinon": "^9.0.10",
     "@types/xml-crypto": "^1.4.1",
     "@types/xml-encryption": "^1.2.0",

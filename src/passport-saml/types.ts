@@ -9,6 +9,7 @@ export type RACComparision = "exact" | "minimum" | "maximum" | "better";
 export type SignatureAlgorithm = "sha1" | "sha256" | "sha512";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
+  samlFallback?: "login-request" | "logout-request";
   additionalParams?: Record<string, any>;
 }
 

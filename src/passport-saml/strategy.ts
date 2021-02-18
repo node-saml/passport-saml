@@ -41,7 +41,7 @@ class Strategy extends PassportStrategy {
     this._passReqToCallback = !!options.passReqToCallback;
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions): void {
+  authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
     options.samlFallback = options.samlFallback || "login-request";
 
     const validateCallback = (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => {

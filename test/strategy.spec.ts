@@ -1,15 +1,15 @@
 "use strict";
 
 import * as sinon from "sinon";
-import { Strategy as SamlStrategy } from "../src/passport-saml";
+import { Strategy as SamlStrategy, SAML } from "../src/passport-saml";
 import { RequestWithUser } from "../src/passport-saml/types";
 
-function verify() {}
+const noop = () => undefined;
 
 describe("strategy#authorize", function () {
   beforeEach(function () {
-    this.getAuthorizeFormStub = sinon.stub(SamlStrategy.prototype, "getAuthorizeForm");
-    this.getAuthorizeUrlStub = sinon.stub(SamlStrategy.prototype, "getAuthorizeUrl");
+    this.getAuthorizeFormStub = sinon.stub(SAML.prototype, "getAuthorizeForm");
+    this.getAuthorizeUrlStub = sinon.stub(SAML.prototype, "getAuthorizeUrl");
   });
 
   afterEach(function () {
@@ -22,14 +22,14 @@ describe("strategy#authorize", function () {
       {
         authnRequestBinding: "HTTP-POST",
       },
-      verify
+      noop
     );
     strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.calledOnce(this.getAuthorizeFormStub);
   });
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
-    const strategy = new SamlStrategy({}, verify);
+    const strategy = new SamlStrategy({}, noop);
     strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.calledOnce(this.getAuthorizeUrlStub);
   });

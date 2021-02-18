@@ -3,8 +3,8 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as passport from "passport";
 import { Strategy as SamlStrategy, SAML } from "../src/passport-saml";
-// @ts-ignore no typings for request, TODO: we need to remove this dependency instead of adding typings
 import request = require("request");
+import url = require("url");
 import "should";
 import * as zlib from "zlib";
 import * as querystring from "querystring";
@@ -12,6 +12,7 @@ import { parseString } from "xml2js";
 import * as fs from "fs";
 import * as sinon from "sinon";
 import {
+  AuthenticateOptions,
   Profile,
   RACComparision,
   RequestWithUser,
@@ -24,6 +25,7 @@ import {
 } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
+import { assert } from "sinon";
 
 // a certificate which is re-used by several tests
 const TEST_CERT =
@@ -50,6 +52,8 @@ interface SAMLCheck {
   config: Partial<SamlConfig>;
   expectedNameIDStartsWith?: string;
 }
+
+const noop = () => undefined;
 
 describe("passport-saml /", function () {
   describe("captured saml responses /", function () {
@@ -183,7 +187,7 @@ describe("passport-saml /", function () {
             method: "POST",
             form: check.samlResponse,
           };
-
+          // TODO remove usage of request module
           request(requestOpts, function (err: Error | null, response: any, body: any) {
             try {
               should.not.exist(err);
@@ -1185,8 +1189,10 @@ describe("passport-saml /", function () {
 
         app.get(
           "/login",
-          // @ts-expect-error the problem of passport typings
-          passport.authenticate("saml", { samlFallback: "login-request", session: false }),
+          passport.authenticate("saml", {
+            samlFallback: "login-request",
+            session: false,
+          } as AuthenticateOptions),
           function (req, res) {
             res.status(200).send("200 OK");
           }
@@ -1209,6 +1215,26 @@ describe("passport-saml /", function () {
             followRedirect: false,
           };
 
+          function helper(err: Error | null, samlRequest: Buffer) {
+            try {
+              should.not.exist(err);
+              parseString(samlRequest.toString(), function (err, doc) {
+                try {
+                  should.not.exist(err);
+                  delete doc["samlp:AuthnRequest"]["$"]["ID"];
+                  delete doc["samlp:AuthnRequest"]["$"]["IssueInstant"];
+                  doc.should.eql(check.result);
+                  done();
+                } catch (err2) {
+                  done(err2);
+                }
+              });
+            } catch (err2) {
+              done(err2);
+            }
+          }
+
+          // TODO remove usage of request module
           request(requestOpts, function (err: Error | null, response: any, body: any) {
             try {
               should.not.exist(err);
@@ -1220,32 +1246,13 @@ describe("passport-saml /", function () {
                 encodedSamlRequest = body.match(/<input.*name="SAMLRequest" value="([^"]*)"/)[1];
               } else {
                 response.statusCode.should.equal(302);
-                const query = response.headers.location.match(/^[^\?]*\?(.*)$/)[1];
+                const query = response.headers.location.match(/^[^?]*\?(.*)$/)[1];
                 encodedSamlRequest = querystring.parse(query).SAMLRequest;
               }
 
               const buffer = Buffer.from(encodedSamlRequest, "base64");
               if (check.config.skipRequestCompression) helper(null, buffer);
               else zlib.inflateRaw(buffer, helper);
-
-              function helper(err: Error | null, samlRequest: Buffer) {
-                try {
-                  should.not.exist(err);
-                  parseString(samlRequest.toString(), function (err, doc) {
-                    try {
-                      should.not.exist(err);
-                      delete doc["samlp:AuthnRequest"]["$"]["ID"];
-                      delete doc["samlp:AuthnRequest"]["$"]["IssueInstant"];
-                      doc.should.eql(check.result);
-                      done();
-                    } catch (err2) {
-                      done(err2);
-                    }
-                  });
-                } catch (err2) {
-                  done(err2);
-                }
-              }
             } catch (err2) {
               done(err2);
             }
@@ -1297,6 +1304,26 @@ describe("passport-saml /", function () {
             form: check.samlRequest,
           };
 
+          function helper(err: Error | null, samlResponse: any) {
+            try {
+              should.not.exist(err);
+              parseString(samlResponse.toString(), function (err, doc) {
+                try {
+                  should.not.exist(err);
+                  delete doc["samlp:LogoutResponse"]["$"]["ID"];
+                  delete doc["samlp:LogoutResponse"]["$"]["IssueInstant"];
+                  doc.should.eql(check.result);
+                  done();
+                } catch (err2) {
+                  done(err2);
+                }
+              });
+            } catch (err2) {
+              done(err2);
+            }
+          }
+
+          // TODO remove usage of request module
           request(requestOpts, function (this: any, err: any, response: any, body: any) {
             try {
               const encodedSamlResponse = querystring.parse(this.uri.query).SAMLResponse;
@@ -1307,25 +1334,6 @@ describe("passport-saml /", function () {
               const buffer = Buffer.from(encodedSamlResponse as string, "base64");
               if (check.config.skipRequestCompression) helper(null, buffer);
               else zlib.inflateRaw(buffer, helper);
-
-              function helper(err: Error | null, samlResponse: any) {
-                try {
-                  should.not.exist(err);
-                  parseString(samlResponse.toString(), function (err, doc) {
-                    try {
-                      should.not.exist(err);
-                      delete doc["samlp:LogoutResponse"]["$"]["ID"];
-                      delete doc["samlp:LogoutResponse"]["$"]["IssueInstant"];
-                      doc.should.eql(check.result);
-                      done();
-                    } catch (err2) {
-                      done(err2);
-                    }
-                  });
-                } catch (err2) {
-                  done(err2);
-                }
-              }
             } catch (err2) {
               done(err2);
             }
@@ -1334,12 +1342,12 @@ describe("passport-saml /", function () {
       };
     }
 
-    for (var i = 0; i < capturedChecks.length; i++) {
+    for (let i = 0; i < capturedChecks.length; i++) {
       const check = capturedChecks[i];
       it(check.name, testForCheck(check));
     }
 
-    for (var i = 0; i < logoutChecks.length; i++) {
+    for (let i = 0; i < logoutChecks.length; i++) {
       const check = logoutChecks[i];
       it(check.name, testForCheckLogout(check));
     }
@@ -1601,7 +1609,7 @@ describe("passport-saml /", function () {
         metadata.split("\n").should.eql(expectedMetadata.split("\n"));
 
         // verify that we are exposed through Strategy as well
-        const strategy = new SamlStrategy(samlConfig, function () {});
+        const strategy = new SamlStrategy(samlConfig, noop);
         metadata = strategy.generateServiceProviderMetadata(decryptionCert, signingCert);
         metadata.split("\n").should.eql(expectedMetadata.split("\n"));
       }
@@ -2184,14 +2192,14 @@ describe("passport-saml /", function () {
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
         };
-        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, url) {
+        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, authorizeUrl) {
           try {
-            const qry = require("querystring").parse(require("url").parse(url).query);
-            qry.SigAlg.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-            qry.Signature.should.match(
+            const qry = querystring.parse(url.parse(authorizeUrl).query || "");
+            qry.SigAlg?.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+            qry.Signature?.should.match(
               "hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA=="
             );
-            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
+            qry.customQueryStringParam?.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2216,14 +2224,14 @@ describe("passport-saml /", function () {
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
         };
-        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, url) {
+        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, authorizeUrl) {
           try {
-            const qry = require("querystring").parse(require("url").parse(url).query);
-            qry.SigAlg.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-            qry.Signature.should.match(
+            const qry = querystring.parse(url.parse(authorizeUrl).query || "");
+            qry.SigAlg?.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+            qry.Signature?.should.match(
               "hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA=="
             );
-            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
+            qry.customQueryStringParam?.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2312,14 +2320,14 @@ describe("passport-saml /", function () {
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
         };
-        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, url) {
+        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, authorizeUrl) {
           try {
-            const qry = require("querystring").parse(require("url").parse(url).query);
-            qry.SigAlg.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
-            qry.Signature.should.match(
+            const qry = querystring.parse(url.parse(authorizeUrl).query || "");
+            qry.SigAlg?.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+            qry.Signature?.should.match(
               "MeFo+LjufxP5A+sCRwzR/YH/RV6W14aYSFjUdie62JxkI6hDcVhoSZQUJ3wtWMhL59gJj05tTFnXAZRqUQVsavyy41cmUZVeCsat0gaHBQOILXpp9deB0iSJt1EVQTOJkVx8uu2/WYu/bBiH7w2bpwuCf1gJhlqZb/ca3B6yjHSMjnnVfc2LbNPWHpE5464lrs79VjDXf9GQWfrBr95dh3P51IAb7C+77KDWQUl9WfZfyyuEgS83vyZ0UGOxT4AObJ6NOcLs8+iidDdWJJkBaKQev6U+AghCjLQUYOrflivLIIyqATKu2q9PbOse6Phmnxok50+broXSG23+e+742Q=="
             );
-            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
+            qry.customQueryStringParam?.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -2344,14 +2352,14 @@ describe("passport-saml /", function () {
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
         };
-        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, url) {
+        samlObj.getAuthorizeUrl({} as express.Request, {}, function (err, authorizeUrl) {
           try {
-            const qry = require("querystring").parse(require("url").parse(url).query);
-            qry.SigAlg.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
-            qry.Signature.should.match(
+            const qry = querystring.parse(url.parse(authorizeUrl).query || "");
+            qry.SigAlg?.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+            qry.Signature?.should.match(
               "MeFo+LjufxP5A+sCRwzR/YH/RV6W14aYSFjUdie62JxkI6hDcVhoSZQUJ3wtWMhL59gJj05tTFnXAZRqUQVsavyy41cmUZVeCsat0gaHBQOILXpp9deB0iSJt1EVQTOJkVx8uu2/WYu/bBiH7w2bpwuCf1gJhlqZb/ca3B6yjHSMjnnVfc2LbNPWHpE5464lrs79VjDXf9GQWfrBr95dh3P51IAb7C+77KDWQUl9WfZfyyuEgS83vyZ0UGOxT4AObJ6NOcLs8+iidDdWJJkBaKQev6U+AghCjLQUYOrflivLIIyqATKu2q9PbOse6Phmnxok50+broXSG23+e+742Q=="
             );
-            qry.customQueryStringParam.should.match("CustomQueryStringParamValue");
+            qry.customQueryStringParam?.should.match("CustomQueryStringParamValue");
             done();
           } catch (err2) {
             done(err2);
@@ -3342,7 +3350,7 @@ describe("passport-saml /", function () {
           cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
           idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
         });
-        this.request = Object.assign({}, require("./static/idp_slo_redirect"));
+        this.request = Object.assign({}, fs.readFileSync(__dirname + "/static/idp_slo_redirect.json"));
         this.clock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
       afterEach(function () {
@@ -3429,7 +3437,7 @@ describe("passport-saml /", function () {
           idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
           validateInResponseTo: true,
         });
-        this.request = Object.assign({}, require("./static/sp_slo_redirect"));
+        this.request = Object.assign({}, fs.readFileSync(__dirname + "/static/sp_slo_redirect.json"));
         this.clock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
       afterEach(async function () {
@@ -3464,7 +3472,7 @@ describe("passport-saml /", function () {
         });
       });
       it("errors if unsuccessful", function (done) {
-        this.request = require("./static/sp_slo_redirect_failure");
+        this.request = fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json");
         samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
           try {
             should.exist(err);

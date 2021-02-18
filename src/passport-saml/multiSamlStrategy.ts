@@ -33,7 +33,7 @@ class MultiSamlStrategy extends SamlStrategy {
     this._options = options;
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
+  authenticate(req: RequestWithUser, options: AuthenticateOptions) {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return this.error(err);

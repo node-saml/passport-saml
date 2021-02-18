@@ -575,13 +575,13 @@ class SAML {
    */
   getAuthorizeUrl(
     req: Request,
-    options: AuthenticateOptions & AuthorizeOptions,
-    callback: (err: Error | null, url?: string | null) => void
-  ) {
+    options: AuthorizeOptions,
+    callback: (err: Error | null, url: string) => void
+  ): void {
     util.callbackify(() => this.getAuthorizeUrlAsync(req, options))(callback);
   }
 
-  async getAuthorizeUrlAsync(req: Request, options: AuthenticateOptions & AuthorizeOptions) {
+  async getAuthorizeUrlAsync(req: Request, options: AuthorizeOptions): Promise<string> {
     const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, false);
     const operation = "authorize";
     const overrideParams = options ? options.additionalParams || {} : {};
