@@ -171,13 +171,12 @@ describe("passport-saml /", function () {
         });
 
         app.use(function (
-          _err: Error,
+          err: Error,
           _req: express.Request,
           res: express.Response,
           _next: express.NextFunction
         ) {
-          // console.log( err.stack );
-          res.status(500).send("500 Internal Server Error");
+          res.status(500).send(err.stack);
         });
 
         server = app.listen(3033, function () {
@@ -190,7 +189,7 @@ describe("passport-saml /", function () {
           request(requestOpts, function (err: Error | null, response: any, body: any) {
             try {
               should.not.exist(err);
-              response.statusCode.should.equal(check.expectedStatusCode);
+              response.statusCode.should.equal(check.expectedStatusCode, body);
               if (response.statusCode == 200) {
                 userSerialized.should.be.true;
                 if (check.expectedNameIDStartsWith)
@@ -211,7 +210,7 @@ describe("passport-saml /", function () {
         const app = express();
         app.use(bodyParser.urlencoded({ extended: false }));
         app.use(pp.initialize());
-        const config = check.config;
+        const config = { ...check.config };
         config.callbackUrl = "http://localhost:3033/login";
         config.passReqToCallback = true;
         let passedRequest: express.Request | null = null;
@@ -269,8 +268,7 @@ describe("passport-saml /", function () {
       };
     }
 
-    for (let i = 0; i < capturedChecks.length; i++) {
-      const check = capturedChecks[i];
+    for (const check of capturedChecks) {
       it(check.name, testForCheck(check));
       it(check.name + " passReqToCallback", testPassReqToCallback(check));
     }
