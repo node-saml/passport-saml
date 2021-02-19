@@ -25,7 +25,6 @@ import {
 } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
-import { assert } from "sinon";
 
 // a certificate which is re-used by several tests
 const TEST_CERT =
@@ -3350,7 +3349,10 @@ describe("passport-saml /", function () {
           cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
           idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
         });
-        this.request = Object.assign({}, fs.readFileSync(__dirname + "/static/idp_slo_redirect.json"));
+        this.request = Object.assign(
+          {},
+          JSON.parse(fs.readFileSync(__dirname + "/static/idp_slo_redirect.json", "utf8"))
+        );
         this.clock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
       afterEach(function () {
@@ -3437,7 +3439,10 @@ describe("passport-saml /", function () {
           idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
           validateInResponseTo: true,
         });
-        this.request = Object.assign({}, fs.readFileSync(__dirname + "/static/sp_slo_redirect.json"));
+        this.request = Object.assign(
+          {},
+          JSON.parse(fs.readFileSync(__dirname + "/static/sp_slo_redirect.json", "utf8"))
+        );
         this.clock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
       afterEach(async function () {
@@ -3472,7 +3477,9 @@ describe("passport-saml /", function () {
         });
       });
       it("errors if unsuccessful", function (done) {
-        this.request = fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json");
+        this.request = JSON.parse(
+          fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json", "utf8")
+        );
         samlObj.validateRedirect(this.request, this.request.originalQuery, function (err) {
           try {
             should.exist(err);
