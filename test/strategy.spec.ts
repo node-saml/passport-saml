@@ -1,15 +1,15 @@
 "use strict";
 
-var sinon = require("sinon");
-var saml = require("../lib/passport-saml/saml.js");
-var SamlStrategy = require("../lib/passport-saml/index.js").Strategy;
+import * as sinon from "sinon";
+import { Strategy as SamlStrategy, SAML } from "../src/passport-saml";
+import { RequestWithUser } from "../src/passport-saml/types";
 
-function verify() {}
+const noop = () => undefined;
 
 describe("strategy#authorize", function () {
   beforeEach(function () {
-    this.getAuthorizeFormStub = sinon.stub(saml.SAML.prototype, "getAuthorizeForm");
-    this.getAuthorizeUrlStub = sinon.stub(saml.SAML.prototype, "getAuthorizeUrl");
+    this.getAuthorizeFormStub = sinon.stub(SAML.prototype, "getAuthorizeForm");
+    this.getAuthorizeUrlStub = sinon.stub(SAML.prototype, "getAuthorizeUrl");
   });
 
   afterEach(function () {
@@ -18,19 +18,19 @@ describe("strategy#authorize", function () {
   });
 
   it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
-    var strategy = new SamlStrategy(
+    const strategy = new SamlStrategy(
       {
         authnRequestBinding: "HTTP-POST",
       },
-      verify
+      noop
     );
-    strategy.authenticate({}, {});
+    strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.calledOnce(this.getAuthorizeFormStub);
   });
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
-    var strategy = new SamlStrategy({}, verify);
-    strategy.authenticate({}, {});
+    const strategy = new SamlStrategy({}, noop);
+    strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.calledOnce(this.getAuthorizeUrlStub);
   });
 });
