@@ -14,7 +14,10 @@ import {
 
 class MultiSamlStrategy extends SamlStrategy {
   _options: MultiSamlConfig;
-  constructor(options: MultiSamlConfig, verify: VerifyWithRequest | VerifyWithoutRequest) {
+
+  constructor(options: MultiSamlConfig, verify: VerifyWithRequest);
+  constructor(options: MultiSamlConfig, verify: VerifyWithoutRequest);
+  constructor(options: MultiSamlConfig, verify: never) {
     if (!options || typeof options.getSamlOptions != "function") {
       throw new Error("Please provide a getSamlOptions function");
     }

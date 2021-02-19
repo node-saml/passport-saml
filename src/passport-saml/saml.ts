@@ -24,7 +24,7 @@ import {
   LogoutRequestXML,
   Profile,
   RequestWithUser,
-  SAMLOptions,
+  SamlOptions,
   SamlIDPListConfig,
   SamlIDPEntryConfig,
   SamlScopingConfig,
@@ -107,14 +107,14 @@ async function promiseWithNameID(nameid: Node): Promise<NameID> {
 }
 
 class SAML {
-  options: SAMLOptions;
+  options: SamlOptions;
   cacheProvider: InMemoryCacheProvider;
 
-  constructor(options: Partial<SAMLOptions>) {
+  constructor(options: Partial<SamlOptions>) {
     this.options = this.initialize(options);
     this.cacheProvider = this.options.cacheProvider;
   }
-  initialize(options: Partial<SAMLOptions>): SAMLOptions {
+  initialize(options: Partial<SamlOptions>): SamlOptions {
     if (!options) {
       options = {};
     }
@@ -200,7 +200,7 @@ class SAML {
 
     options.authnRequestBinding = options.authnRequestBinding || "HTTP-Redirect";
 
-    return options as SAMLOptions;
+    return options as SamlOptions;
   }
 
   getProtocol(req: Request | { headers?: undefined; protocol?: undefined }) {

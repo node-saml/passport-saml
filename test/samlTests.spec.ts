@@ -29,7 +29,7 @@ describe("SAML.js", function () {
         user: {
           nameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
           nameID: "nameID",
-        } as Profile,
+        },
         samlLogoutRequest: {
           ID: 123,
         },

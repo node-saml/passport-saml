@@ -17,7 +17,9 @@ class Strategy extends PassportStrategy {
   _saml: saml.SAML;
   _passReqToCallback?: boolean;
 
-  constructor(options: SamlConfig, verify: VerifyWithRequest | VerifyWithoutRequest) {
+  constructor(options: SamlConfig, verify: VerifyWithRequest);
+  constructor(options: SamlConfig, verify: VerifyWithoutRequest);
+  constructor(options: SamlConfig, verify: never) {
     super();
     if (typeof options == "function") {
       verify = options;

@@ -17,11 +17,8 @@ import {
   RACComparision,
   RequestWithUser,
   SamlConfig,
-  SAMLOptions,
-  SignatureAlgorithm,
+  SamlOptions,
   VerifiedCallback,
-  VerifyWithoutRequest,
-  VerifyWithRequest,
 } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
@@ -150,12 +147,17 @@ describe("passport-saml /", function () {
         app.use(pp.initialize());
         const config = check.config;
         config.callbackUrl = "http://localhost:3033/login";
-        let profile: Profile | null = null;
+        let profile: Profile;
         pp.use(
-          new SamlStrategy(config, function (_profile: Profile, done: VerifiedCallback) {
-            profile = _profile;
-            done(null, { id: profile.nameID });
-          } as VerifyWithoutRequest)
+          new SamlStrategy(
+            config,
+            function (_profile: Profile | null | undefined, done: VerifiedCallback): void {
+              if (_profile) {
+                profile = _profile;
+                done(null, { id: profile.nameID });
+              }
+            }
+          )
         );
 
         let userSerialized = false;
@@ -215,14 +217,19 @@ describe("passport-saml /", function () {
         config.passReqToCallback = true;
         let passedRequest: express.Request | null = null;
         pp.use(
-          new SamlStrategy(config, function (
-            req: express.Request,
-            _profile: Profile,
-            done: VerifiedCallback
-          ) {
-            passedRequest = req;
-            done(null, { id: _profile!.nameID });
-          } as VerifyWithRequest)
+          new SamlStrategy(
+            config,
+            function (
+              req: express.Request,
+              _profile: Profile | null | undefined,
+              done: VerifiedCallback
+            ) {
+              if (_profile) {
+                passedRequest = req;
+                done(null, { id: _profile!.nameID });
+              }
+            }
+          )
         );
         pp.serializeUser(function (user, done) {
           done(null, user);
@@ -1170,12 +1177,17 @@ describe("passport-saml /", function () {
         const config = check.config;
         config.callbackUrl = "http://localhost:3033/login";
         config.entryPoint = "https://wwwexampleIdp.com/saml";
-        let profile = null;
+        let profile: Profile;
         passport.use(
-          new SamlStrategy(config, function (_profile: Profile, done: VerifiedCallback) {
-            profile = _profile;
-            done(null, profile);
-          } as VerifyWithoutRequest)
+          new SamlStrategy(
+            config,
+            function (_profile: Profile | null | undefined, done: VerifiedCallback) {
+              if (_profile) {
+                profile = _profile;
+                done(null, profile);
+              }
+            }
+          )
         );
 
         let userSerialized = false;
@@ -1266,12 +1278,17 @@ describe("passport-saml /", function () {
         const config = check.config;
         config.callbackUrl = "http://localhost:3033/login";
         config.entryPoint = "https://wwwexampleIdp.com/saml";
-        let profile = null;
+        let profile: Profile;
         passport.use(
-          new SamlStrategy(config, function (_profile: Profile, done: VerifiedCallback) {
-            profile = _profile;
-            done(null, profile);
-          } as VerifyWithoutRequest)
+          new SamlStrategy(
+            config,
+            function (_profile: Profile | null | undefined, done: VerifiedCallback) {
+              if (_profile) {
+                profile = _profile;
+                done(null, profile);
+              }
+            }
+          )
         );
 
         let userSerialized = false;
@@ -1481,10 +1498,7 @@ describe("passport-saml /", function () {
       };
 
       const samlObj = new SAML({ entryPoint: "foo" });
-      const logoutRequest = samlObj.generateLogoutResponse(
-        {} as express.Request,
-        { ID: "quux" } as Profile
-      );
+      const logoutRequest = samlObj.generateLogoutResponse({} as express.Request, { ID: "quux" });
       parseString(logoutRequest, function (err, doc) {
         try {
           delete doc["samlp:LogoutResponse"]["$"]["ID"];
@@ -1592,7 +1606,7 @@ describe("passport-saml /", function () {
 
     describe("generateServiceProviderMetadata tests /", function () {
       function testMetadata(
-        samlConfig: Partial<SAMLOptions>,
+        samlConfig: Partial<SamlOptions>,
         expectedMetadata: string,
         signingCert?: string
       ) {
@@ -1612,12 +1626,12 @@ describe("passport-saml /", function () {
       }
 
       it("config with callbackUrl and decryptionPvk should pass", function () {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           issuer: "http://example.serviceprovider.com",
           callbackUrl: "http://example.serviceprovider.com/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-        } as Partial<SAMLOptions>;
+        };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata.xml",
           "utf-8"
@@ -2016,12 +2030,12 @@ describe("passport-saml /", function () {
         });
 
         it("cert as a function should validate with the returned cert", function (done) {
-          const functionCertSamlConfig = {
+          const functionCertSamlConfig: Partial<SamlOptions> = {
             entryPoint: samlConfig.entryPoint,
             cert: function (callback) {
               callback(null, samlConfig.cert);
             },
-          } as Partial<SAMLOptions>;
+          };
           const xml =
             '<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="R689b0733bccca22a137e3654830312332940b1be" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>' +
             '<saml:Assertion xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.0" ID="pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa" IssueInstant="2014-05-28T00:16:08Z"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>DCnPTQYBb1hKspbe6fg1U3q8xn4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>e0+aFomA0+JAY0f9tKqzIuqIVSSw7LiFUsneEDKPBWdiTz1sMdgr/2y1e9+rjaS2mRmCi/vSQLY3zTYz0hp6nJNU19+TWoXo9kHQyWT4KkeQL4Xs/gZ/AoKC20iHVKtpPps0IQ0Ml/qRoouSitt6Sf/WDz2LV/pWcH2hx5tv3xSw36hK2NQc7qw7r1mEXnvcjXReYo8rrVf7XHGGxNoRIEICUIi110uvsWemSXf0Z0dyb0FVYOWuSsQMDlzNpheADBifFO4UTfSEhFZvn8kVCGZUIwrbOhZ2d/+YEtgyuTg+qtslgfy4dwd4TvEcfuRzQTazeefprSFyiQckAXOjcw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>' +
@@ -2043,12 +2057,12 @@ describe("passport-saml /", function () {
         });
 
         it("cert as a function should validate with one of the returned certs", function (done) {
-          const functionMultiCertSamlConfig = {
+          const functionMultiCertSamlConfig: Partial<SamlOptions> = {
             entryPoint: samlConfig.entryPoint,
             cert: function (callback) {
               callback(null, [ALT_TEST_CERT, samlConfig.cert]);
             },
-          } as Partial<SAMLOptions>;
+          };
           const xml =
             '<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="R689b0733bccca22a137e3654830312332940b1be" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>' +
             '<saml:Assertion xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.0" ID="pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa" IssueInstant="2014-05-28T00:16:08Z"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>DCnPTQYBb1hKspbe6fg1U3q8xn4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>e0+aFomA0+JAY0f9tKqzIuqIVSSw7LiFUsneEDKPBWdiTz1sMdgr/2y1e9+rjaS2mRmCi/vSQLY3zTYz0hp6nJNU19+TWoXo9kHQyWT4KkeQL4Xs/gZ/AoKC20iHVKtpPps0IQ0Ml/qRoouSitt6Sf/WDz2LV/pWcH2hx5tv3xSw36hK2NQc7qw7r1mEXnvcjXReYo8rrVf7XHGGxNoRIEICUIi110uvsWemSXf0Z0dyb0FVYOWuSsQMDlzNpheADBifFO4UTfSEhFZvn8kVCGZUIwrbOhZ2d/+YEtgyuTg+qtslgfy4dwd4TvEcfuRzQTazeefprSFyiQckAXOjcw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>' +
@@ -2071,12 +2085,12 @@ describe("passport-saml /", function () {
 
         it("cert as a function should return an error if the cert function returns an error", function (done) {
           const errorToReturn = new Error("test");
-          const functionErrorCertSamlConfig = {
+          const functionErrorCertSamlConfig: Partial<SamlOptions> = {
             entryPoint: samlConfig.entryPoint,
             cert: function (callback) {
               callback(errorToReturn);
             },
-          } as SAMLOptions;
+          };
           const xml =
             '<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="R689b0733bccca22a137e3654830312332940b1be" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>' +
             '<saml:Assertion xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.0" ID="pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa" IssueInstant="2014-05-28T00:16:08Z"><saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#pfx3b63c7be-fe86-62fd-8cb5-16ab6273efaa"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>DCnPTQYBb1hKspbe6fg1U3q8xn4=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>e0+aFomA0+JAY0f9tKqzIuqIVSSw7LiFUsneEDKPBWdiTz1sMdgr/2y1e9+rjaS2mRmCi/vSQLY3zTYz0hp6nJNU19+TWoXo9kHQyWT4KkeQL4Xs/gZ/AoKC20iHVKtpPps0IQ0Ml/qRoouSitt6Sf/WDz2LV/pWcH2hx5tv3xSw36hK2NQc7qw7r1mEXnvcjXReYo8rrVf7XHGGxNoRIEICUIi110uvsWemSXf0Z0dyb0FVYOWuSsQMDlzNpheADBifFO4UTfSEhFZvn8kVCGZUIwrbOhZ2d/+YEtgyuTg+qtslgfy4dwd4TvEcfuRzQTazeefprSFyiQckAXOjcw==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>' +
@@ -2172,7 +2186,7 @@ describe("passport-saml /", function () {
       });
 
       it("acme_tools request signed with sha256", function (done) {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
@@ -2184,7 +2198,7 @@ describe("passport-saml /", function () {
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-        } as Partial<SAMLOptions>;
+        };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
@@ -2204,7 +2218,7 @@ describe("passport-saml /", function () {
         });
       });
       it("acme_tools request signed with sha256 when using privateKey", function (done) {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
@@ -2212,11 +2226,11 @@ describe("passport-saml /", function () {
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
-          signatureAlgorithm: "sha256" as SignatureAlgorithm,
+          signatureAlgorithm: "sha256",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-        } as Partial<SAMLOptions>;
+        };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
@@ -2236,14 +2250,14 @@ describe("passport-saml /", function () {
         });
       });
       it("acme_tools request not signed if missing entry point", function (done) {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           entryPoint: "",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
           privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          signatureAlgorithm: "sha256" as SignatureAlgorithm,
+          signatureAlgorithm: "sha256",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
@@ -2268,14 +2282,14 @@ describe("passport-saml /", function () {
         });
       });
       it("acme_tools request not signed if missing entry point when using privateKey", function (done) {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           entryPoint: "",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          signatureAlgorithm: "sha256" as SignatureAlgorithm,
+          signatureAlgorithm: "sha256",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
@@ -2300,7 +2314,7 @@ describe("passport-saml /", function () {
         });
       });
       it("acme_tools request signed with sha1", function (done) {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
@@ -2308,11 +2322,11 @@ describe("passport-saml /", function () {
           authnContext:
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           identifierFormat: null,
-          signatureAlgorithm: "sha1" as SignatureAlgorithm,
+          signatureAlgorithm: "sha1",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-        } as Partial<SAMLOptions>;
+        };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
@@ -2332,7 +2346,7 @@ describe("passport-saml /", function () {
         });
       });
       it("acme_tools request signed with sha1 when using privateKey", function (done) {
-        const samlConfig = {
+        const samlConfig: Partial<SamlOptions> = {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
@@ -2344,7 +2358,7 @@ describe("passport-saml /", function () {
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-        } as Partial<SAMLOptions>;
+        };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
           return "12345678901234567890";
@@ -2628,12 +2642,11 @@ describe("passport-saml /", function () {
     });
 
     describe("InResponseTo validation checks /", function () {
-      let fakeClock: sinon.SinonFakeTimers | null = null;
+      let fakeClock: sinon.SinonFakeTimers;
 
       afterEach(function () {
         if (fakeClock) {
           fakeClock.restore();
-          fakeClock = null;
         }
       });
 

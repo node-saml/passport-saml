@@ -17,7 +17,16 @@ export interface AuthorizeOptions extends AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
 }
 
-export interface SAMLOptions {
+export interface SamlSigningOptions {
+  /** @deprecated use privateKey field instead */
+  privateCert?: string | Buffer;
+  privateKey: string | Buffer;
+  signatureAlgorithm?: SignatureAlgorithm;
+  xmlSignatureTransforms?: string[];
+  digestAlgorithm?: string;
+}
+
+export interface SamlOptions extends SamlSigningOptions {
   // Core
   callbackUrl: string;
   path: string;
@@ -25,12 +34,8 @@ export interface SAMLOptions {
   host: string;
   entryPoint: string;
   issuer: string;
-  /** @deprecated use privateKey field instead */
-  privateCert?: string | Buffer;
-  privateKey: string | Buffer;
   cert: string | string[] | CertCallback;
   decryptionPvk: string | Buffer;
-  signatureAlgorithm: SignatureAlgorithm;
 
   // Additional SAML behaviors
   additionalParams: Record<string, string>;
@@ -61,12 +66,10 @@ export interface SAMLOptions {
   logoutCallbackUrl: string;
 
   // extras
-  xmlSignatureTransforms: string[];
-  digestAlgorithm: string;
   disableRequestACSUrl: boolean;
 }
 
-export type SamlConfig = Partial<SAMLOptions> & StrategyOptions;
+export type SamlConfig = Partial<SamlOptions> & StrategyOptions;
 
 interface StrategyOptions {
   name?: string;
@@ -122,7 +125,7 @@ export interface SamlIDPEntryConfig {
   loc?: string;
 }
 
-export type Profile = {
+export interface Profile {
   issuer?: string;
   sessionIndex?: string;
   nameID?: string;
@@ -133,12 +136,11 @@ export type Profile = {
   mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
   email?: string; // `mail` if not present in the assertion
   ["urn:oid:0.9.2342.19200300.100.1.3"]?: string;
-  getAssertionXml(): string; // get the raw assertion XML
-  getAssertion(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
-  getSamlResponseXml(): string; // get the raw SAML response XML
-} & {
+  getAssertionXml?(): string; // get the raw assertion XML
+  getAssertion?(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
+  getSamlResponseXml?(): string; // get the raw SAML response XML
   [attributeName: string]: unknown; // arbitrary `AttributeValue`s
-};
+}
 
 export interface RequestWithUser extends express.Request {
   samlLogoutRequest: any;

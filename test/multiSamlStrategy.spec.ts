@@ -3,7 +3,13 @@ import * as express from "express";
 import * as sinon from "sinon";
 import * as should from "should";
 import { Strategy as SamlStrategy, MultiSamlStrategy, SAML } from "../src/passport-saml";
-import { MultiSamlConfig, SamlOptionsCallback, RequestWithUser } from "../src/passport-saml/types";
+import {
+  MultiSamlConfig,
+  SamlOptionsCallback,
+  RequestWithUser,
+  SamlConfig,
+  SamlOptions,
+} from "../src/passport-saml/types";
 
 const noop = () => undefined;
 
@@ -74,7 +80,7 @@ describe("MultiSamlStrategy#authenticate", function () {
 
   it("uses given options to setup internal saml provider", function (done) {
     const superAuthenticateStub = this.superAuthenticateStub;
-    const samlOptions = {
+    const samlOptions: SamlConfig = {
       issuer: "http://foo.issuer",
       callbackUrl: "http://foo.callback",
       cert: "deadbeef",
@@ -83,7 +89,7 @@ describe("MultiSamlStrategy#authenticate", function () {
       identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
       path: "/saml/callback",
       logoutUrl: "http://foo.slo",
-      signatureAlgorithm: "sha256" as const,
+      signatureAlgorithm: "sha256",
     };
 
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
@@ -182,7 +188,7 @@ describe("MultiSamlStrategy#logout", function () {
 
   it("uses given options to setup internal saml provider", function (done) {
     const superLogoutMock = this.superLogoutMock;
-    const samlOptions = {
+    const samlOptions: SamlConfig = {
       issuer: "http://foo.issuer",
       callbackUrl: "http://foo.callback",
       authnRequestBinding: "HTTP-POST",
@@ -192,7 +198,7 @@ describe("MultiSamlStrategy#logout", function () {
       identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
       path: "/saml/callback",
       logoutUrl: "http://foo.slo",
-      signatureAlgorithm: "sha256" as const,
+      signatureAlgorithm: "sha256",
     };
 
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
