@@ -86,9 +86,15 @@ describe("Signatures", function () {
       testOneResponse("/invalid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 2)
     );
     it(
-      "R1AWas - root signed - wantAssertionsSigned=true => error",
+      "R1A - root signed - wantAssertionsSigned=true => error",
       testOneResponse("/valid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2, {
         cert,
+        wantAssertionsSigned: true,
+      })
+    );
+    it(
+      "R1A - root unsigned - missing cert - wantAssertionsSigned=true => error",
+      testOneResponse("/valid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 0, {
         wantAssertionsSigned: true,
       })
     );
