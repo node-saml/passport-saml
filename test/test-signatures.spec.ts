@@ -140,6 +140,19 @@ describe("Signatures", function () {
         }
       )
     );
+    it(
+      "R1A - root signed - asrt invalidly signed wantAssertionsSigned=true => error",
+      testOneResponse(
+        "/invalid/response.root-signed.assertion-invalidly-signed-encrypted.xml",
+        INVALID_ENCRYPTED_SIGNATURE,
+        2,
+        {
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          cert,
+          wantAssertionsSigned: true,
+        }
+      )
+    );
   });
 
   describe("Signatures on saml:Response - 1 saml:Assertion + 1 saml:Advice containing 1 saml:Assertion", () => {
