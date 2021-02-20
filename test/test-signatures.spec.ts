@@ -50,7 +50,12 @@ describe("Signatures", function () {
       options?: Partial<SamlOptions>
     ) => {
       //== Create a body based on an XML and run the test
-      return testOneResponseBody(createBody(pathToXml), shouldErrorWith, amountOfSignaturesChecks);
+      return testOneResponseBody(
+        createBody(pathToXml),
+        shouldErrorWith,
+        amountOfSignaturesChecks,
+        options
+      );
     };
 
   describe("Signatures on saml:Response - Only 1 saml:Assertion", () => {
