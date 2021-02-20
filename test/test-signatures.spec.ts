@@ -8,6 +8,7 @@ const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
 
 describe("Signatures", function () {
   const INVALID_SIGNATURE = "Invalid signature",
+    INVALID_ENCRYPTED_SIGNATURE = "Invalid signature from encrypted assertion",
     createBody = (pathToXml: string) => ({
       SAMLResponse: fs.readFileSync(__dirname + "/static/signatures" + pathToXml, "base64"),
     }),
@@ -106,6 +107,19 @@ describe("Signatures", function () {
       testOneResponse("/valid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 0, {
         wantAssertionsSigned: true,
       })
+    );
+    it(
+      "R1A - root signed - assertion encrypted -wantAssertionsSigned=true => error",
+      testOneResponse(
+        "/valid/response.root-signed.assertion-unsigned-encrypted.xml",
+        INVALID_ENCRYPTED_SIGNATURE,
+        2,
+        {
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          cert,
+          wantAssertionsSigned: true,
+        }
+      )
     );
   });
 
