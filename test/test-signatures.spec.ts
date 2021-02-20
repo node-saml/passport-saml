@@ -128,6 +128,18 @@ describe("Signatures", function () {
         wantAssertionsSigned: true,
       })
     );
+    it(
+      "R1A - root signed - asrt invalidly signed wantAssertionsSigned=true => error",
+      testOneResponse(
+        "/invalid/response.root-signed.assertion-invalidly-signed.xml",
+        INVALID_SIGNATURE,
+        2,
+        {
+          cert,
+          wantAssertionsSigned: true,
+        }
+      )
+    );
   });
 
   describe("Signatures on saml:Response - 1 saml:Assertion + 1 saml:Advice containing 1 saml:Assertion", () => {
