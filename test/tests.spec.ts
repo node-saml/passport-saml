@@ -1746,7 +1746,7 @@ describe("passport-saml /", function () {
     });
 
     it("generateServiceProviderMetadata contains WantAssertionsSigned", function () {
-      var samlConfig = {
+      const samlConfig = {
         issuer: "http://example.serviceprovider.com",
         callbackUrl: "http://example.serviceprovider.com/saml/callback",
         identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
@@ -1754,12 +1754,12 @@ describe("passport-saml /", function () {
         wantAssertionsSigned: true,
       };
 
-      var samlObj = new SAML(samlConfig);
-      var decryptionCert = fs.readFileSync(
+      const samlObj = new SAML(samlConfig);
+      const decryptionCert = fs.readFileSync(
         __dirname + "/static/testshib encryption cert.pem",
         "utf-8"
       );
-      var metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
+      const metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
       metadata.should.containEql('WantAssertionsSigned="true"');
     });
 

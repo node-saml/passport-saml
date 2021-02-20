@@ -2,6 +2,7 @@ import { SAML } from "../lib/passport-saml/index.js";
 import * as fs from "fs";
 import * as sinon from "sinon";
 import "should";
+import { SamlOptions } from "../lib/passport-saml/types.js";
 
 const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
 
@@ -20,11 +21,12 @@ describe("Signatures", function () {
     testOneResponseBody = (
       samlResponseBody: Record<string, string>,
       shouldErrorWith: string | false | undefined,
-      amountOfSignatureChecks = 1
+      amountOfSignatureChecks = 1,
+      options: Partial<SamlOptions> = {}
     ) => {
       return (done: Mocha.Done) => {
         //== Instantiate new instance before every test
-        const samlObj = new SAML({ cert });
+        const samlObj = new SAML({ cert, ...options });
         //== Spy on `validateSignature` to be able to count how many times it has been called
         const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
 
@@ -44,7 +46,8 @@ describe("Signatures", function () {
     testOneResponse = (
       pathToXml: string,
       shouldErrorWith: string | false,
-      amountOfSignaturesChecks: number | undefined
+      amountOfSignaturesChecks: number | undefined,
+      options?: Partial<SamlOptions>
     ) => {
       //== Create a body based on an XML and run the test
       return testOneResponseBody(createBody(pathToXml), shouldErrorWith, amountOfSignaturesChecks);
@@ -85,6 +88,12 @@ describe("Signatures", function () {
     it(
       "R1A - asrt signed => error",
       testOneResponse("/invalid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 2)
+    );
+    it(
+      "R1AWas - root signed - wantAssertionsSigned=true => error",
+      testOneResponse("/valid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2, {
+        wantAssertionsSigned: true,
+      })
     );
   });
 
