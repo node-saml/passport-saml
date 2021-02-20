@@ -21,11 +21,11 @@ describe("Signatures", function () {
       samlResponseBody,
       shouldErrorWith,
       amountOfSignatureChecks = 1,
-      options = {}
+      options = { cert }
     ) => {
       return (done) => {
         //== Instantiate new instance before every test
-        const samlObj = new SAML({ cert, ...options });
+        const samlObj = new SAML(options);
         //== Spy on `validateSignature` to be able to count how many times it has been called
         const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
 
@@ -88,6 +88,7 @@ describe("Signatures", function () {
     it(
       "R1AWas - root signed - wantAssertionsSigned=true => error",
       testOneResponse("/valid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2, {
+        cert,
         wantAssertionsSigned: true,
       })
     );
