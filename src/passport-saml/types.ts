@@ -5,8 +5,11 @@ import type { CacheProvider } from "./inmemory-cache-provider";
 export type CertCallback = (
   callback: (err: Error | null, cert?: string | string[]) => void
 ) => void;
+export type RACComparision = "exact" | "minimum" | "maximum" | "better";
+export type SignatureAlgorithm = "sha1" | "sha256" | "sha512";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
+  samlFallback?: "login-request" | "logout-request";
   additionalParams?: Record<string, any>;
 }
 
@@ -14,7 +17,16 @@ export interface AuthorizeOptions extends AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
 }
 
-export interface SAMLOptions {
+export interface SamlSigningOptions {
+  /** @deprecated use privateKey field instead */
+  privateCert?: string | Buffer;
+  privateKey: string | Buffer;
+  signatureAlgorithm?: SignatureAlgorithm;
+  xmlSignatureTransforms?: string[];
+  digestAlgorithm?: string;
+}
+
+export interface SamlOptions extends SamlSigningOptions {
   // Core
   callbackUrl: string;
   path: string;
@@ -22,24 +34,21 @@ export interface SAMLOptions {
   host: string;
   entryPoint: string;
   issuer: string;
-  /** @deprecated use privateKey field instead */
-  privateCert?: string;
-  privateKey: string;
   cert: string | string[] | CertCallback;
-  decryptionPvk: string;
-  signatureAlgorithm: "sha1" | "sha256" | "sha512";
+  decryptionPvk: string | Buffer;
 
   // Additional SAML behaviors
   additionalParams: Record<string, string>;
   additionalAuthorizeParams: Record<string, string>;
-  identifierFormat: string;
+  identifierFormat: string | null;
   acceptedClockSkewMs: number;
   attributeConsumingServiceIndex: string | null;
   disableRequestedAuthnContext: boolean;
   authnContext: string | string[];
   forceAuthn: boolean;
   skipRequestCompression: boolean;
-  RACComparison: "exact" | "minimum" | "maximum" | "better";
+  authnRequestBinding?: string;
+  RACComparison: RACComparision;
   providerName: string;
   passive: boolean;
   idpIssuer: string;
@@ -58,23 +67,20 @@ export interface SAMLOptions {
   logoutCallbackUrl: string;
 
   // extras
-  xmlSignatureTransforms: string[];
-  digestAlgorithm: string;
   disableRequestACSUrl: boolean;
 }
 
-export type SamlConfig = Partial<SAMLOptions> & StrategyOptions;
+export type SamlConfig = Partial<SamlOptions> & StrategyOptions;
 
 interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
-  authnRequestBinding?: string;
 }
 
 export interface SamlScopingConfig {
   idpList?: SamlIDPListConfig[];
   proxyCount?: number;
-  requesterId?: string[];
+  requesterId?: string[] | string;
 }
 
 export type XMLValue = string | number | boolean | null | XMLObject | XMLValue[];
@@ -120,7 +126,7 @@ export interface SamlIDPEntryConfig {
   loc?: string;
 }
 
-export type Profile = {
+export interface Profile {
   issuer?: string;
   sessionIndex?: string;
   nameID?: string;
@@ -131,12 +137,11 @@ export type Profile = {
   mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
   email?: string; // `mail` if not present in the assertion
   ["urn:oid:0.9.2342.19200300.100.1.3"]?: string;
-  getAssertionXml(): string; // get the raw assertion XML
-  getAssertion(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
-  getSamlResponseXml(): string; // get the raw SAML response XML
-} & {
+  getAssertionXml?(): string; // get the raw assertion XML
+  getAssertion?(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
+  getSamlResponseXml?(): string; // get the raw SAML response XML
   [attributeName: string]: unknown; // arbitrary `AttributeValue`s
-};
+}
 
 export interface RequestWithUser extends express.Request {
   samlLogoutRequest: any;
