@@ -20,11 +20,12 @@ describe("Signatures", function () {
     testOneResponseBody = (
       samlResponseBody: Record<string, string>,
       shouldErrorWith: string | false | undefined,
-      amountOfSignatureChecks = 1
+      amountOfSignatureChecks = 1,
+      options = { cert }
     ) => {
       return (done: Mocha.Done) => {
         //== Instantiate new instance before every test
-        const samlObj = new SAML({ cert });
+        const samlObj = new SAML(options);
         //== Spy on `validateSignature` to be able to count how many times it has been called
         const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
 
@@ -85,6 +86,19 @@ describe("Signatures", function () {
     it(
       "R1A - asrt signed => error",
       testOneResponse("/invalid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 2)
+    );
+    it(
+      "R1A - root signed - wantAssertionsSigned=true => error",
+      testOneResponse("/valid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2, {
+        cert,
+        wantAssertionsSigned: true,
+      })
+    );
+    it(
+      "R1A - root unsigned - missing cert - wantAssertionsSigned=true => error",
+      testOneResponse("/valid/response.root-unsigned.assertion-signed.xml", INVALID_SIGNATURE, 0, {
+        wantAssertionsSigned: true,
+      })
     );
   });
 

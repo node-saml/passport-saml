@@ -54,6 +54,7 @@ export interface SamlOptions extends SamlSigningOptions {
   idpIssuer: string;
   audience: string;
   scoping: SamlScopingConfig;
+  wantAssertionsSigned: boolean;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;
