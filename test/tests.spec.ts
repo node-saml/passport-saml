@@ -1747,6 +1747,7 @@ describe("passport-saml /", function () {
 
     it("generateServiceProviderMetadata contains WantAssertionsSigned", function () {
       const samlConfig = {
+        cert: TEST_CERT,
         issuer: "http://example.serviceprovider.com",
         callbackUrl: "http://example.serviceprovider.com/saml/callback",
         identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
@@ -1761,6 +1762,25 @@ describe("passport-saml /", function () {
       );
       const metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
       metadata.should.containEql('WantAssertionsSigned="true"');
+    });
+
+    it("WantAssertionsSigned=true should throw when cert options is missing", function () {
+      var samlConfig = {
+        issuer: "http://example.serviceprovider.com",
+        callbackUrl: "http://example.serviceprovider.com/saml/callback",
+        identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+        decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+        wantAssertionsSigned: true,
+      };
+
+      var samlObj = new SAML(samlConfig);
+      var decryptionCert = fs.readFileSync(
+        __dirname + "/static/testshib encryption cert.pem",
+        "utf-8"
+      );
+      should(function () {
+        samlObj.generateServiceProviderMetadata(decryptionCert);
+      }).throw('"cert" config parameter is required for signed assertions');
     });
 
     it("#certToPEM should generate valid certificate", function (done) {

@@ -868,6 +868,10 @@ class SAML {
         throw new Error("Invalid signature: multiple assertions");
       }
 
+      if (this.options.wantAssertionsSigned && !this.options.cert) {
+        throw new Error("Invalid signature");
+      }
+
       if (assertions.length == 1) {
         if (
           (this.options.wantAssertionsSigned || (this.options.cert && !validSignature)) &&
@@ -1553,6 +1557,9 @@ class SAML {
     }
 
     if (this.options.wantAssertionsSigned) {
+      if (!this.options.cert) {
+        throw new Error('"cert" config parameter is required for signed assertions');
+      }
       metadata.EntityDescriptor.SPSSODescriptor["@WantAssertionsSigned"] = true;
     }
 
