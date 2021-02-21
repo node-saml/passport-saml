@@ -128,7 +128,7 @@ describe("Signatures", function () {
       )
     );
     it(
-      "R1A - root signed - asrt invalidly signed wantAssertionsSigned=true => error",
+      "R1A - root signed - asrt invalidly signed encrypted wantAssertionsSigned=true => error",
       testOneResponse(
         "/invalid/response.root-signed.assertion-invalidly-signed-encrypted.xml",
         INVALID_ENCRYPTED_SIGNATURE,
