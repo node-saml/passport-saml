@@ -1378,6 +1378,12 @@ describe("passport-saml /", function () {
       }).throw("Invalid property: cert must not be empty");
     });
 
+    it("should throw an error if wantAssertionsSigned is true and cert property is not provided", function () {
+      should(function () {
+        new SAML({ wantAssertionsSigned: true });
+      }).throw('"cert" config parameter is required for signed assertions');
+    });
+
     it("generateUniqueID should generate 20 char IDs", function () {
       const samlObj = new SAML({ entryPoint: "foo" });
       for (let i = 0; i < 200; i++) {
@@ -1762,25 +1768,6 @@ describe("passport-saml /", function () {
       );
       const metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
       metadata.should.containEql('WantAssertionsSigned="true"');
-    });
-
-    it("WantAssertionsSigned=true should throw when cert options is missing", function () {
-      const samlConfig = {
-        issuer: "http://example.serviceprovider.com",
-        callbackUrl: "http://example.serviceprovider.com/saml/callback",
-        identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-        decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-        wantAssertionsSigned: true,
-      };
-
-      const samlObj = new SAML(samlConfig);
-      const decryptionCert = fs.readFileSync(
-        __dirname + "/static/testshib encryption cert.pem",
-        "utf-8"
-      );
-      should(function () {
-        samlObj.generateServiceProviderMetadata(decryptionCert);
-      }).throw('"cert" config parameter is required for signed assertions');
     });
 
     it("#certToPEM should generate valid certificate", function (done) {
