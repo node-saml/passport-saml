@@ -1381,7 +1381,9 @@ describe("passport-saml /", function () {
     it("should throw an error if wantAssertionsSigned is true and cert property is not provided", function () {
       should(function () {
         new SAML({ wantAssertionsSigned: true });
-      }).throw('"cert" config parameter is required for signed assertions');
+      }).throw(
+        "cert config parameter with IdP's certificate is required to validate assertion's signature"
+      );
     });
 
     it("generateUniqueID should generate 20 char IDs", function () {

@@ -132,7 +132,9 @@ class SAML {
     }
 
     if (options.wantAssertionsSigned && !options.cert) {
-      throw new Error('"cert" config parameter is required for signed assertions');
+      throw new Error(
+        "cert config parameter with IdP's certificate is required to validate assertion's signature"
+      );
     }
 
     if (!options.path) {
