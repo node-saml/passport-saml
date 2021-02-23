@@ -22,6 +22,7 @@ import {
 } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
+import assert = require("assert");
 
 // a certificate which is re-used by several tests
 const TEST_CERT =
@@ -1764,13 +1765,9 @@ describe("passport-saml /", function () {
     describe("validatePostResponse checks /", function () {
       it("response with junk content should explain the XML or base64 is not valid", async () => {
         const samlObj = new SAML({ cert: TEST_CERT });
-        try {
-          await samlObj.validatePostResponseAsync({ SAMLResponse: "BOOM" });
-          false.should.eql(true, "validatePostResponse should fail");
-        } catch (err) {
-          should.exist(err);
-          err!.message!.should.match(/SAMLResponse is not valid base64-encoded XML/);
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync({ SAMLResponse: "BOOM" }), {
+          message: /SAMLResponse is not valid base64-encoded XML/,
+        });
       });
       it("response with error status message should generate appropriate error", async () => {
         const xml =
@@ -1780,15 +1777,9 @@ describe("passport-saml /", function () {
         const samlObj = new SAML({
           cert: "-----BEGIN CERTIFICATE-----" + TEST_CERT + "-----END CERTIFICATE-----",
         });
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "validatePostResponse should fail");
-        } catch (err) {
-          should.exist(err);
-          err!.message!.should.match(/Responder/);
-          err!.message!.should.match(/Required NameID format not supported/);
-          should.exist(err.statusXml);
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: /Responder.*Required NameID format not supported/,
+        });
       });
 
       it("response with error status code should generate appropriate error", async () => {
@@ -1797,15 +1788,9 @@ describe("passport-saml /", function () {
         const base64xml = Buffer.from(xml).toString("base64");
         const container = { SAMLResponse: base64xml };
         const samlObj = new SAML({});
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "validatePostResponse should fail");
-        } catch (err) {
-          should.exist(err);
-          err!.message!.should.match(/Responder/);
-          err!.message!.should.match(/InvalidNameIDPolicy/);
-          should.exist(err.statusXml);
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: /Responder.*InvalidNameIDPolicy/,
+        });
       });
 
       it("accept response with an attributeStatement element without attributeValue", async () => {
@@ -2198,13 +2183,9 @@ describe("passport-saml /", function () {
 
         const request =
           '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-        try {
-          await samlObj.requestToUrlAsync(request, null, "authorize", {});
-          false.should.eql(true, "requestToUrlAsync should fail");
-        } catch (err) {
-          should.exist(err);
-          err!.message!.should.eql('"entryPoint" config parameter is required for signed messages');
-        }
+        await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+          message: '"entryPoint" config parameter is required for signed messages',
+        });
       });
       it("acme_tools request not signed if missing entry point when using privateKey", async () => {
         const samlConfig: Partial<SamlOptions> = {
@@ -2226,12 +2207,9 @@ describe("passport-saml /", function () {
 
         const request =
           '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-        try {
-          await samlObj.requestToUrlAsync(request, null, "authorize", {});
-          false.should.eql(true, "requestToUrlAsync should fail");
-        } catch (err) {
-          err!.message!.should.eql('"entryPoint" config parameter is required for signed messages');
-        }
+        await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+          message: '"entryPoint" config parameter is required for signed messages',
+        });
       });
       it("acme_tools request signed with sha1", async () => {
         const samlConfig: Partial<SamlOptions> = {
@@ -2606,12 +2584,9 @@ describe("passport-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:09Z"));
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "Should not succeed");
-        } catch (err) {
-          err!.message!.should.match("InResponseTo is not valid");
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: "InResponseTo is not valid",
+        });
       });
 
       it("xml document with SubjectConfirmation InResponseTo from request should be valid", async () => {
@@ -2843,12 +2818,9 @@ describe("passport-saml /", function () {
         // Fake the current date to be after the valid time range
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:13:07Z"));
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "Should not succeed");
-        } catch (err) {
-          err!.message!.should.match("SAML assertion not yet valid");
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: "SAML assertion not yet valid",
+        });
       });
 
       it("onelogin xml document with current time equal to NotOnOrAfter (minus default clock skew) time should fail", async () => {
@@ -2865,12 +2837,9 @@ describe("passport-saml /", function () {
         // Fake the current date to be after the valid time range
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:19:08Z"));
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "Should not succeed");
-        } catch (err) {
-          err!.message!.should.match("SAML assertion expired");
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: "SAML assertion expired",
+        });
       });
 
       it("onelogin xml document with current time after NotOnOrAfter time (minus default clock skew) should fail", async () => {
@@ -2887,12 +2856,9 @@ describe("passport-saml /", function () {
         // Fake the current date to be after the valid time range
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:19:09Z"));
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "Should not succeed");
-        } catch (err) {
-          err!.message!.should.match("SAML assertion expired");
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: "SAML assertion expired",
+        });
       });
 
       it("onelogin xml document with current time after NotOnOrAfter time with accepted clock skew equal to -1 should pass", async () => {
@@ -2936,12 +2902,9 @@ describe("passport-saml /", function () {
           acceptedClockSkewMs: -1,
         };
         const samlObj = new SAML(samlConfig);
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "Should not succeed");
-        } catch (err) {
-          err!.message!.should.match("SAML assertion has no AudienceRestriction");
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: "SAML assertion has no AudienceRestriction",
+        });
       });
 
       it("onelogin xml document with audience not matching AudienceRestriction should not pass", async () => {
@@ -2960,12 +2923,9 @@ describe("passport-saml /", function () {
           acceptedClockSkewMs: -1,
         };
         const samlObj = new SAML(samlConfig);
-        try {
-          await samlObj.validatePostResponseAsync(container);
-          false.should.eql(true, "Should not succeed");
-        } catch (err) {
-          err!.message!.should.match("SAML assertion audience mismatch");
-        }
+        await assert.rejects(samlObj.validatePostResponseAsync(container), {
+          message: "SAML assertion audience mismatch",
+        });
       });
 
       it("onelogin xml document with audience matching AudienceRestriction should pass", async () => {
@@ -3002,12 +2962,9 @@ describe("passport-saml /", function () {
       const body = {
         SAMLRequest: "asdf",
       };
-      try {
-        await samlObj.validatePostRequestAsync(body);
-        false.should.eql(true, "validatoPostRequest should fail");
-      } catch (err) {
-        err.message.should.match(/Non-whitespace before first tag/);
-      }
+      await assert.rejects(samlObj.validatePostRequestAsync(body), {
+        message: /Non-whitespace before first tag/,
+      });
     });
     it("errors if bad signature", async () => {
       const body = {
@@ -3016,12 +2973,9 @@ describe("passport-saml /", function () {
           "base64"
         ),
       };
-      try {
-        await samlObj.validatePostRequestAsync(body);
-        false.should.eql(true, "validatoPostRequest should fail");
-      } catch (err) {
-        err.should.eql(new Error("Invalid signature on documentElement"));
-      }
+      await assert.rejects(samlObj.validatePostRequestAsync(body), {
+        message: "Invalid signature on documentElement",
+      });
     });
     it("returns profile for valid signature", async () => {
       const body = {
@@ -3086,12 +3040,9 @@ describe("passport-saml /", function () {
         "base64"
       ),
     };
-    try {
-      await samlObj.validatePostRequestAsync(body);
-      false.should.eql(true, "validatePostRequest should fail");
-    } catch (err) {
-      err!.message!.should.containEql("Encryption block is invalid.");
-    }
+    await assert.rejects(samlObj.validatePostRequestAsync(body), {
+      message: "Encryption block is invalid.",
+    });
   });
   it("errors if bad privateCert to requestToURL", async () => {
     const samlObj = new SAML({
@@ -3126,12 +3077,9 @@ describe("passport-saml /", function () {
     });
     const request =
       '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-    try {
-      await samlObj.requestToUrlAsync(request, null, "authorize", {});
-      false.should.eql(true, "requestToUrlAsync should fail");
-    } catch (err) {
-      err!.message!.should.containEql("no start line");
-    }
+    await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+      message: /no start line/,
+    });
   });
   it("errors if bad privateKey to requestToURL", async () => {
     const samlObj = new SAML({
@@ -3166,12 +3114,9 @@ describe("passport-saml /", function () {
     });
     const request =
       '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-    try {
-      await samlObj.requestToUrlAsync(request, null, "authorize", {});
-      false.should.eql(true, "requestToUrlAsync should fail");
-    } catch (err) {
-      err!.message!.should.containEql("no start line");
-    }
+    await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+      message: /no start line/,
+    });
   });
 });
 
@@ -3196,41 +3141,31 @@ describe("validateRedirect()", function () {
       const body = {
         SAMLRequest: "asdf",
       };
-      try {
-        await samlObj.validateRedirectAsync(body, this.request.originalQuery);
-        false.should.eql(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        // success
-      }
+      await assert.rejects(samlObj.validateRedirectAsync(body, this.request.originalQuery));
     });
     it("errors if idpIssuer is set and issuer is wrong", async function () {
       samlObj.options.idpIssuer = "foo";
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.eql(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql(
-          "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php"
-        );
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        {
+          message:
+            "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
+        }
+      );
     });
     it("errors if request has expired", async function () {
       this.clock.restore();
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.eql(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql("SAML assertion expired");
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        { message: "SAML assertion expired" }
+      );
     });
     it("errors if request has a bad signature", async function () {
       this.request.Signature = "foo";
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.eql(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql("Invalid signature");
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        { message: "Invalid signature" }
+      );
     });
     it("returns profile for valid signature including session index", async function () {
       const { profile } = await samlObj.validateRedirectAsync(
@@ -3268,52 +3203,40 @@ describe("validateRedirect()", function () {
       const body = {
         SAMLRequest: "asdf",
       };
-      try {
-        await samlObj.validateRedirectAsync(body, null);
-        false.should.equal(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        // as expected
-      }
+      await assert.rejects(samlObj.validateRedirectAsync(body, null));
     });
     it("errors if idpIssuer is set and wrong issuer", async function () {
       samlObj.options.idpIssuer = "foo";
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.equal(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql(
-          "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php"
-        );
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        {
+          message:
+            "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
+        }
+      );
     });
     it("errors if unsuccessful", async function () {
       this.request = JSON.parse(
         fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json", "utf8")
       );
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.equal(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql("Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester");
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        { message: "Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester" }
+      );
     });
     it("errors if InResponseTo is not found", async function () {
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.equal(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql("InResponseTo is not valid");
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        { message: "InResponseTo is not valid" }
+      );
     });
     it("errors if bad signature", async function () {
       await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
       this.request.Signature = "foo";
-      try {
-        await samlObj.validateRedirectAsync(this.request, this.request.originalQuery);
-        false.should.equal(true, "validateRedirectAsync should fail");
-      } catch (err) {
-        err!.message!.should.eql("Invalid signature");
-      }
+      await assert.rejects(
+        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+        { message: "Invalid signature" }
+      );
     });
 
     it("returns true for valid signature", async function () {

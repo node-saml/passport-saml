@@ -2,6 +2,7 @@ import { SAML } from "../lib/passport-saml/index.js";
 import * as fs from "fs";
 import * as sinon from "sinon";
 import "should";
+import assert = require("assert");
 
 const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
 
@@ -28,14 +29,11 @@ describe("Signatures", function () {
       const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
 
       //== Run the test in `func`
-      try {
-        await samlObj.validatePostResponseAsync(samlResponseBody);
-        false.should.eql(true, "Test should raise an error");
-      } catch (error) {
-        error.should.eql(new Error(shouldErrorWith || "SAML assertion expired"));
-        //== Assert times `validateSignature` was called
-        validateSignatureSpy.callCount.should.eql(amountOfSignatureChecks);
-      }
+      await assert.rejects(samlObj.validatePostResponseAsync(samlResponseBody), {
+        message: shouldErrorWith || "SAML assertion expired",
+      });
+      //== Assert times `validateSignature` was called
+      validateSignatureSpy.callCount.should.eql(amountOfSignatureChecks);
     },
     testOneResponse = (
       pathToXml: string,
