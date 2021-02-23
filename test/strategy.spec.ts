@@ -8,8 +8,8 @@ const noop = () => undefined;
 
 describe("strategy#authorize", function () {
   beforeEach(function () {
-    this.getAuthorizeFormStub = sinon.stub(SAML.prototype, "getAuthorizeForm");
-    this.getAuthorizeUrlStub = sinon.stub(SAML.prototype, "getAuthorizeUrl");
+    this.getAuthorizeFormStub = sinon.stub(SAML.prototype, "getAuthorizeFormAsync").resolves();
+    this.getAuthorizeUrlStub = sinon.stub(SAML.prototype, "getAuthorizeUrlAsync").resolves();
   });
 
   afterEach(function () {
