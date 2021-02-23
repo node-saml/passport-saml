@@ -3197,7 +3197,7 @@ describe("validateRedirect()", function () {
         SAMLRequest: "asdf",
       };
       try {
-        await samlObj.validateRedirectAsync(body, null);
+        await samlObj.validateRedirectAsync(body, this.request.originalQuery);
         false.should.eql(true, "validateRedirectAsync should fail");
       } catch (err) {
         // success
