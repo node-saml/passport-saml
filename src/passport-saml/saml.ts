@@ -62,9 +62,9 @@ async function processValidlySignedPostRequestAsync(
     } else {
       throw new Error("Missing SAML issuer");
     }
-    const nameID = await util.promisify(self.getNameID).bind(self)(self, dom);
+    const nameID = await self.getNameIDAsync(self, dom);
     if (nameID) {
-      profile.nameID = nameID.value;
+      profile.nameID = nameID.value!;
       if (nameID.format) {
         profile.nameIDFormat = nameID.format;
       }
@@ -248,21 +248,6 @@ class SAML {
     }
     signer.update(querystring.stringify(samlMessageToSign));
     samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateKey), "base64");
-  }
-
-  /**
-   *
-   * @deprecated
-   */
-  generateAuthorizeRequest(
-    req: Request,
-    isPassive: boolean,
-    isHttpPostBinding: boolean,
-    callback: (err: Error | null, request?: string) => void
-  ) {
-    return util.callbackify(() =>
-      this.generateAuthorizeRequestAsync(req, isPassive, isHttpPostBinding)
-    )(callback);
   }
 
   async generateAuthorizeRequestAsync(
@@ -466,20 +451,6 @@ class SAML {
     return xmlbuilder.create(request).end();
   }
 
-  /**
-   * @deprecated
-   */
-  requestToUrl(
-    request: string | null | undefined,
-    response: string | null,
-    operation: string,
-    additionalParameters: querystring.ParsedUrlQuery,
-    callback: (err: Error | null, url?: string | null | undefined) => void
-  ) {
-    util.callbackify(() =>
-      this.requestToUrlAsync(request, response, operation, additionalParameters)
-    )(callback);
-  }
   async requestToUrlAsync(
     request: string | null | undefined,
     response: string | null,
@@ -570,17 +541,6 @@ class SAML {
     return additionalParams;
   }
 
-  /**
-   * @deprecated
-   */
-  getAuthorizeUrl(
-    req: Request,
-    options: AuthorizeOptions,
-    callback: (err: Error | null, url: string) => void
-  ): void {
-    util.callbackify(() => this.getAuthorizeUrlAsync(req, options))(callback);
-  }
-
   async getAuthorizeUrlAsync(req: Request, options: AuthorizeOptions): Promise<string> {
     const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, false);
     const operation = "authorize";
@@ -593,12 +553,6 @@ class SAML {
     );
   }
 
-  /**
-   * @deprecated
-   */
-  getAuthorizeForm(req: Request, callback: (err: Error | null, data?: unknown) => void) {
-    util.callbackify(() => this.getAuthorizeFormAsync(req))(callback);
-  }
   async getAuthorizeFormAsync(req: Request) {
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
     // but must be interpreted by an XML or HTML parser, and it must absolutely avoid breaking the syntax
@@ -675,16 +629,6 @@ class SAML {
     ].join("\r\n");
   }
 
-  /**
-   * @deprecated
-   */
-  getLogoutUrl(
-    req: RequestWithUser,
-    options: AuthenticateOptions & AuthorizeOptions,
-    callback: (err: Error | null, url?: string | null) => void
-  ) {
-    util.callbackify(() => this.getLogoutUrlAsync(req, options))(callback);
-  }
   async getLogoutUrlAsync(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
     const request = await this.generateLogoutRequest(req);
     const operation = "logout";
@@ -811,18 +755,6 @@ class SAML {
     }
     fullXml = this.normalizeNewlines(fullXml);
     return sig.checkSignature(fullXml);
-  }
-
-  /**
-   * @deprecated
-   */
-  validatePostResponse(
-    container: Record<string, string>,
-    callback: (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => void
-  ) {
-    this.validatePostResponseAsync(container)
-      .then((res) => callback(null, res.profile, res.loggedOut))
-      .catch((err) => callback(err));
   }
 
   async validatePostResponseAsync(
@@ -1007,19 +939,6 @@ class SAML {
     }
   }
 
-  /**
-   * @deprecated
-   */
-  validateRedirect(
-    container: ParsedQs,
-    originalQuery: string | null,
-    callback: (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => void
-  ) {
-    this.validateRedirectAsync(container, originalQuery)
-      .then((res) => callback(null, res.profile, res.loggedOut))
-      .catch((err) => callback(err));
-  }
-
   async validateRedirectAsync(
     container: ParsedQs,
     originalQuery: string | null
@@ -1149,24 +1068,6 @@ class SAML {
         throw new Error("Missing SAML issuer");
       }
     }
-  }
-
-  /**
-   * @deprecated
-   */
-  processValidlySignedAssertion(
-    xml: xml2js.convertableToString,
-    samlResponseXml: string,
-    inResponseTo: string,
-    callback: (
-      err: Error | null,
-      profile?: Profile | undefined,
-      loggedOut?: boolean | undefined
-    ) => void
-  ) {
-    this.processValidlySignedAssertionAsync(xml, samlResponseXml, inResponseTo)
-      .then((res) => callback(null, res.profile, res.loggedOut))
-      .catch((err) => callback(err));
   }
 
   async processValidlySignedAssertionAsync(
@@ -1391,18 +1292,6 @@ class SAML {
     return null;
   }
 
-  /**
-   * @deprecated
-   */
-  validatePostRequest(
-    container: Record<string, string>,
-    callback: (err: Error | null, profile?: Profile, loggedOut?: boolean) => void
-  ) {
-    this.validatePostRequestAsync(container)
-      .then((res) => callback(null, res.profile, res.loggedOut))
-      .catch((err) => callback(err));
-  }
-
   async validatePostRequestAsync(
     container: Record<string, string>
   ): Promise<{ profile?: Profile; loggedOut?: boolean }> {
@@ -1420,13 +1309,6 @@ class SAML {
       throw new Error("Invalid signature on documentElement");
     }
     return await processValidlySignedPostRequestAsync(this, doc, dom);
-  }
-
-  /**
-   * @deprecated
-   */
-  getNameID(self: SAML, doc: Node, callback: (err: Error | null, nameID?: XMLOutput) => void) {
-    return util.callbackify(() => this.getNameIDAsync(self, doc)).bind(this)(callback);
   }
 
   async getNameIDAsync(self: SAML, doc: Node): Promise<NameID> {

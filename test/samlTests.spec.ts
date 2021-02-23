@@ -42,136 +42,64 @@ describe("SAML.js", function () {
     });
 
     describe("getAuthorizeUrl", function () {
-      it("calls callback with right host", function (done) {
-        saml.getAuthorizeUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!).host!.should.equal("exampleidp.com");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with right host", async () => {
+        const target = await saml.getAuthorizeUrlAsync(req, {});
+        url.parse(target!).host!.should.equal("exampleidp.com");
       });
-      it("calls callback with right protocol", function (done) {
-        saml.getAuthorizeUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!).protocol!.should.equal("https:");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with right protocol", async () => {
+        const target = await saml.getAuthorizeUrlAsync(req, {});
+        url.parse(target!).protocol!.should.equal("https:");
       });
-      it("calls callback with right path", function (done) {
-        saml.getAuthorizeUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!).pathname!.should.equal("/path");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with right path", async () => {
+        const target = await saml.getAuthorizeUrlAsync(req, {});
+        url.parse(target!).pathname!.should.equal("/path");
       });
-      it("calls callback with original query string", function (done) {
-        saml.getAuthorizeUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!, true).query["key"]!.should.equal("value");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with original query string", async () => {
+        const target = await saml.getAuthorizeUrlAsync(req, {});
+        url.parse(target!, true).query["key"]!.should.equal("value");
       });
-      it("calls callback with additional run-time params in query string", function (done) {
-        saml.getAuthorizeUrl(req, options, function (err, target) {
-          try {
-            Object.keys(url.parse(target!, true).query).should.have.length(3);
-            url.parse(target!, true).query["key"]!.should.equal("value");
-            url.parse(target!, true).query["SAMLRequest"]!.should.not.be.empty();
-            url.parse(target!, true).query["additionalKey"]!.should.equal("additionalValue");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with additional run-time params in query string", async () => {
+        const target = await saml.getAuthorizeUrlAsync(req, options);
+        Object.keys(url.parse(target!, true).query).should.have.length(3);
+        url.parse(target!, true).query["key"]!.should.equal("value");
+        url.parse(target!, true).query["SAMLRequest"]!.should.not.be.empty();
+        url.parse(target!, true).query["additionalKey"]!.should.equal("additionalValue");
       });
       // NOTE: This test only tests existence of the assertion, not the correctness
-      it("calls callback with saml request object", function (done) {
-        saml.getAuthorizeUrl(req, {}, function (err, target) {
-          try {
-            should(url.parse(target!, true).query).have.property("SAMLRequest");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with saml request object", async () => {
+        const target = await saml.getAuthorizeUrlAsync(req, {});
+        should(url.parse(target!, true).query).have.property("SAMLRequest");
       });
     });
 
     describe("getLogoutUrl", function () {
-      it("calls callback with right host", function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!).host!.should.equal("exampleidp.com");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with right host", async () => {
+        const target = await saml.getLogoutUrlAsync(req, {});
+        url.parse(target!).host!.should.equal("exampleidp.com");
       });
-      it("calls callback with right protocol", function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!).protocol!.should.equal("https:");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with right protocol", async () => {
+        const target = await saml.getLogoutUrlAsync(req, {});
+        url.parse(target!).protocol!.should.equal("https:");
       });
-      it("calls callback with right path", function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!).pathname!.should.equal("/path");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with right path", async () => {
+        const target = await saml.getLogoutUrlAsync(req, {});
+        url.parse(target!).pathname!.should.equal("/path");
       });
-      it("calls callback with original query string", function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
-          try {
-            url.parse(target!, true).query["key"]!.should.equal("value");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with original query string", async () => {
+        const target = await saml.getLogoutUrlAsync(req, {});
+        url.parse(target!, true).query["key"]!.should.equal("value");
       });
-      it("calls callback with additional run-time params in query string", function (done) {
-        saml.getLogoutUrl(req, options, function (err, target) {
-          try {
-            Object.keys(url.parse(target!, true).query).should.have.length(3);
-            url.parse(target!, true).query["key"]!.should.equal("value");
-            url.parse(target!, true).query["SAMLRequest"]!.should.not.be.empty();
-            url.parse(target!, true).query["additionalKey"]!.should.equal("additionalValue");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with additional run-time params in query string", async () => {
+        const target = await saml.getLogoutUrlAsync(req, options);
+        Object.keys(url.parse(target!, true).query).should.have.length(3);
+        url.parse(target!, true).query["key"]!.should.equal("value");
+        url.parse(target!, true).query["SAMLRequest"]!.should.not.be.empty();
+        url.parse(target!, true).query["additionalKey"]!.should.equal("additionalValue");
       });
       // NOTE: This test only tests existence of the assertion, not the correctness
-      it("calls callback with saml request object", function (done) {
-        saml.getLogoutUrl(req, {}, function (err, target) {
-          try {
-            should(url.parse(target!, true).query).have.property("SAMLRequest");
-            done();
-          } catch (err2) {
-            done(err2);
-          }
-        });
+      it("calls callback with saml request object", async () => {
+        const target = await saml.getLogoutUrlAsync(req, {});
+        should(url.parse(target!, true).query).have.property("SAMLRequest");
       });
     });
 
