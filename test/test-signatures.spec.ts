@@ -74,6 +74,14 @@ describe("Signatures", function () {
       testOneResponse("/invalid/response.root-signed.assertion-signed.xml", INVALID_SIGNATURE, 2)
     );
     it(
+      "R1A - both signed with invalid root signature => error",
+      testOneResponse(
+        "/invalid/response.root-invalidly-signed.assertion-signed.xml",
+        INVALID_SIGNATURE,
+        2
+      )
+    );
+    it(
       "R1A - root signed => error",
       testOneResponse("/invalid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2)
     );
