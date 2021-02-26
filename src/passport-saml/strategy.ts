@@ -45,12 +45,13 @@ class Strategy extends PassportStrategy {
 
   authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
     options.samlFallback = options.samlFallback || "login-request";
-
-    const validateCallback = (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => {
-      if (err) {
-        return this.error(err);
-      }
-
+    const validateCallback = ({
+      profile,
+      loggedOut,
+    }: {
+      profile?: Profile | null;
+      loggedOut?: boolean;
+    }) => {
       if (loggedOut) {
         req.logout();
         if (profile) {
@@ -93,30 +94,42 @@ class Strategy extends PassportStrategy {
 
     if (req.query && (req.query.SAMLResponse || req.query.SAMLRequest)) {
       const originalQuery = url.parse(req.url).query;
-      this._saml.validateRedirect(req.query, originalQuery, validateCallback);
+      this._saml
+        .validateRedirectAsync(req.query, originalQuery)
+        .then(validateCallback)
+        .catch((err) => this.error(err));
     } else if (req.body && req.body.SAMLResponse) {
-      this._saml.validatePostResponse(req.body, validateCallback);
+      this._saml
+        .validatePostResponseAsync(req.body)
+        .then(validateCallback)
+        .catch((err) => this.error(err));
     } else if (req.body && req.body.SAMLRequest) {
-      this._saml.validatePostRequest(req.body, validateCallback);
+      this._saml
+        .validatePostRequestAsync(req.body)
+        .then(validateCallback)
+        .catch((err) => this.error(err));
     } else {
       const requestHandler = {
-        "login-request": () => {
-          if (this._saml.options.authnRequestBinding === "HTTP-POST") {
-            this._saml.getAuthorizeForm(req, (err: Error | null, data?: any) => {
-              if (err) {
-                this.error(err);
-              } else {
-                const res = req.res!;
-                res.send(data);
-              }
-            });
-          } else {
-            // Defaults to HTTP-Redirect
-            this._saml.getAuthorizeUrl(req, options, redirectIfSuccess);
+        "login-request": async () => {
+          try {
+            if (this._saml.options.authnRequestBinding === "HTTP-POST") {
+              const data = await this._saml.getAuthorizeFormAsync(req);
+              const res = req.res!;
+              res.send(data);
+            } else {
+              // Defaults to HTTP-Redirect
+              this.redirect(await this._saml.getAuthorizeUrlAsync(req, options));
+            }
+          } catch (err) {
+            this.error(err);
           }
         },
-        "logout-request": () => {
-          this._saml.getLogoutUrl(req, options, redirectIfSuccess);
+        "logout-request": async () => {
+          try {
+            this.redirect(await this._saml.getLogoutUrlAsync(req, options));
+          } catch (err) {
+            this.error(err);
+          }
         },
       }[options.samlFallback];
 
@@ -129,7 +142,10 @@ class Strategy extends PassportStrategy {
   }
 
   logout(req: RequestWithUser, callback: (err: Error | null, url?: string | null) => void): void {
-    this._saml.getLogoutUrl(req, {}, callback);
+    this._saml
+      .getLogoutUrlAsync(req, {})
+      .then((url) => callback(null, url))
+      .catch((err) => callback(err));
   }
 
   generateServiceProviderMetadata(

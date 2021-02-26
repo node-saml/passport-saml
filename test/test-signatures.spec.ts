@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as sinon from "sinon";
 import "should";
 import { SamlOptions } from "../lib/passport-saml/types.js";
+import assert = require("assert");
 
 const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
 
@@ -19,30 +20,23 @@ describe("Signatures", function () {
         done(ex);
       }
     },
-    testOneResponseBody = (
+    testOneResponseBody = async (
       samlResponseBody: Record<string, string>,
       shouldErrorWith: string | false | undefined,
       amountOfSignatureChecks = 1,
       options: Partial<SamlOptions> = {}
     ) => {
-      return (done: Mocha.Done) => {
-        //== Instantiate new instance before every test
-        const samlObj = new SAML({ cert, ...options });
-        //== Spy on `validateSignature` to be able to count how many times it has been called
-        const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
+      //== Instantiate new instance before every test
+      const samlObj = new SAML({ cert, ...options });
+      //== Spy on `validateSignature` to be able to count how many times it has been called
+      const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
 
-        //== Run the test in `func`
-        samlObj.validatePostResponse(
-          samlResponseBody,
-          tryCatchTest(done, function (error: any) {
-            //== Assert error. If the error is `SAML assertion expired` we made it past the certificate validation
-            error.should.eql(new Error(shouldErrorWith || "SAML assertion expired"));
-            //== Assert times `validateSignature` was called
-            validateSignatureSpy.callCount.should.eql(amountOfSignatureChecks);
-            done();
-          })
-        );
-      };
+      //== Run the test in `func`
+      await assert.rejects(samlObj.validatePostResponseAsync(samlResponseBody), {
+        message: shouldErrorWith || "SAML assertion expired",
+      });
+      //== Assert times `validateSignature` was called
+      validateSignatureSpy.callCount.should.eql(amountOfSignatureChecks);
     },
     testOneResponse = (
       pathToXml: string,
@@ -51,12 +45,13 @@ describe("Signatures", function () {
       options?: Partial<SamlOptions>
     ) => {
       //== Create a body based on an XML and run the test
-      return testOneResponseBody(
-        createBody(pathToXml),
-        shouldErrorWith,
-        amountOfSignaturesChecks,
-        options
-      );
+      return async () =>
+        await testOneResponseBody(
+          createBody(pathToXml),
+          shouldErrorWith,
+          amountOfSignaturesChecks,
+          options
+        );
     };
 
   describe("Signatures on saml:Response - Only 1 saml:Assertion", () => {
@@ -282,14 +277,14 @@ describe("Signatures", function () {
       .toString();
     const makeBody = (str: string) => ({ SAMLResponse: Buffer.from(str).toString("base64") });
 
-    it("CRLF line endings", (done) => {
+    it("CRLF line endings", async () => {
       const body = makeBody(samlResponseXml.replace(/\n/g, "\r\n"));
-      testOneResponseBody(body, false, 1)(done);
+      await testOneResponseBody(body, false, 1);
     });
 
-    it("CR line endings", (done) => {
+    it("CR line endings", async () => {
       const body = makeBody(samlResponseXml.replace(/\n/g, "\r"));
-      testOneResponseBody(body, false, 1)(done);
+      await testOneResponseBody(body, false, 1);
     });
   });
 });
