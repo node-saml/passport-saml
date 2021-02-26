@@ -125,18 +125,6 @@ describe("Signatures", function () {
       )
     );
     it(
-      "R1A - root unsigned - asrt invalidly signed encrypted wantAssertionsSigned=true => error",
-      testOneResponse(
-        "/invalid/response.root-unsigned.assertion-invalidly-signed-encrypted.xml",
-        INVALID_ENCRYPTED_SIGNATURE,
-        2,
-        {
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          wantAssertionsSigned: true,
-        }
-      )
-    );
-    it(
       "R1A - root signed - asrt invalidly signed encrypted wantAssertionsSigned=true => error",
       testOneResponse(
         "/invalid/response.root-signed.assertion-invalidly-signed-encrypted.xml",
