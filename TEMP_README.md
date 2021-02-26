@@ -32,7 +32,7 @@ TEMPORARY FILE -- CHECK FOR EVERY ADDED TEST IF THEY ARE CORRECT.
 Test name: `R1A - root signed - wantAssertionsSigned=true => error`  
 Response xml: `/valid/response.root-signed.assertion-unsigned.xml`
 
-- a:
+- a: `validSignature = true;` is run (correct because root is signed)
 - b:
 - c:
 
@@ -41,7 +41,7 @@ Response xml: `/valid/response.root-signed.assertion-unsigned.xml`
 Test name: `R1A - root signed - asrt unsigned encrypted -wantAssertionsSigned=true => error`  
 Response xml: `/valid/response.root-signed.assertion-unsigned-encrypted.xml`
 
-- a:
+- a: `validSignature = true;` is run (correct because root is signed)
 - b:
 - c:
 
@@ -70,7 +70,7 @@ Response xml: `/invalid/response.root-signed.assertion-invalidly-signed.xml`
 
 (`saml:NameID` and `saml:SubjectConfirmationData` have been changed)
 
-- a:
+- a: `validSignature = true;` is run (correct because root is signed)
 - b:
 - c:
 
@@ -81,6 +81,6 @@ Response xml: `/invalid/response.root-signed.assertion-invalidly-signed-encrypte
 
 (`saml:NameID` and `saml:SubjectConfirmationData` have been changed)
 
-- a:
+- a: `validSignature = true;` is run (correct because root is signed)
 - b:
 - c:
