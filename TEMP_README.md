@@ -47,26 +47,28 @@ Response xml: `/valid/response.root-signed.assertion-unsigned-encrypted.xml`
 
 ### 3. unsigned response with signed unencrypted assertion and cert option not provided at all
 
-Test name:  
-Response xml:
+Test name: `tests.spec.ts/should throw an error if wantAssertionsSigned is true and cert property is not provided`  
+Response xml: NA: Missing cert is checked at SAML initialization
 
-* a:
-* b:
-* c:
+* a: NA
+* b: NA
+* c: NA
 
 ### 4. unsigned response with with signed encrypted assertion and certoption not provided at all
 
-Test name:  
-Response xml:
+Test name: `tests.spec.ts/should throw an error if wantAssertionsSigned is true and cert property is not provided`  
+Response xml: NA
 
-* a:
-* b:
-* c:
+* a: NA
+* b: NA
+* c: NA
 
 ### 5. signed response with signed unencrypted assertion so that assertions content (e.g. nameid) is modified after calculation of assertion's signature but prior to signing response
 
-Test name:  
-Response xml:
+Test name: `R1A - root signed - asrt invalidly signed wantAssertionsSigned=true => error`  
+Response xml: `/invalid/response.root-signed.assertion-invalidly-signed.xml`
+
+(`saml:NameID` and `saml:SubjectConfirmationData` have been changed)
 
 * a:
 * b:
@@ -74,8 +76,10 @@ Response xml:
 
 ### 6. signed response with signed encrypted assertion so that assertion's content doesn't match with assertion's signature
 
-Test name:  
-Response xml:
+Test name: `R1A - root signed - asrt invalidly signed encrypted wantAssertionsSigned=true => error`  
+Response xml: `/invalid/response.root-signed.assertion-invalidly-signed-encrypted.xml`
+
+(`saml:NameID` and `saml:SubjectConfirmationData` have been changed)
 
 * a:
 * b:
