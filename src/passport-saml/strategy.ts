@@ -6,6 +6,7 @@ import {
   AuthorizeOptions,
   RequestWithUser,
   SamlConfig,
+  StrategyOptions,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
@@ -17,13 +18,12 @@ class Strategy extends PassportStrategy {
   _saml: saml.SAML;
   _passReqToCallback?: boolean;
 
-  constructor(options: SamlConfig, verify: VerifyWithRequest);
-  constructor(options: SamlConfig, verify: VerifyWithoutRequest);
-  constructor(options: SamlConfig, verify: never) {
+  constructor(options: SamlConfig & StrategyOptions, verify: VerifyWithRequest);
+  constructor(options: SamlConfig & StrategyOptions, verify: VerifyWithoutRequest);
+  constructor(options: SamlConfig & StrategyOptions, verify: never) {
     super();
     if (typeof options == "function") {
-      verify = options;
-      options = {};
+      throw new Error("Manditory SAML options missing");
     }
 
     if (!verify) {
@@ -153,6 +153,11 @@ class Strategy extends PassportStrategy {
     signingCert?: string | null
   ): string {
     return this._saml.generateServiceProviderMetadata(decryptionCert, signingCert);
+  }
+
+  // This is reduntant, but helps with testing
+  error(err: Error): void {
+    super.error(err);
   }
 }
 

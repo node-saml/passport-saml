@@ -27,13 +27,15 @@ import {
   SamlOptions,
   SamlIDPListConfig,
   SamlIDPEntryConfig,
-  SamlScopingConfig,
   ServiceMetadataXML,
   XMLInput,
   XMLObject,
   XMLOutput,
   XMLValue,
+  ManditorySamlOptions,
+  SamlConfig,
 } from "./types";
+import { assertRequired } from "./utility";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
 const deflateRawAsync = util.promisify(zlib.deflateRaw);
@@ -62,7 +64,7 @@ async function processValidlySignedPostRequestAsync(
     } else {
       throw new Error("Missing SAML issuer");
     }
-    const nameID = await self.getNameIDAsync(self, dom);
+    const nameID = await self.getNameIdAsync(self, dom);
     if (nameID) {
       profile.nameID = nameID.value!;
       if (nameID.format) {
@@ -107,100 +109,111 @@ async function promiseWithNameID(nameid: Node): Promise<NameID> {
 }
 
 class SAML {
-  options: SamlOptions;
-  cacheProvider: InMemoryCacheProvider;
+  private ctorOptions: SamlConfig;
 
-  constructor(options: Partial<SamlOptions>) {
-    this.options = this.initialize(options);
-    this.cacheProvider = this.options.cacheProvider;
+  // This will be fully defined upon first use
+  // This enables compatability with lazy usage from MultiSamlStrategy
+  options: SamlOptions = {} as SamlOptions;
+
+  // This is only for testing
+  cacheProvider!: InMemoryCacheProvider;
+
+  constructor(ctorOptions: SamlConfig) {
+    this.ctorOptions = ctorOptions;
+
+    Object.defineProperty(this, "options", {
+      get: function () {
+        // Check to make sure we have new options before we throw
+        // this will allow catch blocks to still probe this.options
+        // without generating a secondary error which obfuscates the
+        // initialization error
+        const options = this.initialize();
+        delete this.options;
+        delete this.cacheProvider;
+        this.options = options;
+        this.cacheProvider = this.options.cacheProvider;
+
+        return this.options;
+      },
+      configurable: true,
+    });
+
+    Object.defineProperty(this, "cacheProvider", {
+      get: function () {
+        const cacheProvider = this.options.cacheProvider;
+
+        return cacheProvider;
+      },
+      configurable: true,
+    });
   }
-  initialize(options: Partial<SamlOptions>): SamlOptions {
-    if (!options) {
-      options = {};
+
+  initialize(): SamlOptions {
+    if (!this.ctorOptions) {
+      throw new Error("SamlOptions required on construction");
     }
 
-    if (options.privateCert) {
+    if (this.ctorOptions.privateCert) {
       console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
 
-      if (!options.privateKey) {
-        options.privateKey = options.privateCert;
+      if (!this.ctorOptions.privateKey) {
+        this.ctorOptions.privateKey = this.ctorOptions.privateCert;
       }
     }
 
-    if (Object.prototype.hasOwnProperty.call(options, "cert") && !options.cert) {
-      throw new Error("Invalid property: cert must not be empty");
-    }
+    const options = {
+      ...this.ctorOptions,
+      passive: this.ctorOptions.passive ?? false,
+      disableRequestedAuthnContext: this.ctorOptions.disableRequestedAuthnContext ?? false,
+      additionalParams: this.ctorOptions.additionalParams ?? {},
+      additionalAuthorizeParams: this.ctorOptions.additionalAuthorizeParams ?? {},
+      additionalLogoutParams: this.ctorOptions.additionalLogoutParams ?? {},
+      forceAuthn: this.ctorOptions.forceAuthn ?? false,
+      skipRequestCompression: this.ctorOptions.skipRequestCompression ?? false,
+      disableRequestAcsUrl: this.ctorOptions.disableRequestAcsUrl ?? false,
+      acceptedClockSkewMs: this.ctorOptions.acceptedClockSkewMs ?? 0,
+      path: this.ctorOptions.path ?? "/saml/consume",
+      host: this.ctorOptions.host ?? "localhost",
+      issuer: this.ctorOptions.issuer ?? "onelogin_saml",
+      identifierFormat:
+        this.ctorOptions.identifierFormat === undefined
+          ? "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+          : this.ctorOptions.identifierFormat,
+      authnContext: this.ctorOptions.authnContext ?? [
+        "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+      ],
+      validateInResponseTo: this.ctorOptions.validateInResponseTo ?? false,
+      cert: assertRequired(this.ctorOptions.cert, "cert is required"),
+      requestIdExpirationPeriodMs: this.ctorOptions.requestIdExpirationPeriodMs ?? 28800000, // 8 hours
+      cacheProvider:
+        this.ctorOptions.cacheProvider ??
+        new InMemoryCacheProvider({
+          keyExpirationPeriodMs: this.ctorOptions.requestIdExpirationPeriodMs,
+        }),
+      logoutUrl: this.ctorOptions.logoutUrl ?? this.ctorOptions.entryPoint ?? "", // Default to Entry Point
+      signatureAlgorithm: this.ctorOptions.signatureAlgorithm ?? "sha1", // sha1, sha256, or sha512
+      authnRequestBinding: this.ctorOptions.authnRequestBinding ?? "HTTP-Redirect",
 
-    if (!options.path) {
-      options.path = "/saml/consume";
-    }
+      RacComparison: (() => {
+        /**
+         * List of possible values:
+         * - exact : Assertion context must exactly match a context in the list
+         * - minimum:  Assertion context must be at least as strong as a context in the list
+         * - maximum:  Assertion context must be no stronger than a context in the list
+         * - better:  Assertion context must be stronger than all contexts in the list
+         */
+        this.ctorOptions.RacComparison = this.ctorOptions.RacComparison ?? "exact";
+        if (
+          ["exact", "minimum", "maximum", "better"].indexOf(this.ctorOptions.RacComparison) === -1
+        ) {
+          throw new Error("RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']");
+        }
 
-    if (!options.host) {
-      options.host = "localhost";
-    }
+        return this.ctorOptions.RacComparison;
+      })(),
+    };
 
-    if (!options.issuer) {
-      options.issuer = "onelogin_saml";
-    }
-
-    if (options.identifierFormat === undefined) {
-      options.identifierFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
-    }
-
-    if (options.authnContext === undefined) {
-      options.authnContext = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
-    }
-
-    if (!Array.isArray(options.authnContext)) {
-      options.authnContext = [options.authnContext];
-    }
-
-    if (!options.acceptedClockSkewMs) {
-      // default to no skew
-      options.acceptedClockSkewMs = 0;
-    }
-
-    if (!options.validateInResponseTo) {
-      options.validateInResponseTo = false;
-    }
-
-    if (!options.requestIdExpirationPeriodMs) {
-      options.requestIdExpirationPeriodMs = 28800000; // 8 hours
-    }
-
-    if (!options.cacheProvider) {
-      options.cacheProvider = new InMemoryCacheProvider({
-        keyExpirationPeriodMs: options.requestIdExpirationPeriodMs,
-      });
-    }
-
-    if (!options.logoutUrl) {
-      // Default to Entry Point
-      options.logoutUrl = options.entryPoint || "";
-    }
-
-    // sha1, sha256, or sha512
-    if (!options.signatureAlgorithm) {
-      options.signatureAlgorithm = "sha1";
-    }
-
-    /**
-     * List of possible values:
-     * - exact : Assertion context must exactly match a context in the list
-     * - minimum:  Assertion context must be at least as strong as a context in the list
-     * - maximum:  Assertion context must be no stronger than a context in the list
-     * - better:  Assertion context must be stronger than all contexts in the list
-     */
-    if (
-      !options.RACComparison ||
-      ["exact", "minimum", "maximum", "better"].indexOf(options.RACComparison) === -1
-    ) {
-      options.RACComparison = "exact";
-    }
-
-    options.authnRequestBinding = options.authnRequestBinding || "HTTP-Redirect";
-
-    return options as SamlOptions;
+    return options;
   }
 
   getProtocol(req: Request | { headers?: undefined; protocol?: undefined }) {
@@ -230,7 +243,9 @@ class SAML {
     return new Date().toISOString();
   }
 
-  signRequest(samlMessage: querystring.ParsedUrlQueryInput) {
+  signRequest(samlMessage: querystring.ParsedUrlQueryInput): void {
+    this.options.privateKey = assertRequired(this.options.privateKey, "privateKey is required");
+
     const samlMessageToSign: querystring.ParsedUrlQueryInput = {};
     samlMessage.SigAlg = algorithms.getSigningAlgorithm(this.options.signatureAlgorithm);
     const signer = algorithms.getSigner(this.options.signatureAlgorithm);
@@ -255,9 +270,10 @@ class SAML {
     isPassive: boolean,
     isHttpPostBinding: boolean
   ): Promise<string | undefined> {
+    this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
+
     const id = "_" + this.generateUniqueID();
     const instant = this.generateInstant();
-    const forceAuthn = this.options.forceAuthn || false;
 
     if (this.options.validateInResponseTo) {
       await this.cacheProvider.saveAsync(id, instant);
@@ -279,11 +295,11 @@ class SAML {
 
     if (isPassive) request["samlp:AuthnRequest"]["@IsPassive"] = true;
 
-    if (forceAuthn) {
+    if (this.options.forceAuthn) {
       request["samlp:AuthnRequest"]["@ForceAuthn"] = true;
     }
 
-    if (!this.options.disableRequestACSUrl) {
+    if (!this.options.disableRequestAcsUrl) {
       request["samlp:AuthnRequest"]["@AssertionConsumerServiceURL"] = this.getCallbackUrl(req);
     }
 
@@ -306,7 +322,7 @@ class SAML {
 
       request["samlp:AuthnRequest"]["samlp:RequestedAuthnContext"] = {
         "@xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-        "@Comparison": this.options.RACComparison,
+        "@Comparison": this.options.RacComparison,
         "saml:AuthnContextClassRef": authnContextClassRefs,
       };
     }
@@ -317,11 +333,11 @@ class SAML {
       ] = this.options.attributeConsumingServiceIndex;
     }
 
-    if (this.options.providerName) {
+    if (this.options.providerName != null) {
       request["samlp:AuthnRequest"]["@ProviderName"] = this.options.providerName;
     }
 
-    if (this.options.scoping) {
+    if (this.options.scoping != null) {
       const scoping: XMLInput = {
         "@xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
       };
@@ -376,7 +392,7 @@ class SAML {
     }
 
     let stringRequest = xmlbuilder.create((request as unknown) as Record<string, any>).end();
-    if (isHttpPostBinding && this.options.privateKey) {
+    if (isHttpPostBinding && this.options.privateKey != null) {
       stringRequest = signAuthnRequestPost(stringRequest, this.options);
     }
     return stringRequest;
@@ -457,6 +473,8 @@ class SAML {
     operation: string,
     additionalParameters: querystring.ParsedUrlQuery
   ): Promise<string> {
+    this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
+
     let buffer: Buffer;
     if (this.options.skipRequestCompression) {
       buffer = Buffer.from((request || response)!, "utf8");
@@ -485,7 +503,7 @@ class SAML {
     Object.keys(additionalParameters).forEach((k) => {
       samlMessage[k] = additionalParameters[k];
     });
-    if (this.options.privateKey) {
+    if (this.options.privateKey != null) {
       if (!this.options.entryPoint) {
         throw new Error('"entryPoint" config parameter is required for signed messages');
       }
@@ -508,7 +526,7 @@ class SAML {
     req: Request,
     operation: string,
     overrideParams?: querystring.ParsedUrlQuery
-  ) {
+  ): querystring.ParsedUrlQuery {
     const additionalParams: querystring.ParsedUrlQuery = {};
 
     const RelayState = (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
@@ -516,24 +534,24 @@ class SAML {
       additionalParams.RelayState = RelayState;
     }
 
-    const optionsAdditionalParams = this.options.additionalParams || {};
+    const optionsAdditionalParams = this.options.additionalParams;
     Object.keys(optionsAdditionalParams).forEach(function (k) {
       additionalParams[k] = optionsAdditionalParams[k];
     });
 
     let optionsAdditionalParamsForThisOperation: Record<string, string> = {};
     if (operation == "authorize") {
-      optionsAdditionalParamsForThisOperation = this.options.additionalAuthorizeParams || {};
+      optionsAdditionalParamsForThisOperation = this.options.additionalAuthorizeParams;
     }
     if (operation == "logout") {
-      optionsAdditionalParamsForThisOperation = this.options.additionalLogoutParams || {};
+      optionsAdditionalParamsForThisOperation = this.options.additionalLogoutParams;
     }
 
     Object.keys(optionsAdditionalParamsForThisOperation).forEach(function (k) {
       additionalParams[k] = optionsAdditionalParamsForThisOperation[k];
     });
 
-    overrideParams = overrideParams || {};
+    overrideParams = overrideParams ?? {};
     Object.keys(overrideParams).forEach(function (k) {
       additionalParams[k] = overrideParams![k];
     });
@@ -553,7 +571,9 @@ class SAML {
     );
   }
 
-  async getAuthorizeFormAsync(req: Request) {
+  async getAuthorizeFormAsync(req: Request): Promise<string> {
+    this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
+
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
     // but must be interpreted by an XML or HTML parser, and it must absolutely avoid breaking the syntax
     // of an element attribute.
@@ -645,13 +665,13 @@ class SAML {
     req: RequestWithUser,
     options: AuthenticateOptions & AuthorizeOptions,
     callback: (err: Error | null, url?: string | null) => void
-  ) {
+  ): void {
     util.callbackify(() => this.getLogoutResponseUrlAsync(req, options))(callback);
   }
   async getLogoutResponseUrlAsync(
     req: RequestWithUser,
     options: AuthenticateOptions & AuthorizeOptions
-  ) {
+  ): Promise<string> {
     const response = this.generateLogoutResponse(req, req.samlLogoutRequest);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
@@ -672,10 +692,7 @@ class SAML {
     return cert;
   }
 
-  async certsToCheck(): Promise<undefined | string[]> {
-    if (!this.options.cert) {
-      return undefined;
-    }
+  async certsToCheck(): Promise<string[]> {
     if (typeof this.options.cert === "function") {
       return util
         .promisify(this.options.cert as CertCallback)()
@@ -781,7 +798,7 @@ class SAML {
       const certs = await this.certsToCheck();
       // Check if this document has a valid top-level signature
       let validSignature = false;
-      if (this.options.cert && this.validateSignature(xml, doc.documentElement, certs!)) {
+      if (this.validateSignature(xml, doc.documentElement, certs)) {
         validSignature = true;
       }
 
@@ -801,11 +818,7 @@ class SAML {
       }
 
       if (assertions.length == 1) {
-        if (
-          this.options.cert &&
-          !validSignature &&
-          !this.validateSignature(xml, assertions[0], certs!)
-        ) {
+        if (!validSignature && !this.validateSignature(xml, assertions[0], certs)) {
           throw new Error("Invalid signature");
         }
         return this.processValidlySignedAssertionAsync(
@@ -816,8 +829,10 @@ class SAML {
       }
 
       if (encryptedAssertions.length == 1) {
-        if (!this.options.decryptionPvk)
-          throw new Error("No decryption key for encrypted SAML response");
+        this.options.decryptionPvk = assertRequired(
+          this.options.decryptionPvk,
+          "No decryption key for encrypted SAML response"
+        );
 
         const encryptedAssertionXml = encryptedAssertions[0].toString();
 
@@ -834,7 +849,6 @@ class SAML {
         if (decryptedAssertions.length != 1) throw new Error("Invalid EncryptedAssertion content");
 
         if (
-          this.options.cert &&
           !validSignature &&
           !this.validateSignature(decryptedXml, decryptedAssertions[0], certs!)
         )
@@ -873,7 +887,7 @@ class SAML {
                 nestedStatusCode &&
                 nestedStatusCode[0].$.Value === "urn:oasis:names:tc:SAML:2.0:status:NoPassive"
               ) {
-                if (this.options.cert && !validSignature) {
+                if (!validSignature) {
                   throw new Error("Invalid signature: NoPassive");
                 }
                 return { profile: null, loggedOut: false };
@@ -906,7 +920,7 @@ class SAML {
         }
         throw new Error("Missing SAML assertion");
       } else {
-        if (this.options.cert && !validSignature) {
+        if (!validSignature) {
           throw new Error("Invalid signature: No response found");
         }
         const logoutResponse = xmljsDoc.LogoutResponse;
@@ -918,14 +932,14 @@ class SAML {
       }
     } catch (err) {
       debug("validatePostResponse resulted in an error: %s", err);
-      if (this.options.validateInResponseTo) {
+      if (this.options.validateInResponseTo != null) {
         await this.cacheProvider.removeAsync(inResponseTo!);
       }
       throw err;
     }
   }
 
-  async validateInResponseTo(inResponseTo: string | null) {
+  async validateInResponseTo(inResponseTo: string | null): Promise<undefined> {
     if (this.options.validateInResponseTo) {
       if (inResponseTo) {
         const result = await this.cacheProvider.getAsync(inResponseTo);
@@ -975,7 +989,7 @@ class SAML {
       return exists[0];
     };
 
-    if (container.Signature && this.options.cert) {
+    if (container.Signature) {
       let urlString = getParam("SAMLRequest") || getParam("SAMLResponse");
 
       if (getParam("RelayState")) {
@@ -985,7 +999,7 @@ class SAML {
       urlString += "&" + getParam("SigAlg");
 
       const certs = await this.certsToCheck();
-      const hasValidQuerySignature = certs!.some((cert) => {
+      const hasValidQuerySignature = certs.some((cert) => {
         return this.validateSignatureForRedirect(
           urlString,
           container.Signature as string,
@@ -994,7 +1008,7 @@ class SAML {
         );
       });
       if (!hasValidQuerySignature) {
-        throw new Error("Invalid signature");
+        throw new Error("Invalid query signature");
       }
     } else {
       return true;
@@ -1057,7 +1071,7 @@ class SAML {
   }
 
   verifyIssuer(samlMessage: XMLOutput) {
-    if (this.options.idpIssuer) {
+    if (this.options.idpIssuer != null) {
       const issuer = samlMessage.Issuer;
       if (issuer) {
         if (issuer[0]._ !== this.options.idpIssuer)
@@ -1193,7 +1207,7 @@ class SAML {
       if (conErr) throw conErr;
     }
 
-    if (this.options.audience) {
+    if (this.options.audience != null) {
       const audienceErr = this.checkAudienceValidityError(
         this.options.audience,
         conditions.AudienceRestriction
@@ -1305,13 +1319,13 @@ class SAML {
     const parser = new xml2js.Parser(parserConfig);
     const doc = await parser.parseStringPromise(xml);
     const certs = await this.certsToCheck();
-    if (this.options.cert && !this.validateSignature(xml, dom.documentElement, certs!)) {
+    if (!this.validateSignature(xml, dom.documentElement, certs)) {
       throw new Error("Invalid signature on documentElement");
     }
     return await processValidlySignedPostRequestAsync(this, doc, dom);
   }
 
-  async getNameIDAsync(self: SAML, doc: Node): Promise<NameID> {
+  async getNameIdAsync(self: SAML, doc: Node): Promise<NameID> {
     const nameIds = xmlCrypto.xpath(
       doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='NameID']"
@@ -1328,9 +1342,10 @@ class SAML {
       return promiseWithNameID(nameIds[0]);
     }
     if (encryptedIds.length === 1) {
-      if (!self.options.decryptionPvk) {
-        throw new Error("No decryption key for encrypted SAML response");
-      }
+      self.options.decryptionPvk = assertRequired(
+        self.options.decryptionPvk,
+        "No decryption key found getting name ID for encrypted SAML response"
+      );
 
       const encryptedDatas = xmlCrypto.xpath(encryptedIds[0], "./*[local-name()='EncryptedData']");
 
@@ -1367,14 +1382,14 @@ class SAML {
       },
     };
 
-    if (this.options.decryptionPvk) {
+    if (this.options.decryptionPvk != null) {
       if (!decryptionCert) {
         throw new Error(
           "Missing decryptionCert while generating metadata for decrypting service provider"
         );
       }
     }
-    if (this.options.privateKey) {
+    if (this.options.privateKey != null) {
       if (!signingCert) {
         throw new Error(
           "Missing signingCert while generating metadata for signing service provider messages"
@@ -1382,9 +1397,9 @@ class SAML {
       }
     }
 
-    if (this.options.decryptionPvk || this.options.privateKey) {
+    if (this.options.decryptionPvk != null || this.options.privateKey != null) {
       metadata.EntityDescriptor.SPSSODescriptor.KeyDescriptor = [];
-      if (this.options.privateKey) {
+      if (this.options.privateKey != null) {
         signingCert = signingCert!.replace(/-+BEGIN CERTIFICATE-+\r?\n?/, "");
         signingCert = signingCert.replace(/-+END CERTIFICATE-+\r?\n?/, "");
         signingCert = signingCert.replace(/\r\n/g, "\n");
@@ -1401,7 +1416,7 @@ class SAML {
         });
       }
 
-      if (this.options.decryptionPvk) {
+      if (this.options.decryptionPvk != null) {
         decryptionCert = decryptionCert!.replace(/-+BEGIN CERTIFICATE-+\r?\n?/, "");
         decryptionCert = decryptionCert.replace(/-+END CERTIFICATE-+\r?\n?/, "");
         decryptionCert = decryptionCert.replace(/\r\n/g, "\n");
@@ -1425,7 +1440,7 @@ class SAML {
       }
     }
 
-    if (this.options.logoutCallbackUrl) {
+    if (this.options.logoutCallbackUrl != null) {
       metadata.EntityDescriptor.SPSSODescriptor.SingleLogoutService = {
         "@Binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
         "@Location": this.options.logoutCallbackUrl,
@@ -1447,19 +1462,25 @@ class SAML {
       .end({ pretty: true, indent: "  ", newline: "\n" });
   }
 
-  keyToPEM(key: crypto.KeyLike) {
-    if (!key || typeof key !== "string") return key;
+  keyToPEM(key: string | Buffer): typeof key extends string | Buffer ? string | Buffer : Error {
+    key = assertRequired(key, "key is required");
 
-    const lines = key.split(/\r?\n/);
-    if (lines.length !== 1) return key;
+    if (typeof key !== "string") return key;
+    if (key.split(/\r?\n/).length !== 1) return key;
 
-    const wrappedKey = [
-      "-----BEGIN PRIVATE KEY-----",
-      ...(key.match(/.{1,64}/g) ?? []),
-      "-----END PRIVATE KEY-----",
-      "",
-    ].join("\n");
-    return wrappedKey;
+    const matchedKey = key.match(/.{1,64}/g);
+
+    if (matchedKey) {
+      const wrappedKey = [
+        "-----BEGIN PRIVATE KEY-----",
+        ...matchedKey,
+        "-----END PRIVATE KEY-----",
+        "",
+      ].join("\n");
+      return wrappedKey;
+    }
+
+    throw new Error("Invalid key");
   }
 
   normalizeNewlines(xml: string): string {
