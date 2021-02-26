@@ -3,7 +3,7 @@ TEMPORARY FILE -- CHECK FOR EVERY ADDED TEST IF THEY ARE CORRECT.
 ## THINGS TO CHECK:
 
 - a. Is the root signature correct (i.e. is `validSignature = true;` run on saml.ts:859)
-- b. Is the expected number of validation checks correct
+- b. `amountOfSignaturesChecks` is 2 (one for root because "cert" is given and one for assertion because wantAssertionsSigned=true)
 - c. Is the expected error thrown (i.e. "SAML assertion expired" if we made it past certificate validation, see test-signatures.spec.ts:38)
 
 ## TESTS TO CHECK:
@@ -33,8 +33,8 @@ Test name: `R1A - root signed - wantAssertionsSigned=true => error`
 Response xml: `/valid/response.root-signed.assertion-unsigned.xml`
 
 - a: `validSignature = true;` is run (correct because root is signed)
-- b:
-- c:
+- b: `amountOfSignaturesChecks` is 2 (correct)
+- c: Correctly tests for invalid signature
 
 ### 2. signed response with unsigned encrypted assertion
 
@@ -42,8 +42,8 @@ Test name: `R1A - root signed - asrt unsigned encrypted -wantAssertionsSigned=tr
 Response xml: `/valid/response.root-signed.assertion-unsigned-encrypted.xml`
 
 - a: `validSignature = true;` is run (correct because root is signed)
-- b:
-- c:
+- b: `amountOfSignaturesChecks` is 2 (correct)
+- c: Correctly tests for invalid signature
 
 ### 3. unsigned response with signed unencrypted assertion and cert option not provided at all
 
@@ -71,8 +71,8 @@ Response xml: `/invalid/response.root-signed.assertion-invalidly-signed.xml`
 (`saml:NameID` and `saml:SubjectConfirmationData` have been changed)
 
 - a: `validSignature = true;` is run (correct because root is signed)
-- b:
-- c:
+- b: `amountOfSignaturesChecks` is 2 (correct)
+- c: Correctly tests for invalid signature
 
 ### 6. signed response with signed encrypted assertion so that assertion's content doesn't match with assertion's signature
 
@@ -82,5 +82,5 @@ Response xml: `/invalid/response.root-signed.assertion-invalidly-signed-encrypte
 (`saml:NameID` and `saml:SubjectConfirmationData` have been changed)
 
 - a: `validSignature = true;` is run (correct because root is signed)
-- b:
-- c:
+- b: `amountOfSignaturesChecks` is 2 (correct)
+- c: Correctly tests for invalid signature
