@@ -23,11 +23,11 @@ describe("Signatures", function () {
       samlResponseBody: Record<string, string>,
       shouldErrorWith: string | false | undefined,
       amountOfSignatureChecks = 1,
-      options: Partial<SamlOptions> = { cert }
+      options: Partial<SamlOptions> = {}
     ) => {
       return (done: Mocha.Done) => {
         //== Instantiate new instance before every test
-        const samlObj = new SAML(options);
+        const samlObj = new SAML({ cert, ...options });
         //== Spy on `validateSignature` to be able to count how many times it has been called
         const validateSignatureSpy = sinon.spy(samlObj, "validateSignature");
 
@@ -98,7 +98,6 @@ describe("Signatures", function () {
     it(
       "R1A - root signed - wantAssertionsSigned=true => error",
       testOneResponse("/valid/response.root-signed.assertion-unsigned.xml", INVALID_SIGNATURE, 2, {
-        cert,
         wantAssertionsSigned: true,
       })
     );
@@ -110,7 +109,6 @@ describe("Signatures", function () {
         2,
         {
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          cert,
           wantAssertionsSigned: true,
         }
       )
@@ -122,7 +120,18 @@ describe("Signatures", function () {
         INVALID_SIGNATURE,
         2,
         {
-          cert,
+          wantAssertionsSigned: true,
+        }
+      )
+    );
+    it(
+      "R1A - root unsigned - asrt invalidly signed encrypted wantAssertionsSigned=true => error",
+      testOneResponse(
+        "/invalid/response.root-unsigned.assertion-invalidly-signed-encrypted.xml",
+        INVALID_ENCRYPTED_SIGNATURE,
+        2,
+        {
+          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
           wantAssertionsSigned: true,
         }
       )
@@ -135,7 +144,6 @@ describe("Signatures", function () {
         2,
         {
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          cert,
           wantAssertionsSigned: true,
         }
       )
