@@ -31,8 +31,6 @@ import {
   XMLInput,
   XMLObject,
   XMLOutput,
-  XMLValue,
-  ManditorySamlOptions,
   SamlConfig,
 } from "./types";
 import { assertRequired } from "./utility";

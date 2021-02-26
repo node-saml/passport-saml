@@ -31,7 +31,7 @@ export interface SamlSigningOptions {
 /**
  * These are SAML options that must be provided to construct a new SAML Strategy
  */
-export interface ManditorySamlOptions {
+export interface MandatorySamlOptions {
   cert: string | string[] | CertCallback;
 }
 
@@ -39,7 +39,7 @@ export interface ManditorySamlOptions {
  * The options required to use a SAML strategy
  * These may be provided by means of defaults specified in the constructor
  */
-export interface SamlOptions extends SamlSigningOptions, ManditorySamlOptions {
+export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
   // Core
   callbackUrl?: string;
   path: string;
@@ -88,7 +88,7 @@ export interface StrategyOptions {
 /**
  * These options are availble for configuring a SAML strategy
  */
-export type SamlConfig = Partial<SamlOptions> & ManditorySamlOptions;
+export type SamlConfig = Partial<SamlOptions> & MandatorySamlOptions;
 
 export interface SamlScopingConfig {
   idpList?: SamlIDPListConfig[];

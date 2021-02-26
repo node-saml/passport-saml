@@ -23,7 +23,7 @@ class Strategy extends PassportStrategy {
   constructor(options: SamlConfig & StrategyOptions, verify: never) {
     super();
     if (typeof options == "function") {
-      throw new Error("Manditory SAML options missing");
+      throw new Error("Mandatory SAML options missing");
     }
 
     if (!verify) {
