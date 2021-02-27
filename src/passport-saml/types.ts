@@ -2,8 +2,6 @@ import type * as express from "express";
 import * as passport from "passport";
 import type { CacheProvider } from "./inmemory-cache-provider";
 
-import { Static } from "runtypes";
-
 export type CertCallback = (
   callback: (err: Error | null, cert?: string | string[]) => void
 ) => void;
