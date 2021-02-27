@@ -25,7 +25,7 @@ class MultiSamlStrategy extends SamlStrategy {
 
     const samlConfig: SamlConfig & MultiSamlConfig = {
       ...options,
-      cert: options.cert ?? "fake cert", // This would never be a valid cert, to it serves to be a good placeholder
+      cert: options.cert ?? "fake cert", // This would never be a valid cert, so it serves as a good placeholder
     };
 
     super(samlConfig, verify);
