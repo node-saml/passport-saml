@@ -848,9 +848,10 @@ class SAML {
 
         if (
           !validSignature &&
-          !this.validateSignature(decryptedXml, decryptedAssertions[0], certs!)
-        )
+          !this.validateSignature(decryptedXml, decryptedAssertions[0], certs)
+        ) {
           throw new Error("Invalid signature from encrypted assertion");
+        }
 
         return await this.processValidlySignedAssertionAsync(
           decryptedAssertions[0].toString(),
