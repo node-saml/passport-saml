@@ -50,7 +50,7 @@ export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
   // Additional SAML behaviors
   additionalParams: Record<string, string>;
   additionalAuthorizeParams: Record<string, string>;
-  identifierFormat: string | null;
+  identifierFormat?: string;
   acceptedClockSkewMs: number;
   attributeConsumingServiceIndex?: string;
   disableRequestedAuthnContext: boolean;

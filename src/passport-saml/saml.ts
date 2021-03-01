@@ -174,9 +174,8 @@ class SAML {
       host: this.ctorOptions.host ?? "localhost",
       issuer: this.ctorOptions.issuer ?? "onelogin_saml",
       identifierFormat:
-        this.ctorOptions.identifierFormat === undefined
-          ? "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-          : this.ctorOptions.identifierFormat,
+        this.ctorOptions.identifierFormat ??
+        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
       authnContext: this.ctorOptions.authnContext ?? [
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       ],
@@ -301,7 +300,7 @@ class SAML {
       request["samlp:AuthnRequest"]["@AssertionConsumerServiceURL"] = this.getCallbackUrl(req);
     }
 
-    if (this.options.identifierFormat) {
+    if (this.options.identifierFormat != null) {
       request["samlp:AuthnRequest"]["samlp:NameIDPolicy"] = {
         "@xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
         "@Format": this.options.identifierFormat,
@@ -1454,7 +1453,7 @@ class SAML {
       };
     }
 
-    if (this.options.identifierFormat) {
+    if (this.options.identifierFormat != null) {
       metadata.EntityDescriptor.SPSSODescriptor.NameIDFormat = this.options.identifierFormat;
     }
 
