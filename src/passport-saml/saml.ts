@@ -691,21 +691,29 @@ class SAML {
   }
 
   async certsToCheck(): Promise<string[]> {
+    let checkedCerts: string[];
+
     if (typeof this.options.cert === "function") {
-      return util
+      checkedCerts = await util
         .promisify(this.options.cert as CertCallback)()
         .then((certs) => {
+          certs = assertRequired(certs, "callback didn't return cert");
           if (!Array.isArray(certs)) {
-            certs = [certs as string];
+            certs = [certs];
           }
-          return certs as string[];
+          return certs;
         });
+    } else if (Array.isArray(this.options.cert)) {
+      checkedCerts = this.options.cert;
+    } else {
+      checkedCerts = [this.options.cert];
     }
-    let certs = this.options.cert;
-    if (!Array.isArray(certs)) {
-      certs = [certs];
-    }
-    return certs;
+
+    checkedCerts.forEach((cert) => {
+      assertRequired(cert, "unknown cert found");
+    });
+
+    return checkedCerts;
   }
 
   // This function checks that the |currentNode| in the |fullXml| document contains exactly 1 valid
