@@ -174,8 +174,9 @@ class SAML {
       host: this.ctorOptions.host ?? "localhost",
       issuer: this.ctorOptions.issuer ?? "onelogin_saml",
       identifierFormat:
-        this.ctorOptions.identifierFormat ??
-        "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+        this.ctorOptions.identifierFormat === undefined
+          ? "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+          : this.ctorOptions.identifierFormat,
       authnContext: this.ctorOptions.authnContext ?? [
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       ],
@@ -203,7 +204,9 @@ class SAML {
         if (
           ["exact", "minimum", "maximum", "better"].indexOf(this.ctorOptions.RacComparison) === -1
         ) {
-          throw new Error("RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']");
+          throw new TypeError(
+            "RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
+          );
         }
 
         return this.ctorOptions.RacComparison;
@@ -720,7 +723,7 @@ class SAML {
   //
   // See https://github.com/bergie/passport-saml/issues/19 for references to some of the attack
   //   vectors against SAML signature verification.
-  validateSignature(fullXml: string, currentNode: HTMLElement, certs: string[]) {
+  validateSignature(fullXml: string, currentNode: HTMLElement, certs: string[]): boolean {
     const xpathSigQuery =
       ".//*[" +
       "local-name(.)='Signature' and " +
@@ -826,7 +829,7 @@ class SAML {
         if (!validSignature && !this.validateSignature(xml, assertions[0], certs)) {
           throw new Error("Invalid signature");
         }
-        return this.processValidlySignedAssertionAsync(
+        return await this.processValidlySignedAssertionAsync(
           assertions[0].toString(),
           xml,
           inResponseTo!

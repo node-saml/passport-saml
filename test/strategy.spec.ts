@@ -27,7 +27,8 @@ describe("strategy#authorize", function () {
     const strategy = new SamlStrategy(
       {
         authnRequestBinding: "HTTP-POST",
-      } as any,
+        cert: "fake cert",
+      },
       noop
     );
     strategy.authenticate({} as RequestWithUser, {});
@@ -36,7 +37,7 @@ describe("strategy#authorize", function () {
   });
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
-    const strategy = new SamlStrategy({} as any, noop);
+    const strategy = new SamlStrategy({ cert: "fake cert" }, noop);
     strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.notCalled(errorStub);
     sinon.assert.calledOnce(getAuthorizeUrlStub);

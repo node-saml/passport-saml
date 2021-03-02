@@ -37,7 +37,10 @@ export class CacheProvider {
       options.keyExpirationPeriodMs = 28800000; // 8 hours
     }
 
-    this.options = options as CacheProviderOptions;
+    this.options = {
+      ...options,
+      keyExpirationPeriodMs: options.keyExpirationPeriodMs,
+    };
 
     // Expire old cache keys
     const expirationTimer = setInterval(() => {

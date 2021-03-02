@@ -17,7 +17,7 @@ import { CapturedCheck, SamlCheck } from "./types";
 const capturedSamlRequestChecks: SamlCheck[] = [
   {
     name: "Empty Config",
-    config: {} as any,
+    config: { cert: "fake cert" },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -55,7 +55,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
   },
   {
     name: "Empty Config w/ HTTP-POST binding",
-    config: { authnRequestBinding: "HTTP-POST" } as any,
+    config: { authnRequestBinding: "HTTP-POST", cert: "fake cert" },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -99,7 +99,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       forceAuthn: false,
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -148,7 +149,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       skipRequestCompression: true,
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -199,7 +201,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       skipRequestCompression: true,
       disableRequestedAuthnContext: true,
       forceAuthn: true,
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -238,7 +241,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       authnContext: ["myAuthnContext"],
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -287,7 +291,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       authnContext: ["myAuthnContext", "myAuthnContext2"],
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -338,7 +343,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       issuer: "http://exampleSp.com/saml",
       identifierFormat: "alternateIdentifier",
       providerName: "myProviderName",
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -384,7 +390,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       identifierFormat: null,
       disableRequestedAuthnContext: true,
       disableRequestAcsUrl: true,
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -420,7 +427,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -512,7 +520,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -601,7 +610,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -688,7 +698,8 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-    } as any,
+      cert: "fake cert",
+    },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -775,6 +786,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
+      cert: "fake cert",
     },
     result: {
       "samlp:AuthnRequest": {
@@ -908,7 +920,7 @@ describe("captured SAML requests /", function () {
         config.entryPoint = "https://wwwexampleIdp.com/saml";
         let profile: Profile;
         const strategy = new SamlStrategy(
-          config as any,
+          config,
           function (_profile: Profile | null | undefined, done: VerifiedCallback) {
             if (_profile) {
               profile = _profile;
@@ -1013,7 +1025,7 @@ describe("captured SAML requests /", function () {
       config.entryPoint = "https://wwwexampleIdp.com/saml";
       let profile: Profile;
       const strategy = new SamlStrategy(
-        config as any,
+        config,
         function (_profile: Profile | null | undefined, done: VerifiedCallback) {
           if (_profile) {
             profile = _profile;
