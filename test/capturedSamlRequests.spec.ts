@@ -11,12 +11,12 @@ import * as fs from "fs";
 import { AuthenticateOptions, Profile, VerifiedCallback } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
-import { CapturedCheck, SamlCheck } from "./types";
+import { CapturedCheck, FAKE_CERT, SamlCheck } from "./types";
 
 const capturedSamlRequestChecks: SamlCheck[] = [
   {
     name: "Empty Config",
-    config: { cert: "fake cert" },
+    config: { cert: FAKE_CERT },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -54,7 +54,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
   },
   {
     name: "Empty Config w/ HTTP-POST binding",
-    config: { authnRequestBinding: "HTTP-POST", cert: "fake cert" },
+    config: { authnRequestBinding: "HTTP-POST", cert: FAKE_CERT },
     result: {
       "samlp:AuthnRequest": {
         $: {
@@ -98,7 +98,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       forceAuthn: false,
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -148,7 +148,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       skipRequestCompression: true,
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -200,7 +200,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       skipRequestCompression: true,
       disableRequestedAuthnContext: true,
       forceAuthn: true,
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -240,7 +240,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       authnContext: ["myAuthnContext"],
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -290,7 +290,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       passive: true,
       attributeConsumingServiceIndex: "123",
       authnContext: ["myAuthnContext", "myAuthnContext2"],
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -342,7 +342,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       issuer: "http://exampleSp.com/saml",
       identifierFormat: "alternateIdentifier",
       providerName: "myProviderName",
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -389,7 +389,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
       identifierFormat: null,
       disableRequestedAuthnContext: true,
       disableRequestAcsUrl: true,
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -426,7 +426,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -519,7 +519,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -609,7 +609,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -697,7 +697,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {
@@ -785,7 +785,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
           },
         ],
       },
-      cert: "fake cert",
+      cert: FAKE_CERT,
     },
     result: {
       "samlp:AuthnRequest": {

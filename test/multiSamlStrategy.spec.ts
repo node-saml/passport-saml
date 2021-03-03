@@ -10,15 +10,16 @@ import {
   SamlConfig,
 } from "../src/passport-saml/types";
 import assert = require("assert");
+import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
 
 describe("MultiSamlStrategy()", function () {
   it("extends passport Strategy", function () {
     function getSamlOptions(): SamlConfig {
-      return {} as any;
+      return { cert: FAKE_CERT };
     }
-    const strategy = new MultiSamlStrategy({ getSamlOptions } as any, noop);
+    const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
     strategy.should.be.an.instanceOf(SamlStrategy);
   });
 
@@ -43,7 +44,7 @@ describe("MultiSamlStrategy#authenticate", function () {
     const superAuthenticateStub = this.superAuthenticateStub;
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
       try {
-        fn(null, {} as any);
+        fn(null, { cert: FAKE_CERT });
         sinon.assert.calledOnce(superAuthenticateStub);
         done();
       } catch (err2) {
@@ -54,7 +55,7 @@ describe("MultiSamlStrategy#authenticate", function () {
     const strategy = new MultiSamlStrategy(
       {
         getSamlOptions,
-      } as any,
+      },
       noop
     );
     strategy.authenticate("random" as any, "random" as any);
@@ -65,7 +66,7 @@ describe("MultiSamlStrategy#authenticate", function () {
       passReqToCallback: true,
       getSamlOptions: function (req: express.Request, fn: SamlOptionsCallback) {
         try {
-          fn(null, {} as any);
+          fn(null, { cert: FAKE_CERT });
           strategy._passReqToCallback!.should.eql(true);
           done();
         } catch (err2) {
@@ -74,7 +75,7 @@ describe("MultiSamlStrategy#authenticate", function () {
       },
     };
 
-    const strategy = new MultiSamlStrategy(passportOptions as any, noop);
+    const strategy = new MultiSamlStrategy(passportOptions, noop);
     strategy.authenticate("random" as any, "random" as any);
   });
 
@@ -106,7 +107,7 @@ describe("MultiSamlStrategy#authenticate", function () {
     }
 
     const strategy = new MultiSamlStrategy(
-      { getSamlOptions, cacheProvider: "mock cache provider" as any } as any,
+      { getSamlOptions, cacheProvider: "mock cache provider" as any },
       noop
     );
     strategy.authenticate("random" as any, "random" as any);
@@ -132,9 +133,9 @@ describe("MultiSamlStrategy#authorize", function () {
 
   it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
-      fn(null, { authnRequestBinding: "HTTP-POST" } as any);
+      fn(null, { authnRequestBinding: "HTTP-POST", cert: FAKE_CERT });
     }
-    const strategy = new MultiSamlStrategy({ getSamlOptions } as any, noop);
+    const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
     strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.notCalled(errorStub);
     sinon.assert.calledOnce(getAuthorizeFormStub);
@@ -142,9 +143,9 @@ describe("MultiSamlStrategy#authorize", function () {
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
-      fn(null, {} as any);
+      fn(null, { cert: FAKE_CERT });
     }
-    const strategy = new MultiSamlStrategy({ getSamlOptions } as any, noop);
+    const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
     strategy.authenticate({} as RequestWithUser, {});
     sinon.assert.notCalled(errorStub);
     sinon.assert.calledOnce(getAuthorizeUrlStub);
@@ -172,7 +173,7 @@ describe("MultiSamlStrategy#logout", function () {
       }
     }
 
-    const strategy = new MultiSamlStrategy({ getSamlOptions } as any, noop);
+    const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
     strategy.logout("random" as any, "random" as any);
   });
 
@@ -181,7 +182,7 @@ describe("MultiSamlStrategy#logout", function () {
       passReqToCallback: true,
       getSamlOptions: function (req: express.Request, fn: SamlOptionsCallback) {
         try {
-          fn(null, {} as any);
+          fn(null, { cert: FAKE_CERT });
           strategy._passReqToCallback!.should.eql(true);
           done();
         } catch (err2) {
@@ -190,7 +191,7 @@ describe("MultiSamlStrategy#logout", function () {
       },
     };
 
-    const strategy = new MultiSamlStrategy(passportOptions as any, noop);
+    const strategy = new MultiSamlStrategy(passportOptions, noop);
     strategy.logout("random" as any, "random" as any);
   });
 
@@ -220,7 +221,7 @@ describe("MultiSamlStrategy#logout", function () {
       }
     }
 
-    const strategy = new MultiSamlStrategy({ getSamlOptions } as any, noop);
+    const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
     strategy.logout("random" as any, sinon.spy());
   });
 });
@@ -250,7 +251,7 @@ describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
       }
     }
 
-    const strategy = new MultiSamlStrategy({ getSamlOptions } as any, noop);
+    const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
     strategy.generateServiceProviderMetadata("foo" as any, "bar", "baz", noop);
   });
 
@@ -260,7 +261,7 @@ describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
 
       getSamlOptions: function (req: express.Request, fn: SamlOptionsCallback) {
         try {
-          fn(null, {} as any);
+          fn(null, { cert: FAKE_CERT });
           strategy._passReqToCallback!.should.eql(true);
           done();
         } catch (err2) {
@@ -269,18 +270,18 @@ describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
       },
     };
 
-    const strategy = new MultiSamlStrategy(passportOptions as any, noop);
+    const strategy = new MultiSamlStrategy(passportOptions, noop);
     strategy.generateServiceProviderMetadata("foo" as any, "bar", "baz", noop);
   });
 
   it("should pass error to callback function", function (done) {
     const passportOptions = {
       getSamlOptions: function (req: express.Request, fn: SamlOptionsCallback) {
-        fn(new Error("My error"), {} as any);
+        fn(new Error("My error"));
       },
     };
 
-    const strategy = new MultiSamlStrategy(passportOptions as any, noop);
+    const strategy = new MultiSamlStrategy(passportOptions, noop);
     strategy.generateServiceProviderMetadata("foo" as any, "bar", "baz", function (error, result) {
       try {
         should(error?.message).equal("My error");
@@ -294,11 +295,11 @@ describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
   it("should pass result to callback function", function (done) {
     const passportOptions = {
       getSamlOptions: function (req: express.Request, fn: SamlOptionsCallback) {
-        fn(null, {} as any);
+        fn(null, { cert: FAKE_CERT });
       },
     };
 
-    const strategy = new MultiSamlStrategy(passportOptions as any, noop);
+    const strategy = new MultiSamlStrategy(passportOptions, noop);
     strategy.generateServiceProviderMetadata("foo" as any, "bar", "baz", function (error, result) {
       try {
         should(result).equal("My Metadata Result");

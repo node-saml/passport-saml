@@ -120,7 +120,7 @@ describe("captured saml responses /", function () {
       let profile: Profile;
       pp.use(
         new SamlStrategy(
-          config as any,
+          config,
           function (_profile: Profile | null | undefined, done: VerifiedCallback): void {
             if (_profile) {
               profile = _profile;
@@ -188,7 +188,7 @@ describe("captured saml responses /", function () {
       let passedRequest: express.Request | null = null;
       pp.use(
         new SamlStrategy(
-          config as any,
+          config,
           function (
             req: express.Request,
             _profile: Profile | null | undefined,

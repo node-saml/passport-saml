@@ -6,6 +6,7 @@ import assert = require("assert");
 import { SAML } from "../src/passport-saml/saml";
 import { RequestWithUser, AuthenticateOptions, AuthorizeOptions } from "../src/passport-saml/types";
 import { assertRequired } from "../src/passport-saml/utility";
+import { FAKE_CERT } from "./types";
 
 describe("SAML.js", function () {
   describe("get Urls", function () {
@@ -16,8 +17,8 @@ describe("SAML.js", function () {
       saml = new SAML({
         entryPoint: "https://exampleidp.com/path?key=value",
         logoutUrl: "https://exampleidp.com/path?key=value",
-        cert: "fake cert",
-      } as any);
+        cert: FAKE_CERT,
+      });
       req = {
         protocol: "https",
         headers: {

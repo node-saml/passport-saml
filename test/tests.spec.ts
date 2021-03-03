@@ -9,7 +9,7 @@ import * as sinon from "sinon";
 import { RacComparision, RequestWithUser, SamlConfig } from "../src/passport-saml/types.js";
 import * as should from "should";
 import assert = require("assert");
-import { TEST_CERT } from "./types";
+import { FAKE_CERT, TEST_CERT } from "./types";
 import { signXmlResponse } from "../src/passport-saml/utility";
 
 export const BAD_TEST_CERT =
@@ -27,7 +27,7 @@ describe("passport-saml /", function () {
     });
 
     it("generateUniqueID should generate 20 char IDs", function () {
-      const samlObj = new SAML({ entryPoint: "foo" } as any);
+      const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       for (let i = 0; i < 200; i++) {
         samlObj.generateUniqueID().length.should.eql(20);
       }
@@ -52,7 +52,7 @@ describe("passport-saml /", function () {
           },
         };
 
-        const samlObj = new SAML({ entryPoint: "foo", cert: "fake cert" });
+        const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
         const logoutRequestPromise = samlObj.generateLogoutRequest({
           user: {
             nameIDFormat: "foo",
@@ -109,7 +109,7 @@ describe("passport-saml /", function () {
           },
         };
 
-        const samlObj = new SAML({ entryPoint: "foo", cert: "fake cert" });
+        const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
         const logoutRequestPromise = samlObj.generateLogoutRequest({
           user: {
             nameIDFormat: "foo",
@@ -161,7 +161,7 @@ describe("passport-saml /", function () {
         },
       };
 
-      const samlObj = new SAML({ entryPoint: "foo", cert: "fake cert" });
+      const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       const logoutRequest = samlObj.generateLogoutResponse({} as express.Request, { ID: "quux" });
       parseString(logoutRequest, function (err, doc) {
         try {
@@ -197,7 +197,7 @@ describe("passport-saml /", function () {
           },
         };
 
-        const samlObj = new SAML({ entryPoint: "foo", cert: "fake cert" });
+        const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
         const logoutRequestPromise = samlObj.generateLogoutRequest({
           user: {
             nameIDFormat: "foo",
@@ -248,7 +248,7 @@ describe("passport-saml /", function () {
         },
       };
 
-      const samlObj = new SAML({ entryPoint: "foo", cert: "fake cert" });
+      const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       const cacheSaveSpy = sinon.spy(samlObj.cacheProvider, "saveAsync");
       const logoutRequestPromise = samlObj.generateLogoutRequest({
         user: {
@@ -282,7 +282,7 @@ describe("passport-saml /", function () {
         expectedMetadata: string,
         signingCert?: string
       ) {
-        const samlObj = new SAML(samlConfig as any);
+        const samlObj = new SAML(samlConfig);
         const decryptionCert = fs.readFileSync(
           __dirname + "/static/testshib encryption cert.pem",
           "utf-8"
@@ -292,7 +292,7 @@ describe("passport-saml /", function () {
         metadata.split("\n").should.eql(expectedMetadata.split("\n"));
 
         // verify that we are exposed through Strategy as well
-        const strategy = new SamlStrategy(samlConfig as any, noop);
+        const strategy = new SamlStrategy(samlConfig, noop);
         metadata = strategy.generateServiceProviderMetadata(decryptionCert, signingCert);
         metadata.split("\n").should.eql(expectedMetadata.split("\n"));
       }
@@ -303,7 +303,7 @@ describe("passport-saml /", function () {
           callbackUrl: "http://example.serviceprovider.com/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata.xml",
@@ -318,7 +318,7 @@ describe("passport-saml /", function () {
           issuer: "http://example.serviceprovider.com",
           callbackUrl: "http://example.serviceprovider.com/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata without key.xml",
@@ -336,7 +336,7 @@ describe("passport-saml /", function () {
           path: "/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata.xml",
@@ -353,7 +353,7 @@ describe("passport-saml /", function () {
           host: "example.serviceprovider.com",
           path: "/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expected metadata without key.xml",
@@ -372,7 +372,7 @@ describe("passport-saml /", function () {
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
           privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expectedMetadataWithBothKeys.xml",
@@ -392,7 +392,7 @@ describe("passport-saml /", function () {
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
           __dirname + "/static/expectedMetadataWithBothKeys.xml",
@@ -411,7 +411,7 @@ describe("passport-saml /", function () {
         identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
         decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
         logoutCallbackUrl: "http://example.serviceprovider.com/logout",
-        cert: "fake cert",
+        cert: FAKE_CERT,
       };
 
       const samlObj = new SAML(samlConfig);
@@ -472,7 +472,7 @@ describe("passport-saml /", function () {
           '<?xml version="1.0" encoding="UTF-8"?><saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" Destination="http://localhost/browserSamlLogin" ID="_6a377272c8662561acf1056274ef3f81" InResponseTo="_4324fb0d00661146f7dc" IssueInstant="2014-07-02T18:16:31.278Z" Version="2.0"><saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://idp.testshib.org/idp/shibboleth</saml2:Issuer><saml2p:Status><saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Responder"><saml2p:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy"/></saml2p:StatusCode></saml2p:Status></saml2p:Response>';
         const base64xml = Buffer.from(xml).toString("base64");
         const container = { SAMLResponse: base64xml };
-        const samlObj = new SAML({ cert: "fake cert" });
+        const samlObj = new SAML({ cert: FAKE_CERT });
         await assert.rejects(samlObj.validatePostResponseAsync(container), {
           message: /Responder.*InvalidNameIDPolicy/,
         });
@@ -545,7 +545,7 @@ describe("passport-saml /", function () {
         };
         const noCertSamlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
-        };
+        } as SamlConfig;
         const badCertSamlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: BAD_TEST_CERT,
@@ -553,7 +553,7 @@ describe("passport-saml /", function () {
 
         it("must have a cert to construct a SAML object", function () {
           try {
-            new SAML(noCertSamlConfig as any);
+            new SAML(noCertSamlConfig);
           } catch (err) {
             should.exist(err);
             err!.message!.should.match(/cert is required/);
@@ -593,7 +593,7 @@ describe("passport-saml /", function () {
           const base64xml = Buffer.from(xml).toString("base64");
           const container = { SAMLResponse: base64xml };
           try {
-            const samlObj = new SAML(noCertSamlConfig as any);
+            const samlObj = new SAML(noCertSamlConfig);
           } catch (err) {
             should.exist(err);
             err!.message!.should.match(/Invalid property: cert must not be empty/);
@@ -622,7 +622,7 @@ describe("passport-saml /", function () {
             "</samlp:Response>";
           const base64xml = Buffer.from(xml).toString("base64");
           const container = { SAMLResponse: base64xml };
-          const samlObj = new SAML(noCertSamlConfig as any);
+          const samlObj = new SAML(noCertSamlConfig);
           await assert.rejects(samlObj.validatePostResponseAsync(container), /cert is required/);
         });
 
@@ -719,7 +719,7 @@ describe("passport-saml /", function () {
             "</samlp:Response>";
           const base64xml = Buffer.from(xml).toString("base64");
           const container = { SAMLResponse: base64xml };
-          const samlObj = new SAML(functionCertSamlConfig as any);
+          const samlObj = new SAML(functionCertSamlConfig);
           const { profile } = await samlObj.validatePostResponseAsync(container);
           profile!.nameID!.should.startWith("ploer");
         });
@@ -739,7 +739,7 @@ describe("passport-saml /", function () {
             "</samlp:Response>";
           const base64xml = Buffer.from(xml).toString("base64");
           const container = { SAMLResponse: base64xml };
-          const samlObj = new SAML(functionMultiCertSamlConfig as any);
+          const samlObj = new SAML(functionMultiCertSamlConfig);
           const { profile } = await samlObj.validatePostResponseAsync(container);
           profile!.nameID!.should.startWith("ploer");
         });
@@ -760,7 +760,7 @@ describe("passport-saml /", function () {
             "</samlp:Response>";
           const base64xml = Buffer.from(xml).toString("base64");
           const container = { SAMLResponse: base64xml };
-          const samlObj = new SAML(functionErrorCertSamlConfig as any);
+          const samlObj = new SAML(functionErrorCertSamlConfig);
           try {
             await samlObj.validatePostResponseAsync(container);
             should.not.exist(true);
@@ -891,12 +891,12 @@ describe("passport-saml /", function () {
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
-          identifierFormat: null as any,
+          identifierFormat: null,
           signatureAlgorithm: "sha256",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
@@ -919,12 +919,12 @@ describe("passport-saml /", function () {
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
-          identifierFormat: null as any,
+          identifierFormat: null,
           signatureAlgorithm: "sha256",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
@@ -951,7 +951,7 @@ describe("passport-saml /", function () {
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
@@ -977,7 +977,7 @@ describe("passport-saml /", function () {
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
@@ -1026,12 +1026,12 @@ describe("passport-saml /", function () {
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
-          identifierFormat: null as any,
+          identifierFormat: null,
           signatureAlgorithm: "sha1",
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         samlObj.generateUniqueID = function () {
@@ -1051,7 +1051,7 @@ describe("passport-saml /", function () {
       it("should not pass any additional params by default", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1064,7 +1064,7 @@ describe("passport-saml /", function () {
       it("should not pass any additional params by default apart from the RelayState in request query", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1082,7 +1082,7 @@ describe("passport-saml /", function () {
       it("should not pass any additional params by default apart from the RelayState in request body", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1103,7 +1103,7 @@ describe("passport-saml /", function () {
           additionalParams: {
             queryParam: "queryParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1120,7 +1120,7 @@ describe("passport-saml /", function () {
           additionalAuthorizeParams: {
             queryParam: "queryParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1141,7 +1141,7 @@ describe("passport-saml /", function () {
           additionalLogoutParams: {
             queryParam: "queryParamValue",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1168,7 +1168,7 @@ describe("passport-saml /", function () {
           additionalLogoutParams: {
             queryParam2: "queryParamValueLogout",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1202,7 +1202,7 @@ describe("passport-saml /", function () {
           additionalLogoutParams: {
             queryParam2: "queryParamValueLogout",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         const options = {
@@ -1248,7 +1248,7 @@ describe("passport-saml /", function () {
           additionalLogoutParams: {
             queryParam: "queryParamValueLogout",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
 
@@ -1276,7 +1276,7 @@ describe("passport-saml /", function () {
           additionalLogoutParams: {
             queryParam: "queryParamValueLogout",
           },
-          cert: "fake cert",
+          cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
         const options = {
@@ -1306,15 +1306,15 @@ describe("passport-saml /", function () {
         assert.throws(
           () => {
             new SAML({
-              RacComparison: "bad_value" as any,
-              cert: "fake cert",
+              RacComparison: "bad_value" as RacComparision,
+              cert: FAKE_CERT,
             }).options;
           },
           { message: "RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']" }
         );
 
         const samlObjBadComparisonType = new SAML({
-          cert: "fake cert",
+          cert: FAKE_CERT,
         });
         should.equal(
           samlObjBadComparisonType.options.RacComparison,
@@ -1325,7 +1325,7 @@ describe("passport-saml /", function () {
         const validComparisonTypes: RacComparision[] = ["exact", "minimum", "maximum", "better"];
         let samlObjValidComparisonType: SAML;
         validComparisonTypes.forEach(function (RacComparison) {
-          samlObjValidComparisonType = new SAML({ RacComparison, cert: "fake cert" } as any);
+          samlObjValidComparisonType = new SAML({ RacComparison, cert: FAKE_CERT });
           should.equal(samlObjValidComparisonType.options.RacComparison, RacComparison);
         });
       });
@@ -1513,7 +1513,7 @@ describe("passport-saml /", function () {
           const samlConfig = {
             validateInResponseTo: true,
             requestIdExpirationPeriodMs: 100,
-            cert: "fake cert",
+            cert: FAKE_CERT,
           };
           const samlObj = new SAML(samlConfig);
 
@@ -1533,7 +1533,7 @@ describe("passport-saml /", function () {
           const samlConfig = {
             validateInResponseTo: true,
             requestIdExpirationPeriodMs: 100,
-            cert: "fake cert",
+            cert: FAKE_CERT,
           };
           const samlObj = new SAML(samlConfig);
 
@@ -1951,7 +1951,7 @@ describe("passport-saml /", function () {
         "jF3SNJh0SmHoT62vc+cJqPxMDP6E7Q1nZxsEyaAkKr2H4dSM4SlRm0VB+bS+jXsz\n" +
         "PCiRGSm8eupuxfix05LMMreo4mC7e3Ir4JhdCsXxAMZIvbNyXcvUMA==\n" +
         "-----END CERTIFICATE-----\n",
-      cert: "fake cert",
+      cert: FAKE_CERT,
     });
     const request =
       '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
@@ -1989,7 +1989,7 @@ describe("passport-saml /", function () {
         "jF3SNJh0SmHoT62vc+cJqPxMDP6E7Q1nZxsEyaAkKr2H4dSM4SlRm0VB+bS+jXsz\n" +
         "PCiRGSm8eupuxfix05LMMreo4mC7e3Ir4JhdCsXxAMZIvbNyXcvUMA==\n" +
         "-----END CERTIFICATE-----\n",
-      cert: "fake cert",
+      cert: FAKE_CERT,
     });
     const request =
       '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
