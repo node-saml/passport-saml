@@ -201,9 +201,7 @@ class SAML {
          * - better:  Assertion context must be stronger than all contexts in the list
          */
         this.ctorOptions.RacComparison = this.ctorOptions.RacComparison ?? "exact";
-        if (
-          ["exact", "minimum", "maximum", "better"].indexOf(this.ctorOptions.RacComparison) === -1
-        ) {
+        if (!["exact", "minimum", "maximum", "better"].includes(this.ctorOptions.RacComparison)) {
           throw new TypeError(
             "RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
           );
@@ -735,7 +733,7 @@ class SAML {
     const signatures = xmlCrypto.xpath(currentNode, xpathSigQuery);
     // This function is expecting to validate exactly one signature, so if we find more or fewer
     //   than that, reject.
-    if (signatures.length != 1) {
+    if (signatures.length !== 1) {
       return false;
     }
 
@@ -751,12 +749,12 @@ class SAML {
     cert: string,
     fullXml: string,
     currentNode: HTMLElement
-  ) {
+  ): boolean {
     const sig = new xmlCrypto.SignedXml();
     sig.keyInfoProvider = {
       file: "",
-      getKeyInfo: (key) => "<X509Data></X509Data>",
-      getKey: (keyInfo) => Buffer.from(this.certToPEM(cert)),
+      getKeyInfo: () => "<X509Data></X509Data>",
+      getKey: () => Buffer.from(this.certToPEM(cert)),
     };
     signature = this.normalizeNewlines(signature.toString());
     sig.loadSignature(signature);

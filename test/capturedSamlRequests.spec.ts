@@ -11,7 +11,6 @@ import * as fs from "fs";
 import { AuthenticateOptions, Profile, VerifiedCallback } from "../src/passport-saml/types.js";
 import * as should from "should";
 import { Server } from "http";
-import assert = require("assert");
 import { CapturedCheck, SamlCheck } from "./types";
 
 const capturedSamlRequestChecks: SamlCheck[] = [
