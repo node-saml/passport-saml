@@ -1,77 +1,87 @@
-import { Strategy as PassportStrategy } from 'passport-strategy';
-import * as saml from './saml';
-import * as url from 'url';
-import { AuthenticateOptions, AuthorizeOptions, RequestWithUser, SamlConfig, VerifyWithoutRequest, VerifyWithRequest } from './types';
-import { Profile } from './types';
+import { Strategy as PassportStrategy } from "passport-strategy";
+import * as saml from "./saml";
+import * as url from "url";
+import {
+  AuthenticateOptions,
+  AuthorizeOptions,
+  RequestWithUser,
+  SamlConfig,
+  VerifyWithoutRequest,
+  VerifyWithRequest,
+} from "./types";
+import { Profile } from "./types";
 
 class Strategy extends PassportStrategy {
   name: string;
   _verify: VerifyWithRequest | VerifyWithoutRequest;
   _saml: saml.SAML;
   _passReqToCallback?: boolean;
-  _authnRequestBinding?: string;
 
-  constructor(options: SamlConfig, verify: VerifyWithRequest | VerifyWithoutRequest) {
+  constructor(options: SamlConfig, verify: VerifyWithRequest);
+  constructor(options: SamlConfig, verify: VerifyWithoutRequest);
+  constructor(options: SamlConfig, verify: never) {
     super();
-    if (typeof options == 'function') {
+    if (typeof options == "function") {
       verify = options;
       options = {};
     }
 
     if (!verify) {
-      throw new Error('SAML authentication strategy requires a verify function');
+      throw new Error("SAML authentication strategy requires a verify function");
     }
 
     // Customizing the name can be useful to support multiple SAML configurations at the same time.
     // Unlike other options, this one gets deleted instead of passed along.
-    if  (options.name) {
-      this.name  = options.name;
+    if (options.name) {
+      this.name = options.name;
     } else {
-      this.name = 'saml';
+      this.name = "saml";
     }
-
 
     this._verify = verify;
     this._saml = new saml.SAML(options);
     this._passReqToCallback = !!options.passReqToCallback;
-    this._authnRequestBinding = options.authnRequestBinding || 'HTTP-Redirect';
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions): void {
+  authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
+    options.samlFallback = options.samlFallback || "login-request";
+    const validateCallback = ({
+      profile,
+      loggedOut,
+    }: {
+      profile?: Profile | null;
+      loggedOut?: boolean;
+    }) => {
+      if (loggedOut) {
+        req.logout();
+        if (profile) {
+          req.samlLogoutRequest = profile;
+          return this._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
+        }
+        return this.pass();
+      }
 
-    options.samlFallback = options.samlFallback || 'login-request';
-
-    const validateCallback = (err: Error | null, profile?: Profile | null, loggedOut?: boolean) => {
+      const verified = (
+        err: Error | null,
+        user?: Record<string, unknown>,
+        info?: Record<string, unknown>
+      ) => {
         if (err) {
           return this.error(err);
         }
 
-        if (loggedOut) {
-          req.logout();
-          if (profile) {
-            req.samlLogoutRequest = profile;
-            return this._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
-          }
-          return this.pass();
+        if (!user) {
+          return this.fail(info, 401);
         }
 
-        const verified = (err: Error | null, user?: Record<string, unknown>, info?: Record<string, unknown>) => {
-          if (err) {
-            return this.error(err);
-          }
+        this.success(user, info);
+      };
 
-          if (!user) {
-            return this.fail(info, 401);
-          }
-
-          this.success(user, info);
-        };
-
-        if (this._passReqToCallback) {
-          (this._verify as VerifyWithRequest)(req, profile, verified);
-        } else {
-          (this._verify as VerifyWithoutRequest)(profile, verified);
-        }
+      if (this._passReqToCallback) {
+        (this._verify as VerifyWithRequest)(req, profile, verified);
+      } else {
+        (this._verify as VerifyWithoutRequest)(profile, verified);
+      }
     };
 
     const redirectIfSuccess = (err: Error | null, url?: string | null) => {
@@ -84,33 +94,46 @@ class Strategy extends PassportStrategy {
 
     if (req.query && (req.query.SAMLResponse || req.query.SAMLRequest)) {
       const originalQuery = url.parse(req.url).query;
-      this._saml.validateRedirect(req.query, originalQuery, validateCallback);
+      this._saml
+        .validateRedirectAsync(req.query, originalQuery)
+        .then(validateCallback)
+        .catch((err) => this.error(err));
     } else if (req.body && req.body.SAMLResponse) {
-      this._saml.validatePostResponse(req.body, validateCallback);
+      this._saml
+        .validatePostResponseAsync(req.body)
+        .then(validateCallback)
+        .catch((err) => this.error(err));
     } else if (req.body && req.body.SAMLRequest) {
-      this._saml.validatePostRequest(req.body, validateCallback);
+      this._saml
+        .validatePostRequestAsync(req.body)
+        .then(validateCallback)
+        .catch((err) => this.error(err));
     } else {
       const requestHandler = {
-        'login-request': () => {
-          if (this._authnRequestBinding === 'HTTP-POST') {
-            this._saml.getAuthorizeForm(req, (err: Error | null, data?: any) => {
-              if (err) {
-                this.error(err);
-              } else {
-                const res = req.res!;
-                res.send(data);
-              }
-            });
-          } else { // Defaults to HTTP-Redirect
-            this._saml.getAuthorizeUrl(req, options, redirectIfSuccess);
+        "login-request": async () => {
+          try {
+            if (this._saml.options.authnRequestBinding === "HTTP-POST") {
+              const data = await this._saml.getAuthorizeFormAsync(req);
+              const res = req.res!;
+              res.send(data);
+            } else {
+              // Defaults to HTTP-Redirect
+              this.redirect(await this._saml.getAuthorizeUrlAsync(req, options));
+            }
+          } catch (err) {
+            this.error(err);
           }
         },
-        'logout-request': () => {
-            this._saml.getLogoutUrl(req, options, redirectIfSuccess);
-        }
+        "logout-request": async () => {
+          try {
+            this.redirect(await this._saml.getLogoutUrlAsync(req, options));
+          } catch (err) {
+            this.error(err);
+          }
+        },
       }[options.samlFallback];
 
-      if (typeof requestHandler !== 'function') {
+      if (typeof requestHandler !== "function") {
         return this.fail(401);
       }
 
@@ -119,11 +142,17 @@ class Strategy extends PassportStrategy {
   }
 
   logout(req: RequestWithUser, callback: (err: Error | null, url?: string | null) => void): void {
-    this._saml.getLogoutUrl(req, {}, callback);
+    this._saml
+      .getLogoutUrlAsync(req, {})
+      .then((url) => callback(null, url))
+      .catch((err) => callback(err));
   }
 
-  generateServiceProviderMetadata( decryptionCert: string | null, signingCert?: string | null ): string {
-    return this._saml.generateServiceProviderMetadata( decryptionCert, signingCert );
+  generateServiceProviderMetadata(
+    decryptionCert: string | null,
+    signingCert?: string | null
+  ): string {
+    return this._saml.generateServiceProviderMetadata(decryptionCert, signingCert);
   }
 }
 

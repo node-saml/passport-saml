@@ -1,6 +1,7 @@
 {
   "env": {
     "node": true,
+    "mocha": true,
     "es6": false
   },
   "root": true,
@@ -9,7 +10,6 @@
   "parserOptions": {
     "ecmaVersion": 6
   },
-
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -17,7 +17,6 @@
     "prettier"
   ],
   "rules": {
-    "no-console": "warn",
-    "prettier/prettier": "warn"
+    "no-console": "warn"
   }
 }
