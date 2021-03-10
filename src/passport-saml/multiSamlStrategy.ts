@@ -14,6 +14,8 @@ import {
 } from "./types";
 
 class MultiSamlStrategy extends SamlStrategy {
+  static newSamlProviderOnConstruct = false;
+
   _options: SamlConfig & MultiSamlConfig;
 
   constructor(options: MultiSamlConfig, verify: VerifyWithRequest);
@@ -23,10 +25,12 @@ class MultiSamlStrategy extends SamlStrategy {
       throw new Error("Please provide a getSamlOptions function");
     }
 
-    const samlConfig: SamlConfig & MultiSamlConfig = {
+    // Force the type on this since we've disabled `newOnConstruct`
+    // so the `SAML` constructor will not be called at this time
+    // and there are defaults for all `strategy`-required options.
+    const samlConfig = {
       ...options,
-      cert: options.cert ?? "fake cert", // This would never be a valid cert, so it serves as a good placeholder
-    };
+    } as SamlConfig & MultiSamlConfig;
 
     super(samlConfig, verify);
     this._options = samlConfig;
