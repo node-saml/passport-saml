@@ -165,7 +165,7 @@ describe("MultiSamlStrategy#logout", function () {
     const superLogoutMock = this.superLogoutMock;
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
       try {
-        fn(null);
+        fn(null, { cert: FAKE_CERT });
         sinon.assert.calledOnce(superLogoutMock);
         done();
       } catch (err2) {
@@ -241,7 +241,7 @@ describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
     const superGenerateServiceProviderMetadata = this.superGenerateServiceProviderMetadata;
     function getSamlOptions(req: express.Request, fn: SamlOptionsCallback) {
       try {
-        fn(null);
+        fn(null, { cert: FAKE_CERT });
         sinon.assert.calledOnce(superGenerateServiceProviderMetadata);
         superGenerateServiceProviderMetadata.calledWith("bar", "baz");
         req.should.eql("foo");
@@ -256,7 +256,7 @@ describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
   });
 
   it("passes options on to saml strategy", function (done) {
-    const passportOptions = {
+    const passportOptions: MultiSamlConfig = {
       passReqToCallback: true,
 
       getSamlOptions: function (req: express.Request, fn: SamlOptionsCallback) {

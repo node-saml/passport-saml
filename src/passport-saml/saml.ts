@@ -107,90 +107,60 @@ async function promiseWithNameID(nameid: Node): Promise<NameID> {
 }
 
 class SAML {
-  private ctorOptions: SamlConfig;
-
-  // This will be fully defined upon first use
-  // This enables compatability with lazy usage from MultiSamlStrategy
-  options: SamlOptions = {} as SamlOptions;
-
+  options: SamlOptions;
   // This is only for testing
   cacheProvider!: InMemoryCacheProvider;
 
   constructor(ctorOptions: SamlConfig) {
-    this.ctorOptions = ctorOptions;
-
-    Object.defineProperty(this, "options", {
-      get: function () {
-        // Check to make sure we have new options before we throw
-        // this will allow catch blocks to still probe this.options
-        // without generating a secondary error which obfuscates the
-        // initialization error
-        const options = this.initialize();
-        delete this.options;
-        delete this.cacheProvider;
-        this.options = options;
-        this.cacheProvider = this.options.cacheProvider;
-
-        return this.options;
-      },
-      configurable: true,
-    });
-
-    Object.defineProperty(this, "cacheProvider", {
-      get: function () {
-        const cacheProvider = this.options.cacheProvider;
-
-        return cacheProvider;
-      },
-      configurable: true,
-    });
+    this.options = this.initialize(ctorOptions);
+    this.cacheProvider = this.options.cacheProvider;
   }
 
-  initialize(): SamlOptions {
-    if (!this.ctorOptions) {
-      throw new Error("SamlOptions required on construction");
+  initialize(ctorOptions: SamlConfig): SamlOptions {
+    if (!ctorOptions) {
+      throw new TypeError("SamlOptions required on construction");
     }
 
-    if (this.ctorOptions.privateCert) {
+    if (ctorOptions.privateCert) {
       console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
 
-      if (!this.ctorOptions.privateKey) {
-        this.ctorOptions.privateKey = this.ctorOptions.privateCert;
+      if (!ctorOptions.privateKey) {
+        ctorOptions.privateKey = ctorOptions.privateCert;
       }
     }
 
     const options = {
-      ...this.ctorOptions,
-      passive: this.ctorOptions.passive ?? false,
-      disableRequestedAuthnContext: this.ctorOptions.disableRequestedAuthnContext ?? false,
-      additionalParams: this.ctorOptions.additionalParams ?? {},
-      additionalAuthorizeParams: this.ctorOptions.additionalAuthorizeParams ?? {},
-      additionalLogoutParams: this.ctorOptions.additionalLogoutParams ?? {},
-      forceAuthn: this.ctorOptions.forceAuthn ?? false,
-      skipRequestCompression: this.ctorOptions.skipRequestCompression ?? false,
-      disableRequestAcsUrl: this.ctorOptions.disableRequestAcsUrl ?? false,
-      acceptedClockSkewMs: this.ctorOptions.acceptedClockSkewMs ?? 0,
-      path: this.ctorOptions.path ?? "/saml/consume",
-      host: this.ctorOptions.host ?? "localhost",
-      issuer: this.ctorOptions.issuer ?? "onelogin_saml",
+      ...ctorOptions,
+      passive: ctorOptions.passive ?? false,
+      disableRequestedAuthnContext: ctorOptions.disableRequestedAuthnContext ?? false,
+      additionalParams: ctorOptions.additionalParams ?? {},
+      additionalAuthorizeParams: ctorOptions.additionalAuthorizeParams ?? {},
+      additionalLogoutParams: ctorOptions.additionalLogoutParams ?? {},
+      forceAuthn: ctorOptions.forceAuthn ?? false,
+      skipRequestCompression: ctorOptions.skipRequestCompression ?? false,
+      disableRequestAcsUrl: ctorOptions.disableRequestAcsUrl ?? false,
+      acceptedClockSkewMs: ctorOptions.acceptedClockSkewMs ?? 0,
+      path: ctorOptions.path ?? "/saml/consume",
+      host: ctorOptions.host ?? "localhost",
+      issuer: ctorOptions.issuer ?? "onelogin_saml",
       identifierFormat:
-        this.ctorOptions.identifierFormat === undefined
+        ctorOptions.identifierFormat === undefined
           ? "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-          : this.ctorOptions.identifierFormat,
-      authnContext: this.ctorOptions.authnContext ?? [
+          : ctorOptions.identifierFormat,
+      authnContext: ctorOptions.authnContext ?? [
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       ],
-      validateInResponseTo: this.ctorOptions.validateInResponseTo ?? false,
-      cert: assertRequired(this.ctorOptions.cert, "cert is required"),
-      requestIdExpirationPeriodMs: this.ctorOptions.requestIdExpirationPeriodMs ?? 28800000, // 8 hours
+      validateInResponseTo: ctorOptions.validateInResponseTo ?? false,
+      cert: assertRequired(ctorOptions.cert, "cert is required"),
+      requestIdExpirationPeriodMs: ctorOptions.requestIdExpirationPeriodMs ?? 28800000, // 8 hours
       cacheProvider:
-        this.ctorOptions.cacheProvider ??
+        ctorOptions.cacheProvider ??
         new InMemoryCacheProvider({
-          keyExpirationPeriodMs: this.ctorOptions.requestIdExpirationPeriodMs,
+          keyExpirationPeriodMs: ctorOptions.requestIdExpirationPeriodMs,
         }),
-      logoutUrl: this.ctorOptions.logoutUrl ?? this.ctorOptions.entryPoint ?? "", // Default to Entry Point
-      signatureAlgorithm: this.ctorOptions.signatureAlgorithm ?? "sha1", // sha1, sha256, or sha512
-      authnRequestBinding: this.ctorOptions.authnRequestBinding ?? "HTTP-Redirect",
+      logoutUrl: ctorOptions.logoutUrl ?? ctorOptions.entryPoint ?? "", // Default to Entry Point
+      signatureAlgorithm: ctorOptions.signatureAlgorithm ?? "sha1", // sha1, sha256, or sha512
+      authnRequestBinding: ctorOptions.authnRequestBinding ?? "HTTP-Redirect",
 
       RacComparison: (() => {
         /**
@@ -200,14 +170,14 @@ class SAML {
          * - maximum:  Assertion context must be no stronger than a context in the list
          * - better:  Assertion context must be stronger than all contexts in the list
          */
-        this.ctorOptions.RacComparison = this.ctorOptions.RacComparison ?? "exact";
-        if (!["exact", "minimum", "maximum", "better"].includes(this.ctorOptions.RacComparison)) {
+        ctorOptions.RacComparison = ctorOptions.RacComparison ?? "exact";
+        if (!["exact", "minimum", "maximum", "better"].includes(ctorOptions.RacComparison)) {
           throw new TypeError(
             "RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
           );
         }
 
-        return this.ctorOptions.RacComparison;
+        return ctorOptions.RacComparison;
       })(),
     };
 

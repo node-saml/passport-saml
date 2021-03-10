@@ -41,7 +41,7 @@ class Strategy extends PassportStrategy {
     }
 
     this._verify = verify;
-    if (Strategy.newOnConstruct) {
+    if ((this.constructor as typeof Strategy).newSamlProviderOnConstruct) {
       this._saml = new saml.SAML(options);
     }
     this._passReqToCallback = !!options.passReqToCallback;

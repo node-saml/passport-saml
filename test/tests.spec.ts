@@ -596,7 +596,7 @@ describe("passport-saml /", function () {
             const samlObj = new SAML(noCertSamlConfig);
           } catch (err) {
             should.exist(err);
-            err!.message!.should.match(/Invalid property: cert must not be empty/);
+            err!.message!.should.match(/cert is required/);
           }
         });
 
@@ -622,8 +622,8 @@ describe("passport-saml /", function () {
             "</samlp:Response>";
           const base64xml = Buffer.from(xml).toString("base64");
           const container = { SAMLResponse: base64xml };
-          const samlObj = new SAML(noCertSamlConfig);
-          await assert.rejects(samlObj.validatePostResponseAsync(container), /cert is required/);
+          const samlObj = new SAML(samlConfig);
+          await assert.rejects(samlObj.validatePostResponseAsync(container), /Invalid signature/);
         });
 
         it("onelogin xml document with altered assertion should fail", async () => {
