@@ -10,8 +10,8 @@ import {
 } from "./types";
 import { Profile } from "./types";
 
-class Strategy extends PassportStrategy {
-  static readonly newSamlProviderOnConstruct = true;
+export abstract class AbstractStrategy extends PassportStrategy {
+  static readonly newSamlProviderOnConstruct: boolean;
 
   name: string;
   _verify: VerifyWithRequest | VerifyWithoutRequest;
@@ -178,7 +178,7 @@ class Strategy extends PassportStrategy {
       .catch((err) => callback(err));
   }
 
-  generateServiceProviderMetadata(
+  protected _generateServiceProviderMetadata(
     decryptionCert: string | null,
     signingCert?: string | null
   ): string {
@@ -195,4 +195,13 @@ class Strategy extends PassportStrategy {
   }
 }
 
-export = Strategy;
+export class Strategy extends AbstractStrategy {
+  static readonly newSamlProviderOnConstruct = true;
+
+  generateServiceProviderMetadata(
+    decryptionCert: string | null,
+    signingCert?: string | null
+  ): string {
+    return this._generateServiceProviderMetadata(decryptionCert, signingCert);
+  }
+}
