@@ -86,7 +86,7 @@ export interface StrategyOptions {
 /**
  * These options are availble for configuring a SAML strategy
  */
-export type SamlConfig = Partial<SamlOptions> & MandatorySamlOptions;
+export type SamlConfig = Partial<SamlOptions> & StrategyOptions & MandatorySamlOptions;
 
 export interface SamlScopingConfig {
   idpList?: SamlIDPListConfig[];
