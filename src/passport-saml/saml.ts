@@ -162,24 +162,21 @@ class SAML {
       signatureAlgorithm: ctorOptions.signatureAlgorithm ?? "sha1", // sha1, sha256, or sha512
       authnRequestBinding: ctorOptions.authnRequestBinding ?? "HTTP-Redirect",
 
-      racComparison: (() => {
-        /**
-         * List of possible values:
-         * - exact : Assertion context must exactly match a context in the list
-         * - minimum:  Assertion context must be at least as strong as a context in the list
-         * - maximum:  Assertion context must be no stronger than a context in the list
-         * - better:  Assertion context must be stronger than all contexts in the list
-         */
-        ctorOptions.racComparison = ctorOptions.racComparison ?? "exact";
-        if (!["exact", "minimum", "maximum", "better"].includes(ctorOptions.racComparison)) {
-          throw new TypeError(
-            "racComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
-          );
-        }
-
-        return ctorOptions.racComparison;
-      })(),
+      racComparison: ctorOptions.racComparison ?? "exact",
     };
+
+    /**
+     * List of possible values:
+     * - exact : Assertion context must exactly match a context in the list
+     * - minimum:  Assertion context must be at least as strong as a context in the list
+     * - maximum:  Assertion context must be no stronger than a context in the list
+     * - better:  Assertion context must be stronger than all contexts in the list
+     */
+    if (!["exact", "minimum", "maximum", "better"].includes(options.racComparison)) {
+      throw new TypeError(
+        "racComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
+      );
+    }
 
     return options;
   }
