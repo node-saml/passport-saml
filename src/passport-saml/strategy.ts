@@ -13,7 +13,7 @@ import {
 import { Profile } from "./types";
 
 class Strategy extends PassportStrategy {
-  static newSamlProviderOnConstruct = true;
+  static readonly newSamlProviderOnConstruct = true;
 
   name: string;
   _verify: VerifyWithRequest | VerifyWithoutRequest;

@@ -14,7 +14,7 @@ import {
 } from "./types";
 
 class MultiSamlStrategy extends SamlStrategy {
-  static newSamlProviderOnConstruct = false;
+  static readonly newSamlProviderOnConstruct = false;
 
   _options: SamlConfig & MultiSamlConfig;
 
