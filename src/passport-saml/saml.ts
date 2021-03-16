@@ -173,9 +173,7 @@ class SAML {
      * - better:  Assertion context must be stronger than all contexts in the list
      */
     if (!["exact", "minimum", "maximum", "better"].includes(options.racComparison)) {
-      throw new TypeError(
-        "racComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
-      );
+      throw new TypeError("racComparison must be one of ['exact', 'minimum', 'maximum', 'better']");
     }
 
     return options;
