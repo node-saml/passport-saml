@@ -29,17 +29,9 @@ export class CacheProvider {
   constructor(options: Partial<CacheProviderOptions>) {
     this.cacheKeys = {};
 
-    if (!options) {
-      options = {};
-    }
-
-    if (!options.keyExpirationPeriodMs) {
-      options.keyExpirationPeriodMs = 28800000; // 8 hours
-    }
-
     this.options = {
       ...options,
-      keyExpirationPeriodMs: options.keyExpirationPeriodMs,
+      keyExpirationPeriodMs: options?.keyExpirationPeriodMs ?? 28800000, // 8 hours,
     };
 
     // Expire old cache keys
