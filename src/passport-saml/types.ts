@@ -58,7 +58,7 @@ export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
   forceAuthn: boolean;
   skipRequestCompression: boolean;
   authnRequestBinding?: string;
-  RacComparison: RacComparision;
+  racComparison: RacComparision;
   providerName?: string;
   passive: boolean;
   idpIssuer?: string;

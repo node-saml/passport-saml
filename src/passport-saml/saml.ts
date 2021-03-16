@@ -162,7 +162,7 @@ class SAML {
       signatureAlgorithm: ctorOptions.signatureAlgorithm ?? "sha1", // sha1, sha256, or sha512
       authnRequestBinding: ctorOptions.authnRequestBinding ?? "HTTP-Redirect",
 
-      RacComparison: (() => {
+      racComparison: (() => {
         /**
          * List of possible values:
          * - exact : Assertion context must exactly match a context in the list
@@ -170,14 +170,14 @@ class SAML {
          * - maximum:  Assertion context must be no stronger than a context in the list
          * - better:  Assertion context must be stronger than all contexts in the list
          */
-        ctorOptions.RacComparison = ctorOptions.RacComparison ?? "exact";
-        if (!["exact", "minimum", "maximum", "better"].includes(ctorOptions.RacComparison)) {
+        ctorOptions.racComparison = ctorOptions.racComparison ?? "exact";
+        if (!["exact", "minimum", "maximum", "better"].includes(ctorOptions.racComparison)) {
           throw new TypeError(
-            "RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
+            "racComparison must be one of ['exact', 'minimum', 'maximum', 'better']"
           );
         }
 
-        return ctorOptions.RacComparison;
+        return ctorOptions.racComparison;
       })(),
     };
 
@@ -290,7 +290,7 @@ class SAML {
 
       request["samlp:AuthnRequest"]["samlp:RequestedAuthnContext"] = {
         "@xmlns:samlp": "urn:oasis:names:tc:SAML:2.0:protocol",
-        "@Comparison": this.options.RacComparison,
+        "@Comparison": this.options.racComparison,
         "saml:AuthnContextClassRef": authnContextClassRefs,
       };
     }

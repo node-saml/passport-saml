@@ -1302,31 +1302,31 @@ describe("passport-saml /", function () {
         additionalLogoutParams.should.containEql({ queryParam: "queryParamRuntimeValue" });
       });
 
-      it("should check the value of the option `RacComparison`", function () {
+      it("should check the value of the option `racComparison`", function () {
         assert.throws(
           () => {
             new SAML({
-              RacComparison: "bad_value" as RacComparision,
+              racComparison: "bad_value" as RacComparision,
               cert: FAKE_CERT,
             }).options;
           },
-          { message: "RacComparison must be one of ['exact', 'minimum', 'maximum', 'better']" }
+          { message: "racComparison must be one of ['exact', 'minimum', 'maximum', 'better']" }
         );
 
         const samlObjBadComparisonType = new SAML({
           cert: FAKE_CERT,
         });
         should.equal(
-          samlObjBadComparisonType.options.RacComparison,
+          samlObjBadComparisonType.options.racComparison,
           "exact",
-          "the default value of the option `RacComparison` must be exact"
+          "the default value of the option `racComparison` must be exact"
         );
 
         const validComparisonTypes: RacComparision[] = ["exact", "minimum", "maximum", "better"];
         let samlObjValidComparisonType: SAML;
-        validComparisonTypes.forEach(function (RacComparison) {
-          samlObjValidComparisonType = new SAML({ RacComparison, cert: FAKE_CERT });
-          should.equal(samlObjValidComparisonType.options.RacComparison, RacComparison);
+        validComparisonTypes.forEach(function (racComparison) {
+          samlObjValidComparisonType = new SAML({ racComparison, cert: FAKE_CERT });
+          should.equal(samlObjValidComparisonType.options.racComparison, racComparison);
         });
       });
     });
