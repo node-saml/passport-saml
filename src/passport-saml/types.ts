@@ -37,6 +37,7 @@ export interface SAMLOptions {
     authnContext: string | string[];
     forceAuthn: boolean;
     skipRequestCompression: boolean;
+    racComparison: 'exact' | 'minimum' | 'maximum' | 'better';
     RACComparison: 'exact' | 'minimum' | 'maximum' | 'better';
     providerName: string;
     passive: boolean;

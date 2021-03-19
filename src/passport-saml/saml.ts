@@ -122,6 +122,14 @@ class SAML {
       }
     }
 
+    if (options.RACComparison) {
+      console.warn("options.RACComparison has been deprecated; use options.racComparison instead.")
+
+      if (!options.racComparison) {
+        options.racComparison = options.RACComparison;
+      }
+    }
+
     if (Object.prototype.hasOwnProperty.call(options, 'cert') && !options.cert) {
       throw new Error('Invalid property: cert must not be empty');
     }
@@ -185,8 +193,8 @@ class SAML {
      * - maximum:  Assertion context must be no stronger than a context in the list
      * - better:  Assertion context must be stronger than all contexts in the list
      */
-    if (!options.RACComparison || ['exact','minimum','maximum','better'].indexOf(options.RACComparison) === -1){
-      options.RACComparison = 'exact';
+    if (!options.racComparison || ['exact','minimum','maximum','better'].indexOf(options.racComparison) === -1){
+      options.racComparison = 'exact';
     }
 
     return options as SAMLOptions;
@@ -297,7 +305,7 @@ class SAML {
 
         request['samlp:AuthnRequest']['samlp:RequestedAuthnContext'] = {
           '@xmlns:samlp': 'urn:oasis:names:tc:SAML:2.0:protocol',
-          '@Comparison': this.options.RACComparison,
+          '@Comparison': this.options.racComparison,
           'saml:AuthnContextClassRef': authnContextClassRefs
         };
       }
