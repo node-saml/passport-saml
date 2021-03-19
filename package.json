@@ -29,10 +29,8 @@
   "main": "./lib/passport-saml",
   "files": [
     "lib",
-    "multiSamlStrategy.js",
-    "multiSamlStrategy.d.ts",
-    "docs",
-    "package-lock.json"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
