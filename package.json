@@ -37,7 +37,7 @@
   "scripts": {
     "build": "tsc",
     "changelog": "gren changelog --override --generate",
-    "lint": "eslint --ext .ts **/*.ts --cache",
+    "lint": "eslint --ext .ts \"**/*.ts\" --cache",
     "lint-watch": "onchange -k -p 100 \"**/*.ts\" -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
     "prepare": "tsc",
