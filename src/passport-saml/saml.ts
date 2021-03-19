@@ -117,7 +117,7 @@ class SAML {
     if (options.privateCert) {
       console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
 
-      if (!options.privateKey) {
+      if (options.privateKey == null) {
         options.privateKey = options.privateCert;
       }
     }
@@ -125,7 +125,7 @@ class SAML {
     if (options.RACComparison) {
       console.warn("options.RACComparison has been deprecated; use options.racComparison instead.")
 
-      if (!options.racComparison) {
+      if (options.racComparison == null) {
         options.racComparison = options.RACComparison;
       }
     }
@@ -133,7 +133,7 @@ class SAML {
     if (options.disableRequestACSUrl) {
       console.warn("options.disableRequestACSUrl has been deprecated; use options.disableRequestAcsUrl instead.")
 
-      if (!options.disableRequestAcsUrl) {
+      if (options.disableRequestAcsUrl == null) {
         options.disableRequestAcsUrl = options.disableRequestACSUrl;
       }
     }
