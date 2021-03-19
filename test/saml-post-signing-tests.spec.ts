@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import "should";
 import { signSamlPost, signAuthnRequestPost } from "../src/passport-saml/saml-post-signing";
 import { SamlOptions, SamlSigningOptions } from "../src/passport-saml/types";
 

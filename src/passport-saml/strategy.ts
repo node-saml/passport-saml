@@ -6,24 +6,26 @@ import {
   AuthorizeOptions,
   RequestWithUser,
   SamlConfig,
+  StrategyOptions,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
 import { Profile } from "./types";
 
 class Strategy extends PassportStrategy {
+  static readonly newSamlProviderOnConstruct = true;
+
   name: string;
   _verify: VerifyWithRequest | VerifyWithoutRequest;
-  _saml: saml.SAML;
+  _saml: saml.SAML | undefined;
   _passReqToCallback?: boolean;
 
   constructor(options: SamlConfig, verify: VerifyWithRequest);
   constructor(options: SamlConfig, verify: VerifyWithoutRequest);
   constructor(options: SamlConfig, verify: never) {
     super();
-    if (typeof options == "function") {
-      verify = options;
-      options = {};
+    if (typeof options === "function") {
+      throw new Error("Mandatory SAML options missing");
     }
 
     if (!verify) {
@@ -39,11 +41,17 @@ class Strategy extends PassportStrategy {
     }
 
     this._verify = verify;
-    this._saml = new saml.SAML(options);
+    if ((this.constructor as typeof Strategy).newSamlProviderOnConstruct) {
+      this._saml = new saml.SAML(options);
+    }
     this._passReqToCallback = !!options.passReqToCallback;
   }
 
   authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
+    if (this._saml == null) {
+      throw new Error("Can't get authenticate without a SAML provider defined.");
+    }
+
     options.samlFallback = options.samlFallback || "login-request";
     const validateCallback = ({
       profile,
@@ -55,6 +63,10 @@ class Strategy extends PassportStrategy {
       if (loggedOut) {
         req.logout();
         if (profile) {
+          if (this._saml == null) {
+            throw new Error("Can't get logout response URL without a SAML provider defined.");
+          }
+
           req.samlLogoutRequest = profile;
           return this._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
         }
@@ -112,6 +124,10 @@ class Strategy extends PassportStrategy {
       const requestHandler = {
         "login-request": async () => {
           try {
+            if (this._saml == null) {
+              throw new Error("Can't process login request without a SAML provider defined.");
+            }
+
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
               const data = await this._saml.getAuthorizeFormAsync(req);
               const res = req.res!;
@@ -125,6 +141,10 @@ class Strategy extends PassportStrategy {
           }
         },
         "logout-request": async () => {
+          if (this._saml == null) {
+            throw new Error("Can't process logout request without a SAML provider defined.");
+          }
+
           try {
             this.redirect(await this._saml.getLogoutUrlAsync(req, options));
           } catch (err) {
@@ -142,6 +162,10 @@ class Strategy extends PassportStrategy {
   }
 
   logout(req: RequestWithUser, callback: (err: Error | null, url?: string | null) => void): void {
+    if (this._saml == null) {
+      throw new Error("Can't logout without a SAML provider defined.");
+    }
+
     this._saml
       .getLogoutUrlAsync(req, {})
       .then((url) => callback(null, url))
@@ -152,7 +176,16 @@ class Strategy extends PassportStrategy {
     decryptionCert: string | null,
     signingCert?: string | null
   ): string {
+    if (this._saml == null) {
+      throw new Error("Can't generate service provider metadata without a SAML provider defined.");
+    }
+
     return this._saml.generateServiceProviderMetadata(decryptionCert, signingCert);
+  }
+
+  // This is reduntant, but helps with testing
+  error(err: Error): void {
+    super.error(err);
   }
 }
 

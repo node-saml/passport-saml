@@ -1,7 +1,6 @@
 import { SAML } from "../lib/passport-saml/index.js";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import "should";
 import assert = require("assert");
 
 const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
@@ -11,13 +10,6 @@ describe("Signatures", function () {
     createBody = (pathToXml: string) => ({
       SAMLResponse: fs.readFileSync(__dirname + "/static/signatures" + pathToXml, "base64"),
     }),
-    tryCatchTest = (done: Mocha.Done, func: any) => (...args: any) => {
-      try {
-        func(...args);
-      } catch (ex) {
-        done(ex);
-      }
-    },
     testOneResponseBody = async (
       samlResponseBody: Record<string, string>,
       shouldErrorWith: string | false | undefined,

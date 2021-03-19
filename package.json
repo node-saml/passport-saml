@@ -45,6 +45,7 @@
     "prettier-format": "prettier --config .prettierrc.json --write .",
     "prettier-watch": "onchange -k -p 100 \".\" -- prettier --config .prettierrc.json --write {{file}}",
     "test": "npm run prettier-check && npm run lint && npm run tsc && mocha",
+    "test-watch": "mocha --watch",
     "tsc": "tsc",
     "tsc-watch": "tsc --watch",
     "watch": "concurrently --kill-others \"npm:*-watch\""
