@@ -371,7 +371,7 @@ describe("passport-saml /", function () {
           path: "/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
           decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
+          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
@@ -887,34 +887,6 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
-          authnContext: [
-            "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          ],
-          identifierFormat: null,
-          signatureAlgorithm: "sha256",
-          additionalParams: {
-            customQueryStringParam: "CustomQueryStringParamValue",
-          },
-          cert: FAKE_CERT,
-        };
-        const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
-          return "12345678901234567890";
-        };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
-        const qry = querystring.parse(url.parse(authorizeUrl).query || "");
-        qry.SigAlg?.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        qry.Signature?.should.match(
-          "hel9NaoLU0brY/VhrQsY+lTtuAbTsT/ul6nZ/eVlSMXQRaKn5LTbKadzxmPghX7s4xoHwdah+yZHK/0u4StYSj4b5MKcqbsJapVr2R7H90z8YfGfR2C/G0Gng721YV9Da6VBzKg8Was91zQotgsMpZ9pGX1kPKi6cgFwPwM4NEFugn8AYgXEriNvO5+Q23K/MdBT2bgwRTj2FQCWTuQcgwbyWHXoquHztZ0lbh8UhY5BfQRv7c6D9XPkQEMMQFQeME4PIEg3JnynwFZk5wwhkphMd5nXxau+zt7Nfp4fRm0G8WYnxV1etBnWimwSglZVaSHFYeQBRsC2wvKSiVS8JA=="
-        );
-        qry.customQueryStringParam?.should.match("CustomQueryStringParamValue");
-      });
-      it("acme_tools request signed with sha256 when using privateKey", async () => {
-        const samlConfig: SamlConfig = {
-          entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
-          issuer: "acme_tools_com",
-          callbackUrl: "https://relyingparty/adfs/postResponse",
           privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
@@ -938,33 +910,8 @@ describe("passport-saml /", function () {
         );
         qry.customQueryStringParam?.should.match("CustomQueryStringParamValue");
       });
-      it("acme_tools request not signed if missing entry point", async () => {
-        const samlConfig: SamlConfig = {
-          entryPoint: "",
-          issuer: "acme_tools_com",
-          callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateCert: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
-          authnContext: [
-            "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
-          ],
-          signatureAlgorithm: "sha256",
-          additionalParams: {
-            customQueryStringParam: "CustomQueryStringParamValue",
-          },
-          cert: FAKE_CERT,
-        };
-        const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
-          return "12345678901234567890";
-        };
 
-        const request =
-          '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-        await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
-          message: "entryPoint is required",
-        });
-      });
-      it("acme_tools request not signed if missing entry point when using privateKey", async () => {
+      it("acme_tools request not signed if missing entry point", async () => {
         const samlConfig: SamlConfig = {
           entryPoint: "",
           issuer: "acme_tools_com",
@@ -1921,44 +1868,7 @@ describe("passport-saml /", function () {
       message: "Encryption block is invalid.",
     });
   });
-  it("errors if bad privateCert to requestToURL", async () => {
-    const samlObj = new SAML({
-      entryPoint: "foo",
-      privateCert:
-        "-----BEGIN CERTIFICATE-----\n" +
-        "8mvhvrcCOiJ3mjgKNN1F31jOBJuZNmq0U7n9v+Z+3NfyU/0E9jkrnFvm5ks+p8kl\n" +
-        "BjuBk9RAkazsU9l02XMS/VxOOIifxKC7R9bDtx0hjolYxgqxPIO5s4rmjj0rLzvo\n" +
-        "vQTTTx/tB5e+hbdx922QSeTjP4DO4ms6cIexcH+ZEUOJ3wXiHToJW83SXLRtwPI9\n" +
-        "JbWKeS9nWPnzcedbDNZkGtohW5vf32BHuvLsWcl6eFXRSkdX/7+rgpXmDRB7caQ+\n" +
-        "2SXVY7ORily7LTKg1cFmuKHDzKTGFIp5/GU6dwIDAQABAoIBAArgFQ+Uk4UN4diY\n" +
-        "gJWCAaQlTVmP0UEHZQt/NmJrc9ZVduuhOP0hH6gF53nREHz5UQb4nXB2Ksa3MtYD\n" +
-        "Z1vhJcu/T7pvmib4q+Ij6oAmlyeL/xwVY3IUURMxX3tCdPItlk4PEFELKeqQOiIS\n" +
-        "7B0DYxWfJbMle3c95w5ruYEr2A+fHCKVSlDpg7uPd9VQ6t7bGMZZvc9tDSC1qPXQ\n" +
-        "Gd/WOMXxi+t/TpyVZ6tOcEekQzAMLmWElUUPx3TJ0ur0Zl2LZ7IvQEXXias4lUHV\n" +
-        "fnH3akDCMmdhlJSVqUfplrh85zAOh6fLloZagphj/Kpgfw1TZ+njSDYqSLYE0NZ1\n" +
-        "j+83feECgYEA2aNGgbc+t6QLrJJ63l9Mz541lVV3IUAxZ5ACqOnMkQVuLoa5IMwM\n" +
-        "oENIo38ptfHQqjQ9x8/tEINFqOHnQuOJ/+1xP9f0Me+0clRDCqjGYqNYgmakKyD7\n" +
-        "vey/q6kwHk679RVGiI1p+HdoA+CbEKWHJiRxE0RhAA3G3wGAq7kpJocCgYEAxp4/\n" +
-        "tCft+eHVRivspfDN//axc2TR6qWP9E1ueGvbiXPXv0Puag0W9cER/df/s5jW4Rqg\n" +
-        "CE8649HPUZ0FJT+YaeKgu2Sw9SMcGl4/uyHzg7KnXIeYyQZJPqQkKyXmIix8cw3+\n" +
-        "HBGRtwX5nOy0DgFdaMiH0F08peNI9QHKKTBoWJECgYEAyymJ1ekzWMaAR1Zt8EvS\n" +
-        "LjWoG4EuthFwjRZ4BSpLVk1Vb4VAKAeS+cAVfNpmG3xip6Ag0/ebe0CvtFk9QsmZ\n" +
-        "txj2EP0M7div/9H8y2SF3OpS41fhhIlDtyXcPuivDHu/Jaf4sdwgwlrk9EmlN0Lu\n" +
-        "CIMYMz4vtpclwGNss+EjMt0CgYEAqepD0Vm/iuCaVhfJsgSaFvnywSdlNfpBdtyv\n" +
-        "PzH2dFa4IZZ55hwgoklznNgmlnyQh68BbVpqpO+fDtDnz//h4ePRYb84a96Hcj9j\n" +
-        "AjJ/YxF5f/04xfEsw/wkPQ2FHYM1TDCSTWzyXcMs0gTl3H1qbfPvzF+XPMt+ZKwN\n" +
-        "SMNy4SECgYB3ig6t+XVfNkw8oBOh0Gx37XKbmImXsA8ucDAX9KUbMIvD03XCEf34\n" +
-        "jF3SNJh0SmHoT62vc+cJqPxMDP6E7Q1nZxsEyaAkKr2H4dSM4SlRm0VB+bS+jXsz\n" +
-        "PCiRGSm8eupuxfix05LMMreo4mC7e3Ir4JhdCsXxAMZIvbNyXcvUMA==\n" +
-        "-----END CERTIFICATE-----\n",
-      cert: FAKE_CERT,
-    });
-    const request =
-      '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-    await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
-      message: /no start line/,
-    });
-  });
+
   it("errors if bad privateKey to requestToURL", async () => {
     const samlObj = new SAML({
       entryPoint: "foo",

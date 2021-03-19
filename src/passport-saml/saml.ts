@@ -121,14 +121,6 @@ class SAML {
       throw new TypeError("SamlOptions required on construction");
     }
 
-    if (ctorOptions.privateCert) {
-      console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
-
-      if (!ctorOptions.privateKey) {
-        ctorOptions.privateKey = ctorOptions.privateCert;
-      }
-    }
-
     const options = {
       ...ctorOptions,
       passive: ctorOptions.passive ?? false,
