@@ -512,7 +512,7 @@ describe( 'passport-saml /', function() {
       config: {
         identifierFormat: null,
         disableRequestedAuthnContext: true,
-        disableRequestACSUrl: true,
+        disableRequestAcsUrl: true,
       },
       result: {
         'samlp:AuthnRequest':

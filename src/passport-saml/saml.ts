@@ -130,6 +130,14 @@ class SAML {
       }
     }
 
+    if (options.disableRequestACSUrl) {
+      console.warn("options.disableRequestACSUrl has been deprecated; use options.disableRequestAcsUrl instead.")
+
+      if (!options.disableRequestAcsUrl) {
+        options.disableRequestAcsUrl = options.disableRequestACSUrl;
+      }
+    }
+
     if (Object.prototype.hasOwnProperty.call(options, 'cert') && !options.cert) {
       throw new Error('Invalid property: cert must not be empty');
     }
@@ -282,7 +290,7 @@ class SAML {
         request['samlp:AuthnRequest']['@ForceAuthn'] = true;
       }
 
-      if (!this.options.disableRequestACSUrl) {
+      if (!this.options.disableRequestAcsUrl) {
         request['samlp:AuthnRequest']['@AssertionConsumerServiceURL'] = this.getCallbackUrl(req);
       }
 
