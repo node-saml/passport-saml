@@ -2,3 +2,5 @@
 node_modules
 lib
 package-lock.json
+.eslintcache
+.prettierignore

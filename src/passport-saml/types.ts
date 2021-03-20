@@ -5,7 +5,7 @@ import type { CacheProvider } from "./inmemory-cache-provider";
 export type CertCallback = (
   callback: (err: Error | null, cert?: string | string[]) => void
 ) => void;
-export type RACComparision = "exact" | "minimum" | "maximum" | "better";
+export type RacComparision = "exact" | "minimum" | "maximum" | "better";
 export type SignatureAlgorithm = "sha1" | "sha256" | "sha512";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
@@ -20,41 +20,51 @@ export interface AuthorizeOptions extends AuthenticateOptions {
 export interface SamlSigningOptions {
   /** @deprecated use privateKey field instead */
   privateCert?: string | Buffer;
-  privateKey: string | Buffer;
+  privateKey?: string | Buffer;
   signatureAlgorithm?: SignatureAlgorithm;
   xmlSignatureTransforms?: string[];
   digestAlgorithm?: string;
 }
 
-export interface SamlOptions extends SamlSigningOptions {
-  // Core
-  callbackUrl: string;
-  path: string;
-  protocol: string;
-  host: string;
-  entryPoint: string;
-  issuer: string;
+/**
+ * These are SAML options that must be provided to construct a new SAML Strategy
+ */
+export interface MandatorySamlOptions {
   cert: string | string[] | CertCallback;
-  decryptionPvk: string | Buffer;
+}
+
+/**
+ * The options required to use a SAML strategy
+ * These may be provided by means of defaults specified in the constructor
+ */
+export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
+  // Core
+  callbackUrl?: string;
+  path: string;
+  protocol?: string;
+  host: string;
+  entryPoint?: string;
+  issuer: string;
+  decryptionPvk?: string | Buffer;
 
   // Additional SAML behaviors
   additionalParams: Record<string, string>;
   additionalAuthorizeParams: Record<string, string>;
-  identifierFormat: string | null;
+  identifierFormat?: string | null;
   acceptedClockSkewMs: number;
-  attributeConsumingServiceIndex: string | null;
+  attributeConsumingServiceIndex?: string;
   disableRequestedAuthnContext: boolean;
-  authnContext: string | string[];
+  authnContext: string[];
   forceAuthn: boolean;
   skipRequestCompression: boolean;
   authnRequestBinding?: string;
-  RACComparison: RACComparision;
-  providerName: string;
+  racComparison: RacComparision;
+  providerName?: string;
   passive: boolean;
-  idpIssuer: string;
-  audience: string;
-  scoping: SamlScopingConfig;
-  wantAssertionsSigned: boolean;
+  idpIssuer?: string;
+  audience?: string;
+  scoping?: SamlScopingConfig;
+  wantAssertionsSigned?: boolean;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;
@@ -64,18 +74,20 @@ export interface SamlOptions extends SamlSigningOptions {
   // Logout
   logoutUrl: string;
   additionalLogoutParams: Record<string, string>;
-  logoutCallbackUrl: string;
+  logoutCallbackUrl?: string;
 
   // extras
-  disableRequestACSUrl: boolean;
+  disableRequestAcsUrl: boolean;
 }
-
-export type SamlConfig = Partial<SamlOptions> & StrategyOptions;
-
-interface StrategyOptions {
+export interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
 }
+
+/**
+ * These options are availble for configuring a SAML strategy
+ */
+export type SamlConfig = Partial<SamlOptions> & StrategyOptions & MandatorySamlOptions;
 
 export interface SamlScopingConfig {
   idpList?: SamlIDPListConfig[];
@@ -167,6 +179,8 @@ export type VerifyWithoutRequest = (
 
 export type SamlOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
 
-export interface MultiSamlConfig extends SamlConfig {
+interface BaseMultiSamlConfig {
   getSamlOptions(req: express.Request, callback: SamlOptionsCallback): void;
 }
+
+export type MultiSamlConfig = Partial<SamlConfig> & StrategyOptions & BaseMultiSamlConfig;

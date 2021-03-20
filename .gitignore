@@ -5,3 +5,4 @@ node_modules/
 yarn-error.log
 .DS_Store 
 .eslintcache
+.dir-locals.el

@@ -1,36 +1,46 @@
 "use strict";
 
 import * as sinon from "sinon";
-import { Strategy as SamlStrategy, SAML } from "../src/passport-saml";
+import { SAML, Strategy as SamlStrategy } from "../src/passport-saml";
 import { RequestWithUser } from "../src/passport-saml/types";
+import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
 
 describe("strategy#authorize", function () {
+  let getAuthorizeFormStub: sinon.SinonStub;
+  let getAuthorizeUrlStub: sinon.SinonStub;
+  let errorStub: sinon.SinonStub;
+
   beforeEach(function () {
-    this.getAuthorizeFormStub = sinon.stub(SAML.prototype, "getAuthorizeFormAsync").resolves();
-    this.getAuthorizeUrlStub = sinon.stub(SAML.prototype, "getAuthorizeUrlAsync").resolves();
+    getAuthorizeFormStub = sinon.stub(SAML.prototype, "getAuthorizeFormAsync").resolves();
+    getAuthorizeUrlStub = sinon.stub(SAML.prototype, "getAuthorizeUrlAsync").resolves();
+    errorStub = sinon.stub(SamlStrategy.prototype, "error");
   });
 
   afterEach(function () {
-    this.getAuthorizeFormStub.restore();
-    this.getAuthorizeUrlStub.restore();
+    getAuthorizeFormStub.restore();
+    getAuthorizeUrlStub.restore();
+    errorStub.restore();
   });
 
   it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
     const strategy = new SamlStrategy(
       {
         authnRequestBinding: "HTTP-POST",
+        cert: FAKE_CERT,
       },
       noop
     );
     strategy.authenticate({} as RequestWithUser, {});
-    sinon.assert.calledOnce(this.getAuthorizeFormStub);
+    sinon.assert.notCalled(errorStub);
+    sinon.assert.calledOnce(getAuthorizeFormStub);
   });
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
-    const strategy = new SamlStrategy({}, noop);
+    const strategy = new SamlStrategy({ cert: FAKE_CERT }, noop);
     strategy.authenticate({} as RequestWithUser, {});
-    sinon.assert.calledOnce(this.getAuthorizeUrlStub);
+    sinon.assert.notCalled(errorStub);
+    sinon.assert.calledOnce(getAuthorizeUrlStub);
   });
 });

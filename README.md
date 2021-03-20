@@ -30,7 +30,8 @@ passport.use(new SamlStrategy(
   {
     path: '/login/callback',
     entryPoint: 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
-    issuer: 'passport-saml'
+    issuer: 'passport-saml',
+    cert: 'fake cert', // cert must be provided
   },
   function(profile, done) {
     findByEmail(profile.email, function(err, user) {
@@ -53,7 +54,7 @@ const { MultiSamlStrategy } = require('passport-saml');
 
 passport.use(new MultiSamlStrategy(
   {
-    passReqToCallback: true, //makes req available in callback
+    passReqToCallback: true, // makes req available in callback
     getSamlOptions: function(request, done) {
       findProvider(request, function(err, provider) {
         if (err) {
@@ -124,19 +125,19 @@ type Profile = {
 - **Additional SAML behaviors**
 - `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
 - `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
-- `identifierFormat`: if truthy, name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
+- `identifierFormat`: optional name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
 - `wantAssertionsSigned`: if truthy, add `WantAssertionsSigned="true"` to the metadata, to specify that the IdP should always sign the assertions.
 - `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `OnBefore` and `NotOnOrAfter` assertion condition validity timestamps. Setting to `-1` will disable checking these conditions entirely. Default is `0`.
 - `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
 - `disableRequestedAuthnContext`: if truthy, do not request a specific authentication context. This is [known to help when authenticating against Active Directory](https://github.com/node-saml/passport-saml/issues/226) (AD FS) servers.
 - `authnContext`: if truthy, name identifier format to request auth context (default: `urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport`); array of values is also supported
-- `RACComparison`: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
+- `racComparison`: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
 
 - `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
 - `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
 - `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
 - `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
-- `disableRequestACSUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
+- `disableRequestAcsUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
 - `scoping`: An optional configuration which implements the functionality [explained in the SAML spec paragraph "3.4.1.2 Element <Scoping>"](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf). The config object is structured as following:
 
 ```javascript
