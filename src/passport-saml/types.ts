@@ -64,6 +64,7 @@ export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
   idpIssuer?: string;
   audience?: string;
   scoping?: SamlScopingConfig;
+  wantAssertionsSigned?: boolean;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;
