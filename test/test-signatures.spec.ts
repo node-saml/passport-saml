@@ -1,7 +1,7 @@
 import { SAML } from "../lib/passport-saml/index.js";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import { SamlOptions } from "../lib/passport-saml/types.js";
+import { SamlConfig } from "../lib/passport-saml/types.js";
 import assert = require("assert");
 
 const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
@@ -16,7 +16,7 @@ describe("Signatures", function () {
       samlResponseBody: Record<string, string>,
       shouldErrorWith: string | false | undefined,
       amountOfSignatureChecks = 1,
-      options: Partial<SamlOptions> = {}
+      options: Partial<SamlConfig> = {}
     ) => {
       //== Instantiate new instance before every test
       const samlObj = new SAML({ cert, ...options });
@@ -34,7 +34,7 @@ describe("Signatures", function () {
       pathToXml: string,
       shouldErrorWith: string | false,
       amountOfSignaturesChecks: number | undefined,
-      options?: Partial<SamlOptions>
+      options?: Partial<SamlConfig>
     ) => {
       //== Create a body based on an XML and run the test
       return async () =>
