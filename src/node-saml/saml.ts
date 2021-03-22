@@ -3,7 +3,6 @@ const debug = Debug("node-saml");
 import * as zlib from "zlib";
 import * as xml2js from "xml2js";
 import * as crypto from "crypto";
-import * as xmldom from "xmldom";
 import { URL } from "url";
 import * as querystring from "querystring";
 import * as xmlbuilder from "xmlbuilder";
@@ -27,7 +26,7 @@ import {
 } from "./types";
 import { AuthenticateOptions, AuthorizeOptions, Profile, SamlConfig } from "../passport-saml/types";
 import { assertRequired } from "./utility";
-import { decryptXml, validateXmlSignatureForCert, xpath } from "./xml";
+import { decryptXml, parseDomFromString, validateXmlSignatureForCert, xpath } from "./xml";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
 const deflateRawAsync = util.promisify(zlib.deflateRaw);
@@ -715,7 +714,7 @@ class SAML {
     let xml: string, doc: Document, inResponseTo: string | null;
     try {
       xml = Buffer.from(container.SAMLResponse, "base64").toString("utf8");
-      doc = new xmldom.DOMParser({}).parseFromString(xml);
+      doc = parseDomFromString(xml);
 
       if (!Object.prototype.hasOwnProperty.call(doc, "documentElement"))
         throw new Error("SAMLResponse is not valid base64-encoded XML");
@@ -775,7 +774,7 @@ class SAML {
         const encryptedAssertionXml = encryptedAssertions[0].toString();
 
         const decryptedXml = await decryptXml(encryptedAssertionXml, this.options.decryptionPvk);
-        const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
+        const decryptedDoc = parseDomFromString(decryptedXml);
         const decryptedAssertions = xpath.selectElements(
           decryptedDoc,
           "/*[local-name()='Assertion']"
@@ -897,7 +896,7 @@ class SAML {
     const data = Buffer.from(container[samlMessageType] as string, "base64");
     const inflated = await inflateRawAsync(data);
 
-    const dom = new xmldom.DOMParser().parseFromString(inflated.toString());
+    const dom = parseDomFromString(inflated.toString());
     const parserConfig = {
       explicitRoot: true,
       explicitCharkey: true,
@@ -1245,7 +1244,7 @@ class SAML {
     container: Record<string, string>
   ): Promise<{ profile?: Profile; loggedOut?: boolean }> {
     const xml = Buffer.from(container.SAMLRequest, "base64").toString("utf8");
-    const dom = new xmldom.DOMParser().parseFromString(xml);
+    const dom = parseDomFromString(xml);
     const parserConfig = {
       explicitRoot: true,
       explicitCharkey: true,
@@ -1293,7 +1292,7 @@ class SAML {
       const encryptedDataXml = encryptedDatas[0].toString();
 
       const decryptedXml = await decryptXml(encryptedDataXml, self.options.decryptionPvk);
-      const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
+      const decryptedDoc = parseDomFromString(decryptedXml);
       const decryptedIds = xpath.selectElements(decryptedDoc, "/*[local-name()='NameID']");
       if (decryptedIds.length !== 1) {
         throw new Error("Invalid EncryptedAssertion content");

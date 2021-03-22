@@ -98,3 +98,7 @@ export const validateXmlSignatureForCert = (
   fullXml = normalizeNewlines(fullXml);
   return sig.checkSignature(fullXml);
 };
+
+export const parseDomFromString = (xml: string): Document => {
+  return new xmldom.DOMParser().parseFromString(xml);
+};
