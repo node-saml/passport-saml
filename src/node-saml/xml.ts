@@ -2,6 +2,7 @@ import * as util from "util";
 import * as xmlCrypto from "xml-crypto";
 import * as xmlenc from "xml-encryption";
 import * as xmldom from "xmldom";
+import * as xml2js from "xml2js";
 
 type SelectedValue = string | number | boolean | Node;
 
@@ -101,4 +102,22 @@ export const validateXmlSignatureForCert = (
 
 export const parseDomFromString = (xml: string): Document => {
   return new xmldom.DOMParser().parseFromString(xml);
+};
+
+export const parseXml2JsFromString = async (xml: string | Buffer): Promise<any> => {
+  const parserConfig = {
+    explicitRoot: true,
+    explicitCharkey: true,
+    tagNameProcessors: [xml2js.processors.stripPrefix],
+  };
+  const parser = new xml2js.Parser(parserConfig);
+  return parser.parseStringPromise(xml);
+};
+
+export const buildXml2JsObject = (rootName: string, xml: any): string => {
+  const builderOpts = {
+    rootName,
+    headless: true,
+  };
+  return new xml2js.Builder(builderOpts).buildObject(xml);
 };

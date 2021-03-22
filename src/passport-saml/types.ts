@@ -67,3 +67,9 @@ interface BaseMultiSamlConfig {
 }
 
 export type MultiSamlConfig = Partial<SamlConfig> & StrategyOptions & BaseMultiSamlConfig;
+
+export class ErrorWithXmlStatus extends Error {
+  constructor(message: string, public readonly xmlStatus: string) {
+    super(message);
+  }
+}

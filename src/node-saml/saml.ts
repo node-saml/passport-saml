@@ -1,7 +1,6 @@
 import Debug from "debug";
 const debug = Debug("node-saml");
 import * as zlib from "zlib";
-import * as xml2js from "xml2js";
 import * as crypto from "crypto";
 import { URL } from "url";
 import * as querystring from "querystring";
@@ -24,9 +23,22 @@ import {
   XMLObject,
   XMLOutput,
 } from "./types";
-import { AuthenticateOptions, AuthorizeOptions, Profile, SamlConfig } from "../passport-saml/types";
+import {
+  AuthenticateOptions,
+  AuthorizeOptions,
+  Profile,
+  SamlConfig,
+  ErrorWithXmlStatus,
+} from "../passport-saml/types";
 import { assertRequired } from "./utility";
-import { decryptXml, parseDomFromString, validateXmlSignatureForCert, xpath } from "./xml";
+import {
+  buildXml2JsObject,
+  decryptXml,
+  parseDomFromString,
+  parseXml2JsFromString,
+  validateXmlSignatureForCert,
+  xpath,
+} from "./xml";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
 const deflateRawAsync = util.promisify(zlib.deflateRaw);
@@ -798,13 +810,7 @@ class SAML {
       // If there's no assertion, fall back on xml2js response parsing for the status &
       //   LogoutResponse code.
 
-      const parserConfig = {
-        explicitRoot: true,
-        explicitCharkey: true,
-        tagNameProcessors: [xml2js.processors.stripPrefix],
-      };
-      const parser = new xml2js.Parser(parserConfig);
-      const xmljsDoc = await parser.parseStringPromise(xml);
+      const xmljsDoc = await parseXml2JsFromString(xml);
       const response = xmljsDoc.Response;
       if (response) {
         const assertion = response.Assertion;
@@ -840,14 +846,11 @@ class SAML {
                 } else if (statusCode[0].StatusCode) {
                   msg = statusCode[0].StatusCode[0].$.Value.match(/[^:]*$/)[0];
                 }
-                const error = new Error("SAML provider returned " + msgType + " error: " + msg);
-                const builderOpts = {
-                  rootName: "Status",
-                  headless: true,
-                };
-                // @ts-expect-error adding extra attr to default Error object
-                error.statusXml = new xml2js.Builder(builderOpts).buildObject(status[0]);
-                throw error;
+                const statusXml = buildXml2JsObject("Status", status[0]);
+                throw new ErrorWithXmlStatus(
+                  "SAML provider returned " + msgType + " error: " + msg,
+                  statusXml
+                );
               }
             }
           }
@@ -897,13 +900,7 @@ class SAML {
     const inflated = await inflateRawAsync(data);
 
     const dom = parseDomFromString(inflated.toString());
-    const parserConfig = {
-      explicitRoot: true,
-      explicitCharkey: true,
-      tagNameProcessors: [xml2js.processors.stripPrefix],
-    };
-    const parser = new xml2js.Parser(parserConfig);
-    const doc: XMLOutput = await parser.parseStringPromise(inflated);
+    const doc: XMLOutput = await parseXml2JsFromString(inflated);
     samlMessageType === "SAMLResponse"
       ? await this.verifyLogoutResponse(doc)
       : this.verifyLogoutRequest(doc);
@@ -1019,20 +1016,14 @@ class SAML {
   }
 
   private async processValidlySignedAssertionAsync(
-    xml: xml2js.convertableToString,
+    xml: string,
     samlResponseXml: string,
     inResponseTo: string
   ) {
     let msg;
-    const parserConfig = {
-      explicitRoot: true,
-      explicitCharkey: true,
-      tagNameProcessors: [xml2js.processors.stripPrefix],
-    };
     const nowMs = new Date().getTime();
     const profile = {} as Profile;
-    const parser = new xml2js.Parser(parserConfig);
-    const doc: XMLOutput = await parser.parseStringPromise(xml);
+    const doc: XMLOutput = await parseXml2JsFromString(xml);
     const parsedAssertion: XMLOutput = doc;
     const assertion: XMLOutput = doc.Assertion;
     getInResponseTo: {
@@ -1245,13 +1236,7 @@ class SAML {
   ): Promise<{ profile?: Profile; loggedOut?: boolean }> {
     const xml = Buffer.from(container.SAMLRequest, "base64").toString("utf8");
     const dom = parseDomFromString(xml);
-    const parserConfig = {
-      explicitRoot: true,
-      explicitCharkey: true,
-      tagNameProcessors: [xml2js.processors.stripPrefix],
-    };
-    const parser = new xml2js.Parser(parserConfig);
-    const doc = await parser.parseStringPromise(xml);
+    const doc = await parseXml2JsFromString(xml);
     const certs = await this.certsToCheck();
     if (!this.validateSignature(xml, dom.documentElement, certs)) {
       throw new Error("Invalid signature on documentElement");
