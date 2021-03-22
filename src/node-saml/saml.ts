@@ -29,6 +29,7 @@ import {
 } from "./types";
 import { AuthenticateOptions, AuthorizeOptions, Profile, SamlConfig } from "../passport-saml/types";
 import { assertRequired } from "./utility";
+import { xpath } from "./xml";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
 const deflateRawAsync = util.promisify(zlib.deflateRaw);
@@ -94,7 +95,7 @@ async function processValidlySignedSamlLogoutAsync(
 }
 
 async function promiseWithNameID(nameid: Node): Promise<NameID> {
-  const format = xmlCrypto.xpath(nameid, "@Format") as Node[];
+  const format = xpath.selectAttributes(nameid, "@Format");
   return {
     value: nameid.textContent,
     format: format && format[0] && format[0].nodeValue,
@@ -683,7 +684,7 @@ class SAML {
   //
   // See https://github.com/bergie/passport-saml/issues/19 for references to some of the attack
   //   vectors against SAML signature verification.
-  validateSignature(fullXml: string, currentNode: HTMLElement, certs: string[]): boolean {
+  validateSignature(fullXml: string, currentNode: Element, certs: string[]): boolean {
     const xpathSigQuery =
       ".//*[" +
       "local-name(.)='Signature' and " +
@@ -692,7 +693,7 @@ class SAML {
       currentNode.getAttribute("ID") +
       "']" +
       "]";
-    const signatures = xmlCrypto.xpath(currentNode, xpathSigQuery);
+    const signatures = xpath.selectElements(currentNode, xpathSigQuery);
     // This function is expecting to validate exactly one signature, so if we find more or fewer
     //   than that, reject.
     if (signatures.length !== 1) {
@@ -701,16 +702,16 @@ class SAML {
 
     const signature = signatures[0];
     return certs.some((certToCheck) => {
-      return this.validateSignatureForCert(signature as string, certToCheck, fullXml, currentNode);
+      return this.validateSignatureForCert(signature, certToCheck, fullXml, currentNode);
     });
   }
 
   // This function checks that the |signature| is signed with a given |cert|.
   validateSignatureForCert(
-    signature: string | Node,
+    signature: Node,
     cert: string,
     fullXml: string,
-    currentNode: HTMLElement
+    currentNode: Element
   ): boolean {
     const sig = new xmlCrypto.SignedXml();
     sig.keyInfoProvider = {
@@ -718,8 +719,8 @@ class SAML {
       getKeyInfo: () => "<X509Data></X509Data>",
       getKey: () => Buffer.from(this._certToPEM(cert)),
     };
-    signature = this.normalizeNewlines(signature.toString());
-    sig.loadSignature(signature);
+    const signatureStr = this.normalizeNewlines(signature.toString());
+    sig.loadSignature(signatureStr);
     // We expect each signature to contain exactly one reference to the top level of the xml we
     //   are validating, so if we see anything else, reject.
     if (sig.references.length != 1) return false;
@@ -730,7 +731,7 @@ class SAML {
     if (currentNode.getAttribute(idAttribute) != refId) return false;
     // If we find any extra referenced nodes, reject.  (xml-crypto only verifies one digest, so
     //   multiple candidate references is bad news)
-    const totalReferencedNodes = xmlCrypto.xpath(
+    const totalReferencedNodes = xpath.selectElements(
       currentNode.ownerDocument,
       "//*[@" + idAttribute + "='" + refId + "']"
     );
@@ -755,10 +756,10 @@ class SAML {
       if (!Object.prototype.hasOwnProperty.call(doc, "documentElement"))
         throw new Error("SAMLResponse is not valid base64-encoded XML");
 
-      const inResponseToNodes = xmlCrypto.xpath(
+      const inResponseToNodes = xpath.selectAttributes(
         doc,
         "/*[local-name()='Response']/@InResponseTo"
-      ) as Attr[];
+      );
 
       if (inResponseToNodes) {
         inResponseTo = inResponseToNodes.length ? inResponseToNodes[0].nodeValue : null;
@@ -772,11 +773,11 @@ class SAML {
         validSignature = true;
       }
 
-      const assertions = xmlCrypto.xpath(
+      const assertions = xpath.selectElements(
         doc,
         "/*[local-name()='Response']/*[local-name()='Assertion']"
-      ) as HTMLElement[];
-      const encryptedAssertions = xmlCrypto.xpath(
+      );
+      const encryptedAssertions = xpath.selectElements(
         doc,
         "/*[local-name()='Response']/*[local-name()='EncryptedAssertion']"
       );
@@ -815,10 +816,10 @@ class SAML {
           xmlencOptions
         );
         const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
-        const decryptedAssertions = xmlCrypto.xpath(
+        const decryptedAssertions = xpath.selectElements(
           decryptedDoc,
           "/*[local-name()='Assertion']"
-        ) as HTMLElement[];
+        );
         if (decryptedAssertions.length != 1) throw new Error("Invalid EncryptedAssertion content");
 
         if (
@@ -1300,14 +1301,14 @@ class SAML {
   }
 
   async _getNameIdAsync(self: SAML, doc: Node): Promise<NameID> {
-    const nameIds = xmlCrypto.xpath(
+    const nameIds = xpath.selectElements(
       doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='NameID']"
-    ) as Node[];
-    const encryptedIds = xmlCrypto.xpath(
+    );
+    const encryptedIds = xpath.selectElements(
       doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='EncryptedID']"
-    ) as Node[];
+    );
 
     if (nameIds.length + encryptedIds.length > 1) {
       throw new Error("Invalid LogoutRequest");
@@ -1321,7 +1322,10 @@ class SAML {
         "No decryption key found getting name ID for encrypted SAML response"
       );
 
-      const encryptedDatas = xmlCrypto.xpath(encryptedIds[0], "./*[local-name()='EncryptedData']");
+      const encryptedDatas = xpath.selectElements(
+        encryptedIds[0],
+        "./*[local-name()='EncryptedData']"
+      );
 
       if (encryptedDatas.length !== 1) {
         throw new Error("Invalid LogoutRequest");
@@ -1334,7 +1338,7 @@ class SAML {
         xmlencOptions
       );
       const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
-      const decryptedIds = xmlCrypto.xpath(decryptedDoc, "/*[local-name()='NameID']") as Node[];
+      const decryptedIds = xpath.selectElements(decryptedDoc, "/*[local-name()='NameID']");
       if (decryptedIds.length !== 1) {
         throw new Error("Invalid EncryptedAssertion content");
       }
