@@ -22,15 +22,7 @@ export function signSamlPost(
     options = {} as SamlSigningOptions;
   }
 
-  if (options.privateCert) {
-    console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
-
-    if (!options.privateKey) {
-      options.privateKey = options.privateCert;
-    }
-  }
-
-  if (!options.privateKey) throw new Error("options.privateKey is required");
+  if (options.privateKey == null) throw new Error("options.privateKey is required");
 
   const transforms = options.xmlSignatureTransforms || defaultTransforms;
   const sig = new SignedXml();

@@ -18,8 +18,6 @@ export interface AuthorizeOptions extends AuthenticateOptions {
 }
 
 export interface SamlSigningOptions {
-  /** @deprecated use privateKey field instead */
-  privateCert?: string | Buffer;
   privateKey?: string | Buffer;
   signatureAlgorithm?: SignatureAlgorithm;
   xmlSignatureTransforms?: string[];

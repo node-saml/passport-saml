@@ -117,7 +117,7 @@ type Profile = {
 - `issuer`: issuer string to supply to identity provider
 - `audience`: expected saml response Audience (if not provided, Audience won't be verified)
 - `cert`: the IDP's public signing certificate used to validate the signatures of the incoming SAML Responses, see [Security and signatures](#security-and-signatures)
-- `privateKey`: see [Security and signatures](#security-and-signatures). Old name of `privateCert` is accepted alternative.
+- `privateKey`: see [Security and signatures](#security-and-signatures).
 - `decryptionPvk`: optional private key that will be used to attempt to decrypt any encrypted assertions that are received
 - `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
 - `digestAlgorithm`: optionally set the digest algorithm used to provide a digest for the signed data object, valid values are 'sha1' (default), 'sha256', or 'sha512'

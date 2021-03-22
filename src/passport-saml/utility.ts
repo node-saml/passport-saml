@@ -22,14 +22,6 @@ export function signXml(samlMessage: string, xpath: string, options: SamlSigning
     options = {} as SamlSigningOptions;
   }
 
-  if (options.privateCert) {
-    console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
-
-    if (!options.privateKey) {
-      options.privateKey = options.privateCert;
-    }
-  }
-
   if (!options.privateKey) throw new Error("options.privateKey is required");
 
   const transforms = options.xmlSignatureTransforms || defaultTransforms;
