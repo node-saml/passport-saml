@@ -4,6 +4,8 @@ import * as xmlenc from "xml-encryption";
 import * as xmldom from "xmldom";
 import * as xml2js from "xml2js";
 import * as xmlbuilder from "xmlbuilder";
+import { isValidSamlSigningOptions, SamlSigningOptions } from "./types";
+import * as algorithms from "./algorithms";
 
 type SelectedValue = string | number | boolean | Node;
 
@@ -99,6 +101,41 @@ export const validateXmlSignatureForCert = (
   fullXml = normalizeXml(fullXml);
   fullXml = normalizeNewlines(fullXml);
   return sig.checkSignature(fullXml);
+};
+
+interface XmlSignatureLocation {
+  reference: string;
+  action: "append" | "prepend" | "before" | "after";
+}
+
+export const signXml = (
+  xml: string,
+  xpath: string,
+  location: XmlSignatureLocation,
+  options: SamlSigningOptions
+): string => {
+  const defaultTransforms = [
+    "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+    "http://www.w3.org/2001/10/xml-exc-c14n#",
+  ];
+
+  if (!xml) throw new Error("samlMessage is required");
+  if (!location) throw new Error("location is required");
+  if (!options) throw new Error("options is required");
+  if (!isValidSamlSigningOptions(options)) throw new Error("options.privateKey is required");
+
+  const transforms = options.xmlSignatureTransforms ?? defaultTransforms;
+  const sig = new xmlCrypto.SignedXml();
+  if (options.signatureAlgorithm != null) {
+    sig.signatureAlgorithm = algorithms.getSigningAlgorithm(options.signatureAlgorithm);
+  }
+  sig.addReference(xpath, transforms, algorithms.getDigestAlgorithm(options.digestAlgorithm));
+  sig.signingKey = options.privateKey;
+  sig.computeSignature(xml, {
+    location,
+  });
+
+  return sig.getSignedXml();
 };
 
 export const parseDomFromString = (xml: string): Document => {

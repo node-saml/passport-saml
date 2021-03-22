@@ -3,11 +3,17 @@ import type { CacheProvider } from "./inmemory-cache-provider";
 export type SignatureAlgorithm = "sha1" | "sha256" | "sha512";
 
 export interface SamlSigningOptions {
-  privateKey?: string | Buffer;
+  privateKey: string | Buffer;
   signatureAlgorithm?: SignatureAlgorithm;
   xmlSignatureTransforms?: string[];
   digestAlgorithm?: string;
 }
+
+export const isValidSamlSigningOptions = (
+  options: Partial<SamlSigningOptions>
+): options is SamlSigningOptions => {
+  return options.privateKey != null;
+};
 
 export interface AudienceRestrictionXML {
   Audience?: XMLObject[];
@@ -75,7 +81,7 @@ interface SamlScopingConfig {
  * The options required to use a SAML strategy
  * These may be provided by means of defaults specified in the constructor
  */
-export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
+export interface SamlOptions extends Partial<SamlSigningOptions>, MandatorySamlOptions {
   // Core
   callbackUrl?: string;
   path: string;

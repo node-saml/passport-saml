@@ -10,6 +10,7 @@ import * as algorithms from "./algorithms";
 import { signAuthnRequestPost } from "./saml-post-signing";
 import { ParsedQs } from "qs";
 import {
+  isValidSamlSigningOptions,
   AudienceRestrictionXML,
   AuthorizeRequestXML,
   CertCallback,
@@ -355,7 +356,8 @@ class SAML {
     }
 
     let stringRequest = buildXmlBuilderObject(request, false);
-    if (isHttpPostBinding && this.options.privateKey != null) {
+    // TODO: maybe we should always sign here
+    if (isHttpPostBinding && isValidSamlSigningOptions(this.options)) {
       stringRequest = signAuthnRequestPost(stringRequest, this.options);
     }
     return stringRequest;
