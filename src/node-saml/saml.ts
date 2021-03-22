@@ -2,13 +2,11 @@ import Debug from "debug";
 const debug = Debug("node-saml");
 import * as zlib from "zlib";
 import * as xml2js from "xml2js";
-import * as xmlCrypto from "xml-crypto";
 import * as crypto from "crypto";
 import * as xmldom from "xmldom";
 import { URL } from "url";
 import * as querystring from "querystring";
 import * as xmlbuilder from "xmlbuilder";
-import * as xmlenc from "xml-encryption";
 import * as util from "util";
 import { CacheProvider as InMemoryCacheProvider } from "./inmemory-cache-provider";
 import * as algorithms from "./algorithms";
@@ -29,7 +27,7 @@ import {
 } from "./types";
 import { AuthenticateOptions, AuthorizeOptions, Profile, SamlConfig } from "../passport-saml/types";
 import { assertRequired } from "./utility";
-import { xpath } from "./xml";
+import { decryptXml, validateXmlSignatureForCert, xpath } from "./xml";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
 const deflateRawAsync = util.promisify(zlib.deflateRaw);
@@ -702,47 +700,13 @@ class SAML {
 
     const signature = signatures[0];
     return certs.some((certToCheck) => {
-      return this.validateSignatureForCert(signature, certToCheck, fullXml, currentNode);
+      return validateXmlSignatureForCert(
+        signature,
+        this._certToPEM(certToCheck),
+        fullXml,
+        currentNode
+      );
     });
-  }
-
-  // This function checks that the |signature| is signed with a given |cert|.
-  validateSignatureForCert(
-    signature: Node,
-    cert: string,
-    fullXml: string,
-    currentNode: Element
-  ): boolean {
-    const sig = new xmlCrypto.SignedXml();
-    sig.keyInfoProvider = {
-      file: "",
-      getKeyInfo: () => "<X509Data></X509Data>",
-      getKey: () => Buffer.from(this._certToPEM(cert)),
-    };
-    const signatureStr = this.normalizeNewlines(signature.toString());
-    sig.loadSignature(signatureStr);
-    // We expect each signature to contain exactly one reference to the top level of the xml we
-    //   are validating, so if we see anything else, reject.
-    if (sig.references.length != 1) return false;
-    const refUri = sig.references[0].uri!;
-    const refId = refUri[0] === "#" ? refUri.substring(1) : refUri;
-    // If we can't find the reference at the top level, reject
-    const idAttribute = currentNode.getAttribute("ID") ? "ID" : "Id";
-    if (currentNode.getAttribute(idAttribute) != refId) return false;
-    // If we find any extra referenced nodes, reject.  (xml-crypto only verifies one digest, so
-    //   multiple candidate references is bad news)
-    const totalReferencedNodes = xpath.selectElements(
-      currentNode.ownerDocument,
-      "//*[@" + idAttribute + "='" + refId + "']"
-    );
-
-    if (totalReferencedNodes.length > 1) {
-      return false;
-    }
-    // normalize XML to replace XML-encoded carriage returns with actual carriage returns
-    fullXml = this.normalizeXml(fullXml);
-    fullXml = this.normalizeNewlines(fullXml);
-    return sig.checkSignature(fullXml);
   }
 
   async validatePostResponseAsync(
@@ -810,11 +774,7 @@ class SAML {
 
         const encryptedAssertionXml = encryptedAssertions[0].toString();
 
-        const xmlencOptions = { key: this.options.decryptionPvk };
-        const decryptedXml: string = await util.promisify(xmlenc.decrypt).bind(xmlenc)(
-          encryptedAssertionXml,
-          xmlencOptions
-        );
+        const decryptedXml = await decryptXml(encryptedAssertionXml, this.options.decryptionPvk);
         const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
         const decryptedAssertions = xpath.selectElements(
           decryptedDoc,
@@ -1332,11 +1292,7 @@ class SAML {
       }
       const encryptedDataXml = encryptedDatas[0].toString();
 
-      const xmlencOptions = { key: self.options.decryptionPvk };
-      const decryptedXml: string = await util.promisify(xmlenc.decrypt).bind(xmlenc)(
-        encryptedDataXml,
-        xmlencOptions
-      );
+      const decryptedXml = await decryptXml(encryptedDataXml, self.options.decryptionPvk);
       const decryptedDoc = new xmldom.DOMParser().parseFromString(decryptedXml);
       const decryptedIds = xpath.selectElements(decryptedDoc, "/*[local-name()='NameID']");
       if (decryptedIds.length !== 1) {
@@ -1463,19 +1419,6 @@ class SAML {
     }
 
     throw new Error("Invalid key");
-  }
-
-  normalizeNewlines(xml: string): string {
-    // we can use this utility before passing XML to `xml-crypto`
-    // we are considered the XML processor and are responsible for newline normalization
-    // https://github.com/node-saml/passport-saml/issues/431#issuecomment-718132752
-    return xml.replace(/\r\n?/g, "\n");
-  }
-
-  normalizeXml(xml: string): string {
-    // we can use this utility to parse and re-stringify XML
-    // `DOMParser` will take care of normalization tasks, like replacing XML-encoded carriage returns with actual carriage returns
-    return new xmldom.DOMParser({}).parseFromString(xml).toString();
   }
 }
 

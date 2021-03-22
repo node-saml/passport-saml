@@ -1,4 +1,7 @@
+import * as util from "util";
 import * as xmlCrypto from "xml-crypto";
+import * as xmlenc from "xml-encryption";
+import * as xmldom from "xmldom";
 
 type SelectedValue = string | number | boolean | Node;
 
@@ -37,4 +40,61 @@ export const xpath = {
     selectXPath(attributesXPathTypeGuard, node, xpath),
   selectElements: (node: Node, xpath: string): Element[] =>
     selectXPath(elementsXPathTypeGuard, node, xpath),
+};
+
+export const decryptXml = async (xml: string, decryptionKey: string | Buffer) =>
+  util.promisify(xmlenc.decrypt).bind(xmlenc)(xml, { key: decryptionKey });
+
+const normalizeNewlines = (xml: string): string => {
+  // we can use this utility before passing XML to `xml-crypto`
+  // we are considered the XML processor and are responsible for newline normalization
+  // https://github.com/node-saml/passport-saml/issues/431#issuecomment-718132752
+  return xml.replace(/\r\n?/g, "\n");
+};
+
+const normalizeXml = (xml: string): string => {
+  // we can use this utility to parse and re-stringify XML
+  // `DOMParser` will take care of normalization tasks, like replacing XML-encoded carriage returns with actual carriage returns
+  return new xmldom.DOMParser({}).parseFromString(xml).toString();
+};
+
+/**
+ * This function checks that the |signature| is signed with a given |cert|.
+ */
+export const validateXmlSignatureForCert = (
+  signature: Node,
+  certPem: string,
+  fullXml: string,
+  currentNode: Element
+): boolean => {
+  const sig = new xmlCrypto.SignedXml();
+  sig.keyInfoProvider = {
+    file: "",
+    getKeyInfo: () => "<X509Data></X509Data>",
+    getKey: () => Buffer.from(certPem),
+  };
+  const signatureStr = normalizeNewlines(signature.toString());
+  sig.loadSignature(signatureStr);
+  // We expect each signature to contain exactly one reference to the top level of the xml we
+  //   are validating, so if we see anything else, reject.
+  if (sig.references.length != 1) return false;
+  const refUri = sig.references[0].uri!;
+  const refId = refUri[0] === "#" ? refUri.substring(1) : refUri;
+  // If we can't find the reference at the top level, reject
+  const idAttribute = currentNode.getAttribute("ID") ? "ID" : "Id";
+  if (currentNode.getAttribute(idAttribute) != refId) return false;
+  // If we find any extra referenced nodes, reject.  (xml-crypto only verifies one digest, so
+  //   multiple candidate references is bad news)
+  const totalReferencedNodes = xpath.selectElements(
+    currentNode.ownerDocument,
+    "//*[@" + idAttribute + "='" + refId + "']"
+  );
+
+  if (totalReferencedNodes.length > 1) {
+    return false;
+  }
+  // normalize XML to replace XML-encoded carriage returns with actual carriage returns
+  fullXml = normalizeXml(fullXml);
+  fullXml = normalizeNewlines(fullXml);
+  return sig.checkSignature(fullXml);
 };
