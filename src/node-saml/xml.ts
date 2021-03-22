@@ -3,6 +3,7 @@ import * as xmlCrypto from "xml-crypto";
 import * as xmlenc from "xml-encryption";
 import * as xmldom from "xmldom";
 import * as xml2js from "xml2js";
+import * as xmlbuilder from "xmlbuilder";
 
 type SelectedValue = string | number | boolean | Node;
 
@@ -120,4 +121,9 @@ export const buildXml2JsObject = (rootName: string, xml: any): string => {
     headless: true,
   };
   return new xml2js.Builder(builderOpts).buildObject(xml);
+};
+
+export const buildXmlBuilderObject = (xml: Record<string, any>, pretty: boolean): string => {
+  const options = pretty ? { pretty: true, indent: "  ", newline: "\n" } : {};
+  return xmlbuilder.create(xml).end(options);
 };

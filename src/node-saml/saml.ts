@@ -4,7 +4,6 @@ import * as zlib from "zlib";
 import * as crypto from "crypto";
 import { URL } from "url";
 import * as querystring from "querystring";
-import * as xmlbuilder from "xmlbuilder";
 import * as util from "util";
 import { CacheProvider as InMemoryCacheProvider } from "./inmemory-cache-provider";
 import * as algorithms from "./algorithms";
@@ -33,6 +32,7 @@ import {
 import { assertRequired } from "./utility";
 import {
   buildXml2JsObject,
+  buildXmlBuilderObject,
   decryptXml,
   parseDomFromString,
   parseXml2JsFromString,
@@ -354,7 +354,7 @@ class SAML {
       request["samlp:AuthnRequest"]["samlp:Scoping"] = scoping;
     }
 
-    let stringRequest = xmlbuilder.create((request as unknown) as Record<string, any>).end();
+    let stringRequest = buildXmlBuilderObject(request, false);
     if (isHttpPostBinding && this.options.privateKey != null) {
       stringRequest = signAuthnRequestPost(stringRequest, this.options);
     }
@@ -400,7 +400,7 @@ class SAML {
     }
 
     await this.cacheProvider.saveAsync(id, instant);
-    return xmlbuilder.create((request as unknown) as Record<string, any>).end();
+    return buildXmlBuilderObject(request, false);
   }
 
   _generateLogoutResponse(logoutRequest: Profile) {
@@ -427,7 +427,7 @@ class SAML {
       },
     };
 
-    return xmlbuilder.create(request).end();
+    return buildXmlBuilderObject(request, false);
   }
 
   async _requestToUrlAsync(
@@ -1379,9 +1379,7 @@ class SAML {
       "@Binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
       "@Location": this.getCallbackUrl(),
     };
-    return xmlbuilder
-      .create((metadata as unknown) as Record<string, any>)
-      .end({ pretty: true, indent: "  ", newline: "\n" });
+    return buildXmlBuilderObject(metadata, true);
   }
 
   _keyToPEM(key: string | Buffer): typeof key extends string | Buffer ? string | Buffer : Error {
