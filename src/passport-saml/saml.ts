@@ -121,14 +121,6 @@ class SAML {
       throw new TypeError("SamlOptions required on construction");
     }
 
-    if (ctorOptions.privateCert) {
-      console.warn("options.privateCert has been deprecated; use options.privateKey instead.");
-
-      if (!ctorOptions.privateKey) {
-        ctorOptions.privateKey = ctorOptions.privateCert;
-      }
-    }
-
     const options = {
       ...ctorOptions,
       passive: ctorOptions.passive ?? false,
@@ -147,6 +139,7 @@ class SAML {
         ctorOptions.identifierFormat === undefined
           ? "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
           : ctorOptions.identifierFormat,
+      wantAssertionsSigned: ctorOptions.wantAssertionsSigned ?? false,
       authnContext: ctorOptions.authnContext ?? [
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
       ],
@@ -789,7 +782,10 @@ class SAML {
       }
 
       if (assertions.length == 1) {
-        if (!validSignature && !this.validateSignature(xml, assertions[0], certs)) {
+        if (
+          (this.options.wantAssertionsSigned || !validSignature) &&
+          !this.validateSignature(xml, assertions[0], certs)
+        ) {
           throw new Error("Invalid signature");
         }
         return await this.processValidlySignedAssertionAsync(
@@ -820,7 +816,7 @@ class SAML {
         if (decryptedAssertions.length != 1) throw new Error("Invalid EncryptedAssertion content");
 
         if (
-          !validSignature &&
+          (this.options.wantAssertionsSigned || !validSignature) &&
           !this.validateSignature(decryptedXml, decryptedAssertions[0], certs)
         ) {
           throw new Error("Invalid signature from encrypted assertion");
@@ -1421,6 +1417,10 @@ class SAML {
 
     if (this.options.identifierFormat != null) {
       metadata.EntityDescriptor.SPSSODescriptor.NameIDFormat = this.options.identifierFormat;
+    }
+
+    if (this.options.wantAssertionsSigned) {
+      metadata.EntityDescriptor.SPSSODescriptor["@WantAssertionsSigned"] = true;
     }
 
     metadata.EntityDescriptor.SPSSODescriptor.AssertionConsumerService = {

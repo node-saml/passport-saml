@@ -18,8 +18,6 @@ export interface AuthorizeOptions extends AuthenticateOptions {
 }
 
 export interface SamlSigningOptions {
-  /** @deprecated use privateKey field instead */
-  privateCert?: string | Buffer;
   privateKey?: string | Buffer;
   signatureAlgorithm?: SignatureAlgorithm;
   xmlSignatureTransforms?: string[];
@@ -64,6 +62,7 @@ export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
   idpIssuer?: string;
   audience?: string;
   scoping?: SamlScopingConfig;
+  wantAssertionsSigned?: boolean;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;
