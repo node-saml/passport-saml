@@ -512,7 +512,7 @@ describe( 'passport-saml /', function() {
       config: {
         identifierFormat: null,
         disableRequestedAuthnContext: true,
-        disableRequestACSUrl: true,
+        disableRequestAcsUrl: true,
       },
       result: {
         'samlp:AuthnRequest':
@@ -2247,14 +2247,14 @@ describe( 'passport-saml /', function() {
         additionalLogoutParams.should.containEql({'queryParam': 'queryParamRuntimeValue'});
       });
 
-      it('should check the value of the option `RACComparison`', function() {
-        var samlObjBadComparisonType = new SAML({ RACComparison: 'bad_value' });
-        should.equal(samlObjBadComparisonType.options.RACComparison, 'exact', ['the default value of the option `RACComparison` must be exact']);
+      it('should check the value of the option `racComparison`', function() {
+        var samlObjBadComparisonType = new SAML({ racComparison: 'bad_value' });
+        should.equal(samlObjBadComparisonType.options.racComparison, 'exact', ['the default value of the option `racComparison` must be exact']);
 
         var validComparisonTypes = ['exact','minimum','maximum','better'], samlObjValidComparisonType;
-        validComparisonTypes.forEach(function(RACComparison) {
-            samlObjValidComparisonType = new SAML( {RACComparison: RACComparison} );
-            should.equal(samlObjValidComparisonType.options.RACComparison, RACComparison);
+        validComparisonTypes.forEach(function(racComparison) {
+            samlObjValidComparisonType = new SAML( {racComparison: racComparison} );
+            should.equal(samlObjValidComparisonType.options.racComparison, racComparison);
         });
       });
     });

@@ -37,7 +37,9 @@ export interface SAMLOptions {
     authnContext: string | string[];
     forceAuthn: boolean;
     skipRequestCompression: boolean;
-    RACComparison: 'exact' | 'minimum' | 'maximum' | 'better';
+    /** @deprecated use racComparison field instead */
+    RACComparison?: 'exact' | 'minimum' | 'maximum' | 'better';
+    racComparison: 'exact' | 'minimum' | 'maximum' | 'better';
     providerName: string;
     passive: boolean;
     idpIssuer: string;
@@ -57,7 +59,9 @@ export interface SAMLOptions {
     // extras
     xmlSignatureTransforms: string[];
     digestAlgorithm: string;
-    disableRequestACSUrl: boolean;
+    /** @deprecated use disableRequestAcsUrl field instead */
+    disableRequestACSUrl?: boolean;
+    disableRequestAcsUrl: boolean;
 }
 
 export type SamlConfig = Partial<SAMLOptions> & StrategyOptions
