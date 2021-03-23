@@ -1,6 +1,6 @@
 import * as fs from "fs";
-import { signSamlPost, signAuthnRequestPost } from "../src/passport-saml/saml-post-signing";
-import { SamlOptions, SamlSigningOptions } from "../src/passport-saml/types";
+import { signSamlPost, signAuthnRequestPost } from "../../src/node-saml/saml-post-signing";
+import { SamlSigningOptions } from "../../src/node-saml/types";
 
 const signingKey = fs.readFileSync(__dirname + "/static/key.pem");
 

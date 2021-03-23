@@ -1,12 +1,12 @@
 import type * as express from "express";
 import * as passport from "passport";
-import type { CacheProvider } from "./inmemory-cache-provider";
+import type { CacheProvider } from "../node-saml/inmemory-cache-provider";
+import type { SamlSigningOptions } from "../node-saml/types";
 
 export type CertCallback = (
   callback: (err: Error | null, cert?: string | string[]) => void
 ) => void;
 export type RacComparision = "exact" | "minimum" | "maximum" | "better";
-export type SignatureAlgorithm = "sha1" | "sha256" | "sha512";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
@@ -15,13 +15,6 @@ export interface AuthenticateOptions extends passport.AuthenticateOptions {
 
 export interface AuthorizeOptions extends AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
-}
-
-export interface SamlSigningOptions {
-  privateKey?: string | Buffer;
-  signatureAlgorithm?: SignatureAlgorithm;
-  xmlSignatureTransforms?: string[];
-  digestAlgorithm?: string;
 }
 
 /**

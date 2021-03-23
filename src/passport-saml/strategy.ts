@@ -1,5 +1,5 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
-import * as saml from "./saml";
+import * as saml from "../node-saml/saml";
 import * as url from "url";
 import {
   AuthenticateOptions,

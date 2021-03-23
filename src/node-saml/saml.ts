@@ -32,7 +32,7 @@ import {
   XMLObject,
   XMLOutput,
   SamlConfig,
-} from "./types";
+} from "../passport-saml/types";
 import { assertRequired } from "./utility";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);

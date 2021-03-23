@@ -1,6 +1,6 @@
 import * as util from "util";
-import * as saml from "./saml";
-import { CacheProvider as InMemoryCacheProvider } from "./inmemory-cache-provider";
+import * as saml from "../node-saml/saml";
+import { CacheProvider as InMemoryCacheProvider } from "../node-saml/inmemory-cache-provider";
 import SamlStrategy = require("./strategy");
 import type { Request } from "express";
 import {

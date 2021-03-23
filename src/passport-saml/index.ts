@@ -1,5 +1,5 @@
-import type { CacheItem, CacheProvider } from "./inmemory-cache-provider";
-import { SAML } from "./saml";
+import type { CacheItem, CacheProvider } from "../node-saml/inmemory-cache-provider";
+import { SAML } from "../node-saml";
 import Strategy = require("./strategy");
 import MultiSamlStrategy = require("./multiSamlStrategy");
 import type {

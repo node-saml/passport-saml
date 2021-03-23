@@ -10,14 +10,14 @@ import { RacComparision, RequestWithUser, SamlConfig } from "../src/passport-sam
 import * as should from "should";
 import assert = require("assert");
 import { FAKE_CERT, TEST_CERT } from "./types";
-import { signXmlResponse } from "../src/passport-saml/utility";
+import { signXmlResponse } from "../src/node-saml/utility";
 
 export const BAD_TEST_CERT =
   "MIIEOTCCAyGgAwIBAgIJAKZgJdKdCdL6MA0GCSqGSIb3DQEBBQUAMHAxCzAJBgNVBAYTAkFVMREwDwYDVQQIEwhWaWN0b3JpYTESMBAGA1UEBxMJTWVsYm91cm5lMSEwHwYDVQQKExhUYWJjb3JwIEhvbGRpbmdzIExpbWl0ZWQxFzAVBgNVBAMTDnN0cy50YWIuY29tLmF1MB4XDTE3MDUzMDA4NTQwOFoXDTI3MDUyODA4NTQwOFowcDELMAkGA1UEBhMCQVUxETAPBgNVBAgTCFZpY3RvcmlhMRIwEAYDVQQHEwlNZWxib3VybmUxITAfBgNVBAoTGFRhYmNvcnAgSG9sZGluZ3MgTGltaXRlZDEXMBUGA1UEAxMOc3RzLnRhYi5jb20uYXUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD0NuMcflq3rtupKYDf4a7lWmsXy66fYe9n8jB2DuLMakEJBlzn9j6B98IZftrilTq21VR7wUXROxG8BkN8IHY+l8X7lATmD28fFdZJj0c8Qk82eoq48faemth4fBMx2YrpnhU00jeXeP8dIIaJTPCHBTNgZltMMhphklN1YEPlzefJs3YD+Ryczy1JHbwETxt+BzO1JdjBe1fUTyl6KxAwWvtsNBURmQRYlDOk4GRgdkQnfxBuCpOMeOpV8wiBAi3h65Lab9C5avu4AJlA9e4qbOmWt6otQmgy5fiJVy6bH/d8uW7FJmSmePX9sqAWa9szhjdn36HHVQsfHC+IUEX7AgMBAAGjgdUwgdIwHQYDVR0OBBYEFN6z6cuxY7FTkg1S/lIjnS4x5ARWMIGiBgNVHSMEgZowgZeAFN6z6cuxY7FTkg1S/lIjnS4x5ARWoXSkcjBwMQswCQYDVQQGEwJBVTERMA8GA1UECBMIVmljdG9yaWExEjAQBgNVBAcTCU1lbGJvdXJuZTEhMB8GA1UEChMYVGFiY29ycCBIb2xkaW5ncyBMaW1pdGVkMRcwFQYDVQQDEw5zdHMudGFiLmNvbS5hdYIJAKZgJdKdCdL6MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAMi5HyvXgRa4+kKz3dk4SwAEXzeZRcsbeDJWVUxdb6a+JQxIoG7L9rSbd6yZvP/Xel5TrcwpCpl5eikzXB02/C0wZKWicNmDEBlOfw0Pc5ngdoh6ntxHIWm5QMlAfjR0dgTlojN4Msw2qk7cP1QEkV96e2BJUaqaNnM3zMvd7cfRjPNfbsbwl6hCCCAdwrALKYtBnjKVrCGPwO+xiw5mUJhZ1n6ZivTOdQEWbl26UO60J9ItiWP8VK0d0aChn326Ovt7qC4S3AgDlaJwcKe5Ifxl/UOWePGRwXj2UUuDWFhjtVmRntMmNZbe5yE8MkEvU+4/c6LqGwTCgDenRbK53Dgg";
 
 export const noop = (): void => undefined;
 
-describe("passport-saml /", function () {
+describe("node-saml /", function () {
   describe("saml.js / ", function () {
     it("should throw an error if cert property is provided to saml constructor but is empty", function () {
       should(function () {
@@ -1926,149 +1926,149 @@ describe("passport-saml /", function () {
       message: /no start line/,
     });
   });
-});
 
-describe("validateRedirect()", function () {
-  describe("idp slo", function () {
-    let samlObj: SAML;
-    let fakeClock: sinon.SinonFakeTimers;
-    beforeEach(function () {
-      samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
-        idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
+  describe("validateRedirect()", function () {
+    describe("idp slo", function () {
+      let samlObj: SAML;
+      let fakeClock: sinon.SinonFakeTimers;
+      beforeEach(function () {
+        samlObj = new SAML({
+          cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
+          idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
+        });
+        this.request = Object.assign(
+          {},
+          JSON.parse(fs.readFileSync(__dirname + "/static/idp_slo_redirect.json", "utf8"))
+        );
+        fakeClock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
-      this.request = Object.assign(
-        {},
-        JSON.parse(fs.readFileSync(__dirname + "/static/idp_slo_redirect.json", "utf8"))
-      );
-      fakeClock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
-    });
-    afterEach(function () {
-      fakeClock.restore();
-    });
-    it("errors if bad xml", async function () {
-      const body = {
-        SAMLRequest: "asdf",
-      };
-      await assert.rejects(samlObj.validateRedirectAsync(body, this.request.originalQuery));
-    });
-    it("errors if idpIssuer is set and issuer is wrong", async function () {
-      samlObj.options.idpIssuer = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        {
-          message:
-            "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
-        }
-      );
-    });
-    it("errors if request has expired", async function () {
-      fakeClock.restore();
-      fakeClock = sinon.useFakeTimers(Date.parse("2100-04-11T14:08:00Z"));
+      afterEach(function () {
+        fakeClock.restore();
+      });
+      it("errors if bad xml", async function () {
+        const body = {
+          SAMLRequest: "asdf",
+        };
+        await assert.rejects(samlObj.validateRedirectAsync(body, this.request.originalQuery));
+      });
+      it("errors if idpIssuer is set and issuer is wrong", async function () {
+        samlObj.options.idpIssuer = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          {
+            message:
+              "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
+          }
+        );
+      });
+      it("errors if request has expired", async function () {
+        fakeClock.restore();
+        fakeClock = sinon.useFakeTimers(Date.parse("2100-04-11T14:08:00Z"));
 
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "SAML assertion expired" }
-      );
-    });
-    it("errors if request has a bad signature", async function () {
-      this.request.Signature = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "Invalid query signature" }
-      );
-    });
-    it("returns profile for valid signature including session index", async function () {
-      const { profile } = await samlObj.validateRedirectAsync(
-        this.request,
-        this.request.originalQuery
-      );
-      profile!.should.eql({
-        ID: "_8f0effde308adfb6ae7f1e29b414957fc320f5636f",
-        issuer: "http://localhost:20000/saml2/idp/metadata.php",
-        nameID: "stavros@workable.com",
-        nameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        sessionIndex: "_00bf7b2d5d9d3c970217eecefb1194bef3362a618e",
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "SAML assertion expired" }
+        );
+      });
+      it("errors if request has a bad signature", async function () {
+        this.request.Signature = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "Invalid query signature" }
+        );
+      });
+      it("returns profile for valid signature including session index", async function () {
+        const { profile } = await samlObj.validateRedirectAsync(
+          this.request,
+          this.request.originalQuery
+        );
+        profile!.should.eql({
+          ID: "_8f0effde308adfb6ae7f1e29b414957fc320f5636f",
+          issuer: "http://localhost:20000/saml2/idp/metadata.php",
+          nameID: "stavros@workable.com",
+          nameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+          sessionIndex: "_00bf7b2d5d9d3c970217eecefb1194bef3362a618e",
+        });
       });
     });
-  });
-  describe("sp slo", function () {
-    let samlObj: SAML;
+    describe("sp slo", function () {
+      let samlObj: SAML;
 
-    beforeEach(function () {
-      samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
-        idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
-        validateInResponseTo: true,
+      beforeEach(function () {
+        samlObj = new SAML({
+          cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
+          idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
+          validateInResponseTo: true,
+        });
+        this.request = Object.assign(
+          {},
+          JSON.parse(fs.readFileSync(__dirname + "/static/sp_slo_redirect.json", "utf8"))
+        );
       });
-      this.request = Object.assign(
-        {},
-        JSON.parse(fs.readFileSync(__dirname + "/static/sp_slo_redirect.json", "utf8"))
-      );
-    });
-    afterEach(async function () {
-      await samlObj.cacheProvider.removeAsync("_79db1e7ad12ca1d63e5b");
-    });
-    it("errors if bad xml", async function () {
-      const body = {
-        SAMLRequest: "asdf",
-      };
-      await assert.rejects(samlObj.validateRedirectAsync(body, null));
-    });
-    it("errors if idpIssuer is set and wrong issuer", async function () {
-      samlObj.options.idpIssuer = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        {
-          message:
-            "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
-        }
-      );
-    });
-    it("errors if unsuccessful", async function () {
-      this.request = JSON.parse(
-        fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json", "utf8")
-      );
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester" }
-      );
-    });
-    it("errors if InResponseTo is not found", async function () {
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "InResponseTo is not valid" }
-      );
-    });
-    it("errors if bad signature", async function () {
-      await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
-      this.request.Signature = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "Invalid query signature" }
-      );
-    });
+      afterEach(async function () {
+        await samlObj.cacheProvider.removeAsync("_79db1e7ad12ca1d63e5b");
+      });
+      it("errors if bad xml", async function () {
+        const body = {
+          SAMLRequest: "asdf",
+        };
+        await assert.rejects(samlObj.validateRedirectAsync(body, null));
+      });
+      it("errors if idpIssuer is set and wrong issuer", async function () {
+        samlObj.options.idpIssuer = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          {
+            message:
+              "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
+          }
+        );
+      });
+      it("errors if unsuccessful", async function () {
+        this.request = JSON.parse(
+          fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json", "utf8")
+        );
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester" }
+        );
+      });
+      it("errors if InResponseTo is not found", async function () {
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "InResponseTo is not valid" }
+        );
+      });
+      it("errors if bad signature", async function () {
+        await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
+        this.request.Signature = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "Invalid query signature" }
+        );
+      });
 
-    it("returns true for valid signature", async function () {
-      await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
-      const { loggedOut } = await samlObj.validateRedirectAsync(
-        this.request,
-        this.request.originalQuery
-      );
-      loggedOut!.should.eql(true);
-    });
+      it("returns true for valid signature", async function () {
+        await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
+        const { loggedOut } = await samlObj.validateRedirectAsync(
+          this.request,
+          this.request.originalQuery
+        );
+        loggedOut!.should.eql(true);
+      });
 
-    it("accepts cert without header and footer line", async function () {
-      samlObj.options.cert = fs.readFileSync(
-        __dirname + "/static/acme_tools_com_without_header_and_footer.cert",
-        "ascii"
-      );
-      await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
-      const { loggedOut } = await samlObj.validateRedirectAsync(
-        this.request,
-        this.request.originalQuery
-      );
-      loggedOut!.should.eql(true);
+      it("accepts cert without header and footer line", async function () {
+        samlObj.options.cert = fs.readFileSync(
+          __dirname + "/static/acme_tools_com_without_header_and_footer.cert",
+          "ascii"
+        );
+        await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
+        const { loggedOut } = await samlObj.validateRedirectAsync(
+          this.request,
+          this.request.originalQuery
+        );
+        loggedOut!.should.eql(true);
+      });
     });
   });
 });

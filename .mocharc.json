@@ -2,6 +2,7 @@
   "diff": true,
   "extension": "spec.ts",
   "package": "./package.json",
+  "recursive": true,
   "reporter": "spec",
   "require": ["choma", "ts-node/register"],
   "files": "test/**/*.spec.ts",

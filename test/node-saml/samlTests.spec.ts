@@ -3,10 +3,10 @@ import * as fs from "fs";
 import * as url from "url";
 import * as should from "should";
 import assert = require("assert");
-import { SAML } from "../src/passport-saml/saml";
-import { RequestWithUser, AuthenticateOptions, AuthorizeOptions } from "../src/passport-saml/types";
-import { assertRequired } from "../src/passport-saml/utility";
-import { FAKE_CERT } from "./types";
+import { SAML } from "../../src/node-saml/saml";
+import { RequestWithUser, AuthenticateOptions, AuthorizeOptions } from "../../src/passport-saml/types";
+import { assertRequired } from "../../src/node-saml/utility";
+import { FAKE_CERT } from "../types";
 
 describe("SAML.js", function () {
   describe("get Urls", function () {
