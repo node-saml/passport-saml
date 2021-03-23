@@ -1,12 +1,10 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
-import * as saml from "../node-saml/saml";
+import {SAML} from "../node-saml";
 import * as url from "url";
 import {
   AuthenticateOptions,
-  AuthorizeOptions,
   RequestWithUser,
   SamlConfig,
-  StrategyOptions,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
@@ -17,7 +15,7 @@ class Strategy extends PassportStrategy {
 
   name: string;
   _verify: VerifyWithRequest | VerifyWithoutRequest;
-  _saml: saml.SAML | undefined;
+  _saml: SAML | undefined;
   _passReqToCallback?: boolean;
 
   constructor(options: SamlConfig, verify: VerifyWithRequest);
@@ -42,7 +40,7 @@ class Strategy extends PassportStrategy {
 
     this._verify = verify;
     if ((this.constructor as typeof Strategy).newSamlProviderOnConstruct) {
-      this._saml = new saml.SAML(options);
+      this._saml = new SAML(options);
     }
     this._passReqToCallback = !!options.passReqToCallback;
   }

@@ -1,11 +1,9 @@
 import * as util from "util";
-import * as saml from "../node-saml/saml";
-import { CacheProvider as InMemoryCacheProvider } from "../node-saml/inmemory-cache-provider";
+import {SAML} from "../node-saml";
 import SamlStrategy = require("./strategy");
 import type { Request } from "express";
 import {
   AuthenticateOptions,
-  AuthorizeOptions,
   MultiSamlConfig,
   RequestWithUser,
   SamlConfig,
@@ -42,7 +40,7 @@ class MultiSamlStrategy extends SamlStrategy {
         return this.error(err);
       }
 
-      const samlService = new saml.SAML({ ...this._options, ...samlOptions });
+      const samlService = new SAML({ ...this._options, ...samlOptions });
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.authenticate.call(strategy, req, options);
@@ -58,7 +56,7 @@ class MultiSamlStrategy extends SamlStrategy {
         return callback(err);
       }
 
-      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.logout.call(strategy, req, callback);
@@ -81,7 +79,7 @@ class MultiSamlStrategy extends SamlStrategy {
         return callback(err);
       }
 
-      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       return callback(
