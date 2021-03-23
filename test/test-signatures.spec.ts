@@ -1,7 +1,7 @@
-import { SAML } from "../lib/passport-saml/index.js";
+import { SAML } from "../src/passport-saml";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import { SamlConfig } from "../lib/passport-saml/types.js";
+import { SamlConfig } from "../src/passport-saml/types";
 import assert = require("assert");
 
 const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
