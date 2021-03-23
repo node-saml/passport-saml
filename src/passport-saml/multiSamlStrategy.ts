@@ -1,5 +1,5 @@
 import * as util from "util";
-import {SAML} from "../node-saml";
+import { SAML } from "../node-saml";
 import SamlStrategy = require("./strategy");
 import type { Request } from "express";
 import {

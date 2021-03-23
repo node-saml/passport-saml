@@ -17,20 +17,22 @@ import type { Request } from "express";
 import { ParsedQs } from "qs";
 import {
   AudienceRestrictionXML,
-  AuthenticateOptions,
-  AuthorizeOptions,
   AuthorizeRequestXML,
   CertCallback,
   LogoutRequestXML,
-  Profile,
-  RequestWithUser,
-  SamlOptions,
   SamlIDPListConfig,
   SamlIDPEntryConfig,
   ServiceMetadataXML,
   XMLInput,
   XMLObject,
   XMLOutput,
+} from "./types";
+import {
+  AuthenticateOptions,
+  AuthorizeOptions,
+  Profile,
+  RequestWithUser,
+  SamlOptions,
   SamlConfig,
 } from "../passport-saml/types";
 import { assertRequired } from "./utility";

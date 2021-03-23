@@ -1,11 +1,12 @@
 import type * as express from "express";
 import * as passport from "passport";
 import type { CacheProvider } from "../node-saml/inmemory-cache-provider";
-import type { SamlSigningOptions } from "../node-saml/types";
+import type {
+  SamlSigningOptions,
+  MandatorySamlOptions,
+  SamlIDPListConfig,
+} from "../node-saml/types";
 
-export type CertCallback = (
-  callback: (err: Error | null, cert?: string | string[]) => void
-) => void;
 export type RacComparision = "exact" | "minimum" | "maximum" | "better";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
@@ -15,13 +16,6 @@ export interface AuthenticateOptions extends passport.AuthenticateOptions {
 
 export interface AuthorizeOptions extends AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
-}
-
-/**
- * These are SAML options that must be provided to construct a new SAML Strategy
- */
-export interface MandatorySamlOptions {
-  cert: string | string[] | CertCallback;
 }
 
 /**
@@ -84,49 +78,6 @@ export interface SamlScopingConfig {
   idpList?: SamlIDPListConfig[];
   proxyCount?: number;
   requesterId?: string[] | string;
-}
-
-export type XMLValue = string | number | boolean | null | XMLObject | XMLValue[];
-
-export type XMLObject = {
-  [key: string]: XMLValue;
-};
-
-export type XMLInput = XMLObject;
-
-export interface AuthorizeRequestXML {
-  "samlp:AuthnRequest": XMLInput;
-}
-
-export interface LogoutRequestXML {
-  "samlp:LogoutRequest": {
-    "saml:NameID": XMLInput;
-    [key: string]: XMLValue;
-  };
-}
-
-export interface ServiceMetadataXML {
-  EntityDescriptor: {
-    [key: string]: XMLValue;
-    SPSSODescriptor: XMLObject;
-  };
-}
-
-export interface AudienceRestrictionXML {
-  Audience?: XMLObject[];
-}
-
-export type XMLOutput = Record<string, any>;
-
-export interface SamlIDPListConfig {
-  entries: SamlIDPEntryConfig[];
-  getComplete?: string;
-}
-
-export interface SamlIDPEntryConfig {
-  providerId: string;
-  name?: string;
-  loc?: string;
 }
 
 export interface Profile {
