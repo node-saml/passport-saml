@@ -26,14 +26,14 @@ describe("node-saml /", function () {
       }).throw("cert is required");
     });
 
-    it("generateUniqueID should generate 20 char IDs", function () {
+    it("_generateUniqueID should generate 20 char IDs", function () {
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       for (let i = 0; i < 200; i++) {
-        samlObj.generateUniqueID().length.should.eql(20);
+        samlObj._generateUniqueID().length.should.eql(20);
       }
     });
 
-    it("generateLogoutRequest", function (done) {
+    it("_generateLogoutRequest", function (done) {
       try {
         const expectedRequest = {
           "samlp:LogoutRequest": {
@@ -53,7 +53,7 @@ describe("node-saml /", function () {
         };
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-        const logoutRequestPromise = samlObj.generateLogoutRequest({
+        const logoutRequestPromise = samlObj._generateLogoutRequest({
           user: {
             nameIDFormat: "foo",
             nameID: "bar",
@@ -81,7 +81,7 @@ describe("node-saml /", function () {
       }
     });
 
-    it("generateLogoutRequest adds the NameQualifier and SPNameQualifier to the saml request", function (done) {
+    it("_generateLogoutRequest adds the NameQualifier and SPNameQualifier to the saml request", function (done) {
       try {
         const expectedRequest = {
           "samlp:LogoutRequest": {
@@ -110,7 +110,7 @@ describe("node-saml /", function () {
         };
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-        const logoutRequestPromise = samlObj.generateLogoutRequest({
+        const logoutRequestPromise = samlObj._generateLogoutRequest({
           user: {
             nameIDFormat: "foo",
             nameID: "bar",
@@ -140,7 +140,7 @@ describe("node-saml /", function () {
       }
     });
 
-    it("generateLogoutResponse", function (done) {
+    it("_generateLogoutResponse", function (done) {
       const expectedResponse = {
         "samlp:LogoutResponse": {
           $: {
@@ -162,7 +162,7 @@ describe("node-saml /", function () {
       };
 
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-      const logoutRequest = samlObj.generateLogoutResponse({} as express.Request, { ID: "quux" });
+      const logoutRequest = samlObj._generateLogoutResponse({} as express.Request, { ID: "quux" });
       parseString(logoutRequest, function (err, doc) {
         try {
           delete doc["samlp:LogoutResponse"]["$"]["ID"];
@@ -175,7 +175,7 @@ describe("node-saml /", function () {
       });
     });
 
-    it("generateLogoutRequest with session index", function (done) {
+    it("_generateLogoutRequest with session index", function (done) {
       try {
         const expectedRequest = {
           "samlp:LogoutRequest": {
@@ -198,7 +198,7 @@ describe("node-saml /", function () {
         };
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-        const logoutRequestPromise = samlObj.generateLogoutRequest({
+        const logoutRequestPromise = samlObj._generateLogoutRequest({
           user: {
             nameIDFormat: "foo",
             nameID: "bar",
@@ -227,7 +227,7 @@ describe("node-saml /", function () {
       }
     });
 
-    it("generateLogoutRequest saves id and instant to cache", function (done) {
+    it("_generateLogoutRequest saves id and instant to cache", function (done) {
       const expectedRequest = {
         "samlp:LogoutRequest": {
           $: {
@@ -250,7 +250,7 @@ describe("node-saml /", function () {
 
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       const cacheSaveSpy = sinon.spy(samlObj.cacheProvider, "saveAsync");
-      const logoutRequestPromise = samlObj.generateLogoutRequest({
+      const logoutRequestPromise = samlObj._generateLogoutRequest({
         user: {
           nameIDFormat: "foo",
           nameID: "bar",
@@ -447,14 +447,14 @@ describe("node-saml /", function () {
       metadata.should.containEql('WantAssertionsSigned="true"');
     });
 
-    it("#certToPEM should generate valid certificate", function () {
+    it("#_certToPEM should generate valid certificate", function () {
       const samlConfig = {
         entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
         cert: "-----BEGIN CERTIFICATE-----" + TEST_CERT + "-----END CERTIFICATE-----",
         acceptedClockSkewMs: -1,
       };
       const samlObj = new SAML(samlConfig);
-      const certificate = samlObj.certToPEM(samlConfig.cert);
+      const certificate = samlObj._certToPEM(samlConfig.cert);
 
       if (!(certificate.match(/BEGIN/g)!.length == 1 && certificate.match(/END/g)!.length == 1)) {
         throw Error("Certificate should have only 1 BEGIN and 1 END block");
@@ -922,7 +922,7 @@ describe("node-saml /", function () {
           cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
         const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
@@ -950,13 +950,13 @@ describe("node-saml /", function () {
           cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
 
         const request =
           '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-        await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+        await assert.rejects(samlObj._requestToUrlAsync(request, null, "authorize", {}), {
           message: "entryPoint is required",
         });
       });
@@ -976,7 +976,7 @@ describe("node-saml /", function () {
           cert: fs.readFileSync(__dirname + "/../static/acme_tools_com.cert", "utf-8"),
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
         const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
@@ -1004,7 +1004,7 @@ describe("node-saml /", function () {
           cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
         const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
@@ -1017,7 +1017,7 @@ describe("node-saml /", function () {
       });
     });
 
-    describe("getAdditionalParams checks /", function () {
+    describe("_getAdditionalParams checks /", function () {
       it("should not pass any additional params by default", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
@@ -1026,7 +1026,7 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams({} as express.Request, operation);
+          const additionalParams = samlObj._getAdditionalParams({} as express.Request, operation);
           additionalParams.should.be.empty;
         });
       });
@@ -1039,7 +1039,7 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams(
+          const additionalParams = samlObj._getAdditionalParams(
             ({ query: { RelayState: "test" } } as unknown) as express.Request,
             operation
           );
@@ -1057,7 +1057,7 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams(
+          const additionalParams = samlObj._getAdditionalParams(
             { body: { RelayState: "test" } } as express.Request,
             operation
           );
@@ -1078,7 +1078,7 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams({} as express.Request, operation);
+          const additionalParams = samlObj._getAdditionalParams({} as express.Request, operation);
           Object.keys(additionalParams).should.have.length(1);
           additionalParams.should.containEql({ queryParam: "queryParamValue" });
         });
@@ -1094,14 +1094,17 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "authorize"
         );
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValue" });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams(
+          {} as express.Request,
+          "logout"
+        );
         additionalLogoutParams.should.be.empty;
       });
 
@@ -1115,13 +1118,16 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "authorize"
         );
         additionalAuthorizeParams.should.be.empty;
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams(
+          {} as express.Request,
+          "logout"
+        );
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({ queryParam: "queryParamValue" });
       });
@@ -1142,7 +1148,7 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "authorize"
         );
@@ -1152,7 +1158,10 @@ describe("node-saml /", function () {
           queryParam2: "queryParamValueAuthorize",
         });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams(
+          {} as express.Request,
+          "logout"
+        );
         Object.keys(additionalLogoutParams).should.have.length(2);
         additionalLogoutParams.should.containEql({
           queryParam1: "queryParamValue",
@@ -1181,7 +1190,7 @@ describe("node-saml /", function () {
           },
         };
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "authorize",
           options.additionalParams
@@ -1193,7 +1202,7 @@ describe("node-saml /", function () {
           queryParam3: "queryParamRuntimeValue",
         });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams(
+        const additionalLogoutParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "logout",
           options.additionalParams
@@ -1222,14 +1231,17 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "authorize"
         );
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValueAuthorize" });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams(
+          {} as express.Request,
+          "logout"
+        );
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({ queryParam: "queryParamValueLogout" });
       });
@@ -1255,7 +1267,7 @@ describe("node-saml /", function () {
           },
         };
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "authorize",
           options.additionalParams
@@ -1263,7 +1275,7 @@ describe("node-saml /", function () {
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamRuntimeValue" });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams(
+        const additionalLogoutParams = samlObj._getAdditionalParams(
           {} as express.Request,
           "logout",
           options.additionalParams
@@ -1926,7 +1938,7 @@ describe("node-saml /", function () {
     });
     const request =
       '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-    await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+    await assert.rejects(samlObj._requestToUrlAsync(request, null, "authorize", {}), {
       message: /no start line/,
     });
   });

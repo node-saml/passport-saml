@@ -64,7 +64,7 @@ async function processValidlySignedPostRequestAsync(
     } else {
       throw new Error("Missing SAML issuer");
     }
-    const nameID = await self.getNameIdAsync(self, dom);
+    const nameID = await self._getNameIdAsync(self, dom);
     if (nameID) {
       profile.nameID = nameID.value!;
       if (nameID.format) {
@@ -109,6 +109,8 @@ async function promiseWithNameID(nameid: Node): Promise<NameID> {
 }
 
 class SAML {
+  // not that some methods in SAML are not yet marked as private as they are used in testing.
+  // those methods start with an underscore, e.g. _generateUniqueID
   options: SamlOptions;
   // This is only for testing
   cacheProvider!: InMemoryCacheProvider;
@@ -178,7 +180,7 @@ class SAML {
     return this.options.protocol || (req.protocol || "http").concat("://");
   }
 
-  getCallbackUrl(req: Request | { headers?: undefined; protocol?: undefined }) {
+  private getCallbackUrl(req: Request | { headers?: undefined; protocol?: undefined }) {
     // Post-auth destination
     if (this.options.callbackUrl) {
       return this.options.callbackUrl;
@@ -193,15 +195,15 @@ class SAML {
     }
   }
 
-  generateUniqueID() {
+  _generateUniqueID() {
     return crypto.randomBytes(10).toString("hex");
   }
 
-  generateInstant() {
+  private generateInstant() {
     return new Date().toISOString();
   }
 
-  signRequest(samlMessage: querystring.ParsedUrlQueryInput): void {
+  private signRequest(samlMessage: querystring.ParsedUrlQueryInput): void {
     this.options.privateKey = assertRequired(this.options.privateKey, "privateKey is required");
 
     const samlMessageToSign: querystring.ParsedUrlQueryInput = {};
@@ -220,17 +222,17 @@ class SAML {
       samlMessageToSign.SigAlg = samlMessage.SigAlg;
     }
     signer.update(querystring.stringify(samlMessageToSign));
-    samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateKey), "base64");
+    samlMessage.Signature = signer.sign(this._keyToPEM(this.options.privateKey), "base64");
   }
 
-  async generateAuthorizeRequestAsync(
+  private async generateAuthorizeRequestAsync(
     req: Request,
     isPassive: boolean,
     isHttpPostBinding: boolean
   ): Promise<string | undefined> {
     this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
 
-    const id = "_" + this.generateUniqueID();
+    const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
     if (this.options.validateInResponseTo) {
@@ -356,8 +358,8 @@ class SAML {
     return stringRequest;
   }
 
-  async generateLogoutRequest(req: RequestWithUser) {
-    const id = "_" + this.generateUniqueID();
+  async _generateLogoutRequest(req: RequestWithUser) {
+    const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
     const request = {
@@ -398,8 +400,8 @@ class SAML {
     return xmlbuilder.create((request as unknown) as Record<string, any>).end();
   }
 
-  generateLogoutResponse(req: Request, logoutRequest: Profile) {
-    const id = "_" + this.generateUniqueID();
+  _generateLogoutResponse(req: Request, logoutRequest: Profile) {
+    const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
     const request = {
@@ -425,7 +427,7 @@ class SAML {
     return xmlbuilder.create(request).end();
   }
 
-  async requestToUrlAsync(
+  async _requestToUrlAsync(
     request: string | null | undefined,
     response: string | null,
     operation: string,
@@ -480,7 +482,7 @@ class SAML {
     return url.format(target);
   }
 
-  getAdditionalParams(
+  _getAdditionalParams(
     req: Request,
     operation: string,
     overrideParams?: querystring.ParsedUrlQuery
@@ -521,11 +523,11 @@ class SAML {
     const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, false);
     const operation = "authorize";
     const overrideParams = options ? options.additionalParams || {} : {};
-    return await this.requestToUrlAsync(
+    return await this._requestToUrlAsync(
       request,
       null,
       operation,
-      this.getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(req, operation, overrideParams)
     );
   }
 
@@ -571,7 +573,7 @@ class SAML {
     }
 
     const operation = "authorize";
-    const additionalParameters = this.getAdditionalParams(req, operation);
+    const additionalParameters = this._getAdditionalParams(req, operation);
     const samlMessage: querystring.ParsedUrlQueryInput = {
       SAMLRequest: buffer!.toString("base64"),
     };
@@ -608,14 +610,14 @@ class SAML {
   }
 
   async getLogoutUrlAsync(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
-    const request = await this.generateLogoutRequest(req);
+    const request = await this._generateLogoutRequest(req);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
-    return await this.requestToUrlAsync(
+    return await this._requestToUrlAsync(
       request,
       null,
       operation,
-      this.getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(req, operation, overrideParams)
     );
   }
 
@@ -630,18 +632,18 @@ class SAML {
     req: RequestWithUser,
     options: AuthenticateOptions & AuthorizeOptions
   ): Promise<string> {
-    const response = this.generateLogoutResponse(req, req.samlLogoutRequest);
+    const response = this._generateLogoutResponse(req, req.samlLogoutRequest);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
-    return await this.requestToUrlAsync(
+    return await this._requestToUrlAsync(
       null,
       response,
       operation,
-      this.getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(req, operation, overrideParams)
     );
   }
 
-  certToPEM(cert: string): string {
+  _certToPEM(cert: string): string {
     cert = cert.match(/.{1,64}/g)!.join("\n");
 
     if (cert.indexOf("-BEGIN CERTIFICATE-") === -1) cert = "-----BEGIN CERTIFICATE-----\n" + cert;
@@ -650,7 +652,7 @@ class SAML {
     return cert;
   }
 
-  async certsToCheck(): Promise<string[]> {
+  private async certsToCheck(): Promise<string[]> {
     let checkedCerts: string[];
 
     if (typeof this.options.cert === "function") {
@@ -714,7 +716,7 @@ class SAML {
     sig.keyInfoProvider = {
       file: "",
       getKeyInfo: () => "<X509Data></X509Data>",
-      getKey: () => Buffer.from(this.certToPEM(cert)),
+      getKey: () => Buffer.from(this._certToPEM(cert)),
     };
     signature = this.normalizeNewlines(signature.toString());
     sig.loadSignature(signature);
@@ -909,7 +911,7 @@ class SAML {
     }
   }
 
-  async validateInResponseTo(inResponseTo: string | null): Promise<undefined> {
+  private async validateInResponseTo(inResponseTo: string | null): Promise<undefined> {
     if (this.options.validateInResponseTo) {
       if (inResponseTo) {
         const result = await this.cacheProvider.getAsync(inResponseTo);
@@ -947,7 +949,7 @@ class SAML {
     return await processValidlySignedSamlLogoutAsync(this, doc, dom);
   }
 
-  async hasValidSignatureForRedirect(
+  private async hasValidSignatureForRedirect(
     container: ParsedQs,
     originalQuery: string | null
   ): Promise<boolean | void> {
@@ -985,7 +987,7 @@ class SAML {
     }
   }
 
-  validateSignatureForRedirect(
+  private validateSignatureForRedirect(
     urlString: crypto.BinaryLike,
     signature: string,
     alg: string,
@@ -1009,10 +1011,10 @@ class SAML {
     const verifier = crypto.createVerify(matchingAlgo);
     verifier.update(urlString);
 
-    return verifier.verify(this.certToPEM(cert), signature, "base64");
+    return verifier.verify(this._certToPEM(cert), signature, "base64");
   }
 
-  verifyLogoutRequest(doc: XMLOutput) {
+  private verifyLogoutRequest(doc: XMLOutput) {
     this.verifyIssuer(doc.LogoutRequest);
     const nowMs = new Date().getTime();
     const conditions = doc.LogoutRequest.$;
@@ -1026,7 +1028,7 @@ class SAML {
     }
   }
 
-  async verifyLogoutResponse(doc: XMLOutput) {
+  private async verifyLogoutResponse(doc: XMLOutput) {
     const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
     if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
       throw new Error("Bad status code: " + statusCode);
@@ -1040,7 +1042,7 @@ class SAML {
     return true;
   }
 
-  verifyIssuer(samlMessage: XMLOutput) {
+  private verifyIssuer(samlMessage: XMLOutput) {
     if (this.options.idpIssuer != null) {
       const issuer = samlMessage.Issuer;
       if (issuer) {
@@ -1054,7 +1056,7 @@ class SAML {
     }
   }
 
-  async processValidlySignedAssertionAsync(
+  private async processValidlySignedAssertionAsync(
     xml: xml2js.convertableToString,
     samlResponseXml: string,
     inResponseTo: string
@@ -1233,7 +1235,7 @@ class SAML {
     return { profile, loggedOut: false };
   }
 
-  checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
+  private checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
     if (this.options.acceptedClockSkewMs == -1) return null;
 
     if (notBefore) {
@@ -1250,7 +1252,7 @@ class SAML {
     return null;
   }
 
-  checkAudienceValidityError(
+  private checkAudienceValidityError(
     expectedAudience: string,
     audienceRestrictions: AudienceRestrictionXML[]
   ) {
@@ -1295,7 +1297,7 @@ class SAML {
     return await processValidlySignedPostRequestAsync(this, doc, dom);
   }
 
-  async getNameIdAsync(self: SAML, doc: Node): Promise<NameID> {
+  async _getNameIdAsync(self: SAML, doc: Node): Promise<NameID> {
     const nameIds = xmlCrypto.xpath(
       doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='NameID']"
@@ -1436,7 +1438,7 @@ class SAML {
       .end({ pretty: true, indent: "  ", newline: "\n" });
   }
 
-  keyToPEM(key: string | Buffer): typeof key extends string | Buffer ? string | Buffer : Error {
+  _keyToPEM(key: string | Buffer): typeof key extends string | Buffer ? string | Buffer : Error {
     key = assertRequired(key, "key is required");
 
     if (typeof key !== "string") return key;
