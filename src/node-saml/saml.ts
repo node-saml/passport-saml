@@ -1,5 +1,5 @@
 import Debug from "debug";
-const debug = Debug("passport-saml");
+const debug = Debug("node-saml");
 import * as zlib from "zlib";
 import * as xml2js from "xml2js";
 import * as xmlCrypto from "xml-crypto";
