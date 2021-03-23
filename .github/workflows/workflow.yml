@@ -21,7 +21,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
+      - run: npm ci
+      - run: npm test
+      - run: npm ci
+      - run: npm --depth 9999 update
       - run: npm test
         env:
           CI: true
