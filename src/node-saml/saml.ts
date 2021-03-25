@@ -5,7 +5,7 @@ import * as xml2js from "xml2js";
 import * as xmlCrypto from "xml-crypto";
 import * as crypto from "crypto";
 import * as xmldom from "xmldom";
-import * as url from "url";
+import { URL } from "url";
 import * as querystring from "querystring";
 import * as xmlbuilder from "xmlbuilder";
 import * as xmlenc from "xml-encryption";
@@ -443,11 +443,11 @@ class SAML {
     }
 
     const base64 = buffer.toString("base64");
-    let target = url.parse(this.options.entryPoint, true);
+    let target = new URL(this.options.entryPoint);
 
     if (operation === "logout") {
       if (this.options.logoutUrl) {
-        target = url.parse(this.options.logoutUrl, true);
+        target = new URL(this.options.logoutUrl);
       }
     } else if (operation !== "authorize") {
       throw new Error("Unknown operation: " + operation);
@@ -472,14 +472,10 @@ class SAML {
       this.signRequest(samlMessage);
     }
     Object.keys(samlMessage).forEach((k) => {
-      target.query[k] = samlMessage[k];
+      target.searchParams.append(k, samlMessage[k] as string);
     });
 
-    // Delete 'search' to for pulling query string from 'query'
-    // https://nodejs.org/api/url.html#url_url_format_urlobj
-    target.search = null;
-
-    return url.format(target);
+    return target.toString();
   }
 
   _getAdditionalParams(

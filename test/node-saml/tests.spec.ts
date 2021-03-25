@@ -1907,7 +1907,7 @@ describe("node-saml /", function () {
 
   it("errors if bad privateKey to requestToURL", async () => {
     const samlObj = new SAML({
-      entryPoint: "foo",
+      entryPoint: "http://localhost",
       privateKey:
         "-----BEGIN CERTIFICATE-----\n" +
         "8mvhvrcCOiJ3mjgKNN1F31jOBJuZNmq0U7n9v+Z+3NfyU/0E9jkrnFvm5ks+p8kl\n" +
