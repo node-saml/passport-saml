@@ -13,7 +13,6 @@ import * as util from "util";
 import { CacheProvider as InMemoryCacheProvider } from "./inmemory-cache-provider";
 import * as algorithms from "./algorithms";
 import { signAuthnRequestPost } from "./saml-post-signing";
-import type { Request } from "express";
 import { ParsedQs } from "qs";
 import {
   AudienceRestrictionXML,
@@ -28,13 +27,7 @@ import {
   XMLObject,
   XMLOutput,
 } from "./types";
-import {
-  AuthenticateOptions,
-  AuthorizeOptions,
-  Profile,
-  RequestWithUser,
-  SamlConfig,
-} from "../passport-saml/types";
+import { AuthenticateOptions, AuthorizeOptions, Profile, SamlConfig } from "../passport-saml/types";
 import { assertRequired } from "./utility";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
@@ -176,22 +169,22 @@ class SAML {
     return options;
   }
 
-  getProtocol(req: Request | { headers?: undefined; protocol?: undefined }) {
-    return this.options.protocol || (req.protocol || "http").concat("://");
-  }
-
-  private getCallbackUrl(req: Request | { headers?: undefined; protocol?: undefined }) {
+  private getCallbackUrl(host?: string | undefined) {
     // Post-auth destination
     if (this.options.callbackUrl) {
       return this.options.callbackUrl;
     } else {
-      let host;
-      if (req.headers) {
-        host = req.headers.host;
+      const url = new URL("http://localhost");
+      if (host) {
+        url.host = host;
       } else {
-        host = this.options.host;
+        url.host = this.options.host;
       }
-      return this.getProtocol(req) + host + this.options.path;
+      if (this.options.protocol) {
+        url.protocol = this.options.protocol;
+      }
+      url.pathname = this.options.path;
+      return url.toString();
     }
   }
 
@@ -226,9 +219,9 @@ class SAML {
   }
 
   private async generateAuthorizeRequestAsync(
-    req: Request,
     isPassive: boolean,
-    isHttpPostBinding: boolean
+    isHttpPostBinding: boolean,
+    host: string | undefined
   ): Promise<string | undefined> {
     this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
 
@@ -260,7 +253,7 @@ class SAML {
     }
 
     if (!this.options.disableRequestAcsUrl) {
-      request["samlp:AuthnRequest"]["@AssertionConsumerServiceURL"] = this.getCallbackUrl(req);
+      request["samlp:AuthnRequest"]["@AssertionConsumerServiceURL"] = this.getCallbackUrl(host);
     }
 
     if (this.options.identifierFormat != null) {
@@ -358,7 +351,7 @@ class SAML {
     return stringRequest;
   }
 
-  async _generateLogoutRequest(req: RequestWithUser) {
+  async _generateLogoutRequest(user: Profile) {
     const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
@@ -375,24 +368,24 @@ class SAML {
           "#text": this.options.issuer,
         },
         "saml:NameID": {
-          "@Format": req.user!.nameIDFormat,
-          "#text": req.user!.nameID,
+          "@Format": user!.nameIDFormat,
+          "#text": user!.nameID,
         },
       },
     } as LogoutRequestXML;
 
-    if (req.user!.nameQualifier != null) {
-      request["samlp:LogoutRequest"]["saml:NameID"]["@NameQualifier"] = req.user!.nameQualifier;
+    if (user!.nameQualifier != null) {
+      request["samlp:LogoutRequest"]["saml:NameID"]["@NameQualifier"] = user!.nameQualifier;
     }
 
-    if (req.user!.spNameQualifier != null) {
-      request["samlp:LogoutRequest"]["saml:NameID"]["@SPNameQualifier"] = req.user!.spNameQualifier;
+    if (user!.spNameQualifier != null) {
+      request["samlp:LogoutRequest"]["saml:NameID"]["@SPNameQualifier"] = user!.spNameQualifier;
     }
 
-    if (req.user!.sessionIndex) {
+    if (user!.sessionIndex) {
       request["samlp:LogoutRequest"]["saml2p:SessionIndex"] = {
         "@xmlns:saml2p": "urn:oasis:names:tc:SAML:2.0:protocol",
-        "#text": req.user!.sessionIndex,
+        "#text": user!.sessionIndex,
       };
     }
 
@@ -400,7 +393,7 @@ class SAML {
     return xmlbuilder.create((request as unknown) as Record<string, any>).end();
   }
 
-  _generateLogoutResponse(req: Request, logoutRequest: Profile) {
+  _generateLogoutResponse(logoutRequest: Profile) {
     const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
@@ -479,13 +472,12 @@ class SAML {
   }
 
   _getAdditionalParams(
-    req: Request,
+    RelayState: string,
     operation: string,
     overrideParams?: querystring.ParsedUrlQuery
   ): querystring.ParsedUrlQuery {
     const additionalParams: querystring.ParsedUrlQuery = {};
 
-    const RelayState = (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
     if (RelayState) {
       additionalParams.RelayState = RelayState;
     }
@@ -515,19 +507,23 @@ class SAML {
     return additionalParams;
   }
 
-  async getAuthorizeUrlAsync(req: Request, options: AuthorizeOptions): Promise<string> {
-    const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, false);
+  async getAuthorizeUrlAsync(
+    RelayState: string,
+    host: string | undefined,
+    options: AuthorizeOptions
+  ): Promise<string> {
+    const request = await this.generateAuthorizeRequestAsync(this.options.passive, false, host);
     const operation = "authorize";
     const overrideParams = options ? options.additionalParams || {} : {};
     return await this._requestToUrlAsync(
       request,
       null,
       operation,
-      this._getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(RelayState, operation, overrideParams)
     );
   }
 
-  async getAuthorizeFormAsync(req: Request): Promise<string> {
+  async getAuthorizeFormAsync(RelayState: string, host: string | undefined): Promise<string> {
     this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
 
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
@@ -560,7 +556,7 @@ class SAML {
       );
     };
 
-    const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, true);
+    const request = await this.generateAuthorizeRequestAsync(this.options.passive, true, host);
     let buffer: Buffer;
     if (this.options.skipRequestCompression) {
       buffer = Buffer.from(request!, "utf8");
@@ -569,7 +565,7 @@ class SAML {
     }
 
     const operation = "authorize";
-    const additionalParameters = this._getAdditionalParams(req, operation);
+    const additionalParameters = this._getAdditionalParams(RelayState, operation);
     const samlMessage: querystring.ParsedUrlQueryInput = {
       SAMLRequest: buffer!.toString("base64"),
     };
@@ -605,37 +601,45 @@ class SAML {
     ].join("\r\n");
   }
 
-  async getLogoutUrlAsync(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
-    const request = await this._generateLogoutRequest(req);
+  async getLogoutUrlAsync(
+    user: Profile,
+    RelayState: string,
+    options: AuthenticateOptions & AuthorizeOptions
+  ) {
+    const request = await this._generateLogoutRequest(user);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
     return await this._requestToUrlAsync(
       request,
       null,
       operation,
-      this._getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(RelayState, operation, overrideParams)
     );
   }
 
   getLogoutResponseUrl(
-    req: RequestWithUser,
+    samlLogoutRequest: Profile,
+    RelayState: string,
     options: AuthenticateOptions & AuthorizeOptions,
     callback: (err: Error | null, url?: string | null) => void
   ): void {
-    util.callbackify(() => this.getLogoutResponseUrlAsync(req, options))(callback);
+    util.callbackify(() => this.getLogoutResponseUrlAsync(samlLogoutRequest, RelayState, options))(
+      callback
+    );
   }
-  async getLogoutResponseUrlAsync(
-    req: RequestWithUser,
-    options: AuthenticateOptions & AuthorizeOptions
+  private async getLogoutResponseUrlAsync(
+    samlLogoutRequest: Profile,
+    RelayState: string,
+    options: AuthenticateOptions & AuthorizeOptions // add RelayState,
   ): Promise<string> {
-    const response = this._generateLogoutResponse(req, req.samlLogoutRequest);
+    const response = this._generateLogoutResponse(samlLogoutRequest);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
     return await this._requestToUrlAsync(
       null,
       response,
       operation,
-      this._getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(RelayState, operation, overrideParams)
     );
   }
 
@@ -1427,7 +1431,7 @@ class SAML {
       "@index": "1",
       "@isDefault": "true",
       "@Binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
-      "@Location": this.getCallbackUrl({}),
+      "@Location": this.getCallbackUrl(),
     };
     return xmlbuilder
       .create((metadata as unknown) as Record<string, any>)

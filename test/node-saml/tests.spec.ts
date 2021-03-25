@@ -1,12 +1,11 @@
 "use strict";
-import * as express from "express";
 import { Strategy as SamlStrategy, SAML } from "../../src/passport-saml";
 import url = require("url");
 import * as querystring from "querystring";
 import { parseString } from "xml2js";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import { RequestWithUser, SamlConfig } from "../../src/passport-saml/types.js";
+import { SamlConfig, Profile } from "../../src/passport-saml/types.js";
 import { RacComparision } from "../../src/node-saml/types.js";
 import * as should from "should";
 import assert = require("assert");
@@ -55,11 +54,9 @@ describe("node-saml /", function () {
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
         const logoutRequestPromise = samlObj._generateLogoutRequest({
-          user: {
-            nameIDFormat: "foo",
-            nameID: "bar",
-          },
-        } as RequestWithUser);
+          nameIDFormat: "foo",
+          nameID: "bar",
+        } as Profile);
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -112,13 +109,11 @@ describe("node-saml /", function () {
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
         const logoutRequestPromise = samlObj._generateLogoutRequest({
-          user: {
-            nameIDFormat: "foo",
-            nameID: "bar",
-            nameQualifier: "Identity Provider",
-            spNameQualifier: "Service Provider",
-          },
-        } as RequestWithUser);
+          nameIDFormat: "foo",
+          nameID: "bar",
+          nameQualifier: "Identity Provider",
+          spNameQualifier: "Service Provider",
+        } as Profile);
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -163,7 +158,7 @@ describe("node-saml /", function () {
       };
 
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-      const logoutRequest = samlObj._generateLogoutResponse({} as express.Request, { ID: "quux" });
+      const logoutRequest = samlObj._generateLogoutResponse({ ID: "quux" } as Profile);
       parseString(logoutRequest, function (err, doc) {
         try {
           delete doc["samlp:LogoutResponse"]["$"]["ID"];
@@ -200,12 +195,10 @@ describe("node-saml /", function () {
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
         const logoutRequestPromise = samlObj._generateLogoutRequest({
-          user: {
-            nameIDFormat: "foo",
-            nameID: "bar",
-            sessionIndex: "session-id",
-          },
-        } as RequestWithUser);
+          nameIDFormat: "foo",
+          nameID: "bar",
+          sessionIndex: "session-id",
+        } as Profile);
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -252,12 +245,10 @@ describe("node-saml /", function () {
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       const cacheSaveSpy = sinon.spy(samlObj.cacheProvider, "saveAsync");
       const logoutRequestPromise = samlObj._generateLogoutRequest({
-        user: {
-          nameIDFormat: "foo",
-          nameID: "bar",
-          sessionIndex: "session-id",
-        },
-      } as RequestWithUser);
+        nameIDFormat: "foo",
+        nameID: "bar",
+        sessionIndex: "session-id",
+      } as Profile);
 
       logoutRequestPromise.then(function (logoutRequest) {
         parseString(logoutRequest, function (err, doc) {
@@ -926,7 +917,7 @@ describe("node-saml /", function () {
         samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
+        const authorizeUrl = await samlObj.getAuthorizeUrlAsync("", "", {});
         const qry = querystring.parse(url.parse(authorizeUrl).query || "");
         qry.SigAlg?.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         qry.Signature?.should.match(
@@ -980,7 +971,7 @@ describe("node-saml /", function () {
         samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
+        const authorizeUrl = await samlObj.getAuthorizeUrlAsync("", "", {});
         const qry = querystring.parse(url.parse(authorizeUrl).query || "");
         qry.SigAlg?.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         qry.Signature?.should.match(
@@ -1008,7 +999,7 @@ describe("node-saml /", function () {
         samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
+        const authorizeUrl = await samlObj.getAuthorizeUrlAsync("", "", {});
         const qry = querystring.parse(url.parse(authorizeUrl).query || "");
         qry.SigAlg?.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         qry.Signature?.should.match(
@@ -1027,12 +1018,12 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj._getAdditionalParams({} as express.Request, operation);
+          const additionalParams = samlObj._getAdditionalParams("", operation);
           additionalParams.should.be.empty;
         });
       });
 
-      it("should not pass any additional params by default apart from the RelayState in request query", function () {
+      it("should not pass any additional params by default apart from the RelayState", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: FAKE_CERT,
@@ -1040,28 +1031,7 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj._getAdditionalParams(
-            ({ query: { RelayState: "test" } } as unknown) as express.Request,
-            operation
-          );
-
-          Object.keys(additionalParams).should.have.length(1);
-          additionalParams.should.containEql({ RelayState: "test" });
-        });
-      });
-
-      it("should not pass any additional params by default apart from the RelayState in request body", function () {
-        const samlConfig = {
-          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
-          cert: FAKE_CERT,
-        };
-        const samlObj = new SAML(samlConfig);
-
-        ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj._getAdditionalParams(
-            { body: { RelayState: "test" } } as express.Request,
-            operation
-          );
+          const additionalParams = samlObj._getAdditionalParams("test", operation);
 
           Object.keys(additionalParams).should.have.length(1);
           additionalParams.should.containEql({ RelayState: "test" });
@@ -1079,7 +1049,7 @@ describe("node-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj._getAdditionalParams({} as express.Request, operation);
+          const additionalParams = samlObj._getAdditionalParams("", operation);
           Object.keys(additionalParams).should.have.length(1);
           additionalParams.should.containEql({ queryParam: "queryParamValue" });
         });
@@ -1095,17 +1065,11 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValue" });
 
-        const additionalLogoutParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "logout"
-        );
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         additionalLogoutParams.should.be.empty;
       });
 
@@ -1119,16 +1083,10 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         additionalAuthorizeParams.should.be.empty;
 
-        const additionalLogoutParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "logout"
-        );
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({ queryParam: "queryParamValue" });
       });
@@ -1149,20 +1107,14 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(2);
         additionalAuthorizeParams.should.containEql({
           queryParam1: "queryParamValue",
           queryParam2: "queryParamValueAuthorize",
         });
 
-        const additionalLogoutParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "logout"
-        );
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         Object.keys(additionalLogoutParams).should.have.length(2);
         additionalLogoutParams.should.containEql({
           queryParam1: "queryParamValue",
@@ -1192,7 +1144,7 @@ describe("node-saml /", function () {
         };
 
         const additionalAuthorizeParams = samlObj._getAdditionalParams(
-          {} as express.Request,
+          "",
           "authorize",
           options.additionalParams
         );
@@ -1204,7 +1156,7 @@ describe("node-saml /", function () {
         });
 
         const additionalLogoutParams = samlObj._getAdditionalParams(
-          {} as express.Request,
+          "",
           "logout",
           options.additionalParams
         );
@@ -1232,17 +1184,11 @@ describe("node-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValueAuthorize" });
 
-        const additionalLogoutParams = samlObj._getAdditionalParams(
-          {} as express.Request,
-          "logout"
-        );
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({ queryParam: "queryParamValueLogout" });
       });
@@ -1269,7 +1215,7 @@ describe("node-saml /", function () {
         };
 
         const additionalAuthorizeParams = samlObj._getAdditionalParams(
-          {} as express.Request,
+          "",
           "authorize",
           options.additionalParams
         );
@@ -1277,7 +1223,7 @@ describe("node-saml /", function () {
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamRuntimeValue" });
 
         const additionalLogoutParams = samlObj._getAdditionalParams(
-          {} as express.Request,
+          "",
           "logout",
           options.additionalParams
         );

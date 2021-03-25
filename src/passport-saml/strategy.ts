@@ -65,8 +65,15 @@ class Strategy extends PassportStrategy {
             throw new Error("Can't get logout response URL without a SAML provider defined.");
           }
 
-          req.samlLogoutRequest = profile;
-          return this._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
+          const samlLogoutRequest = profile;
+          const RelayState =
+            (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+          return this._saml.getLogoutResponseUrl(
+            samlLogoutRequest,
+            RelayState,
+            options,
+            redirectIfSuccess
+          );
         }
         return this.pass();
       }
@@ -127,12 +134,18 @@ class Strategy extends PassportStrategy {
             }
 
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
-              const data = await this._saml.getAuthorizeFormAsync(req);
+              const RelayState =
+                (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+              const host = req.headers && req.headers.host;
+              const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
               const res = req.res!;
               res.send(data);
             } else {
               // Defaults to HTTP-Redirect
-              this.redirect(await this._saml.getAuthorizeUrlAsync(req, options));
+              const RelayState =
+                (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+              const host = req.headers && req.headers.host;
+              this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
             }
           } catch (err) {
             this.error(err);
@@ -144,7 +157,11 @@ class Strategy extends PassportStrategy {
           }
 
           try {
-            this.redirect(await this._saml.getLogoutUrlAsync(req, options));
+            const RelayState =
+              (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+            this.redirect(
+              await this._saml.getLogoutUrlAsync(req.user as Profile, RelayState, options)
+            );
           } catch (err) {
             this.error(err);
           }
@@ -163,9 +180,9 @@ class Strategy extends PassportStrategy {
     if (this._saml == null) {
       throw new Error("Can't logout without a SAML provider defined.");
     }
-
+    const RelayState = (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
     this._saml
-      .getLogoutUrlAsync(req, {})
+      .getLogoutUrlAsync(req.user as Profile, RelayState, {})
       .then((url) => callback(null, url))
       .catch((err) => callback(err));
   }
