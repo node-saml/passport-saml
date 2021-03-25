@@ -22,6 +22,7 @@ import {
   LogoutRequestXML,
   SamlIDPListConfig,
   SamlIDPEntryConfig,
+  SamlOptions,
   ServiceMetadataXML,
   XMLInput,
   XMLObject,
@@ -32,7 +33,6 @@ import {
   AuthorizeOptions,
   Profile,
   RequestWithUser,
-  SamlOptions,
   SamlConfig,
 } from "../passport-saml/types";
 import { assertRequired } from "./utility";

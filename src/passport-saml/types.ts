@@ -1,13 +1,6 @@
 import type * as express from "express";
 import * as passport from "passport";
-import type { CacheProvider } from "../node-saml/inmemory-cache-provider";
-import type {
-  SamlSigningOptions,
-  MandatorySamlOptions,
-  SamlIDPListConfig,
-} from "../node-saml/types";
-
-export type RacComparision = "exact" | "minimum" | "maximum" | "better";
+import type { SamlOptions, MandatorySamlOptions, SamlIDPListConfig } from "../node-saml/types";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
@@ -18,52 +11,6 @@ export interface AuthorizeOptions extends AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
 }
 
-/**
- * The options required to use a SAML strategy
- * These may be provided by means of defaults specified in the constructor
- */
-export interface SamlOptions extends SamlSigningOptions, MandatorySamlOptions {
-  // Core
-  callbackUrl?: string;
-  path: string;
-  protocol?: string;
-  host: string;
-  entryPoint?: string;
-  issuer: string;
-  decryptionPvk?: string | Buffer;
-
-  // Additional SAML behaviors
-  additionalParams: Record<string, string>;
-  additionalAuthorizeParams: Record<string, string>;
-  identifierFormat?: string | null;
-  acceptedClockSkewMs: number;
-  attributeConsumingServiceIndex?: string;
-  disableRequestedAuthnContext: boolean;
-  authnContext: string[];
-  forceAuthn: boolean;
-  skipRequestCompression: boolean;
-  authnRequestBinding?: string;
-  racComparison: RacComparision;
-  providerName?: string;
-  passive: boolean;
-  idpIssuer?: string;
-  audience?: string;
-  scoping?: SamlScopingConfig;
-  wantAssertionsSigned?: boolean;
-
-  // InResponseTo Validation
-  validateInResponseTo: boolean;
-  requestIdExpirationPeriodMs: number;
-  cacheProvider: CacheProvider;
-
-  // Logout
-  logoutUrl: string;
-  additionalLogoutParams: Record<string, string>;
-  logoutCallbackUrl?: string;
-
-  // extras
-  disableRequestAcsUrl: boolean;
-}
 export interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
@@ -73,12 +20,6 @@ export interface StrategyOptions {
  * These options are availble for configuring a SAML strategy
  */
 export type SamlConfig = Partial<SamlOptions> & StrategyOptions & MandatorySamlOptions;
-
-export interface SamlScopingConfig {
-  idpList?: SamlIDPListConfig[];
-  proxyCount?: number;
-  requesterId?: string[] | string;
-}
 
 export interface Profile {
   issuer?: string;
