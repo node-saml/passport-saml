@@ -132,6 +132,7 @@ class SAML {
       skipRequestCompression: ctorOptions.skipRequestCompression ?? false,
       disableRequestAcsUrl: ctorOptions.disableRequestAcsUrl ?? false,
       acceptedClockSkewMs: ctorOptions.acceptedClockSkewMs ?? 0,
+      maxAssertionAgeMs: ctorOptions.maxAssertionAgeMs ?? 0,
       path: ctorOptions.path ?? "/saml/consume",
       host: ctorOptions.host ?? "localhost",
       issuer: ctorOptions.issuer ?? "onelogin_saml",
@@ -1116,11 +1117,17 @@ class SAML {
           if (confirmData && confirmData.$) {
             const subjectNotBefore = confirmData.$.NotBefore;
             const subjectNotOnOrAfter = confirmData.$.NotOnOrAfter;
+            const maxTimeLimitMs = this.processMaxAgeAssertionTime(
+              this.options.maxAssertionAgeMs,
+              subjectNotOnOrAfter,
+              assertion.$.issueInstant
+            );
 
             const subjErr = this.checkTimestampsValidityError(
               nowMs,
               subjectNotBefore,
-              subjectNotOnOrAfter
+              subjectNotOnOrAfter,
+              maxTimeLimitMs
             );
             if (subjErr) {
               throw subjErr;
@@ -1167,10 +1174,16 @@ class SAML {
       throw new Error(msg);
     }
     if (conditions && conditions.$) {
+      const maxTimeLimitMs = this.processMaxAgeAssertionTime(
+        this.options.maxAssertionAgeMs,
+        conditions.$.NotOnOrAfter,
+        assertion.$.IssueInstant
+      );
       const conErr = this.checkTimestampsValidityError(
         nowMs,
         conditions.$.NotBefore,
-        conditions.$.NotOnOrAfter
+        conditions.$.NotOnOrAfter,
+        maxTimeLimitMs
       );
       if (conErr) throw conErr;
     }
@@ -1231,7 +1244,12 @@ class SAML {
     return { profile, loggedOut: false };
   }
 
-  checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
+  checkTimestampsValidityError(
+    nowMs: number,
+    notBefore: string,
+    notOnOrAfter: string,
+    maxTimeLimitMs?: number
+  ) {
     if (this.options.acceptedClockSkewMs == -1) return null;
 
     if (notBefore) {
@@ -1242,6 +1260,10 @@ class SAML {
     if (notOnOrAfter) {
       const notOnOrAfterMs = Date.parse(notOnOrAfter);
       if (nowMs - this.options.acceptedClockSkewMs >= notOnOrAfterMs)
+        return new Error("SAML assertion expired");
+    }
+    if (maxTimeLimitMs) {
+      if (nowMs - this.options.acceptedClockSkewMs >= maxTimeLimitMs)
         return new Error("SAML assertion expired");
     }
 
@@ -1460,6 +1482,29 @@ class SAML {
     // we are considered the XML processor and are responsible for newline normalization
     // https://github.com/node-saml/passport-saml/issues/431#issuecomment-718132752
     return xml.replace(/\r\n?/g, "\n");
+  }
+
+  /**
+   * Process max age assertion and use it if it is more restrictive than the NotOnOrAfter age
+   * assertion received in the SAMLResponse.
+   *
+   * @param maxAssertionAgeMs Max time after IssueInstant that we will accept assertion, in Ms.
+   * @param notOnOrAfter Expiration provided in response.
+   * @param issueInstant Time when response was issued.
+   * @returns {*} The expiration time to be used, in Ms.
+   */
+  processMaxAgeAssertionTime(
+    maxAssertionAgeMs: number,
+    notOnOrAfter: string,
+    issueInstant: string
+  ): number {
+    const notOnOrAfterMs = Date.parse(notOnOrAfter);
+    if (maxAssertionAgeMs === 0) {
+      return notOnOrAfterMs;
+    }
+
+    const maxAssertionTimeMs = Date.parse(issueInstant) + maxAssertionAgeMs;
+    return maxAssertionTimeMs < notOnOrAfterMs ? maxAssertionTimeMs : notOnOrAfterMs;
   }
 }
 
