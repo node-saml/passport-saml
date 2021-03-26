@@ -1260,11 +1260,11 @@ class SAML {
     if (notOnOrAfter) {
       const notOnOrAfterMs = Date.parse(notOnOrAfter);
       if (nowMs - this.options.acceptedClockSkewMs >= notOnOrAfterMs)
-        return new Error("SAML assertion expired");
+        return new Error("SAML assertion expired: clocks skewed too much");
     }
     if (maxTimeLimitMs) {
       if (nowMs - this.options.acceptedClockSkewMs >= maxTimeLimitMs)
-        return new Error("SAML assertion expired");
+        return new Error("SAML assertion expired: assertion too old");
     }
 
     return null;
