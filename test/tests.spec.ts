@@ -1610,7 +1610,7 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:19:08Z"));
         await assert.rejects(samlObj.validatePostResponseAsync(container), {
-          message: "SAML assertion expired",
+          message: "SAML assertion expired: clocks skewed too much",
         });
       });
 
@@ -1629,7 +1629,7 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:19:09Z"));
         await assert.rejects(samlObj.validatePostResponseAsync(container), {
-          message: "SAML assertion expired",
+          message: "SAML assertion expired: clocks skewed too much",
         });
       });
 
@@ -1677,7 +1677,7 @@ describe("passport-saml /", function () {
         fakeClock.restore();
         fakeClock = sinon.useFakeTimers(Date.parse("2014-05-28T00:17:09Z"));
         await assert.rejects(samlObj.validatePostResponseAsync(container), {
-          message: "SAML assertion expired",
+          message: "SAML assertion expired: assertion too old",
         });
       });
 
@@ -2013,7 +2013,7 @@ describe("validateRedirect()", function () {
 
       await assert.rejects(
         samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "SAML assertion expired" }
+        { message: "SAML assertion expired: clocks skewed too much" }
       );
     });
     it("errors if request has a bad signature", async function () {

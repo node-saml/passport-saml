@@ -25,7 +25,7 @@ describe("Signatures", function () {
 
       //== Run the test in `func`
       await assert.rejects(samlObj.validatePostResponseAsync(samlResponseBody), {
-        message: shouldErrorWith || "SAML assertion expired",
+        message: shouldErrorWith || "SAML assertion expired: clocks skewed too much",
       });
       //== Assert times `validateSignature` was called
       validateSignatureSpy.callCount.should.eql(amountOfSignatureChecks);
