@@ -102,7 +102,7 @@ async function promiseWithNameID(nameid: Node): Promise<NameID> {
 }
 
 class SAML {
-  // not that some methods in SAML are not yet marked as private as they are used in testing.
+  // note that some methods in SAML are not yet marked as private as they are used in testing.
   // those methods start with an underscore, e.g. _generateUniqueID
   options: SamlOptions;
   // This is only for testing
@@ -465,7 +465,7 @@ class SAML {
       this.signRequest(samlMessage);
     }
     Object.keys(samlMessage).forEach((k) => {
-      target.searchParams.append(k, samlMessage[k] as string);
+      target.searchParams.set(k, samlMessage[k] as string);
     });
 
     return target.toString();
