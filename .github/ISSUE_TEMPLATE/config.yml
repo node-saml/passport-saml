@@ -1,0 +1,7 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question on Discussions area (NEW!)
+    url: https://github.com/node-saml/passport-saml/discussions
+    about: Recommended place for questions, debates, consultation.
+  - name: Ask a question on StackOverflow
+    url: https://stackoverflow.com/questions/tagged/passport-saml
