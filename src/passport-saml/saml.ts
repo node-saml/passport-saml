@@ -730,6 +730,8 @@ class SAML {
     if (totalReferencedNodes.length > 1) {
       return false;
     }
+    // normalize XML to replace XML-encoded carriage returns with actual carriage returns
+    fullXml = this.normalizeXml(fullXml);
     fullXml = this.normalizeNewlines(fullXml);
     return sig.checkSignature(fullXml);
   }
@@ -1417,6 +1419,12 @@ class SAML {
     // we are considered the XML processor and are responsible for newline normalization
     // https://github.com/node-saml/passport-saml/issues/431#issuecomment-718132752
     return xml.replace(/\r\n?/g, "\n");
+  }
+
+  normalizeXml(xml: string): string {
+    // we can use this utility to parse and re-stringify XML
+    // `DOMParser` will take care of normalization tasks, like replacing XML-encoded carriage returns with actual carriage returns
+    return new xmldom.DOMParser({}).parseFromString(xml).toString();
   }
 }
 
