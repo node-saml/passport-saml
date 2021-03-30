@@ -65,11 +65,10 @@ class Strategy extends PassportStrategy {
             throw new Error("Can't get logout response URL without a SAML provider defined.");
           }
 
-          const samlLogoutRequest = profile;
           const RelayState =
             (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
           return this._saml.getLogoutResponseUrl(
-            samlLogoutRequest,
+            profile,
             RelayState,
             options,
             redirectIfSuccess
