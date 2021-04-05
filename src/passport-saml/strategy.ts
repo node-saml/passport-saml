@@ -67,12 +67,7 @@ class Strategy extends PassportStrategy {
 
           const RelayState =
             (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-          return this._saml.getLogoutResponseUrl(
-            profile,
-            RelayState,
-            options,
-            redirectIfSuccess
-          );
+          return this._saml.getLogoutResponseUrl(profile, RelayState, options, redirectIfSuccess);
         }
         return this.pass();
       }
@@ -132,18 +127,15 @@ class Strategy extends PassportStrategy {
               throw new Error("Can't process login request without a SAML provider defined.");
             }
 
+            const RelayState =
+              (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+            const host = req.headers && req.headers.host;
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
-              const RelayState =
-                (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-              const host = req.headers && req.headers.host;
               const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
               const res = req.res!;
               res.send(data);
             } else {
               // Defaults to HTTP-Redirect
-              const RelayState =
-                (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-              const host = req.headers && req.headers.host;
               this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
             }
           } catch (err) {
