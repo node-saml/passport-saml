@@ -1038,6 +1038,23 @@ describe("node-saml /", function () {
         });
       });
 
+      it("should only allow RelayState to be a string", function () {
+        const samlConfig = {
+          entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
+          cert: FAKE_CERT,
+        };
+        const samlObj = new SAML(samlConfig);
+
+        ["logout", "authorize"].forEach(function (operation) {
+          const additionalParams = samlObj._getAdditionalParams(
+            ({ RelayState: "test" } as unknown) as string,
+            operation
+          );
+
+          Object.keys(additionalParams).should.have.length(0);
+        });
+      });
+
       it("should pass additional params with all operations if set in additionalParams", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",

@@ -478,7 +478,7 @@ class SAML {
   ): querystring.ParsedUrlQuery {
     const additionalParams: querystring.ParsedUrlQuery = {};
 
-    if (RelayState) {
+    if (typeof RelayState === "string" && RelayState.length > 0) {
       additionalParams.RelayState = RelayState;
     }
 
