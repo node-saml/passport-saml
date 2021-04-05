@@ -59,7 +59,7 @@ const normalizeNewlines = (xml: string): string => {
 const normalizeXml = (xml: string): string => {
   // we can use this utility to parse and re-stringify XML
   // `DOMParser` will take care of normalization tasks, like replacing XML-encoded carriage returns with actual carriage returns
-  return new xmldom.DOMParser({}).parseFromString(xml).toString();
+  return parseDomFromString(xml).toString();
 };
 
 /**
