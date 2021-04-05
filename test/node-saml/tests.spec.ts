@@ -1,23 +1,23 @@
 "use strict";
-import * as express from "express";
-import { Strategy as SamlStrategy, SAML } from "../src/passport-saml";
+import { Strategy as SamlStrategy, SAML } from "../../src/passport-saml";
 import url = require("url");
 import * as querystring from "querystring";
 import { parseString } from "xml2js";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import { RacComparision, RequestWithUser, SamlConfig } from "../src/passport-saml/types.js";
+import { SamlConfig, Profile } from "../../src/passport-saml/types.js";
+import { RacComparision } from "../../src/node-saml/types.js";
 import * as should from "should";
 import assert = require("assert");
-import { FAKE_CERT, TEST_CERT } from "./types";
-import { signXmlResponse } from "../src/passport-saml/utility";
+import { FAKE_CERT, TEST_CERT } from "../types";
+import { signXmlResponse } from "../../src/node-saml/utility";
 
 export const BAD_TEST_CERT =
   "MIIEOTCCAyGgAwIBAgIJAKZgJdKdCdL6MA0GCSqGSIb3DQEBBQUAMHAxCzAJBgNVBAYTAkFVMREwDwYDVQQIEwhWaWN0b3JpYTESMBAGA1UEBxMJTWVsYm91cm5lMSEwHwYDVQQKExhUYWJjb3JwIEhvbGRpbmdzIExpbWl0ZWQxFzAVBgNVBAMTDnN0cy50YWIuY29tLmF1MB4XDTE3MDUzMDA4NTQwOFoXDTI3MDUyODA4NTQwOFowcDELMAkGA1UEBhMCQVUxETAPBgNVBAgTCFZpY3RvcmlhMRIwEAYDVQQHEwlNZWxib3VybmUxITAfBgNVBAoTGFRhYmNvcnAgSG9sZGluZ3MgTGltaXRlZDEXMBUGA1UEAxMOc3RzLnRhYi5jb20uYXUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD0NuMcflq3rtupKYDf4a7lWmsXy66fYe9n8jB2DuLMakEJBlzn9j6B98IZftrilTq21VR7wUXROxG8BkN8IHY+l8X7lATmD28fFdZJj0c8Qk82eoq48faemth4fBMx2YrpnhU00jeXeP8dIIaJTPCHBTNgZltMMhphklN1YEPlzefJs3YD+Ryczy1JHbwETxt+BzO1JdjBe1fUTyl6KxAwWvtsNBURmQRYlDOk4GRgdkQnfxBuCpOMeOpV8wiBAi3h65Lab9C5avu4AJlA9e4qbOmWt6otQmgy5fiJVy6bH/d8uW7FJmSmePX9sqAWa9szhjdn36HHVQsfHC+IUEX7AgMBAAGjgdUwgdIwHQYDVR0OBBYEFN6z6cuxY7FTkg1S/lIjnS4x5ARWMIGiBgNVHSMEgZowgZeAFN6z6cuxY7FTkg1S/lIjnS4x5ARWoXSkcjBwMQswCQYDVQQGEwJBVTERMA8GA1UECBMIVmljdG9yaWExEjAQBgNVBAcTCU1lbGJvdXJuZTEhMB8GA1UEChMYVGFiY29ycCBIb2xkaW5ncyBMaW1pdGVkMRcwFQYDVQQDEw5zdHMudGFiLmNvbS5hdYIJAKZgJdKdCdL6MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAMi5HyvXgRa4+kKz3dk4SwAEXzeZRcsbeDJWVUxdb6a+JQxIoG7L9rSbd6yZvP/Xel5TrcwpCpl5eikzXB02/C0wZKWicNmDEBlOfw0Pc5ngdoh6ntxHIWm5QMlAfjR0dgTlojN4Msw2qk7cP1QEkV96e2BJUaqaNnM3zMvd7cfRjPNfbsbwl6hCCCAdwrALKYtBnjKVrCGPwO+xiw5mUJhZ1n6ZivTOdQEWbl26UO60J9ItiWP8VK0d0aChn326Ovt7qC4S3AgDlaJwcKe5Ifxl/UOWePGRwXj2UUuDWFhjtVmRntMmNZbe5yE8MkEvU+4/c6LqGwTCgDenRbK53Dgg";
 
 export const noop = (): void => undefined;
 
-describe("passport-saml /", function () {
+describe("node-saml /", function () {
   describe("saml.js / ", function () {
     it("should throw an error if cert property is provided to saml constructor but is empty", function () {
       should(function () {
@@ -26,14 +26,14 @@ describe("passport-saml /", function () {
       }).throw("cert is required");
     });
 
-    it("generateUniqueID should generate 20 char IDs", function () {
+    it("_generateUniqueID should generate 20 char IDs", function () {
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       for (let i = 0; i < 200; i++) {
-        samlObj.generateUniqueID().length.should.eql(20);
+        samlObj._generateUniqueID().length.should.eql(20);
       }
     });
 
-    it("generateLogoutRequest", function (done) {
+    it("_generateLogoutRequest", function (done) {
       try {
         const expectedRequest = {
           "samlp:LogoutRequest": {
@@ -53,12 +53,10 @@ describe("passport-saml /", function () {
         };
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-        const logoutRequestPromise = samlObj.generateLogoutRequest({
-          user: {
-            nameIDFormat: "foo",
-            nameID: "bar",
-          },
-        } as RequestWithUser);
+        const logoutRequestPromise = samlObj._generateLogoutRequest({
+          nameIDFormat: "foo",
+          nameID: "bar",
+        });
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -81,7 +79,7 @@ describe("passport-saml /", function () {
       }
     });
 
-    it("generateLogoutRequest adds the NameQualifier and SPNameQualifier to the saml request", function (done) {
+    it("_generateLogoutRequest adds the NameQualifier and SPNameQualifier to the saml request", function (done) {
       try {
         const expectedRequest = {
           "samlp:LogoutRequest": {
@@ -110,14 +108,12 @@ describe("passport-saml /", function () {
         };
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-        const logoutRequestPromise = samlObj.generateLogoutRequest({
-          user: {
-            nameIDFormat: "foo",
-            nameID: "bar",
-            nameQualifier: "Identity Provider",
-            spNameQualifier: "Service Provider",
-          },
-        } as RequestWithUser);
+        const logoutRequestPromise = samlObj._generateLogoutRequest({
+          nameIDFormat: "foo",
+          nameID: "bar",
+          nameQualifier: "Identity Provider",
+          spNameQualifier: "Service Provider",
+        });
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -140,7 +136,7 @@ describe("passport-saml /", function () {
       }
     });
 
-    it("generateLogoutResponse", function (done) {
+    it("_generateLogoutResponse", function (done) {
       const expectedResponse = {
         "samlp:LogoutResponse": {
           $: {
@@ -162,7 +158,7 @@ describe("passport-saml /", function () {
       };
 
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-      const logoutRequest = samlObj.generateLogoutResponse({} as express.Request, { ID: "quux" });
+      const logoutRequest = samlObj._generateLogoutResponse({ ID: "quux" });
       parseString(logoutRequest, function (err, doc) {
         try {
           delete doc["samlp:LogoutResponse"]["$"]["ID"];
@@ -175,7 +171,7 @@ describe("passport-saml /", function () {
       });
     });
 
-    it("generateLogoutRequest with session index", function (done) {
+    it("_generateLogoutRequest with session index", function (done) {
       try {
         const expectedRequest = {
           "samlp:LogoutRequest": {
@@ -198,13 +194,11 @@ describe("passport-saml /", function () {
         };
 
         const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-        const logoutRequestPromise = samlObj.generateLogoutRequest({
-          user: {
-            nameIDFormat: "foo",
-            nameID: "bar",
-            sessionIndex: "session-id",
-          },
-        } as RequestWithUser);
+        const logoutRequestPromise = samlObj._generateLogoutRequest({
+          nameIDFormat: "foo",
+          nameID: "bar",
+          sessionIndex: "session-id",
+        });
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -227,7 +221,7 @@ describe("passport-saml /", function () {
       }
     });
 
-    it("generateLogoutRequest saves id and instant to cache", function (done) {
+    it("_generateLogoutRequest saves id and instant to cache", function (done) {
       const expectedRequest = {
         "samlp:LogoutRequest": {
           $: {
@@ -250,13 +244,11 @@ describe("passport-saml /", function () {
 
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
       const cacheSaveSpy = sinon.spy(samlObj.cacheProvider, "saveAsync");
-      const logoutRequestPromise = samlObj.generateLogoutRequest({
-        user: {
-          nameIDFormat: "foo",
-          nameID: "bar",
-          sessionIndex: "session-id",
-        },
-      } as RequestWithUser);
+      const logoutRequestPromise = samlObj._generateLogoutRequest({
+        nameIDFormat: "foo",
+        nameID: "bar",
+        sessionIndex: "session-id",
+      });
 
       logoutRequestPromise.then(function (logoutRequest) {
         parseString(logoutRequest, function (err, doc) {
@@ -284,7 +276,7 @@ describe("passport-saml /", function () {
       ) {
         const samlObj = new SAML(samlConfig);
         const decryptionCert = fs.readFileSync(
-          __dirname + "/static/testshib encryption cert.pem",
+          __dirname + "/../static/testshib encryption cert.pem",
           "utf-8"
         );
         let metadata = samlObj.generateServiceProviderMetadata(decryptionCert, signingCert);
@@ -302,11 +294,11 @@ describe("passport-saml /", function () {
           issuer: "http://example.serviceprovider.com",
           callbackUrl: "http://example.serviceprovider.com/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
-          __dirname + "/static/expected metadata.xml",
+          __dirname + "/../static/expected metadata.xml",
           "utf-8"
         );
 
@@ -321,7 +313,7 @@ describe("passport-saml /", function () {
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
-          __dirname + "/static/expected metadata without key.xml",
+          __dirname + "/../static/expected metadata without key.xml",
           "utf-8"
         );
 
@@ -335,11 +327,11 @@ describe("passport-saml /", function () {
           host: "example.serviceprovider.com",
           path: "/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
-          __dirname + "/static/expected metadata.xml",
+          __dirname + "/../static/expected metadata.xml",
           "utf-8"
         );
 
@@ -356,7 +348,7 @@ describe("passport-saml /", function () {
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
-          __dirname + "/static/expected metadata without key.xml",
+          __dirname + "/../static/expected metadata without key.xml",
           "utf-8"
         );
 
@@ -370,15 +362,17 @@ describe("passport-saml /", function () {
           host: "example.serviceprovider.com",
           path: "/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
+          decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
+          privateKey: fs.readFileSync(__dirname + "/../static/acme_tools_com.key"),
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
-          __dirname + "/static/expectedMetadataWithBothKeys.xml",
+          __dirname + "/../static/expectedMetadataWithBothKeys.xml",
           "utf-8"
         );
-        const signingCert = fs.readFileSync(__dirname + "/static/acme_tools_com.cert").toString();
+        const signingCert = fs
+          .readFileSync(__dirname + "/../static/acme_tools_com.cert")
+          .toString();
 
         testMetadata(samlConfig, expectedMetadata, signingCert);
       });
@@ -390,15 +384,17 @@ describe("passport-saml /", function () {
           host: "example.serviceprovider.com",
           path: "/saml/callback",
           identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
-          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key"),
+          decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
+          privateKey: fs.readFileSync(__dirname + "/../static/acme_tools_com.key"),
           cert: FAKE_CERT,
         };
         const expectedMetadata = fs.readFileSync(
-          __dirname + "/static/expectedMetadataWithBothKeys.xml",
+          __dirname + "/../static/expectedMetadataWithBothKeys.xml",
           "utf-8"
         );
-        const signingCert = fs.readFileSync(__dirname + "/static/acme_tools_com.cert").toString();
+        const signingCert = fs
+          .readFileSync(__dirname + "/../static/acme_tools_com.cert")
+          .toString();
 
         testMetadata(samlConfig, expectedMetadata, signingCert);
       });
@@ -409,14 +405,14 @@ describe("passport-saml /", function () {
         issuer: "http://example.serviceprovider.com",
         callbackUrl: "http://example.serviceprovider.com/saml/callback",
         identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-        decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+        decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
         logoutCallbackUrl: "http://example.serviceprovider.com/logout",
         cert: FAKE_CERT,
       };
 
       const samlObj = new SAML(samlConfig);
       const decryptionCert = fs.readFileSync(
-        __dirname + "/static/testshib encryption cert.pem",
+        __dirname + "/../static/testshib encryption cert.pem",
         "utf-8"
       );
       const metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
@@ -430,27 +426,27 @@ describe("passport-saml /", function () {
         issuer: "http://example.serviceprovider.com",
         callbackUrl: "http://example.serviceprovider.com/saml/callback",
         identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-        decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+        decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
         wantAssertionsSigned: true,
       };
 
       const samlObj = new SAML(samlConfig);
       const decryptionCert = fs.readFileSync(
-        __dirname + "/static/testshib encryption cert.pem",
+        __dirname + "/../static/testshib encryption cert.pem",
         "utf-8"
       );
       const metadata = samlObj.generateServiceProviderMetadata(decryptionCert);
       metadata.should.containEql('WantAssertionsSigned="true"');
     });
 
-    it("#certToPEM should generate valid certificate", function () {
+    it("#_certToPEM should generate valid certificate", function () {
       const samlConfig = {
         entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
         cert: "-----BEGIN CERTIFICATE-----" + TEST_CERT + "-----END CERTIFICATE-----",
         acceptedClockSkewMs: -1,
       };
       const samlObj = new SAML(samlConfig);
-      const certificate = samlObj.certToPEM(samlConfig.cert);
+      const certificate = samlObj._certToPEM(samlConfig.cert);
 
       if (!(certificate.match(/BEGIN/g)!.length == 1 && certificate.match(/END/g)!.length == 1)) {
         throw Error("Certificate should have only 1 BEGIN and 1 END block");
@@ -502,11 +498,11 @@ describe("passport-saml /", function () {
 
         const container = {
           SAMLResponse: fs
-            .readFileSync(__dirname + "/static/response-with-uncomplete-attribute.xml")
+            .readFileSync(__dirname + "/../static/response-with-uncomplete-attribute.xml")
             .toString("base64"),
         };
 
-        const signingCert = fs.readFileSync(__dirname + "/static/cert.pem", "utf-8");
+        const signingCert = fs.readFileSync(__dirname + "/../static/cert.pem", "utf-8");
 
         const samlObj = new SAML({ cert: signingCert });
         const { profile } = await samlObj.validatePostResponseAsync(container);
@@ -815,8 +811,8 @@ describe("passport-saml /", function () {
             "</saml2:Assertion>" +
             "</Response>";
 
-          const signingKey = fs.readFileSync(__dirname + "/static/key.pem");
-          const signingCert = fs.readFileSync(__dirname + "/static/cert.pem", "utf-8");
+          const signingKey = fs.readFileSync(__dirname + "/../static/key.pem");
+          const signingCert = fs.readFileSync(__dirname + "/../static/cert.pem", "utf-8");
           const signedXml = signXmlResponse(xml, { privateKey: signingKey });
 
           const base64xml = Buffer.from(signedXml).toString("base64");
@@ -879,8 +875,8 @@ describe("passport-saml /", function () {
             "</saml2:Assertion>" +
             "</Response>";
 
-          const signingKey = fs.readFileSync(__dirname + "/static/key.pem");
-          const signingCert = fs.readFileSync(__dirname + "/static/cert.pem", "utf-8");
+          const signingKey = fs.readFileSync(__dirname + "/../static/key.pem");
+          const signingCert = fs.readFileSync(__dirname + "/../static/cert.pem", "utf-8");
           const signedXml = signXmlResponse(xml, { privateKey: signingKey });
 
           const base64xml = Buffer.from(signedXml).toString("base64");
@@ -906,7 +902,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
+          privateKey: fs.readFileSync(__dirname + "/../static/acme_tools_com.key", "utf-8"),
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
@@ -918,10 +914,10 @@ describe("passport-saml /", function () {
           cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
+        const authorizeUrl = await samlObj.getAuthorizeUrlAsync("", "", {});
         const qry = querystring.parse(url.parse(authorizeUrl).query || "");
         qry.SigAlg?.should.match("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         qry.Signature?.should.match(
@@ -935,7 +931,7 @@ describe("passport-saml /", function () {
           entryPoint: "",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
+          privateKey: fs.readFileSync(__dirname + "/../static/acme_tools_com.key", "utf-8"),
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
@@ -946,13 +942,13 @@ describe("passport-saml /", function () {
           cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
 
         const request =
           '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-        await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+        await assert.rejects(samlObj._requestToUrlAsync(request, null, "authorize", {}), {
           message: "entryPoint is required",
         });
       });
@@ -961,7 +957,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
+          privateKey: fs.readFileSync(__dirname + "/../static/acme_tools_com.key", "utf-8"),
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
@@ -969,13 +965,13 @@ describe("passport-saml /", function () {
           additionalParams: {
             customQueryStringParam: "CustomQueryStringParamValue",
           },
-          cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "utf-8"),
+          cert: fs.readFileSync(__dirname + "/../static/acme_tools_com.cert", "utf-8"),
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
+        const authorizeUrl = await samlObj.getAuthorizeUrlAsync("", "", {});
         const qry = querystring.parse(url.parse(authorizeUrl).query || "");
         qry.SigAlg?.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         qry.Signature?.should.match(
@@ -988,7 +984,7 @@ describe("passport-saml /", function () {
           entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
           issuer: "acme_tools_com",
           callbackUrl: "https://relyingparty/adfs/postResponse",
-          privateKey: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "utf-8"),
+          privateKey: fs.readFileSync(__dirname + "/../static/acme_tools_com.key", "utf-8"),
           authnContext: [
             "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
           ],
@@ -1000,10 +996,10 @@ describe("passport-saml /", function () {
           cert: FAKE_CERT,
         };
         const samlObj = new SAML(samlConfig);
-        samlObj.generateUniqueID = function () {
+        samlObj._generateUniqueID = function () {
           return "12345678901234567890";
         };
-        const authorizeUrl = await samlObj.getAuthorizeUrlAsync({} as express.Request, {});
+        const authorizeUrl = await samlObj.getAuthorizeUrlAsync("", "", {});
         const qry = querystring.parse(url.parse(authorizeUrl).query || "");
         qry.SigAlg?.should.match("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
         qry.Signature?.should.match(
@@ -1013,7 +1009,7 @@ describe("passport-saml /", function () {
       });
     });
 
-    describe("getAdditionalParams checks /", function () {
+    describe("_getAdditionalParams checks /", function () {
       it("should not pass any additional params by default", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
@@ -1022,12 +1018,12 @@ describe("passport-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams({} as express.Request, operation);
+          const additionalParams = samlObj._getAdditionalParams("", operation);
           additionalParams.should.be.empty;
         });
       });
 
-      it("should not pass any additional params by default apart from the RelayState in request query", function () {
+      it("should not pass any additional params by default apart from the RelayState", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: FAKE_CERT,
@@ -1035,17 +1031,14 @@ describe("passport-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams(
-            ({ query: { RelayState: "test" } } as unknown) as express.Request,
-            operation
-          );
+          const additionalParams = samlObj._getAdditionalParams("test", operation);
 
           Object.keys(additionalParams).should.have.length(1);
           additionalParams.should.containEql({ RelayState: "test" });
         });
       });
 
-      it("should not pass any additional params by default apart from the RelayState in request body", function () {
+      it("should only allow RelayState to be a string", function () {
         const samlConfig = {
           entryPoint: "https://app.onelogin.com/trust/saml2/http-post/sso/371755",
           cert: FAKE_CERT,
@@ -1053,13 +1046,12 @@ describe("passport-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams(
-            { body: { RelayState: "test" } } as express.Request,
+          const additionalParams = samlObj._getAdditionalParams(
+            ({ RelayState: "test" } as unknown) as string,
             operation
           );
 
-          Object.keys(additionalParams).should.have.length(1);
-          additionalParams.should.containEql({ RelayState: "test" });
+          Object.keys(additionalParams).should.have.length(0);
         });
       });
 
@@ -1074,7 +1066,7 @@ describe("passport-saml /", function () {
         const samlObj = new SAML(samlConfig);
 
         ["logout", "authorize"].forEach(function (operation) {
-          const additionalParams = samlObj.getAdditionalParams({} as express.Request, operation);
+          const additionalParams = samlObj._getAdditionalParams("", operation);
           Object.keys(additionalParams).should.have.length(1);
           additionalParams.should.containEql({ queryParam: "queryParamValue" });
         });
@@ -1090,14 +1082,11 @@ describe("passport-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValue" });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         additionalLogoutParams.should.be.empty;
       });
 
@@ -1111,13 +1100,10 @@ describe("passport-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         additionalAuthorizeParams.should.be.empty;
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({ queryParam: "queryParamValue" });
       });
@@ -1138,17 +1124,14 @@ describe("passport-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(2);
         additionalAuthorizeParams.should.containEql({
           queryParam1: "queryParamValue",
           queryParam2: "queryParamValueAuthorize",
         });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         Object.keys(additionalLogoutParams).should.have.length(2);
         additionalLogoutParams.should.containEql({
           queryParam1: "queryParamValue",
@@ -1177,8 +1160,8 @@ describe("passport-saml /", function () {
           },
         };
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {} as express.Request,
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
+          "",
           "authorize",
           options.additionalParams
         );
@@ -1189,8 +1172,8 @@ describe("passport-saml /", function () {
           queryParam3: "queryParamRuntimeValue",
         });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams(
-          {} as express.Request,
+        const additionalLogoutParams = samlObj._getAdditionalParams(
+          "",
           "logout",
           options.additionalParams
         );
@@ -1218,14 +1201,11 @@ describe("passport-saml /", function () {
         };
         const samlObj = new SAML(samlConfig);
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {} as express.Request,
-          "authorize"
-        );
+        const additionalAuthorizeParams = samlObj._getAdditionalParams("", "authorize");
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamValueAuthorize" });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams({} as express.Request, "logout");
+        const additionalLogoutParams = samlObj._getAdditionalParams("", "logout");
         Object.keys(additionalLogoutParams).should.have.length(1);
         additionalLogoutParams.should.containEql({ queryParam: "queryParamValueLogout" });
       });
@@ -1251,16 +1231,16 @@ describe("passport-saml /", function () {
           },
         };
 
-        const additionalAuthorizeParams = samlObj.getAdditionalParams(
-          {} as express.Request,
+        const additionalAuthorizeParams = samlObj._getAdditionalParams(
+          "",
           "authorize",
           options.additionalParams
         );
         Object.keys(additionalAuthorizeParams).should.have.length(1);
         additionalAuthorizeParams.should.containEql({ queryParam: "queryParamRuntimeValue" });
 
-        const additionalLogoutParams = samlObj.getAdditionalParams(
-          {} as express.Request,
+        const additionalLogoutParams = samlObj._getAdditionalParams(
+          "",
           "logout",
           options.additionalParams
         );
@@ -1659,7 +1639,7 @@ describe("passport-saml /", function () {
       });
 
       it("onelogin xml document with audience and no AudienceRestriction should not pass", async () => {
-        const signingCert = fs.readFileSync(__dirname + "/static/cert.pem", "utf-8");
+        const signingCert = fs.readFileSync(__dirname + "/../static/cert.pem", "utf-8");
         const xml = `<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="pfx1e2f568f-ba3e-9d81-af54-ab41fdbc648e" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50">
   <saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -1701,7 +1681,7 @@ describe("passport-saml /", function () {
       });
 
       it("onelogin xml document with audience not matching AudienceRestriction should not pass", async () => {
-        const signingCert = fs.readFileSync(__dirname + "/static/cert.pem", "utf-8");
+        const signingCert = fs.readFileSync(__dirname + "/../static/cert.pem", "utf-8");
         const xml = `<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="pfxeda919ac-e0ca-fff5-4987-efd3b459a1d5" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50">
   <saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -1747,7 +1727,7 @@ describe("passport-saml /", function () {
       });
 
       it("onelogin xml document with audience matching AudienceRestriction should pass", async () => {
-        const signingCert = fs.readFileSync(__dirname + "/static/cert.pem", "utf-8");
+        const signingCert = fs.readFileSync(__dirname + "/../static/cert.pem", "utf-8");
         const xml = `<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="pfx9bf4fce3-7a3c-5530-22c9-d7c66cdaac4e" Version="2.0" IssueInstant="2014-05-28T00:16:08Z" Destination="{recipient}" InResponseTo="_a6fc46be84e1e3cf3c50">
   <saml:Issuer>https://app.onelogin.com/saml/metadata/371755</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -1797,7 +1777,7 @@ describe("passport-saml /", function () {
     let samlObj: SAML;
     beforeEach(function () {
       samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/static/cert.pem", "ascii"),
+        cert: fs.readFileSync(__dirname + "/../static/cert.pem", "ascii"),
       });
     });
 
@@ -1812,7 +1792,7 @@ describe("passport-saml /", function () {
     it("errors if bad signature", async () => {
       const body = {
         SAMLRequest: fs.readFileSync(
-          __dirname + "/static/logout_request_with_bad_signature.xml",
+          __dirname + "/../static/logout_request_with_bad_signature.xml",
           "base64"
         ),
       };
@@ -1823,7 +1803,7 @@ describe("passport-saml /", function () {
     it("returns profile for valid signature", async () => {
       const body = {
         SAMLRequest: fs.readFileSync(
-          __dirname + "/static/logout_request_with_good_signature.xml",
+          __dirname + "/../static/logout_request_with_good_signature.xml",
           "base64"
         ),
       };
@@ -1838,7 +1818,7 @@ describe("passport-saml /", function () {
     it("returns profile for valid signature including session index", async () => {
       const body = {
         SAMLRequest: fs.readFileSync(
-          __dirname + "/static/logout_request_with_session_index.xml",
+          __dirname + "/../static/logout_request_with_session_index.xml",
           "base64"
         ),
       };
@@ -1853,12 +1833,12 @@ describe("passport-saml /", function () {
     });
     it("returns profile for valid signature with encrypted nameID", async () => {
       const samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/static/cert.pem", "ascii"),
-        decryptionPvk: fs.readFileSync(__dirname + "/static/key.pem", "ascii"),
+        cert: fs.readFileSync(__dirname + "/../static/cert.pem", "ascii"),
+        decryptionPvk: fs.readFileSync(__dirname + "/../static/key.pem", "ascii"),
       });
       const body = {
         SAMLRequest: fs.readFileSync(
-          __dirname + "/static/logout_request_with_encrypted_name_id.xml",
+          __dirname + "/../static/logout_request_with_encrypted_name_id.xml",
           "base64"
         ),
       };
@@ -1874,12 +1854,12 @@ describe("passport-saml /", function () {
   });
   it("validatePostRequest errors for encrypted nameID with wrong decryptionPvk", async () => {
     const samlObj = new SAML({
-      cert: fs.readFileSync(__dirname + "/static/cert.pem", "ascii"),
-      decryptionPvk: fs.readFileSync(__dirname + "/static/acme_tools_com.key", "ascii"),
+      cert: fs.readFileSync(__dirname + "/../static/cert.pem", "ascii"),
+      decryptionPvk: fs.readFileSync(__dirname + "/../static/acme_tools_com.key", "ascii"),
     });
     const body = {
       SAMLRequest: fs.readFileSync(
-        __dirname + "/static/logout_request_with_encrypted_name_id.xml",
+        __dirname + "/../static/logout_request_with_encrypted_name_id.xml",
         "base64"
       ),
     };
@@ -1890,7 +1870,7 @@ describe("passport-saml /", function () {
 
   it("errors if bad privateKey to requestToURL", async () => {
     const samlObj = new SAML({
-      entryPoint: "foo",
+      entryPoint: "http://localhost",
       privateKey:
         "-----BEGIN CERTIFICATE-----\n" +
         "8mvhvrcCOiJ3mjgKNN1F31jOBJuZNmq0U7n9v+Z+3NfyU/0E9jkrnFvm5ks+p8kl\n" +
@@ -1922,153 +1902,153 @@ describe("passport-saml /", function () {
     });
     const request =
       '<?xml version=\\"1.0\\"?><samlp:AuthnRequest xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" ID=\\"_ea40a8ab177df048d645\\" Version=\\"2.0\\" IssueInstant=\\"2017-08-22T19:30:01.363Z\\" ProtocolBinding=\\"urn:oasis:names$tc:SAML:2.0:bindings:HTTP-POST\\" AssertionConsumerServiceURL=\\"https://example.com/login/callback\\" Destination=\\"https://www.example.com\\"><saml:Issuer xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">onelogin_saml</saml:Issuer><s$mlp:NameIDPolicy xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protocol\\" Format=\\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\\" AllowCreate=\\"true\\"/><samlp:RequestedAuthnContext xmlns:samlp=\\"urn:oasis:names:tc:SAML:2.0:protoc$l\\" Comparison=\\"exact\\"><saml:AuthnContextClassRef xmlns:saml=\\"urn:oasis:names:tc:SAML:2.0:assertion\\">urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></samlp:RequestedAuthnContext></samlp$AuthnRequest>';
-    await assert.rejects(samlObj.requestToUrlAsync(request, null, "authorize", {}), {
+    await assert.rejects(samlObj._requestToUrlAsync(request, null, "authorize", {}), {
       message: /no start line/,
     });
   });
-});
 
-describe("validateRedirect()", function () {
-  describe("idp slo", function () {
-    let samlObj: SAML;
-    let fakeClock: sinon.SinonFakeTimers;
-    beforeEach(function () {
-      samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
-        idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
+  describe("validateRedirect()", function () {
+    describe("idp slo", function () {
+      let samlObj: SAML;
+      let fakeClock: sinon.SinonFakeTimers;
+      beforeEach(function () {
+        samlObj = new SAML({
+          cert: fs.readFileSync(__dirname + "/../static/acme_tools_com.cert", "ascii"),
+          idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
+        });
+        this.request = Object.assign(
+          {},
+          JSON.parse(fs.readFileSync(__dirname + "/../static/idp_slo_redirect.json", "utf8"))
+        );
+        fakeClock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
       });
-      this.request = Object.assign(
-        {},
-        JSON.parse(fs.readFileSync(__dirname + "/static/idp_slo_redirect.json", "utf8"))
-      );
-      fakeClock = sinon.useFakeTimers(Date.parse("2018-04-11T14:08:00Z"));
-    });
-    afterEach(function () {
-      fakeClock.restore();
-    });
-    it("errors if bad xml", async function () {
-      const body = {
-        SAMLRequest: "asdf",
-      };
-      await assert.rejects(samlObj.validateRedirectAsync(body, this.request.originalQuery));
-    });
-    it("errors if idpIssuer is set and issuer is wrong", async function () {
-      samlObj.options.idpIssuer = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        {
-          message:
-            "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
-        }
-      );
-    });
-    it("errors if request has expired", async function () {
-      fakeClock.restore();
-      fakeClock = sinon.useFakeTimers(Date.parse("2100-04-11T14:08:00Z"));
+      afterEach(function () {
+        fakeClock.restore();
+      });
+      it("errors if bad xml", async function () {
+        const body = {
+          SAMLRequest: "asdf",
+        };
+        await assert.rejects(samlObj.validateRedirectAsync(body, this.request.originalQuery));
+      });
+      it("errors if idpIssuer is set and issuer is wrong", async function () {
+        samlObj.options.idpIssuer = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          {
+            message:
+              "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
+          }
+        );
+      });
+      it("errors if request has expired", async function () {
+        fakeClock.restore();
+        fakeClock = sinon.useFakeTimers(Date.parse("2100-04-11T14:08:00Z"));
 
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "SAML assertion expired" }
-      );
-    });
-    it("errors if request has a bad signature", async function () {
-      this.request.Signature = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "Invalid query signature" }
-      );
-    });
-    it("returns profile for valid signature including session index", async function () {
-      const { profile } = await samlObj.validateRedirectAsync(
-        this.request,
-        this.request.originalQuery
-      );
-      profile!.should.eql({
-        ID: "_8f0effde308adfb6ae7f1e29b414957fc320f5636f",
-        issuer: "http://localhost:20000/saml2/idp/metadata.php",
-        nameID: "stavros@workable.com",
-        nameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        sessionIndex: "_00bf7b2d5d9d3c970217eecefb1194bef3362a618e",
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "SAML assertion expired" }
+        );
+      });
+      it("errors if request has a bad signature", async function () {
+        this.request.Signature = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "Invalid query signature" }
+        );
+      });
+      it("returns profile for valid signature including session index", async function () {
+        const { profile } = await samlObj.validateRedirectAsync(
+          this.request,
+          this.request.originalQuery
+        );
+        profile!.should.eql({
+          ID: "_8f0effde308adfb6ae7f1e29b414957fc320f5636f",
+          issuer: "http://localhost:20000/saml2/idp/metadata.php",
+          nameID: "stavros@workable.com",
+          nameIDFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+          sessionIndex: "_00bf7b2d5d9d3c970217eecefb1194bef3362a618e",
+        });
       });
     });
-  });
-  describe("sp slo", function () {
-    let samlObj: SAML;
+    describe("sp slo", function () {
+      let samlObj: SAML;
 
-    beforeEach(function () {
-      samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/static/acme_tools_com.cert", "ascii"),
-        idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
-        validateInResponseTo: true,
+      beforeEach(function () {
+        samlObj = new SAML({
+          cert: fs.readFileSync(__dirname + "/../static/acme_tools_com.cert", "ascii"),
+          idpIssuer: "http://localhost:20000/saml2/idp/metadata.php",
+          validateInResponseTo: true,
+        });
+        this.request = Object.assign(
+          {},
+          JSON.parse(fs.readFileSync(__dirname + "/../static/sp_slo_redirect.json", "utf8"))
+        );
       });
-      this.request = Object.assign(
-        {},
-        JSON.parse(fs.readFileSync(__dirname + "/static/sp_slo_redirect.json", "utf8"))
-      );
-    });
-    afterEach(async function () {
-      await samlObj.cacheProvider.removeAsync("_79db1e7ad12ca1d63e5b");
-    });
-    it("errors if bad xml", async function () {
-      const body = {
-        SAMLRequest: "asdf",
-      };
-      await assert.rejects(samlObj.validateRedirectAsync(body, null));
-    });
-    it("errors if idpIssuer is set and wrong issuer", async function () {
-      samlObj.options.idpIssuer = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        {
-          message:
-            "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
-        }
-      );
-    });
-    it("errors if unsuccessful", async function () {
-      this.request = JSON.parse(
-        fs.readFileSync(__dirname + "/static/sp_slo_redirect_failure.json", "utf8")
-      );
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester" }
-      );
-    });
-    it("errors if InResponseTo is not found", async function () {
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "InResponseTo is not valid" }
-      );
-    });
-    it("errors if bad signature", async function () {
-      await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
-      this.request.Signature = "foo";
-      await assert.rejects(
-        samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
-        { message: "Invalid query signature" }
-      );
-    });
+      afterEach(async function () {
+        await samlObj.cacheProvider.removeAsync("_79db1e7ad12ca1d63e5b");
+      });
+      it("errors if bad xml", async function () {
+        const body = {
+          SAMLRequest: "asdf",
+        };
+        await assert.rejects(samlObj.validateRedirectAsync(body, null));
+      });
+      it("errors if idpIssuer is set and wrong issuer", async function () {
+        samlObj.options.idpIssuer = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          {
+            message:
+              "Unknown SAML issuer. Expected: foo Received: http://localhost:20000/saml2/idp/metadata.php",
+          }
+        );
+      });
+      it("errors if unsuccessful", async function () {
+        this.request = JSON.parse(
+          fs.readFileSync(__dirname + "/../static/sp_slo_redirect_failure.json", "utf8")
+        );
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "Bad status code: urn:oasis:names:tc:SAML:2.0:status:Requester" }
+        );
+      });
+      it("errors if InResponseTo is not found", async function () {
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "InResponseTo is not valid" }
+        );
+      });
+      it("errors if bad signature", async function () {
+        await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
+        this.request.Signature = "foo";
+        await assert.rejects(
+          samlObj.validateRedirectAsync(this.request, this.request.originalQuery),
+          { message: "Invalid query signature" }
+        );
+      });
 
-    it("returns true for valid signature", async function () {
-      await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
-      const { loggedOut } = await samlObj.validateRedirectAsync(
-        this.request,
-        this.request.originalQuery
-      );
-      loggedOut!.should.eql(true);
-    });
+      it("returns true for valid signature", async function () {
+        await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
+        const { loggedOut } = await samlObj.validateRedirectAsync(
+          this.request,
+          this.request.originalQuery
+        );
+        loggedOut!.should.eql(true);
+      });
 
-    it("accepts cert without header and footer line", async function () {
-      samlObj.options.cert = fs.readFileSync(
-        __dirname + "/static/acme_tools_com_without_header_and_footer.cert",
-        "ascii"
-      );
-      await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
-      const { loggedOut } = await samlObj.validateRedirectAsync(
-        this.request,
-        this.request.originalQuery
-      );
-      loggedOut!.should.eql(true);
+      it("accepts cert without header and footer line", async function () {
+        samlObj.options.cert = fs.readFileSync(
+          __dirname + "/../static/acme_tools_com_without_header_and_footer.cert",
+          "ascii"
+        );
+        await samlObj.cacheProvider.saveAsync("_79db1e7ad12ca1d63e5b", new Date().toISOString());
+        const { loggedOut } = await samlObj.validateRedirectAsync(
+          this.request,
+          this.request.originalQuery
+        );
+        loggedOut!.should.eql(true);
+      });
     });
   });
 });

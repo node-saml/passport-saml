@@ -1,11 +1,11 @@
 import Debug from "debug";
-const debug = Debug("passport-saml");
+const debug = Debug("node-saml");
 import * as zlib from "zlib";
 import * as xml2js from "xml2js";
 import * as xmlCrypto from "xml-crypto";
 import * as crypto from "crypto";
 import * as xmldom from "xmldom";
-import * as url from "url";
+import { URL } from "url";
 import * as querystring from "querystring";
 import * as xmlbuilder from "xmlbuilder";
 import * as xmlenc from "xml-encryption";
@@ -13,26 +13,21 @@ import * as util from "util";
 import { CacheProvider as InMemoryCacheProvider } from "./inmemory-cache-provider";
 import * as algorithms from "./algorithms";
 import { signAuthnRequestPost } from "./saml-post-signing";
-import type { Request } from "express";
 import { ParsedQs } from "qs";
 import {
   AudienceRestrictionXML,
-  AuthenticateOptions,
-  AuthorizeOptions,
   AuthorizeRequestXML,
   CertCallback,
   LogoutRequestXML,
-  Profile,
-  RequestWithUser,
-  SamlOptions,
   SamlIDPListConfig,
   SamlIDPEntryConfig,
+  SamlOptions,
   ServiceMetadataXML,
   XMLInput,
   XMLObject,
   XMLOutput,
-  SamlConfig,
 } from "./types";
+import { AuthenticateOptions, AuthorizeOptions, Profile, SamlConfig } from "../passport-saml/types";
 import { assertRequired } from "./utility";
 
 const inflateRawAsync = util.promisify(zlib.inflateRaw);
@@ -62,7 +57,7 @@ async function processValidlySignedPostRequestAsync(
     } else {
       throw new Error("Missing SAML issuer");
     }
-    const nameID = await self.getNameIdAsync(self, dom);
+    const nameID = await self._getNameIdAsync(self, dom);
     if (nameID) {
       profile.nameID = nameID.value!;
       if (nameID.format) {
@@ -107,6 +102,8 @@ async function promiseWithNameID(nameid: Node): Promise<NameID> {
 }
 
 class SAML {
+  // note that some methods in SAML are not yet marked as private as they are used in testing.
+  // those methods start with an underscore, e.g. _generateUniqueID
   options: SamlOptions;
   // This is only for testing
   cacheProvider!: InMemoryCacheProvider;
@@ -172,34 +169,34 @@ class SAML {
     return options;
   }
 
-  getProtocol(req: Request | { headers?: undefined; protocol?: undefined }) {
-    return this.options.protocol || (req.protocol || "http").concat("://");
-  }
-
-  getCallbackUrl(req: Request | { headers?: undefined; protocol?: undefined }) {
+  private getCallbackUrl(host?: string | undefined) {
     // Post-auth destination
     if (this.options.callbackUrl) {
       return this.options.callbackUrl;
     } else {
-      let host;
-      if (req.headers) {
-        host = req.headers.host;
+      const url = new URL("http://localhost");
+      if (host) {
+        url.host = host;
       } else {
-        host = this.options.host;
+        url.host = this.options.host;
       }
-      return this.getProtocol(req) + host + this.options.path;
+      if (this.options.protocol) {
+        url.protocol = this.options.protocol;
+      }
+      url.pathname = this.options.path;
+      return url.toString();
     }
   }
 
-  generateUniqueID() {
+  _generateUniqueID() {
     return crypto.randomBytes(10).toString("hex");
   }
 
-  generateInstant() {
+  private generateInstant() {
     return new Date().toISOString();
   }
 
-  signRequest(samlMessage: querystring.ParsedUrlQueryInput): void {
+  private signRequest(samlMessage: querystring.ParsedUrlQueryInput): void {
     this.options.privateKey = assertRequired(this.options.privateKey, "privateKey is required");
 
     const samlMessageToSign: querystring.ParsedUrlQueryInput = {};
@@ -218,17 +215,17 @@ class SAML {
       samlMessageToSign.SigAlg = samlMessage.SigAlg;
     }
     signer.update(querystring.stringify(samlMessageToSign));
-    samlMessage.Signature = signer.sign(this.keyToPEM(this.options.privateKey), "base64");
+    samlMessage.Signature = signer.sign(this._keyToPEM(this.options.privateKey), "base64");
   }
 
-  async generateAuthorizeRequestAsync(
-    req: Request,
+  private async generateAuthorizeRequestAsync(
     isPassive: boolean,
-    isHttpPostBinding: boolean
+    isHttpPostBinding: boolean,
+    host: string | undefined
   ): Promise<string | undefined> {
     this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
 
-    const id = "_" + this.generateUniqueID();
+    const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
     if (this.options.validateInResponseTo) {
@@ -256,7 +253,7 @@ class SAML {
     }
 
     if (!this.options.disableRequestAcsUrl) {
-      request["samlp:AuthnRequest"]["@AssertionConsumerServiceURL"] = this.getCallbackUrl(req);
+      request["samlp:AuthnRequest"]["@AssertionConsumerServiceURL"] = this.getCallbackUrl(host);
     }
 
     if (this.options.identifierFormat != null) {
@@ -354,8 +351,8 @@ class SAML {
     return stringRequest;
   }
 
-  async generateLogoutRequest(req: RequestWithUser) {
-    const id = "_" + this.generateUniqueID();
+  async _generateLogoutRequest(user: Profile) {
+    const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
     const request = {
@@ -371,24 +368,24 @@ class SAML {
           "#text": this.options.issuer,
         },
         "saml:NameID": {
-          "@Format": req.user!.nameIDFormat,
-          "#text": req.user!.nameID,
+          "@Format": user!.nameIDFormat,
+          "#text": user!.nameID,
         },
       },
     } as LogoutRequestXML;
 
-    if (req.user!.nameQualifier != null) {
-      request["samlp:LogoutRequest"]["saml:NameID"]["@NameQualifier"] = req.user!.nameQualifier;
+    if (user!.nameQualifier != null) {
+      request["samlp:LogoutRequest"]["saml:NameID"]["@NameQualifier"] = user!.nameQualifier;
     }
 
-    if (req.user!.spNameQualifier != null) {
-      request["samlp:LogoutRequest"]["saml:NameID"]["@SPNameQualifier"] = req.user!.spNameQualifier;
+    if (user!.spNameQualifier != null) {
+      request["samlp:LogoutRequest"]["saml:NameID"]["@SPNameQualifier"] = user!.spNameQualifier;
     }
 
-    if (req.user!.sessionIndex) {
+    if (user!.sessionIndex) {
       request["samlp:LogoutRequest"]["saml2p:SessionIndex"] = {
         "@xmlns:saml2p": "urn:oasis:names:tc:SAML:2.0:protocol",
-        "#text": req.user!.sessionIndex,
+        "#text": user!.sessionIndex,
       };
     }
 
@@ -396,8 +393,8 @@ class SAML {
     return xmlbuilder.create((request as unknown) as Record<string, any>).end();
   }
 
-  generateLogoutResponse(req: Request, logoutRequest: Profile) {
-    const id = "_" + this.generateUniqueID();
+  _generateLogoutResponse(logoutRequest: Profile) {
+    const id = "_" + this._generateUniqueID();
     const instant = this.generateInstant();
 
     const request = {
@@ -423,7 +420,7 @@ class SAML {
     return xmlbuilder.create(request).end();
   }
 
-  async requestToUrlAsync(
+  async _requestToUrlAsync(
     request: string | null | undefined,
     response: string | null,
     operation: string,
@@ -439,11 +436,11 @@ class SAML {
     }
 
     const base64 = buffer.toString("base64");
-    let target = url.parse(this.options.entryPoint, true);
+    let target = new URL(this.options.entryPoint);
 
     if (operation === "logout") {
       if (this.options.logoutUrl) {
-        target = url.parse(this.options.logoutUrl, true);
+        target = new URL(this.options.logoutUrl);
       }
     } else if (operation !== "authorize") {
       throw new Error("Unknown operation: " + operation);
@@ -468,25 +465,20 @@ class SAML {
       this.signRequest(samlMessage);
     }
     Object.keys(samlMessage).forEach((k) => {
-      target.query[k] = samlMessage[k];
+      target.searchParams.set(k, samlMessage[k] as string);
     });
 
-    // Delete 'search' to for pulling query string from 'query'
-    // https://nodejs.org/api/url.html#url_url_format_urlobj
-    target.search = null;
-
-    return url.format(target);
+    return target.toString();
   }
 
-  getAdditionalParams(
-    req: Request,
+  _getAdditionalParams(
+    RelayState: string,
     operation: string,
     overrideParams?: querystring.ParsedUrlQuery
   ): querystring.ParsedUrlQuery {
     const additionalParams: querystring.ParsedUrlQuery = {};
 
-    const RelayState = (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-    if (RelayState) {
+    if (typeof RelayState === "string" && RelayState.length > 0) {
       additionalParams.RelayState = RelayState;
     }
 
@@ -515,19 +507,23 @@ class SAML {
     return additionalParams;
   }
 
-  async getAuthorizeUrlAsync(req: Request, options: AuthorizeOptions): Promise<string> {
-    const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, false);
+  async getAuthorizeUrlAsync(
+    RelayState: string,
+    host: string | undefined,
+    options: AuthorizeOptions
+  ): Promise<string> {
+    const request = await this.generateAuthorizeRequestAsync(this.options.passive, false, host);
     const operation = "authorize";
     const overrideParams = options ? options.additionalParams || {} : {};
-    return await this.requestToUrlAsync(
+    return await this._requestToUrlAsync(
       request,
       null,
       operation,
-      this.getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(RelayState, operation, overrideParams)
     );
   }
 
-  async getAuthorizeFormAsync(req: Request): Promise<string> {
+  async getAuthorizeFormAsync(RelayState: string, host?: string): Promise<string> {
     this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
 
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
@@ -560,7 +556,7 @@ class SAML {
       );
     };
 
-    const request = await this.generateAuthorizeRequestAsync(req, this.options.passive, true);
+    const request = await this.generateAuthorizeRequestAsync(this.options.passive, true, host);
     let buffer: Buffer;
     if (this.options.skipRequestCompression) {
       buffer = Buffer.from(request!, "utf8");
@@ -569,7 +565,7 @@ class SAML {
     }
 
     const operation = "authorize";
-    const additionalParameters = this.getAdditionalParams(req, operation);
+    const additionalParameters = this._getAdditionalParams(RelayState, operation);
     const samlMessage: querystring.ParsedUrlQueryInput = {
       SAMLRequest: buffer!.toString("base64"),
     };
@@ -605,41 +601,49 @@ class SAML {
     ].join("\r\n");
   }
 
-  async getLogoutUrlAsync(req: RequestWithUser, options: AuthenticateOptions & AuthorizeOptions) {
-    const request = await this.generateLogoutRequest(req);
+  async getLogoutUrlAsync(
+    user: Profile,
+    RelayState: string,
+    options: AuthenticateOptions & AuthorizeOptions
+  ) {
+    const request = await this._generateLogoutRequest(user);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
-    return await this.requestToUrlAsync(
+    return await this._requestToUrlAsync(
       request,
       null,
       operation,
-      this.getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(RelayState, operation, overrideParams)
     );
   }
 
   getLogoutResponseUrl(
-    req: RequestWithUser,
+    samlLogoutRequest: Profile,
+    RelayState: string,
     options: AuthenticateOptions & AuthorizeOptions,
     callback: (err: Error | null, url?: string | null) => void
   ): void {
-    util.callbackify(() => this.getLogoutResponseUrlAsync(req, options))(callback);
+    util.callbackify(() => this.getLogoutResponseUrlAsync(samlLogoutRequest, RelayState, options))(
+      callback
+    );
   }
-  async getLogoutResponseUrlAsync(
-    req: RequestWithUser,
-    options: AuthenticateOptions & AuthorizeOptions
+  private async getLogoutResponseUrlAsync(
+    samlLogoutRequest: Profile,
+    RelayState: string,
+    options: AuthenticateOptions & AuthorizeOptions // add RelayState,
   ): Promise<string> {
-    const response = this.generateLogoutResponse(req, req.samlLogoutRequest);
+    const response = this._generateLogoutResponse(samlLogoutRequest);
     const operation = "logout";
     const overrideParams = options ? options.additionalParams || {} : {};
-    return await this.requestToUrlAsync(
+    return await this._requestToUrlAsync(
       null,
       response,
       operation,
-      this.getAdditionalParams(req, operation, overrideParams)
+      this._getAdditionalParams(RelayState, operation, overrideParams)
     );
   }
 
-  certToPEM(cert: string): string {
+  _certToPEM(cert: string): string {
     cert = cert.match(/.{1,64}/g)!.join("\n");
 
     if (cert.indexOf("-BEGIN CERTIFICATE-") === -1) cert = "-----BEGIN CERTIFICATE-----\n" + cert;
@@ -648,7 +652,7 @@ class SAML {
     return cert;
   }
 
-  async certsToCheck(): Promise<string[]> {
+  private async certsToCheck(): Promise<string[]> {
     let checkedCerts: string[];
 
     if (typeof this.options.cert === "function") {
@@ -712,7 +716,7 @@ class SAML {
     sig.keyInfoProvider = {
       file: "",
       getKeyInfo: () => "<X509Data></X509Data>",
-      getKey: () => Buffer.from(this.certToPEM(cert)),
+      getKey: () => Buffer.from(this._certToPEM(cert)),
     };
     signature = this.normalizeNewlines(signature.toString());
     sig.loadSignature(signature);
@@ -907,7 +911,7 @@ class SAML {
     }
   }
 
-  async validateInResponseTo(inResponseTo: string | null): Promise<undefined> {
+  private async validateInResponseTo(inResponseTo: string | null): Promise<undefined> {
     if (this.options.validateInResponseTo) {
       if (inResponseTo) {
         const result = await this.cacheProvider.getAsync(inResponseTo);
@@ -945,7 +949,7 @@ class SAML {
     return await processValidlySignedSamlLogoutAsync(this, doc, dom);
   }
 
-  async hasValidSignatureForRedirect(
+  private async hasValidSignatureForRedirect(
     container: ParsedQs,
     originalQuery: string | null
   ): Promise<boolean | void> {
@@ -983,7 +987,7 @@ class SAML {
     }
   }
 
-  validateSignatureForRedirect(
+  private validateSignatureForRedirect(
     urlString: crypto.BinaryLike,
     signature: string,
     alg: string,
@@ -1007,10 +1011,10 @@ class SAML {
     const verifier = crypto.createVerify(matchingAlgo);
     verifier.update(urlString);
 
-    return verifier.verify(this.certToPEM(cert), signature, "base64");
+    return verifier.verify(this._certToPEM(cert), signature, "base64");
   }
 
-  verifyLogoutRequest(doc: XMLOutput) {
+  private verifyLogoutRequest(doc: XMLOutput) {
     this.verifyIssuer(doc.LogoutRequest);
     const nowMs = new Date().getTime();
     const conditions = doc.LogoutRequest.$;
@@ -1024,7 +1028,7 @@ class SAML {
     }
   }
 
-  async verifyLogoutResponse(doc: XMLOutput) {
+  private async verifyLogoutResponse(doc: XMLOutput) {
     const statusCode = doc.LogoutResponse.Status[0].StatusCode[0].$.Value;
     if (statusCode !== "urn:oasis:names:tc:SAML:2.0:status:Success")
       throw new Error("Bad status code: " + statusCode);
@@ -1038,7 +1042,7 @@ class SAML {
     return true;
   }
 
-  verifyIssuer(samlMessage: XMLOutput) {
+  private verifyIssuer(samlMessage: XMLOutput) {
     if (this.options.idpIssuer != null) {
       const issuer = samlMessage.Issuer;
       if (issuer) {
@@ -1052,7 +1056,7 @@ class SAML {
     }
   }
 
-  async processValidlySignedAssertionAsync(
+  private async processValidlySignedAssertionAsync(
     xml: xml2js.convertableToString,
     samlResponseXml: string,
     inResponseTo: string
@@ -1231,7 +1235,7 @@ class SAML {
     return { profile, loggedOut: false };
   }
 
-  checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
+  private checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
     if (this.options.acceptedClockSkewMs == -1) return null;
 
     if (notBefore) {
@@ -1248,7 +1252,7 @@ class SAML {
     return null;
   }
 
-  checkAudienceValidityError(
+  private checkAudienceValidityError(
     expectedAudience: string,
     audienceRestrictions: AudienceRestrictionXML[]
   ) {
@@ -1293,7 +1297,7 @@ class SAML {
     return await processValidlySignedPostRequestAsync(this, doc, dom);
   }
 
-  async getNameIdAsync(self: SAML, doc: Node): Promise<NameID> {
+  async _getNameIdAsync(self: SAML, doc: Node): Promise<NameID> {
     const nameIds = xmlCrypto.xpath(
       doc,
       "/*[local-name()='LogoutRequest']/*[local-name()='NameID']"
@@ -1427,14 +1431,14 @@ class SAML {
       "@index": "1",
       "@isDefault": "true",
       "@Binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
-      "@Location": this.getCallbackUrl({}),
+      "@Location": this.getCallbackUrl(),
     };
     return xmlbuilder
       .create((metadata as unknown) as Record<string, any>)
       .end({ pretty: true, indent: "  ", newline: "\n" });
   }
 
-  keyToPEM(key: string | Buffer): typeof key extends string | Buffer ? string | Buffer : Error {
+  _keyToPEM(key: string | Buffer): typeof key extends string | Buffer ? string | Buffer : Error {
     key = assertRequired(key, "key is required");
 
     if (typeof key !== "string") return key;

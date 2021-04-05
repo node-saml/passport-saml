@@ -1,9 +1,9 @@
 "use strict";
 
 import * as sinon from "sinon";
-import { SAML, Strategy as SamlStrategy } from "../src/passport-saml";
-import { RequestWithUser } from "../src/passport-saml/types";
-import { FAKE_CERT } from "./types";
+import { SAML, Strategy as SamlStrategy } from "../../src/passport-saml";
+import { RequestWithUser } from "../../src/passport-saml/types";
+import { FAKE_CERT } from "../types";
 
 const noop = () => undefined;
 

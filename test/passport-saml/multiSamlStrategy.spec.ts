@@ -2,15 +2,15 @@
 import * as express from "express";
 import * as sinon from "sinon";
 import * as should from "should";
-import { Strategy as SamlStrategy, MultiSamlStrategy, SAML } from "../src/passport-saml";
+import { Strategy as SamlStrategy, MultiSamlStrategy, SAML } from "../../src/passport-saml";
 import {
   MultiSamlConfig,
   SamlOptionsCallback,
   RequestWithUser,
   SamlConfig,
-} from "../src/passport-saml/types";
+} from "../../src/passport-saml/types";
 import assert = require("assert");
-import { FAKE_CERT } from "./types";
+import { FAKE_CERT } from "../types";
 
 const noop = () => undefined;
 

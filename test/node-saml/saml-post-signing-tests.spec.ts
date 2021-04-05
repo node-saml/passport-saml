@@ -1,8 +1,9 @@
 import * as fs from "fs";
-import { signSamlPost, signAuthnRequestPost } from "../src/passport-saml/saml-post-signing";
-import { SamlOptions, SamlSigningOptions } from "../src/passport-saml/types";
+import * as should from "should";
+import { signSamlPost, signAuthnRequestPost } from "../../src/node-saml/saml-post-signing";
+import { SamlSigningOptions } from "../../src/node-saml/types";
 
-const signingKey = fs.readFileSync(__dirname + "/static/key.pem");
+const signingKey = fs.readFileSync(__dirname + "/../static/key.pem");
 
 describe("SAML POST Signing", function () {
   it("should sign a simple saml request", function () {
