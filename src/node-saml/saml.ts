@@ -523,7 +523,7 @@ class SAML {
     );
   }
 
-  async getAuthorizeFormAsync(RelayState: string, host: string | undefined): Promise<string> {
+  async getAuthorizeFormAsync(RelayState: string, host?: string): Promise<string> {
     this.options.entryPoint = assertRequired(this.options.entryPoint, "entryPoint is required");
 
     // The quoteattr() function is used in a context, where the result will not be evaluated by javascript
