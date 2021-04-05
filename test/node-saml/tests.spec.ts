@@ -56,7 +56,7 @@ describe("node-saml /", function () {
         const logoutRequestPromise = samlObj._generateLogoutRequest({
           nameIDFormat: "foo",
           nameID: "bar",
-        } as Profile);
+        });
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -113,7 +113,7 @@ describe("node-saml /", function () {
           nameID: "bar",
           nameQualifier: "Identity Provider",
           spNameQualifier: "Service Provider",
-        } as Profile);
+        });
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -158,7 +158,7 @@ describe("node-saml /", function () {
       };
 
       const samlObj = new SAML({ entryPoint: "foo", cert: FAKE_CERT });
-      const logoutRequest = samlObj._generateLogoutResponse({ ID: "quux" } as Profile);
+      const logoutRequest = samlObj._generateLogoutResponse({ ID: "quux" });
       parseString(logoutRequest, function (err, doc) {
         try {
           delete doc["samlp:LogoutResponse"]["$"]["ID"];
@@ -198,7 +198,7 @@ describe("node-saml /", function () {
           nameIDFormat: "foo",
           nameID: "bar",
           sessionIndex: "session-id",
-        } as Profile);
+        });
 
         logoutRequestPromise
           .then(function (logoutRequest) {
@@ -248,7 +248,7 @@ describe("node-saml /", function () {
         nameIDFormat: "foo",
         nameID: "bar",
         sessionIndex: "session-id",
-      } as Profile);
+      });
 
       logoutRequestPromise.then(function (logoutRequest) {
         parseString(logoutRequest, function (err, doc) {
