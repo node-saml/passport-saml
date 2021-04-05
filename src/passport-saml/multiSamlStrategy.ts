@@ -1,6 +1,5 @@
-import * as util from "util";
 import { SAML } from "../node-saml";
-import SamlStrategy = require("./strategy");
+import { AbstractStrategy } from "./strategy";
 import type { Request } from "express";
 import {
   AuthenticateOptions,
@@ -11,9 +10,8 @@ import {
   VerifyWithRequest,
 } from "./types";
 
-class MultiSamlStrategy extends SamlStrategy {
+export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
-
   _options: SamlConfig & MultiSamlConfig;
 
   constructor(options: MultiSamlConfig, verify: VerifyWithRequest);
@@ -63,7 +61,6 @@ class MultiSamlStrategy extends SamlStrategy {
     });
   }
 
-  /** @ts-expect-error typescript disallows changing method signature in a subclass */
   generateServiceProviderMetadata(
     req: Request,
     decryptionCert: string | null,
@@ -84,7 +81,7 @@ class MultiSamlStrategy extends SamlStrategy {
       Object.setPrototypeOf(strategy, this);
       return callback(
         null,
-        super.generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert)
+        this._generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert)
       );
     });
   }
@@ -94,5 +91,3 @@ class MultiSamlStrategy extends SamlStrategy {
     super.error(err);
   }
 }
-
-export = MultiSamlStrategy;
