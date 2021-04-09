@@ -1,16 +1,16 @@
-import { SAML } from "../src/passport-saml";
+import { SAML } from "../../src/node-saml";
 import * as fs from "fs";
 import * as sinon from "sinon";
-import { SamlConfig } from "../src/passport-saml/types";
+import { SamlConfig } from "../../src/passport-saml/types";
 import assert = require("assert");
 
-const cert = fs.readFileSync(__dirname + "/static/cert.pem", "ascii");
+const cert = fs.readFileSync(__dirname + "/../static/cert.pem", "ascii");
 
 describe("Signatures", function () {
   const INVALID_SIGNATURE = "Invalid signature",
     INVALID_ENCRYPTED_SIGNATURE = "Invalid signature from encrypted assertion",
     createBody = (pathToXml: string) => ({
-      SAMLResponse: fs.readFileSync(__dirname + "/static/signatures" + pathToXml, "base64"),
+      SAMLResponse: fs.readFileSync(__dirname + "/../static/signatures" + pathToXml, "base64"),
     }),
     testOneResponseBody = async (
       samlResponseBody: Record<string, string>,
@@ -95,7 +95,7 @@ describe("Signatures", function () {
         INVALID_ENCRYPTED_SIGNATURE,
         2,
         {
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
           wantAssertionsSigned: true,
         }
       )
@@ -118,7 +118,7 @@ describe("Signatures", function () {
         INVALID_ENCRYPTED_SIGNATURE,
         2,
         {
-          decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
+          decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
           wantAssertionsSigned: true,
         }
       )
@@ -264,7 +264,7 @@ describe("Signatures", function () {
   describe("Signature on saml:Response with non-LF line endings", () => {
     const samlResponseXml = fs
       .readFileSync(
-        __dirname + "/static/signatures/valid/response.root-signed.assertion-signed.xml"
+        __dirname + "/../static/signatures/valid/response.root-signed.assertion-signed.xml"
       )
       .toString();
     const makeBody = (str: string) => ({ SAMLResponse: Buffer.from(str).toString("base64") });
@@ -277,6 +277,28 @@ describe("Signatures", function () {
     it("CR line endings", async () => {
       const body = makeBody(samlResponseXml.replace(/\n/g, "\r"));
       await testOneResponseBody(body, false, 1);
+    });
+  });
+
+  describe("Signature on saml:Response with XML-encoded carriage returns", () => {
+    const samlResponseXml = fs
+      .readFileSync(
+        __dirname + "/../static/signatures/valid/response.root-unsigned.assertion-signed.xml"
+      )
+      .toString();
+    const makeBody = (str: string) => ({ SAMLResponse: Buffer.from(str).toString("base64") });
+
+    const insertChars = (str: string, where: string, chars: string) =>
+      str.replace(new RegExp(`(<ds:${where}>)(.{10})(.{10})`), `$1$2${chars}$3`);
+
+    it("SignatureValue with &#13;", async () => {
+      const body = makeBody(insertChars(samlResponseXml, "SignatureValue", "&#13;"));
+      await testOneResponseBody(body, false, 2);
+    });
+
+    it("SignatureValue with &#xd;", async () => {
+      const body = makeBody(insertChars(samlResponseXml, "SignatureValue", "&#xd;"));
+      await testOneResponseBody(body, false, 2);
     });
   });
 });

@@ -1,16 +1,17 @@
 "use strict";
 import * as express from "express";
+import { Strategy } from "passport-strategy";
 import * as sinon from "sinon";
 import * as should from "should";
-import { Strategy as SamlStrategy, MultiSamlStrategy, SAML } from "../src/passport-saml";
+import { MultiSamlStrategy, SAML, AbstractStrategy } from "../../src/passport-saml";
 import {
   MultiSamlConfig,
   SamlOptionsCallback,
   RequestWithUser,
   SamlConfig,
-} from "../src/passport-saml/types";
+} from "../../src/passport-saml/types";
 import assert = require("assert");
-import { FAKE_CERT } from "./types";
+import { FAKE_CERT } from "../types";
 
 const noop = () => undefined;
 
@@ -20,7 +21,8 @@ describe("MultiSamlStrategy()", function () {
       return { cert: FAKE_CERT };
     }
     const strategy = new MultiSamlStrategy({ getSamlOptions }, noop);
-    strategy.should.be.an.instanceOf(SamlStrategy);
+    strategy.should.be.an.instanceOf(AbstractStrategy);
+    strategy.should.be.an.instanceOf(Strategy);
   });
 
   it("throws if wrong finder is provided", function () {
@@ -33,7 +35,7 @@ describe("MultiSamlStrategy()", function () {
 
 describe("MultiSamlStrategy#authenticate", function () {
   beforeEach(function () {
-    this.superAuthenticateStub = sinon.stub(SamlStrategy.prototype, "authenticate");
+    this.superAuthenticateStub = sinon.stub(AbstractStrategy.prototype, "authenticate");
   });
 
   afterEach(function () {
@@ -154,7 +156,7 @@ describe("MultiSamlStrategy#authorize", function () {
 
 describe("MultiSamlStrategy#logout", function () {
   beforeEach(function () {
-    this.superLogoutMock = sinon.stub(SamlStrategy.prototype, "logout");
+    this.superLogoutMock = sinon.stub(AbstractStrategy.prototype, "logout");
   });
 
   afterEach(function () {
@@ -229,7 +231,7 @@ describe("MultiSamlStrategy#logout", function () {
 describe("MultiSamlStrategy#generateServiceProviderMetadata", function () {
   beforeEach(function () {
     this.superGenerateServiceProviderMetadata = sinon
-      .stub(SamlStrategy.prototype, "generateServiceProviderMetadata")
+      .stub(SAML.prototype, "generateServiceProviderMetadata")
       .returns("My Metadata Result");
   });
 

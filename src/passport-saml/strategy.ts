@@ -1,23 +1,21 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
-import * as saml from "./saml";
+import { SAML } from "../node-saml";
 import * as url from "url";
 import {
   AuthenticateOptions,
-  AuthorizeOptions,
   RequestWithUser,
   SamlConfig,
-  StrategyOptions,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
 import { Profile } from "./types";
 
-class Strategy extends PassportStrategy {
-  static readonly newSamlProviderOnConstruct = true;
+export abstract class AbstractStrategy extends PassportStrategy {
+  static readonly newSamlProviderOnConstruct: boolean;
 
   name: string;
   _verify: VerifyWithRequest | VerifyWithoutRequest;
-  _saml: saml.SAML | undefined;
+  _saml: SAML | undefined;
   _passReqToCallback?: boolean;
 
   constructor(options: SamlConfig, verify: VerifyWithRequest);
@@ -42,7 +40,7 @@ class Strategy extends PassportStrategy {
 
     this._verify = verify;
     if ((this.constructor as typeof Strategy).newSamlProviderOnConstruct) {
-      this._saml = new saml.SAML(options);
+      this._saml = new SAML(options);
     }
     this._passReqToCallback = !!options.passReqToCallback;
   }
@@ -67,8 +65,9 @@ class Strategy extends PassportStrategy {
             throw new Error("Can't get logout response URL without a SAML provider defined.");
           }
 
-          req.samlLogoutRequest = profile;
-          return this._saml.getLogoutResponseUrl(req, options, redirectIfSuccess);
+          const RelayState =
+            (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+          return this._saml.getLogoutResponseUrl(profile, RelayState, options, redirectIfSuccess);
         }
         return this.pass();
       }
@@ -128,13 +127,16 @@ class Strategy extends PassportStrategy {
               throw new Error("Can't process login request without a SAML provider defined.");
             }
 
+            const RelayState =
+              (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+            const host = req.headers && req.headers.host;
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
-              const data = await this._saml.getAuthorizeFormAsync(req);
+              const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
               const res = req.res!;
               res.send(data);
             } else {
               // Defaults to HTTP-Redirect
-              this.redirect(await this._saml.getAuthorizeUrlAsync(req, options));
+              this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
             }
           } catch (err) {
             this.error(err);
@@ -146,7 +148,11 @@ class Strategy extends PassportStrategy {
           }
 
           try {
-            this.redirect(await this._saml.getLogoutUrlAsync(req, options));
+            const RelayState =
+              (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+            this.redirect(
+              await this._saml.getLogoutUrlAsync(req.user as Profile, RelayState, options)
+            );
           } catch (err) {
             this.error(err);
           }
@@ -165,14 +171,14 @@ class Strategy extends PassportStrategy {
     if (this._saml == null) {
       throw new Error("Can't logout without a SAML provider defined.");
     }
-
+    const RelayState = (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
     this._saml
-      .getLogoutUrlAsync(req, {})
+      .getLogoutUrlAsync(req.user as Profile, RelayState, {})
       .then((url) => callback(null, url))
       .catch((err) => callback(err));
   }
 
-  generateServiceProviderMetadata(
+  protected _generateServiceProviderMetadata(
     decryptionCert: string | null,
     signingCert?: string | null
   ): string {
@@ -189,4 +195,13 @@ class Strategy extends PassportStrategy {
   }
 }
 
-export = Strategy;
+export class Strategy extends AbstractStrategy {
+  static readonly newSamlProviderOnConstruct = true;
+
+  generateServiceProviderMetadata(
+    decryptionCert: string | null,
+    signingCert?: string | null
+  ): string {
+    return this._generateServiceProviderMetadata(decryptionCert, signingCert);
+  }
+}

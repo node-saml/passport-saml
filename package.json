@@ -29,10 +29,8 @@
   "main": "./lib/passport-saml",
   "files": [
     "lib",
-    "multiSamlStrategy.js",
-    "multiSamlStrategy.d.ts",
-    "docs",
-    "package-lock.json"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
@@ -52,12 +50,12 @@
   },
   "dependencies": {
     "debug": "^4.3.1",
-    "passport-strategy": "*",
+    "passport-strategy": "^1.0.0",
     "xml-crypto": "^2.1.1",
     "xml-encryption": "^1.2.3",
     "xml2js": "^0.4.23",
     "xmlbuilder": "^15.1.1",
-    "xmldom": "0.5.x"
+    "xmldom": "^0.5.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
@@ -82,12 +80,12 @@
     "github-release-notes": "^0.17.3",
     "mocha": "^8.2.1",
     "onchange": "^7.1.0",
-    "passport": "0.4.x",
-    "prettier": "2.2.1",
+    "passport": "^0.4.1",
+    "prettier": "^2.2.1",
     "prettier-plugin-packagejson": "^2.2.8",
     "release-it": "^14.2.2",
     "request": "^2.83.0",
-    "should": "*",
+    "should": "^13.2.3",
     "sinon": "^9.2.2",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"

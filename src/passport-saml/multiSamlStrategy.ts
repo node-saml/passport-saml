@@ -1,11 +1,8 @@
-import * as util from "util";
-import * as saml from "./saml";
-import { CacheProvider as InMemoryCacheProvider } from "./inmemory-cache-provider";
-import SamlStrategy = require("./strategy");
+import { SAML } from "../node-saml";
+import { AbstractStrategy } from "./strategy";
 import type { Request } from "express";
 import {
   AuthenticateOptions,
-  AuthorizeOptions,
   MultiSamlConfig,
   RequestWithUser,
   SamlConfig,
@@ -13,9 +10,8 @@ import {
   VerifyWithRequest,
 } from "./types";
 
-class MultiSamlStrategy extends SamlStrategy {
+export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
-
   _options: SamlConfig & MultiSamlConfig;
 
   constructor(options: MultiSamlConfig, verify: VerifyWithRequest);
@@ -42,7 +38,7 @@ class MultiSamlStrategy extends SamlStrategy {
         return this.error(err);
       }
 
-      const samlService = new saml.SAML({ ...this._options, ...samlOptions });
+      const samlService = new SAML({ ...this._options, ...samlOptions });
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.authenticate.call(strategy, req, options);
@@ -58,14 +54,13 @@ class MultiSamlStrategy extends SamlStrategy {
         return callback(err);
       }
 
-      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.logout.call(strategy, req, callback);
     });
   }
 
-  /** @ts-expect-error typescript disallows changing method signature in a subclass */
   generateServiceProviderMetadata(
     req: Request,
     decryptionCert: string | null,
@@ -81,12 +76,12 @@ class MultiSamlStrategy extends SamlStrategy {
         return callback(err);
       }
 
-      const samlService = new saml.SAML(Object.assign({}, this._options, samlOptions));
+      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       return callback(
         null,
-        super.generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert)
+        this._generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert)
       );
     });
   }
@@ -96,5 +91,3 @@ class MultiSamlStrategy extends SamlStrategy {
     super.error(err);
   }
 }
-
-export = MultiSamlStrategy;
