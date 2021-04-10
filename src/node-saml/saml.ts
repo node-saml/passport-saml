@@ -1079,7 +1079,7 @@ class SAML {
             const maxTimeLimitMs = this.processMaxAgeAssertionTime(
               this.options.maxAssertionAgeMs,
               subjectNotOnOrAfter,
-              assertion.$.issueInstant
+              assertion.$.IssueInstant
             );
 
             const subjErr = this.checkTimestampsValidityError(
