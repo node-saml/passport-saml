@@ -1212,12 +1212,12 @@ class SAML {
     if (this.options.acceptedClockSkewMs == -1) return null;
 
     if (notBefore) {
-      const notBeforeMs = Date.parse(notBefore);
+      const notBeforeMs = this.dateStringToTimestamp(notBefore, "NotBefore");
       if (nowMs + this.options.acceptedClockSkewMs < notBeforeMs)
         return new Error("SAML assertion not yet valid");
     }
     if (notOnOrAfter) {
-      const notOnOrAfterMs = Date.parse(notOnOrAfter);
+      const notOnOrAfterMs = this.dateStringToTimestamp(notOnOrAfter, "NotOnOrAfter");
       if (nowMs - this.options.acceptedClockSkewMs >= notOnOrAfterMs)
         return new Error("SAML assertion expired: clocks skewed too much");
     }
@@ -1441,13 +1441,33 @@ class SAML {
     notOnOrAfter: string,
     issueInstant: string
   ): number {
-    const notOnOrAfterMs = Date.parse(notOnOrAfter);
+    const notOnOrAfterMs = this.dateStringToTimestamp(notOnOrAfter, "NotOnOrAfter");
+    const issueInstantMs = this.dateStringToTimestamp(issueInstant, "IssueInstant");
+
     if (maxAssertionAgeMs === 0) {
       return notOnOrAfterMs;
     }
 
-    const maxAssertionTimeMs = Date.parse(issueInstant) + maxAssertionAgeMs;
+    const maxAssertionTimeMs = issueInstantMs + maxAssertionAgeMs;
     return maxAssertionTimeMs < notOnOrAfterMs ? maxAssertionTimeMs : notOnOrAfterMs;
+  }
+
+  /**
+   * Convert a date string to a timestamp (in milliseconds).
+   *
+   * @param dateString A string representation of a date
+   * @param label Descriptive name of the date being passed in, e.g. "NotOnOrAfter"
+   * @throws Will throw an error if parsing `dateString` returns `NaN`
+   * @returns {number} The timestamp (in milliseconds) representation of the given date
+   */
+  private dateStringToTimestamp(dateString: string, label: string): number {
+    const dateMs = Date.parse(dateString);
+
+    if (isNaN(dateMs)) {
+      throw new Error(`Error parsing ${label}: '${dateString}' is not a valid date`);
+    }
+
+    return dateMs;
   }
 }
 
