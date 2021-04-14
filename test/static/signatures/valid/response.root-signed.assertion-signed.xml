@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Destination="https://evil-corp.madness.com/sso/callback" ID="pfxaff18351-e576-25d5-73d6-fedec9114bcd" InResponseTo="_e8df3fe5f04237d25670" IssueInstant="2015-08-31T08:54:06+00:00" Version="2.0">
     <saml:Issuer>https://evil-corp.com</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
