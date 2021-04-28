@@ -1,6 +1,6 @@
 {
   "name": "passport-saml",
-  "version": "2.0.6",
+  "version": "2.2.0",
   "description": "SAML 2.0 authentication strategy for Passport",
   "keywords": [
     "saml",
@@ -42,6 +42,7 @@
     "prettier-check": "prettier --config .prettierrc.json --check .",
     "prettier-format": "prettier --config .prettierrc.json --write .",
     "prettier-watch": "onchange -k -p 100 \".\" -- prettier --config .prettierrc.json --write {{file}}",
+    "release": "release-it",
     "test": "npm run prettier-check && npm run lint && npm run tsc && mocha",
     "test-watch": "mocha --watch",
     "tsc": "tsc",
@@ -83,7 +84,7 @@
     "passport": "^0.4.1",
     "prettier": "^2.2.1",
     "prettier-plugin-packagejson": "^2.2.8",
-    "release-it": "^14.2.2",
+    "release-it": "^14.6.1",
     "request": "^2.83.0",
     "should": "^13.2.3",
     "sinon": "^9.2.2",
@@ -92,11 +93,5 @@
   },
   "engines": {
     "node": ">= 10"
-  },
-  "release-it": {
-    "github": {
-      "release": true,
-      "releaseName": "v${version}"
-    }
   }
 }
