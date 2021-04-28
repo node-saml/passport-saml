@@ -140,6 +140,7 @@ class SAML {
       skipRequestCompression: ctorOptions.skipRequestCompression ?? false,
       disableRequestAcsUrl: ctorOptions.disableRequestAcsUrl ?? false,
       acceptedClockSkewMs: ctorOptions.acceptedClockSkewMs ?? 0,
+      maxAssertionAgeMs: ctorOptions.maxAssertionAgeMs ?? 0,
       path: ctorOptions.path ?? "/saml/consume",
       host: ctorOptions.host ?? "localhost",
       issuer: ctorOptions.issuer ?? "onelogin_saml",
@@ -1075,11 +1076,17 @@ class SAML {
           if (confirmData && confirmData.$) {
             const subjectNotBefore = confirmData.$.NotBefore;
             const subjectNotOnOrAfter = confirmData.$.NotOnOrAfter;
+            const maxTimeLimitMs = this.processMaxAgeAssertionTime(
+              this.options.maxAssertionAgeMs,
+              subjectNotOnOrAfter,
+              assertion.$.IssueInstant
+            );
 
             const subjErr = this.checkTimestampsValidityError(
               nowMs,
               subjectNotBefore,
-              subjectNotOnOrAfter
+              subjectNotOnOrAfter,
+              maxTimeLimitMs
             );
             if (subjErr) {
               throw subjErr;
@@ -1126,10 +1133,16 @@ class SAML {
       throw new Error(msg);
     }
     if (conditions && conditions.$) {
+      const maxTimeLimitMs = this.processMaxAgeAssertionTime(
+        this.options.maxAssertionAgeMs,
+        conditions.$.NotOnOrAfter,
+        assertion.$.IssueInstant
+      );
       const conErr = this.checkTimestampsValidityError(
         nowMs,
         conditions.$.NotBefore,
-        conditions.$.NotOnOrAfter
+        conditions.$.NotOnOrAfter,
+        maxTimeLimitMs
       );
       if (conErr) throw conErr;
     }
@@ -1190,18 +1203,27 @@ class SAML {
     return { profile, loggedOut: false };
   }
 
-  private checkTimestampsValidityError(nowMs: number, notBefore: string, notOnOrAfter: string) {
+  private checkTimestampsValidityError(
+    nowMs: number,
+    notBefore: string,
+    notOnOrAfter: string,
+    maxTimeLimitMs?: number
+  ) {
     if (this.options.acceptedClockSkewMs == -1) return null;
 
     if (notBefore) {
-      const notBeforeMs = Date.parse(notBefore);
+      const notBeforeMs = this.dateStringToTimestamp(notBefore, "NotBefore");
       if (nowMs + this.options.acceptedClockSkewMs < notBeforeMs)
         return new Error("SAML assertion not yet valid");
     }
     if (notOnOrAfter) {
-      const notOnOrAfterMs = Date.parse(notOnOrAfter);
+      const notOnOrAfterMs = this.dateStringToTimestamp(notOnOrAfter, "NotOnOrAfter");
       if (nowMs - this.options.acceptedClockSkewMs >= notOnOrAfterMs)
-        return new Error("SAML assertion expired");
+        return new Error("SAML assertion expired: clocks skewed too much");
+    }
+    if (maxTimeLimitMs) {
+      if (nowMs - this.options.acceptedClockSkewMs >= maxTimeLimitMs)
+        return new Error("SAML assertion expired: assertion too old");
     }
 
     return null;
@@ -1403,6 +1425,49 @@ class SAML {
     }
 
     throw new Error("Invalid key");
+  }
+
+  /**
+   * Process max age assertion and use it if it is more restrictive than the NotOnOrAfter age
+   * assertion received in the SAMLResponse.
+   *
+   * @param maxAssertionAgeMs Max time after IssueInstant that we will accept assertion, in Ms.
+   * @param notOnOrAfter Expiration provided in response.
+   * @param issueInstant Time when response was issued.
+   * @returns {*} The expiration time to be used, in Ms.
+   */
+  private processMaxAgeAssertionTime(
+    maxAssertionAgeMs: number,
+    notOnOrAfter: string,
+    issueInstant: string
+  ): number {
+    const notOnOrAfterMs = this.dateStringToTimestamp(notOnOrAfter, "NotOnOrAfter");
+    const issueInstantMs = this.dateStringToTimestamp(issueInstant, "IssueInstant");
+
+    if (maxAssertionAgeMs === 0) {
+      return notOnOrAfterMs;
+    }
+
+    const maxAssertionTimeMs = issueInstantMs + maxAssertionAgeMs;
+    return maxAssertionTimeMs < notOnOrAfterMs ? maxAssertionTimeMs : notOnOrAfterMs;
+  }
+
+  /**
+   * Convert a date string to a timestamp (in milliseconds).
+   *
+   * @param dateString A string representation of a date
+   * @param label Descriptive name of the date being passed in, e.g. "NotOnOrAfter"
+   * @throws Will throw an error if parsing `dateString` returns `NaN`
+   * @returns {number} The timestamp (in milliseconds) representation of the given date
+   */
+  private dateStringToTimestamp(dateString: string, label: string): number {
+    const dateMs = Date.parse(dateString);
+
+    if (isNaN(dateMs)) {
+      throw new Error(`Error parsing ${label}: '${dateString}' is not a valid date`);
+    }
+
+    return dateMs;
   }
 }
 

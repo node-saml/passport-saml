@@ -109,6 +109,7 @@ export interface SamlOptions extends Partial<SamlSigningOptions>, MandatorySamlO
   audience?: string;
   scoping?: SamlScopingConfig;
   wantAssertionsSigned?: boolean;
+  maxAssertionAgeMs: number;
 
   // InResponseTo Validation
   validateInResponseTo: boolean;

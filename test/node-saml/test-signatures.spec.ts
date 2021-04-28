@@ -25,7 +25,7 @@ describe("Signatures", function () {
 
       //== Run the test in `func`
       await assert.rejects(samlObj.validatePostResponseAsync(samlResponseBody), {
-        message: shouldErrorWith || "SAML assertion expired",
+        message: shouldErrorWith || "SAML assertion expired: clocks skewed too much",
       });
       //== Assert times `validateSignature` was called
       validateSignatureSpy.callCount.should.eql(amountOfSignatureChecks);
@@ -210,15 +210,15 @@ describe("Signatures", function () {
   describe("Signatures on saml:Response - 1 saml:Assertion + 1 saml:Advice containing 2 saml:Assertion", () => {
     //== VALID
     it(
-      "R1A2Ad - signed root+asrt+advi => error",
+      "R1A2Ad - signed root+asrt+advi => valid",
       testOneResponse("/valid/response.root-signed.assertion-signed.2advice-signed.xml", false, 1)
     );
     it(
-      "R1A2Ad - signed root+asrt => error",
+      "R1A2Ad - signed root+asrt => valid",
       testOneResponse("/valid/response.root-signed.assertion-signed.2advice-unsigned.xml", false, 1)
     );
     it(
-      "R1A2Ad - signed root => error",
+      "R1A2Ad - signed root => valid",
       testOneResponse(
         "/valid/response.root-signed.assertion-unsigned.2advice-unsigned.xml",
         false,

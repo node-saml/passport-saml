@@ -1,16 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Destination="https://evil-corp.madness.com/sso/callback" ID="_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" InResponseTo="_e8df3fe5f04237d25670" IssueInstant="2015-08-31T08:54:06+00:00" Version="2.0">
     <saml:Issuer>https://evil-corp.com</saml:Issuer>
     <samlp:Status>
         <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
     </samlp:Status>
-    <saml:Assertion ID="_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" IssueInstant="2020-09-25T16:00:00+00:00" Version="2.0">
-        <saml:Issuer>https://evil-corp.com</saml:Issuer>
+    <saml:Assertion ID="pfx9e39a2f7-ed7b-afde-7f23-e2850f5a982c" IssueInstant="2020-09-25T16:00:00+00:00" Version="2.0">
+        <saml:Issuer>https://evil-corp.com</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+    <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+  <ds:Reference URI="#pfx9e39a2f7-ed7b-afde-7f23-e2850f5a982c"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>wrJZQQyF9t4yTUXC1YrDCN8K8+o=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>dCNPiUIaiyavhWHSJ4fCnCG0B3dAZTnJFg82FdAhgn4Bv2gJD+Se+QL0ZTp/2Ojv4LkvLs6Qh3IaraNKqSrVWe7uVbc08G3YmiGWeA9aHZAVTCgZpC+y9WKvWP8RUc9l8XrfX0GtHs2ecqM0MQqp9fZ5W3wj5FVggoaFo9O/ip6Swyp4uQ0QNuLGc3Ptq6QFL6Uvtm4FHqPINPDMPNReZUuNwoWPuzI7CHkUiD9Uv6ubpAai4iACvMx4tOa8fbVJns6xsDYJ4dOgjuzVZ1bYBGWa61kCzGUCxYp4q89SR2EPfczJaruhPrmkarbfkvyeAdGdb2r6GD1M9VefeyuRyQ==</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDtTCCAp2gAwIBAgIJAKg4VeVcIDz1MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwHhcNMTUwODEzMDE1NDIwWhcNMTUwOTEyMDE1NDIwWjBFMQswCQYDVQQGEwJVUzETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxG3ouM7U+fXbJt69X1H6d4UNg/uRr06pFuU9RkfIwNC+yaXyptqB3ynXKsL7BFt4DCd0fflRvJAx3feJIDp16wN9GDVHcufWMYPhh2j5HcTW/j9JoIJzGhJyvO00YKBt+hHy83iN1SdChKv5y0iSyiPP5GnqFw+ayyHoM6hSO0PqBou1Xb0ZSIE+DHosBnvVna5w2AiPY4xrJl9yZHZ4Q7DfMiYTgstjETio4bX+6oLiBnYktn7DjdEslqhffVme4PuBxNojI+uCeg/sn4QVLd/iogMJfDWNuLD8326Mi/FE9cCRvFlvAiMSaebMI3zPaySsxTK7Zgj5TpEbmbHI9wIDAQABo4GnMIGkMB0GA1UdDgQWBBSVGgvoW4MhMuzBGce29PY8vSzHFzB1BgNVHSMEbjBsgBSVGgvoW4MhMuzBGce29PY8vSzHF6FJpEcwRTELMAkGA1UEBhMCVVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAKg4VeVcIDz1MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAJu1rqs+anD74dbdwgd3CnqnQsQDJiEXmBhG2leaGt3ve9b/9gKaJg2pyb2NyppDe1uLqh6nNXDuzg1oNZrPz5pJL/eCXPl7FhxhMUi04TtLf8LeNTCIWYZiFuO4pmhohHcv8kRvYR1+6SkLTC8j/TZerm7qvesSiTQFNapa1eNdVQ8nFwVkEtWl+JzKEM1BlRcn42sjJkijeFp7DpI7pU+PnYeiaXpRv5pJo8ogM1iFxN+SnfEs0EuQ7fhKIG9aHKi7bKZ7L6SyX7MDIGLeulEU6lf5D9BfXNmcMambiS0pXhL2QXajt96UBq8FT2KNXY8XNtR4y6MyyCzhaiZZcc8=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature>
         <saml:Subject>
             <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">vincent.vega@evil-corp.com
             </saml:NameID>
             <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-                <saml:SubjectConfirmationData InResponseTo="_e8df3fe5f04237d25670" NotOnOrAfter="2020-09-25T16=7:00:00+00:00" Recipient="https://evil-corp.madness.com/sso/callback"/>
+                <saml:SubjectConfirmationData InResponseTo="_e8df3fe5f04237d25670" NotOnOrAfter="2020-09-25T17:00:00+00:00" Recipient="https://evil-corp.madness.com/sso/callback"/>
             </saml:SubjectConfirmation>
         </saml:Subject>
         <saml:Conditions NotBefore="2020-09-25T16:00:00+00:00" NotOnOrAfter="2020-09-25T17:00:00+00:00"/>
@@ -22,7 +25,7 @@
                         vincent.vega@evil-corp.com
                     </saml:NameID>
                     <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-                        <saml:SubjectConfirmationData InResponseTo="_e8df3fe5f04237d25670" NotOnOrAfter="2020-09-25T16=7:00:00+00:00" Recipient="https://evil-corp.madness.com/sso/callback"/>
+                        <saml:SubjectConfirmationData InResponseTo="_e8df3fe5f04237d25670" NotOnOrAfter="2020-09-25T17:00:00+00:00" Recipient="https://evil-corp.madness.com/sso/callback"/>
                     </saml:SubjectConfirmation>
                 </saml:Subject>
                 <saml:Conditions NotBefore="2020-09-25T16:00:00+00:00" NotOnOrAfter="2020-09-25T17:00:00+00:00"/>
@@ -62,5 +65,5 @@
                 </saml:AttributeValue>
             </saml:Attribute>
         </saml:AttributeStatement>
-    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>JXsH4yqs7dEiVLTSW8KhNTpXVtl+Bi4GYkFZY1Emm1I=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>dKQSuL03fOHOvB980uxsRI9Wzx0Bo1yvcOGFQ0nX1f2EJRPYwkO6HFhZsX7L/l8sjXHmjgjAPK3KHcbxcus1ldWLxlZYBA7RdyW2HsQT8neMJMUpVUuJ5YkbgB1OvDPuAXTHmLByS3YpLaeJXwydBKgPGNmEyGrvqJbYZzGbIhMHt8dfI26PkUkJUqxTxXnn/+dAsZ9w3PXiGvjF/7pggnTWUfvSsTyT3IJ6Mpijlgh3S++Ng3dolpt17gjga4klOQM8uVLudKpOWczjfRu4bmT3VqNs2XmQHqdCb9lgT5S9S/nXaFnt13GIHZaNG1crR6ehGsgUIcuaonCivd82Xg==</ds:SignatureValue></ds:Signature></saml:Assertion>
+    </saml:Assertion>
 </samlp:Response>
