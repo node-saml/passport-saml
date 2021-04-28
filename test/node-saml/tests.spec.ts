@@ -1844,7 +1844,7 @@ describe("node-saml /", function () {
       };
       const { profile } = await samlObj.validatePostRequestAsync(body);
       profile!.should.eql({
-        ID: "pfx00cb5227-d9d0-1d4b-bdb2-c7ad6c3c6906",
+        ID: "pfx087316a5-2dfb-cc05-2ba9-b46751936ff5",
         issuer: "http://sp.example.com/demo1/metadata.php",
         nameID: "ONELOGIN_f92cc1834efc0f73e9c09f482fce80037a6251e7",
         nameIDFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
@@ -1864,7 +1864,7 @@ describe("node-saml /", function () {
       ),
     };
     await assert.rejects(samlObj.validatePostRequestAsync(body), {
-      message: "Encryption block is invalid.",
+      message: "Invalid RSAES-OAEP padding.",
     });
   });
 

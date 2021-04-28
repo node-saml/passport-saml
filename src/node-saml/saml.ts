@@ -1352,9 +1352,10 @@ class SAML {
           },
           EncryptionMethod: [
             // this should be the set that the xmlenc library supports
+            { "@Algorithm": "http://www.w3.org/2001/04/xmlenc#aes256-gcm" },
+            { "@Algorithm": "http://www.w3.org/2001/04/xmlenc#aes128-gcm" },
             { "@Algorithm": "http://www.w3.org/2001/04/xmlenc#aes256-cbc" },
             { "@Algorithm": "http://www.w3.org/2001/04/xmlenc#aes128-cbc" },
-            { "@Algorithm": "http://www.w3.org/2001/04/xmlenc#tripledes-cbc" },
           ],
         });
       }
