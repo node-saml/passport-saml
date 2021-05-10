@@ -27,8 +27,7 @@ export const capturedSamlResponseChecks: CapturedCheck[] = [
     config: {
       entryPoint:
         "https://subspacesw1.okta.com/app/subspacesw_subspacetest_1/kvjj46lsDQEQYUDBZIYW/sso/saml",
-      cert:
-        "MIICoTCCAgqgAwIBAgIGAUY8zVPYMA0GCSqGSIb3DQEBBQUAMIGTMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxFDASBgNVBAMMC3N1YnNwYWNlc3cxMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE0MDUyNzA4MjkyN1oXDTQ0MDUyNzA4MzAyN1owgZMxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjEUMBIGA1UEAwwLc3Vic3BhY2VzdzExHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKYX/UdV9HLXbNKv0yc6YJBtzdWNuGTPIXWVPCb0OsRvR54lq+0SLPQGJS39flWKiqtUiEusuih6GdLfNvFAVLGPqBTWQ4Lc7r5+zD5qnH6LiTM1KCbaF3uu2P+T+utsGqFUZawA9FEVNLkICe36X1yE40X+/jMygyieQPMeJABvAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAHSWPG4y1bNyJySgbFqDcS/6MUNIrSfkQYIxzIGQ37qy5qAW15YkBUiW9TsGJRcrgusVrZIia18eYz84Zn7FyUZNMFo24L7l6BS0WCitIQScBCKB4QWA/b1szqs7EtpOcPP01TYNq2ras+VqR3aWAXLX2oKfClV/SUwszRf5U85Y=",
+      cert: "MIICoTCCAgqgAwIBAgIGAUY8zVPYMA0GCSqGSIb3DQEBBQUAMIGTMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxFDASBgNVBAMMC3N1YnNwYWNlc3cxMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE0MDUyNzA4MjkyN1oXDTQ0MDUyNzA4MzAyN1owgZMxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjEUMBIGA1UEAwwLc3Vic3BhY2VzdzExHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKYX/UdV9HLXbNKv0yc6YJBtzdWNuGTPIXWVPCb0OsRvR54lq+0SLPQGJS39flWKiqtUiEusuih6GdLfNvFAVLGPqBTWQ4Lc7r5+zD5qnH6LiTM1KCbaF3uu2P+T+utsGqFUZawA9FEVNLkICe36X1yE40X+/jMygyieQPMeJABvAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAHSWPG4y1bNyJySgbFqDcS/6MUNIrSfkQYIxzIGQ37qy5qAW15YkBUiW9TsGJRcrgusVrZIia18eYz84Zn7FyUZNMFo24L7l6BS0WCitIQScBCKB4QWA/b1szqs7EtpOcPP01TYNq2ras+VqR3aWAXLX2oKfClV/SUwszRf5U85Y=",
     },
     expectedStatusCode: 200,
     expectedNameIDStartsWith: "ben",
@@ -44,8 +43,7 @@ export const capturedSamlResponseChecks: CapturedCheck[] = [
     config: {
       entryPoint:
         "https://frontapp.oktapreview.com/app/frontdev584714_front_1/exk7xdi6axPfombzx0h7/sso/saml",
-      cert:
-        "MIIDoDCCAoigAwIBAgIGAVaZ04POMA0GCSqGSIb3DQEBBQUAMIGQMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxETAPBgNVBAMMCGZyb250YXBwMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE2MDgxNzE4NDUzMVoXDTI2MDgxNzE4NDYzMVowgZAxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjERMA8GA1UEAwwIZnJvbnRhcHAxHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvplQONVwknRy1iBnaoZtsOz28A7XW2tRpFW+0La7RJexbziIwEy1bPZENhfwjPZA1oHHZqi5l315BxXKWJqmmNmbDCFDo+/FYFCoHXliiLm9vqDbR1br6ByqeY0GfxyTPKHZxb2FSes30TffDknpMQd/8kA9YWaW5xDlu2ivWJI+sfcOJOMd6t+gcfXj58a5fP8Mwm6Y220KeZSvrVpEV2KDp9hln7fhhoxHZ7K/BYbidqdwLzeUQXpb6LIrxtKdug2FofS+ONs6yLIQRmrbCB7SVX1QA8JInMn+fzrGtZmFiHR0aFbyhiO78v/ufDa6S+XpYyp2b6D4SnzeggnobAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAJ2wcFVffFHSd9pj6RgoNHXZBsWp0HUZrNekiSbgomr4tSDefWtKb04nFIlRytfVs/k74wmbNiRCE8nDVBrBDFA/+Tv/3PowZXHjXKBofUuScTP4/Tw1N/ywf7V+XY5kV3VmLBL6ax+ULJauR/YGIIMsIc/rS2D04aAcScU9pqVh2ML7nTH7gFqYrxypavmVk6K94vLjs0ggF2TGp7tXCRjeOlPPJS+MOJHJhTBWYFWvBLclU3zcri3ws7GqJMpeiHa7rMoHV0onxWsZTZW57ybaIWKLt1goAooC7hq0rx7oNlOvrys5lllhBySYYC3ycqca/D0+GxXLcEr9QwP7TVw=",
+      cert: "MIIDoDCCAoigAwIBAgIGAVaZ04POMA0GCSqGSIb3DQEBBQUAMIGQMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxETAPBgNVBAMMCGZyb250YXBwMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE2MDgxNzE4NDUzMVoXDTI2MDgxNzE4NDYzMVowgZAxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjERMA8GA1UEAwwIZnJvbnRhcHAxHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvplQONVwknRy1iBnaoZtsOz28A7XW2tRpFW+0La7RJexbziIwEy1bPZENhfwjPZA1oHHZqi5l315BxXKWJqmmNmbDCFDo+/FYFCoHXliiLm9vqDbR1br6ByqeY0GfxyTPKHZxb2FSes30TffDknpMQd/8kA9YWaW5xDlu2ivWJI+sfcOJOMd6t+gcfXj58a5fP8Mwm6Y220KeZSvrVpEV2KDp9hln7fhhoxHZ7K/BYbidqdwLzeUQXpb6LIrxtKdug2FofS+ONs6yLIQRmrbCB7SVX1QA8JInMn+fzrGtZmFiHR0aFbyhiO78v/ufDa6S+XpYyp2b6D4SnzeggnobAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAJ2wcFVffFHSd9pj6RgoNHXZBsWp0HUZrNekiSbgomr4tSDefWtKb04nFIlRytfVs/k74wmbNiRCE8nDVBrBDFA/+Tv/3PowZXHjXKBofUuScTP4/Tw1N/ywf7V+XY5kV3VmLBL6ax+ULJauR/YGIIMsIc/rS2D04aAcScU9pqVh2ML7nTH7gFqYrxypavmVk6K94vLjs0ggF2TGp7tXCRjeOlPPJS+MOJHJhTBWYFWvBLclU3zcri3ws7GqJMpeiHa7rMoHV0onxWsZTZW57ybaIWKLt1goAooC7hq0rx7oNlOvrys5lllhBySYYC3ycqca/D0+GxXLcEr9QwP7TVw=",
       decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
     },
     expectedStatusCode: 200,
@@ -61,8 +59,7 @@ export const capturedSamlResponseChecks: CapturedCheck[] = [
     config: {
       entryPoint:
         "https://subspacesw1.okta.com/app/subspacesw_subspacetest_1/kvjj46lsDQEQYUDBZIYW/sso/saml",
-      cert:
-        "MIICoTCCAgqgAwIBAgIGAUY8zVPYMA0GCSqGSIb3DQEBBQUAMIGTMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxFDASBgNVBAMMC3N1YnNwYWNlc3cxMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE0MDUyNzA4MjkyN1oXDTQ0MDUyNzA4MzAyN1owgZMxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjEUMBIGA1UEAwwLc3Vic3BhY2VzdzExHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKYX/UdV9HLXbNKv0yc6YJBtzdWNuGTPIXWVPCb0OsRvR54lq+0SLPQGJS39flWKiqtUiEusuih6GdLfNvFAVLGPqBTWQ4Lc7r5+zD5qnH6LiTM1KCbaF3uu2P+T+utsGqFUZawA9FEVNLkICe36X1yE40X+/jMygyieQPMeJABvAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAHSWPG4y1bNyJySgbFqDcS/6MUNIrSfkQYIxzIGQ37qy5qAW15YkBUiW9TsGJRcrgusVrZIia18eYz84Zn7FyUZNMFo24L7l6BS0WCitIQScBCKB4QWA/b1szqs7EtpOcPP01TYNq2ras+VqR3aWAXLX2oKfClV/SUwszRf5U85Y=",
+      cert: "MIICoTCCAgqgAwIBAgIGAUY8zVPYMA0GCSqGSIb3DQEBBQUAMIGTMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxFDASBgNVBAMMC3N1YnNwYWNlc3cxMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE0MDUyNzA4MjkyN1oXDTQ0MDUyNzA4MzAyN1owgZMxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjEUMBIGA1UEAwwLc3Vic3BhY2VzdzExHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKYX/UdV9HLXbNKv0yc6YJBtzdWNuGTPIXWVPCb0OsRvR54lq+0SLPQGJS39flWKiqtUiEusuih6GdLfNvFAVLGPqBTWQ4Lc7r5+zD5qnH6LiTM1KCbaF3uu2P+T+utsGqFUZawA9FEVNLkICe36X1yE40X+/jMygyieQPMeJABvAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAHSWPG4y1bNyJySgbFqDcS/6MUNIrSfkQYIxzIGQ37qy5qAW15YkBUiW9TsGJRcrgusVrZIia18eYz84Zn7FyUZNMFo24L7l6BS0WCitIQScBCKB4QWA/b1szqs7EtpOcPP01TYNq2ras+VqR3aWAXLX2oKfClV/SUwszRf5U85Y=",
     },
     expectedStatusCode: 500,
     mockDate: "2014-05-28T00:16:08Z",
@@ -89,8 +86,7 @@ export const capturedSamlResponseChecks: CapturedCheck[] = [
     },
     config: {
       entryPoint: "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
-      cert:
-        "MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzEVMBMGA1UECBMMUGVubnN5bHZhbmlhMRMwEQYDVQQHEwpQaXR0c2J1cmdoMREwDwYDVQQKEwhUZXN0U2hpYjEZMBcGA1UEAxMQaWRwLnRlc3RzaGliLm9yZzAeFw0wNjA4MzAyMTEyMjVaFw0xNjA4MjcyMTEyMjVaMGcxCzAJBgNVBAYTAlVTMRUwEwYDVQQIEwxQZW5uc3lsdmFuaWExEzARBgNVBAcTClBpdHRzYnVyZ2gxETAPBgNVBAoTCFRlc3RTaGliMRkwFwYDVQQDExBpZHAudGVzdHNoaWIub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYkCGuTmJp9eAOSGHwRJo1SNatB5ZOKqDM9ysg7CyVTDClcpu93gSP10nH4gkCZOlnESNgttg0r+MqL8tfJC6ybddEFB3YBo8PZajKSe3OQ01Ow3yT4I+Wdg1tsTpSge9gEz7SrC07EkYmHuPtd71CHiUaCWDv+xVfUQX0aTNPFmDixzUjoYzbGDrtAyCqA8f9CN2txIfJnpHE6q6CmKcoLADS4UrNPlhHSzd614kR/JYiks0K4kbRqCQF0Dv0P5Di+rEfefC6glV8ysC8dB5/9nb0yh/ojRuJGmgMWHgWk6h0ihjihqiu4jACovUZ7vVOCgSE5Ipn7OIwqd93zp2wIDAQABo4HEMIHBMB0GA1UdDgQWBBSsBQ869nh83KqZr5jArr4/7b+QazCBkQYDVR0jBIGJMIGGgBSsBQ869nh83KqZr5jArr4/7b+Qa6FrpGkwZzELMAkGA1UEBhMCVVMxFTATBgNVBAgTDFBlbm5zeWx2YW5pYTETMBEGA1UEBxMKUGl0dHNidXJnaDERMA8GA1UEChMIVGVzdFNoaWIxGTAXBgNVBAMTEGlkcC50ZXN0c2hpYi5vcmeCAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAjR29PhrCbk8qLN5MFfSVk98t3CT9jHZoYxd8QMRLI4j7iYQxXiGJTT1FXs1nd4Rha9un+LqTfeMMYqISdDDI6tv8iNpkOAvZZUosVkUo93pv1T0RPz35hcHHYq2yee59HJOco2bFlcsH8JBXRSRrJ3Q7Eut+z9uo80JdGNJ4/SJy5UorZ8KazGj16lfJhOBXldgrhppQBb0Nq6HKHguqmwRfJ+WkxemZXzhediAjGeka8nz8JjwxpUjAiSWYKLtJhGEaTqCYxCCX2Dw+dOTqUzHOZ7WKv4JXPK5G/Uhr8K/qhmFT2nIQi538n6rVYLeWj8Bbnl+ev0peYzxFyF5sQA==",
+      cert: "MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzEVMBMGA1UECBMMUGVubnN5bHZhbmlhMRMwEQYDVQQHEwpQaXR0c2J1cmdoMREwDwYDVQQKEwhUZXN0U2hpYjEZMBcGA1UEAxMQaWRwLnRlc3RzaGliLm9yZzAeFw0wNjA4MzAyMTEyMjVaFw0xNjA4MjcyMTEyMjVaMGcxCzAJBgNVBAYTAlVTMRUwEwYDVQQIEwxQZW5uc3lsdmFuaWExEzARBgNVBAcTClBpdHRzYnVyZ2gxETAPBgNVBAoTCFRlc3RTaGliMRkwFwYDVQQDExBpZHAudGVzdHNoaWIub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYkCGuTmJp9eAOSGHwRJo1SNatB5ZOKqDM9ysg7CyVTDClcpu93gSP10nH4gkCZOlnESNgttg0r+MqL8tfJC6ybddEFB3YBo8PZajKSe3OQ01Ow3yT4I+Wdg1tsTpSge9gEz7SrC07EkYmHuPtd71CHiUaCWDv+xVfUQX0aTNPFmDixzUjoYzbGDrtAyCqA8f9CN2txIfJnpHE6q6CmKcoLADS4UrNPlhHSzd614kR/JYiks0K4kbRqCQF0Dv0P5Di+rEfefC6glV8ysC8dB5/9nb0yh/ojRuJGmgMWHgWk6h0ihjihqiu4jACovUZ7vVOCgSE5Ipn7OIwqd93zp2wIDAQABo4HEMIHBMB0GA1UdDgQWBBSsBQ869nh83KqZr5jArr4/7b+QazCBkQYDVR0jBIGJMIGGgBSsBQ869nh83KqZr5jArr4/7b+Qa6FrpGkwZzELMAkGA1UEBhMCVVMxFTATBgNVBAgTDFBlbm5zeWx2YW5pYTETMBEGA1UEBxMKUGl0dHNidXJnaDERMA8GA1UEChMIVGVzdFNoaWIxGTAXBgNVBAMTEGlkcC50ZXN0c2hpYi5vcmeCAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAjR29PhrCbk8qLN5MFfSVk98t3CT9jHZoYxd8QMRLI4j7iYQxXiGJTT1FXs1nd4Rha9un+LqTfeMMYqISdDDI6tv8iNpkOAvZZUosVkUo93pv1T0RPz35hcHHYq2yee59HJOco2bFlcsH8JBXRSRrJ3Q7Eut+z9uo80JdGNJ4/SJy5UorZ8KazGj16lfJhOBXldgrhppQBb0Nq6HKHguqmwRfJ+WkxemZXzhediAjGeka8nz8JjwxpUjAiSWYKLtJhGEaTqCYxCCX2Dw+dOTqUzHOZ7WKv4JXPK5G/Uhr8K/qhmFT2nIQi538n6rVYLeWj8Bbnl+ev0peYzxFyF5sQA==",
       identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
       decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
     },
@@ -119,15 +115,15 @@ describe("captured saml responses /", function () {
       config.callbackUrl = "http://localhost:3033/login";
       let profile: Profile;
       pp.use(
-        new SamlStrategy(
-          config,
-          function (_profile: Profile | null | undefined, done: VerifiedCallback): void {
-            if (_profile) {
-              profile = _profile;
-              done(null, { id: profile.nameID });
-            }
+        new SamlStrategy(config, function (
+          _profile: Profile | null | undefined,
+          done: VerifiedCallback
+        ): void {
+          if (_profile) {
+            profile = _profile;
+            done(null, { id: profile.nameID });
           }
-        )
+        })
       );
 
       let userSerialized = false;
@@ -187,19 +183,16 @@ describe("captured saml responses /", function () {
       config.passReqToCallback = true;
       let passedRequest: express.Request | null = null;
       pp.use(
-        new SamlStrategy(
-          config,
-          function (
-            req: express.Request,
-            _profile: Profile | null | undefined,
-            done: VerifiedCallback
-          ) {
-            if (_profile) {
-              passedRequest = req;
-              done(null, { id: _profile!.nameID });
-            }
+        new SamlStrategy(config, function (
+          req: express.Request,
+          _profile: Profile | null | undefined,
+          done: VerifiedCallback
+        ) {
+          if (_profile) {
+            passedRequest = req;
+            done(null, { id: _profile!.nameID });
           }
-        )
+        })
       );
       pp.serializeUser(function (user, done) {
         done(null, user);

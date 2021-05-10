@@ -681,8 +681,7 @@ const capturedSamlRequestChecks: SamlCheck[] = [
     },
   },
   {
-    name:
-      "Config with Scoping config without proxyCount, requesterId, idpList getComplete, entry name, entry loc",
+    name: "Config with Scoping config without proxyCount, requesterId, idpList getComplete, entry name, entry loc",
     config: {
       issuer: "http://exampleSp.com/saml",
       identifierFormat: "alternateIdentifier",
@@ -918,15 +917,15 @@ describe("captured SAML requests /", function () {
         config.callbackUrl = "http://localhost:3033/login";
         config.entryPoint = "https://wwwexampleIdp.com/saml";
         let profile: Profile;
-        const strategy = new SamlStrategy(
-          config,
-          function (_profile: Profile | null | undefined, done: VerifiedCallback) {
-            if (_profile) {
-              profile = _profile;
-              done(null, profile);
-            }
+        const strategy = new SamlStrategy(config, function (
+          _profile: Profile | null | undefined,
+          done: VerifiedCallback
+        ) {
+          if (_profile) {
+            profile = _profile;
+            done(null, profile);
           }
-        );
+        });
         passport.use(strategy);
 
         let userSerialized = false;
@@ -1023,15 +1022,15 @@ describe("captured SAML requests /", function () {
       config.callbackUrl = "http://localhost:3033/login";
       config.entryPoint = "https://wwwexampleIdp.com/saml";
       let profile: Profile;
-      const strategy = new SamlStrategy(
-        config,
-        function (_profile: Profile | null | undefined, done: VerifiedCallback) {
-          if (_profile) {
-            profile = _profile;
-            done(null, profile);
-          }
+      const strategy = new SamlStrategy(config, function (
+        _profile: Profile | null | undefined,
+        done: VerifiedCallback
+      ) {
+        if (_profile) {
+          profile = _profile;
+          done(null, profile);
         }
-      );
+      });
 
       passport.use(strategy);
 
