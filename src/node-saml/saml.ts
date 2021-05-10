@@ -293,9 +293,8 @@ class SAML {
     }
 
     if (this.options.attributeConsumingServiceIndex != null) {
-      request["samlp:AuthnRequest"][
-        "@AttributeConsumingServiceIndex"
-      ] = this.options.attributeConsumingServiceIndex;
+      request["samlp:AuthnRequest"]["@AttributeConsumingServiceIndex"] =
+        this.options.attributeConsumingServiceIndex;
     }
 
     if (this.options.providerName != null) {
