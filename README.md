@@ -229,7 +229,7 @@ As a convenience, the strategy object exposes a `generateServiceProviderMetadata
 
 The `decryptionCert` argument should be a public certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
 
-The `signingCert` argument should be a public certificate matching the `privateCert` and is required if the strategy is configured with a `privateCert`.
+The `signingCert` argument should be a public certificate matching the `privateKey` and is required if the strategy is configured with a `privateKey`.
 
 The `generateServiceProviderMetadata` method is also available on the `MultiSamlStrategy`, but needs an extra request and a callback argument (`generateServiceProviderMetadata( req, decryptionCert, signingCert, next )`), which are passed to the `getSamlOptions` to retrieve the correct configuration.
 
@@ -279,7 +279,7 @@ See example from tests of [singleline private key](test/static/singleline_acme_t
 Add it to strategy options like this:
 
 ```javascript
-privateCert: fs.readFileSync("./privateCert.pem", "utf-8");
+privateKey: fs.readFileSync("./privateKey.pem", "utf-8");
 ```
 
 It is a good idea to validate the signatures of the incoming SAML Responses. For this, you can provide the Identity Provider's public PEM-encoded X.509 signing certificate using the `cert` configuration key. The "BEGIN CERTIFICATE" and "END CERTIFICATE" lines should be stripped out and the certificate should be provided on a single line.
