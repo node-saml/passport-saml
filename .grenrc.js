@@ -14,7 +14,7 @@ module.exports = {
     "dependencies",
     "documentation",
     "chore",
-    "new-feature"
+    "new-feature",
   ],
   tags: "all",
   groupBy: {
