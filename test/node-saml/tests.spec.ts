@@ -355,7 +355,7 @@ describe("node-saml /", function () {
         testMetadata(samlConfig, expectedMetadata);
       });
 
-      it("config with protocol, path, host, decryptionPvk and privateCert should pass", function () {
+      it("config with protocol, path, host, decryptionPvk and privateKey should pass", function () {
         const samlConfig = {
           issuer: "http://example.serviceprovider.com",
           protocol: "http://",

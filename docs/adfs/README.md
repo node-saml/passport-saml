@@ -45,7 +45,7 @@ passport.use(
       entryPoint: "https://adfs.acme_tools.com/adfs/ls/",
       issuer: "acme_tools_com",
       callbackUrl: "https://acme_tools.com/adfs/postResponse",
-      privateCert: fs.readFileSync("/path/to/acme_tools_com.key", "utf-8"),
+      privateKey: fs.readFileSync("/path/to/acme_tools_com.key", "utf-8"),
       cert: fs.readFileSync("/path/to/adfs.acme_tools.com.crt", "utf-8"),
       // other authn contexts are available e.g. windows single sign-on
       authnContext:
