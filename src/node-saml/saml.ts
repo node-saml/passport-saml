@@ -1175,11 +1175,20 @@ class SAML {
             // if attributes has no AttributeValue child, continue
             return;
           }
+          const name = attribute.$.Name;
           const value = attribute.AttributeValue;
+
+          // If any property is already present in profile and is also present
+          // in attributes, then skip the one from attributes. Handle this
+          // conflict gracefully without returning any error
+          if (Object.prototype.hasOwnProperty.call(profile, name)) {
+            return;
+          }
+
           if (value.length === 1) {
-            profile[attribute.$.Name] = attrValueMapper(value[0]);
+            profile[name] = attrValueMapper(value[0]);
           } else {
-            profile[attribute.$.Name] = value.map(attrValueMapper);
+            profile[name] = value.map(attrValueMapper);
           }
         });
       }

@@ -1904,10 +1904,13 @@ describe("node-saml /", function () {
     });
   });
   describe("validatePostRequest()", function () {
+    const signingKey: any = fs.readFileSync(__dirname + "/../static/key.pem", "ascii");
+    const signingCert: any = fs.readFileSync(__dirname + "/../static/cert.pem", "ascii");
     let samlObj: SAML;
+
     beforeEach(function () {
       samlObj = new SAML({
-        cert: fs.readFileSync(__dirname + "/../static/cert.pem", "ascii"),
+        cert: signingCert,
       });
     });
 
@@ -1981,7 +1984,35 @@ describe("node-saml /", function () {
         sessionIndex: "1",
       });
     });
+
+    it("check conflicting profile fields with data from attributes", async () => {
+      const testSAMLObj = new SAML({ cert: signingCert, issuer: "okta" });
+      const xml =
+        '<Response xmlns="urn:oasis:names:tc:SAML:2.0:protocol" ID="response0">' +
+        '<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0">' +
+        "<saml:Issuer>http://idp.example.com/metadata.php</saml:Issuer>" +
+        "<saml2:AttributeStatement>" +
+        '<saml2:Attribute Name="attributeName" ' +
+        'NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified">' +
+        '<saml2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" ' +
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+        'xsi:type="xs:string"/>' +
+        "</saml2:Attribute>" +
+        '<saml2:Attribute Name="issuer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">' +
+        '<saml2:AttributeValue xsi:type="xs:string">test</saml2:AttributeValue>' +
+        "</saml2:Attribute>" +
+        "</saml2:AttributeStatement>" +
+        "</saml2:Assertion>" +
+        "</Response>";
+      const signedXml = signXmlResponse(xml, { privateKey: signingKey });
+      const { profile } = await testSAMLObj.validatePostResponseAsync({
+        SAMLResponse: Buffer.from(signedXml).toString("base64"),
+      });
+
+      should(profile!.issuer).not.be.equal("test");
+    });
   });
+
   it("validatePostRequest errors for encrypted nameID with wrong decryptionPvk", async () => {
     const samlObj = new SAML({
       cert: fs.readFileSync(__dirname + "/../static/cert.pem", "ascii"),
