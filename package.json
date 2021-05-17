@@ -77,6 +77,7 @@
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-security": "^1.4.0",
     "express": "^4.17.1",
     "github-release-notes": "^0.17.3",
     "mocha": "^8.4.0",

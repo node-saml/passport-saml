@@ -1,0 +1,6 @@
+{
+    "rules": {
+        "security/detect-non-literal-fs-filename": "off",
+        "security/detect-non-literal-regexp": "off"
+    }
+}
