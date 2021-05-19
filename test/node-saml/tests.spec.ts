@@ -1992,11 +1992,6 @@ describe("node-saml /", function () {
         '<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0">' +
         "<saml:Issuer>http://idp.example.com/metadata.php</saml:Issuer>" +
         "<saml2:AttributeStatement>" +
-        '<saml2:Attribute Name="attributeName" ' +
-        'NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified">' +
-        '<saml2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" ' +
-        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
-        'xsi:type="xs:string"/>' +
         "</saml2:Attribute>" +
         '<saml2:Attribute Name="issuer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">' +
         '<saml2:AttributeValue xsi:type="xs:string">test</saml2:AttributeValue>' +
@@ -2010,6 +2005,7 @@ describe("node-saml /", function () {
       });
 
       should(profile!.issuer).not.be.equal("test");
+      should(profile!.attributes).containEql({ issuer: "test" });
     });
   });
 

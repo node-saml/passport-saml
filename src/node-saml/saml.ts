@@ -1170,13 +1170,21 @@ class SAML {
       };
 
       if (attributes) {
+        const profileAttributes: Record<string, unknown> = {};
+
         attributes.forEach((attribute) => {
           if (!Object.prototype.hasOwnProperty.call(attribute, "AttributeValue")) {
             // if attributes has no AttributeValue child, continue
             return;
           }
+
           const name = attribute.$.Name;
-          const value = attribute.AttributeValue;
+          const value =
+            attribute.AttributeValue.length === 1
+              ? attrValueMapper(attribute.AttributeValue[0])
+              : attribute.AttributeValue.map(attrValueMapper);
+
+          profileAttributes[name] = value;
 
           // If any property is already present in profile and is also present
           // in attributes, then skip the one from attributes. Handle this
@@ -1185,12 +1193,10 @@ class SAML {
             return;
           }
 
-          if (value.length === 1) {
-            profile[name] = attrValueMapper(value[0]);
-          } else {
-            profile[name] = value.map(attrValueMapper);
-          }
+          profile[name] = value;
         });
+
+        profile.attributes = profileAttributes;
       }
     }
 
