@@ -721,7 +721,8 @@ class SAML {
     const transforms = xpath.selectElements(currentNode, xpathTransformQuery);
     // Reject also XMLDSIG with more than 2 Transform
     if (transforms.length > 2) {
-      return false;
+      // do not return false, throw an error so that it can be catched by tests differently
+      throw new Error("Invalid signature, too many transforms");
     }
 
     const signature = signatures[0];
