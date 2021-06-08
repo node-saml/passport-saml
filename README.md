@@ -12,8 +12,6 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 
     $ npm install passport-saml
 
-/
-
 ## Usage
 
 The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an account there to log in with this. You also need to [register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service provider.
@@ -175,6 +173,24 @@ type Profile = {
 - `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
 - `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 - `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
+
+- `extensions`: Optional, The extension provides a more flexible structure for expressing which combination of Attributes are requested by service providers in comparison to the existing mechanisms, [More about extensions](https://www.oasis-open.org/committees/download.php/55790/Connectis%20_protocol_extension_draft.pdf). It accept fully customize [XMLBuilder](https://www.npmjs.com/package/xmlbuilder) type. There are many possible value for `extensions` element. You can use [XMLBuilder](https://www.npmjs.com/package/xmlbuilder) to request attributes/data as per your need in SAML Request.
+
+```javascript
+// Example
+extensions: {
+  "md:RequestedAttribute": {
+    "@isRequired": "true",
+    "@Name": "Lastname",
+  },
+  vetuma: {
+    "@xmlns": "urn:vetuma:SAML:2.0:extensions",
+    LG: {
+      "#text": "sv",
+    },
+  },
+},
+```
 
 ### Provide the authentication callback
 
