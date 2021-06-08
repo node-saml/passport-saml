@@ -174,6 +174,7 @@ type Profile = {
 - `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 - `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
 
+- **Extensions**
 - `extensions`: Optional, The extension provides a more flexible structure for expressing which combination of Attributes are requested by service providers in comparison to the existing mechanisms, [More about extensions](https://www.oasis-open.org/committees/download.php/55790/Connectis%20_protocol_extension_draft.pdf). It accept fully customize [XMLBuilder](https://www.npmjs.com/package/xmlbuilder) type. There are many possible value for `extensions` element. You can use [XMLBuilder](https://www.npmjs.com/package/xmlbuilder) to request attributes/data as per your need in SAML Request.
 
 ```javascript
