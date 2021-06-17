@@ -1,22 +1,21 @@
-import { SAML } from "../node-saml";
 import { AbstractStrategy } from "./strategy";
 import type { Request } from "express";
 import {
   AuthenticateOptions,
-  MultiSamlConfig,
+  MultiStrategyConfig,
   RequestWithUser,
-  SamlConfig,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
+import { SAML, SamlConfig } from ".";
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
-  _options: SamlConfig & MultiSamlConfig;
+  _options: SamlConfig & MultiStrategyConfig;
 
-  constructor(options: MultiSamlConfig, verify: VerifyWithRequest);
-  constructor(options: MultiSamlConfig, verify: VerifyWithoutRequest);
-  constructor(options: MultiSamlConfig, verify: never) {
+  constructor(options: MultiStrategyConfig, verify: VerifyWithRequest);
+  constructor(options: MultiStrategyConfig, verify: VerifyWithoutRequest);
+  constructor(options: MultiStrategyConfig, verify: never) {
     if (!options || typeof options.getSamlOptions !== "function") {
       throw new Error("Please provide a getSamlOptions function");
     }
@@ -26,7 +25,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
     // and there are defaults for all `strategy`-required options.
     const samlConfig = {
       ...options,
-    } as SamlConfig & MultiSamlConfig;
+    } as SamlConfig & MultiStrategyConfig;
 
     super(samlConfig, verify);
     this._options = samlConfig;

@@ -2,19 +2,14 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as passport from "passport";
-import { Strategy as SamlStrategy } from "../../src/passport-saml";
+import { Profile, SamlConfig, Strategy as SamlStrategy } from "../src";
 import request = require("request");
 import * as fs from "fs";
 import * as sinon from "sinon";
-import {
-  Profile,
-  SamlConfig,
-  StrategyOptions,
-  VerifiedCallback,
-} from "../../src/passport-saml/types.js";
+import { StrategyOptions, VerifiedCallback } from "../src/types";
 import * as should from "should";
 import { Server } from "http";
-import { CapturedCheck, TEST_CERT } from "../types";
+import { CapturedCheck, TEST_CERT } from "./types";
 
 export const capturedSamlResponseChecks: CapturedCheck[] = [
   {
@@ -44,7 +39,7 @@ export const capturedSamlResponseChecks: CapturedCheck[] = [
       entryPoint:
         "https://frontapp.oktapreview.com/app/frontdev584714_front_1/exk7xdi6axPfombzx0h7/sso/saml",
       cert: "MIIDoDCCAoigAwIBAgIGAVaZ04POMA0GCSqGSIb3DQEBBQUAMIGQMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxETAPBgNVBAMMCGZyb250YXBwMRwwGgYJKoZIhvcNAQkBFg1pbmZvQG9rdGEuY29tMB4XDTE2MDgxNzE4NDUzMVoXDTI2MDgxNzE4NDYzMVowgZAxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ0wCwYDVQQKDARPa3RhMRQwEgYDVQQLDAtTU09Qcm92aWRlcjERMA8GA1UEAwwIZnJvbnRhcHAxHDAaBgkqhkiG9w0BCQEWDWluZm9Ab2t0YS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvplQONVwknRy1iBnaoZtsOz28A7XW2tRpFW+0La7RJexbziIwEy1bPZENhfwjPZA1oHHZqi5l315BxXKWJqmmNmbDCFDo+/FYFCoHXliiLm9vqDbR1br6ByqeY0GfxyTPKHZxb2FSes30TffDknpMQd/8kA9YWaW5xDlu2ivWJI+sfcOJOMd6t+gcfXj58a5fP8Mwm6Y220KeZSvrVpEV2KDp9hln7fhhoxHZ7K/BYbidqdwLzeUQXpb6LIrxtKdug2FofS+ONs6yLIQRmrbCB7SVX1QA8JInMn+fzrGtZmFiHR0aFbyhiO78v/ufDa6S+XpYyp2b6D4SnzeggnobAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAJ2wcFVffFHSd9pj6RgoNHXZBsWp0HUZrNekiSbgomr4tSDefWtKb04nFIlRytfVs/k74wmbNiRCE8nDVBrBDFA/+Tv/3PowZXHjXKBofUuScTP4/Tw1N/ywf7V+XY5kV3VmLBL6ax+ULJauR/YGIIMsIc/rS2D04aAcScU9pqVh2ML7nTH7gFqYrxypavmVk6K94vLjs0ggF2TGp7tXCRjeOlPPJS+MOJHJhTBWYFWvBLclU3zcri3ws7GqJMpeiHa7rMoHV0onxWsZTZW57ybaIWKLt1goAooC7hq0rx7oNlOvrys5lllhBySYYC3ycqca/D0+GxXLcEr9QwP7TVw=",
-      decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
+      decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
     },
     expectedStatusCode: 200,
     expectedNameIDStartsWith: "xavier",
@@ -88,7 +83,7 @@ export const capturedSamlResponseChecks: CapturedCheck[] = [
       entryPoint: "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
       cert: "MIIEDjCCAvagAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJVUzEVMBMGA1UECBMMUGVubnN5bHZhbmlhMRMwEQYDVQQHEwpQaXR0c2J1cmdoMREwDwYDVQQKEwhUZXN0U2hpYjEZMBcGA1UEAxMQaWRwLnRlc3RzaGliLm9yZzAeFw0wNjA4MzAyMTEyMjVaFw0xNjA4MjcyMTEyMjVaMGcxCzAJBgNVBAYTAlVTMRUwEwYDVQQIEwxQZW5uc3lsdmFuaWExEzARBgNVBAcTClBpdHRzYnVyZ2gxETAPBgNVBAoTCFRlc3RTaGliMRkwFwYDVQQDExBpZHAudGVzdHNoaWIub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYkCGuTmJp9eAOSGHwRJo1SNatB5ZOKqDM9ysg7CyVTDClcpu93gSP10nH4gkCZOlnESNgttg0r+MqL8tfJC6ybddEFB3YBo8PZajKSe3OQ01Ow3yT4I+Wdg1tsTpSge9gEz7SrC07EkYmHuPtd71CHiUaCWDv+xVfUQX0aTNPFmDixzUjoYzbGDrtAyCqA8f9CN2txIfJnpHE6q6CmKcoLADS4UrNPlhHSzd614kR/JYiks0K4kbRqCQF0Dv0P5Di+rEfefC6glV8ysC8dB5/9nb0yh/ojRuJGmgMWHgWk6h0ihjihqiu4jACovUZ7vVOCgSE5Ipn7OIwqd93zp2wIDAQABo4HEMIHBMB0GA1UdDgQWBBSsBQ869nh83KqZr5jArr4/7b+QazCBkQYDVR0jBIGJMIGGgBSsBQ869nh83KqZr5jArr4/7b+Qa6FrpGkwZzELMAkGA1UEBhMCVVMxFTATBgNVBAgTDFBlbm5zeWx2YW5pYTETMBEGA1UEBxMKUGl0dHNidXJnaDERMA8GA1UEChMIVGVzdFNoaWIxGTAXBgNVBAMTEGlkcC50ZXN0c2hpYi5vcmeCAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAjR29PhrCbk8qLN5MFfSVk98t3CT9jHZoYxd8QMRLI4j7iYQxXiGJTT1FXs1nd4Rha9un+LqTfeMMYqISdDDI6tv8iNpkOAvZZUosVkUo93pv1T0RPz35hcHHYq2yee59HJOco2bFlcsH8JBXRSRrJ3Q7Eut+z9uo80JdGNJ4/SJy5UorZ8KazGj16lfJhOBXldgrhppQBb0Nq6HKHguqmwRfJ+WkxemZXzhediAjGeka8nz8JjwxpUjAiSWYKLtJhGEaTqCYxCCX2Dw+dOTqUzHOZ7WKv4JXPK5G/Uhr8K/qhmFT2nIQi538n6rVYLeWj8Bbnl+ev0peYzxFyF5sQA==",
       identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-      decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
+      decryptionPvk: fs.readFileSync(__dirname + "/static/testshib encryption pvk.pem"),
     },
     expectedStatusCode: 200,
     mockDate: "2014-06-02T17:48:56.820Z",
