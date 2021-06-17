@@ -9,6 +9,7 @@ const cert = fs.readFileSync(__dirname + "/../static/cert.pem", "ascii");
 describe("Signatures", function () {
   const INVALID_SIGNATURE = "Invalid signature",
     INVALID_ENCRYPTED_SIGNATURE = "Invalid signature from encrypted assertion",
+    INVALID_TOO_MANY_TRANSFORMS = "Invalid signature, too many transforms",
     createBody = (pathToXml: string) => ({
       SAMLResponse: fs.readFileSync(__dirname + "/../static/signatures" + pathToXml, "base64"),
     }),
@@ -121,6 +122,22 @@ describe("Signatures", function () {
           decryptionPvk: fs.readFileSync(__dirname + "/../static/testshib encryption pvk.pem"),
           wantAssertionsSigned: true,
         }
+      )
+    );
+    it(
+      "R1A - root signed but with too many transforms => early error",
+      testOneResponse(
+        "/invalid/response.root-signed-transforms.assertion-unsigned.xml",
+        INVALID_TOO_MANY_TRANSFORMS,
+        1
+      )
+    );
+    it(
+      "R1A - root unsigned, asrt signed but with too many transforms => early error",
+      testOneResponse(
+        "/invalid/response.root-unsigned.assertion-signed-transforms.xml",
+        INVALID_TOO_MANY_TRANSFORMS,
+        2
       )
     );
   });

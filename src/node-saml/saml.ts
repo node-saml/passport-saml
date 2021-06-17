@@ -710,6 +710,20 @@ class SAML {
     if (signatures.length !== 1) {
       return false;
     }
+    const xpathTransformQuery =
+      ".//*[" +
+      "local-name(.)='Transform' and " +
+      "namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#' and " +
+      "ancestor::*[local-name(.)='Reference' and @URI='#" +
+      currentNode.getAttribute("ID") +
+      "']" +
+      "]";
+    const transforms = xpath.selectElements(currentNode, xpathTransformQuery);
+    // Reject also XMLDSIG with more than 2 Transform
+    if (transforms.length > 2) {
+      // do not return false, throw an error so that it can be caught by tests differently
+      throw new Error("Invalid signature, too many transforms");
+    }
 
     const signature = signatures[0];
     return certs.some((certToCheck) => {
