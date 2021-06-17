@@ -6,3 +6,6 @@ yarn-error.log
 .DS_Store 
 .eslintcache
 .dir-locals.el
+
+## Local VS code settings and debug profiles
+.vscode

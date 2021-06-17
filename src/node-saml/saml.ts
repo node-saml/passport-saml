@@ -1170,18 +1170,33 @@ class SAML {
       };
 
       if (attributes) {
+        const profileAttributes: Record<string, unknown> = {};
+
         attributes.forEach((attribute) => {
           if (!Object.prototype.hasOwnProperty.call(attribute, "AttributeValue")) {
             // if attributes has no AttributeValue child, continue
             return;
           }
-          const value = attribute.AttributeValue;
-          if (value.length === 1) {
-            profile[attribute.$.Name] = attrValueMapper(value[0]);
-          } else {
-            profile[attribute.$.Name] = value.map(attrValueMapper);
+
+          const name = attribute.$.Name;
+          const value =
+            attribute.AttributeValue.length === 1
+              ? attrValueMapper(attribute.AttributeValue[0])
+              : attribute.AttributeValue.map(attrValueMapper);
+
+          profileAttributes[name] = value;
+
+          // If any property is already present in profile and is also present
+          // in attributes, then skip the one from attributes. Handle this
+          // conflict gracefully without returning any error
+          if (Object.prototype.hasOwnProperty.call(profile, name)) {
+            return;
           }
+
+          profile[name] = value;
         });
+
+        profile.attributes = profileAttributes;
       }
     }
 
