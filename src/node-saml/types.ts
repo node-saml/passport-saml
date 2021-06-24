@@ -98,7 +98,7 @@ export interface SamlOptions extends Partial<SamlSigningOptions>, MandatorySamlO
   acceptedClockSkewMs: number;
   attributeConsumingServiceIndex?: string;
   disableRequestedAuthnContext: boolean;
-  authnContext: string[];
+  authnContext: string | string[];
   forceAuthn: boolean;
   skipRequestCompression: boolean;
   authnRequestBinding?: string;
