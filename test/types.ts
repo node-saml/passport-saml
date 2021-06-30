@@ -1,4 +1,4 @@
-import { SamlConfig } from "../src/passport-saml/types";
+import { SamlConfig } from "../src";
 
 // a certificate which is re-used by several tests
 export const TEST_CERT =

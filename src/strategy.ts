@@ -1,14 +1,12 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
-import { SAML } from "../node-saml";
 import * as url from "url";
+import { Profile, SAML, SamlConfig } from ".";
 import {
   AuthenticateOptions,
   RequestWithUser,
-  SamlConfig,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { Profile } from "./types";
 
 export abstract class AbstractStrategy extends PassportStrategy {
   static readonly newSamlProviderOnConstruct: boolean;

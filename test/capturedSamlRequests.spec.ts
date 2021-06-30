@@ -2,16 +2,16 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as passport from "passport";
-import { Strategy as SamlStrategy } from "../../src/passport-saml";
+import { Profile, Strategy as SamlStrategy } from "../src";
 import request = require("request");
 import * as zlib from "zlib";
 import * as querystring from "querystring";
 import { parseString } from "xml2js";
 import * as fs from "fs";
-import { AuthenticateOptions, Profile, VerifiedCallback } from "../../src/passport-saml/types.js";
+import { AuthenticateOptions, VerifiedCallback } from "../src/types";
 import * as should from "should";
 import { Server } from "http";
-import { CapturedCheck, FAKE_CERT, SamlCheck } from "../types";
+import { CapturedCheck, FAKE_CERT, SamlCheck } from "./types";
 
 const capturedSamlRequestChecks: SamlCheck[] = [
   {
@@ -867,12 +867,12 @@ export const logoutChecks: CapturedCheck[] = [
     config: {
       skipRequestCompression: true,
       entryPoint: "https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO",
-      cert: fs.readFileSync(__dirname + "/../static/cert.pem", "ascii"),
+      cert: fs.readFileSync(__dirname + "/static/cert.pem", "ascii"),
       identifierFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
     },
     samlRequest: {
       SAMLRequest: fs.readFileSync(
-        __dirname + "/../static/logout_request_with_good_signature.xml",
+        __dirname + "/static/logout_request_with_good_signature.xml",
         "base64"
       ),
     },
