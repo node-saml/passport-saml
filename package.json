@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "debug": "^4.3.1",
-    "node-saml": "^4.0.0-beta.0",
+    "node-saml": "file:../node-saml",
     "passport-strategy": "^1.0.0",
     "xml-crypto": "^2.1.2",
     "xml-encryption": "^1.2.4",

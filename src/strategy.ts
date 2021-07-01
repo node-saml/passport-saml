@@ -53,66 +53,83 @@ export abstract class AbstractStrategy extends PassportStrategy {
       profile,
       loggedOut,
     }: {
-      profile?: Profile | null;
-      loggedOut?: boolean;
+      profile: Profile | null;
+      loggedOut: boolean;
     }) => {
       if (loggedOut) {
+        // Log out the current user no matter if we can verify the logged in user === logout requested user
         req.logout();
-        if (profile) {
+
+        // Check to see if we are logging out the user that is currently logged in to craft a proper IdP response
+        if (profile != null) {
           if (this._saml == null) {
             throw new Error("Can't get logout response URL without a SAML provider defined.");
           }
 
-          const RelayState =
-            (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-          return this._saml.getLogoutResponseUrl(profile, RelayState, options, redirectIfSuccess);
+          const RelayState = req.query?.RelayState || req.body?.RelayState;
+
+          if (
+            req.user != null &&
+            req.user.ID === profile.ID &&
+            req.user.issuer === profile.issuer &&
+            req.user.nameID === profile.nameID &&
+            req.user.nameIDFormat === profile.nameIDFormat
+          ) {
+            this._saml.getLogoutResponseUrl(profile, RelayState, options, true, redirectIfSuccess);
+          } else {
+            this._saml.getLogoutResponseUrl(profile, RelayState, options, false, redirectIfSuccess);
+          }
+        } else {
+          // If the `profile` object was null, this is just a logout acknowledgment, so we take no action
+          return this.pass();
         }
-        return this.pass();
-      }
-
-      const verified = (
-        err: Error | null,
-        user?: Record<string, unknown>,
-        info?: Record<string, unknown>
-      ) => {
-        if (err) {
-          return this.error(err);
-        }
-
-        if (!user) {
-          return this.fail(info, 401);
-        }
-
-        this.success(user, info);
-      };
-
-      if (this._passReqToCallback) {
-        (this._verify as VerifyWithRequest)(req, profile, verified);
       } else {
-        (this._verify as VerifyWithoutRequest)(profile, verified);
+        const verified = (
+          err: Error | null,
+          user?: Record<string, unknown>,
+          info?: Record<string, unknown>
+        ) => {
+          if (err) {
+            return this.error(err);
+          }
+
+          if (!user) {
+            return this.fail(info, 401);
+          }
+
+          this.success(user, info);
+        };
+
+        if (this._passReqToCallback) {
+          (this._verify as VerifyWithRequest)(req, profile, verified);
+        } else {
+          (this._verify as VerifyWithoutRequest)(profile, verified);
+        }
       }
     };
 
-    const redirectIfSuccess = (err: Error | null, url?: string | null) => {
+    const redirectIfSuccess = (err: Error | null, url?: string) => {
       if (err) {
         this.error(err);
+      } else if (url == null) {
+        this.error(new Error("Invalid logout redirect URL."));
       } else {
-        this.redirect(url!);
+        this.redirect(url);
       }
     };
 
-    if (req.query && (req.query.SAMLResponse || req.query.SAMLRequest)) {
+    if (req.query?.SAMLResponse || req.query?.SAMLRequest) {
       const originalQuery = url.parse(req.url).query;
       this._saml
         .validateRedirectAsync(req.query, originalQuery)
         .then(validateCallback)
         .catch((err) => this.error(err));
-    } else if (req.body && req.body.SAMLResponse) {
+    } else if (req.body?.SAMLResponse) {
       this._saml
         .validatePostResponseAsync(req.body)
         .then(validateCallback)
         .catch((err) => this.error(err));
-    } else if (req.body && req.body.SAMLRequest) {
+    } else if (req.body?.SAMLRequest) {
       this._saml
         .validatePostRequestAsync(req.body)
         .then(validateCallback)
@@ -130,8 +147,8 @@ export abstract class AbstractStrategy extends PassportStrategy {
             const host = req.headers && req.headers.host;
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
               const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
-              const res = req.res!;
-              res.send(data);
+              const res = req.res;
+              res?.send(data);
             } else {
               // Defaults to HTTP-Redirect
               this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
@@ -190,6 +207,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
   // This is reduntant, but helps with testing
   error(err: Error): void {
     super.error(err);
+  }
+  redirect(url: string, status?: number): void {
+    super.redirect(url, status);
   }
 }
 
