@@ -60,11 +60,6 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }) => {
       if (loggedOut) {
         if (profile != null) {
-          if (this._saml == null) {
-            throw new Error("Can't get logout response URL without a SAML provider defined.");
-          }
-
-          const getLogoutResponseUrl = this._saml.getLogoutResponseUrl;
           // When logging out a user, use the consumer's `validate` function to check that
           // the `profile` associated with the logout request resolves to the same user
           // as the `profile` associated with the current session.
@@ -89,16 +84,22 @@ export abstract class AbstractStrategy extends PassportStrategy {
             }
 
             const RelayState = req.query?.RelayState || req.body?.RelayState;
-            getLogoutResponseUrl(profile, RelayState, options, userMatch, redirectIfSuccess);
+            if (this._saml == null) {
+              return this.error(
+                new Error("Can't get logout response URL without a SAML provider defined.")
+              );
+            } else {
+              this._saml.getLogoutResponseUrl(
+                profile,
+                RelayState,
+                options,
+                userMatch,
+                redirectIfSuccess
+              );
+            }
 
             // Log out the current user no matter if we can verify the logged in user === logout requested user
             req.logout();
-
-            if (!userMatch) {
-              return this.error(
-                new Error("Attempting to log out a user that differs from the current user.")
-              );
-            }
           };
 
           if (this._passReqToCallback) {

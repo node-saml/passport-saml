@@ -1,8 +1,8 @@
 "use strict";
 
 import * as sinon from "sinon";
-import { SAML, Strategy as SamlStrategy } from "../src";
-import { RequestWithUser } from "../src/types";
+import { Profile, SAML, Strategy as SamlStrategy } from "../src";
+import { RequestWithUser, VerifiedCallback } from "../src/types";
 import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
@@ -79,22 +79,29 @@ describe("strategy#authorize", function () {
   });
 
   it("determines that logout was unsuccessful where user doesn't match", function (done) {
-    const strategy = new SamlStrategy({ cert: FAKE_CERT }, noop);
+    const strategy = new SamlStrategy({ cert: FAKE_CERT }, function (
+      _profile: Profile | null,
+      done: VerifiedCallback
+    ) {
+      if (_profile) {
+        done(null, { name: _profile.nameID });
+      }
+    });
+
     validatePostResponseAsync.resolves({
       profile: {
         ID: "ID",
         issuer: "issuer",
-        nameID: "nameID",
+        nameID: "some other user",
         nameIDFormat: "nameIDFormat",
       },
       loggedOut: true,
     });
 
+    // Pretend we already loaded a users session from a cookie or something
+    // by calling `strategy.authenticate` when the request comes in
     requestWithUserPostResponse.user = {
-      ID: "ID",
-      issuer: "issuer",
-      nameID: "otherNameID",
-      nameIDFormat: "nameIDFormat",
+      name: "some user",
     };
 
     // This returns immediately, but calls async functions; need to turn event loop
@@ -115,22 +122,29 @@ describe("strategy#authorize", function () {
   });
 
   it("determines that logout was successful where user matches", function (done) {
-    const strategy = new SamlStrategy({ cert: FAKE_CERT }, noop);
+    const strategy = new SamlStrategy({ cert: FAKE_CERT }, function (
+      _profile: Profile | null,
+      done: VerifiedCallback
+    ) {
+      if (_profile) {
+        done(null, { name: _profile.nameID });
+      }
+    });
+
     validatePostResponseAsync.resolves({
       profile: {
         ID: "ID",
         issuer: "issuer",
-        nameID: "nameID",
+        nameID: "some user",
         nameIDFormat: "nameIDFormat",
       },
       loggedOut: true,
     });
 
+    // Pretend we already loaded a users session from a cookie or something
+    // by calling `strategy.authenticate` when the request comes in
     requestWithUserPostResponse.user = {
-      ID: "ID",
-      issuer: "issuer",
-      nameID: "nameID",
-      nameIDFormat: "nameIDFormat",
+      name: "some user",
     };
 
     // This returns immediately, but calls async functions; need to turn event loop
