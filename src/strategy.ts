@@ -1,9 +1,11 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
+import { strict as assert } from "assert";
 import * as url from "url";
 import { Profile, SAML, SamlConfig } from ".";
 import {
   AuthenticateOptions,
   RequestWithUser,
+  User,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
@@ -24,7 +26,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
       throw new Error("Mandatory SAML options missing");
     }
 
-    if (!verify) {
+    if (!verify || typeof verify != "function") {
       throw new Error("SAML authentication strategy requires a verify function");
     }
 
@@ -57,38 +59,59 @@ export abstract class AbstractStrategy extends PassportStrategy {
       loggedOut: boolean;
     }) => {
       if (loggedOut) {
-        // Log out the current user no matter if we can verify the logged in user === logout requested user
-        req.logout();
-
-        // Check to see if we are logging out the user that is currently logged in to craft a proper IdP response
         if (profile != null) {
           if (this._saml == null) {
             throw new Error("Can't get logout response URL without a SAML provider defined.");
           }
 
-          const RelayState = req.query?.RelayState || req.body?.RelayState;
+          const getLogoutResponseUrl = this._saml.getLogoutResponseUrl;
+          // When logging out a user, use the consumer's `validate` function to check that
+          // the `profile` associated with the logout request resolves to the same user
+          // as the `profile` associated with the current session.
+          const verified = (err: Error | null, logoutUser?: User, info?: unknown) => {
+            if (err) {
+              return this.error(err);
+            }
 
-          if (
-            req.user != null &&
-            req.user.ID === profile.ID &&
-            req.user.issuer === profile.issuer &&
-            req.user.nameID === profile.nameID &&
-            req.user.nameIDFormat === profile.nameIDFormat
-          ) {
-            this._saml.getLogoutResponseUrl(profile, RelayState, options, true, redirectIfSuccess);
+            if (!logoutUser) {
+              return this.fail(info, 401);
+            }
+
+            let userMatch = true;
+            try {
+              // Check to see if we are logging out the user that is currently logged in to craft a proper IdP response
+
+              // TODO: This may be a problem if there are any timestamps in here, should we do a `strictEqual` instead?
+
+              assert.deepStrictEqual(req.user, logoutUser);
+            } catch (err) {
+              userMatch = false;
+            }
+
+            const RelayState = req.query?.RelayState || req.body?.RelayState;
+            getLogoutResponseUrl(profile, RelayState, options, userMatch, redirectIfSuccess);
+
+            // Log out the current user no matter if we can verify the logged in user === logout requested user
+            req.logout();
+
+            if (!userMatch) {
+              return this.error(
+                new Error("Attempting to log out a user that differs from the current user.")
+              );
+            }
+          };
+
+          if (this._passReqToCallback) {
+            (this._verify as VerifyWithRequest)(req, profile, verified);
           } else {
-            this._saml.getLogoutResponseUrl(profile, RelayState, options, false, redirectIfSuccess);
+            (this._verify as VerifyWithoutRequest)(profile, verified);
           }
         } else {
           // If the `profile` object was null, this is just a logout acknowledgment, so we take no action
           return this.pass();
         }
       } else {
-        const verified = (
-          err: Error | null,
-          user?: Record<string, unknown>,
-          info?: Record<string, unknown>
-        ) => {
+        const verified = (err: Error | null, user?: User, info?: unknown) => {
           if (err) {
             return this.error(err);
           }
@@ -119,7 +142,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     };
 
     if (req.query?.SAMLResponse || req.query?.SAMLRequest) {
-      const originalQuery = url.parse(req.url).query;
+      const originalQuery = url.parse(req.url).query ?? "";
       this._saml
         .validateRedirectAsync(req.query, originalQuery)
         .then(validateCallback)

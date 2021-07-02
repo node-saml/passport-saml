@@ -16,9 +16,11 @@ export interface StrategyOptions {
   passReqToCallback?: boolean;
 }
 
+export type User = Record<string, unknown>;
+
 export interface RequestWithUser extends express.Request {
-  samlLogoutRequest: any;
-  user?: Profile;
+  samlLogoutRequest: Profile;
+  user: User;
 }
 
 export type VerifiedCallback = (
