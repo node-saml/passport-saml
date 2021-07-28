@@ -55,8 +55,8 @@ nwtlCg==
 </ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
-      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-gcm"/>
-      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-gcm"/>
+      <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
+      <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
       <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
       <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
     </KeyDescriptor>
