@@ -1,7 +1,7 @@
 import * as util from "util";
 import * as xmlCrypto from "xml-crypto";
 import * as xmlenc from "xml-encryption";
-import * as xmldom from "xmldom";
+import * as xmldom from "@xmldom/xmldom";
 import * as xml2js from "xml2js";
 import * as xmlbuilder from "xmlbuilder";
 import { isValidSamlSigningOptions, SamlSigningOptions } from "./types";
