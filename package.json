@@ -1,6 +1,6 @@
 {
   "name": "suomifi-passport-saml",
-  "version": "1.3.3-sfi.4",
+  "version": "1.3.3-sfi.5",
   "license": "MIT",
   "keywords": [
     "saml",
@@ -30,11 +30,11 @@
     "debug": "^4.3.1",
     "passport-strategy": "*",
     "q": "^1.5.0",
-    "xml-crypto": "^2.0.0",
-    "xml-encryption": "^1.2.0",
+    "xml-crypto": "^2.1.3",
+    "xml-encryption": "^1.3.0",
     "xml2js": "0.4.x",
     "xmlbuilder": "^15.1.1",
-    "xmldom": "github:xmldom/xmldom#0.7.0"
+    "@xmldom/xmldom": "0.7.4"
   },
   "devDependencies": {
     "body-parser": "^1.17.1",
