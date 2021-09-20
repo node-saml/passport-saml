@@ -569,18 +569,18 @@ describe("node-saml /", function () {
         it("must have a cert to construct a SAML object", function () {
           try {
             new SAML(noCertSamlConfig);
-          } catch (err) {
+          } catch (err: any) {
             should.exist(err);
-            err!.message!.should.match(/cert is required/);
+            err.message!.should.match(/cert is required/);
           }
         });
 
         it("must have a valid cert to construct a SAML object", function () {
           try {
             new SAML(badCertSamlConfig);
-          } catch (err) {
+          } catch (err: any) {
             should.exist(err);
-            err!.message!.should.match(/cert is required/);
+            err.message!.should.match(/cert is required/);
           }
         });
 
@@ -609,9 +609,9 @@ describe("node-saml /", function () {
           const container = { SAMLResponse: base64xml };
           try {
             const samlObj = new SAML(noCertSamlConfig);
-          } catch (err) {
+          } catch (err: any) {
             should.exist(err);
-            err!.message!.should.match(/cert is required/);
+            err.message!.should.match(/cert is required/);
           }
         });
 
@@ -779,9 +779,9 @@ describe("node-saml /", function () {
           try {
             await samlObj.validatePostResponseAsync(container);
             should.not.exist(true);
-          } catch (err) {
+          } catch (err: any) {
             should.exist(err);
-            err!.should.eql(errorToReturn);
+            err.should.eql(errorToReturn);
           }
         });
 
@@ -1386,8 +1386,8 @@ describe("node-saml /", function () {
         try {
           const { profile } = await samlObj.validatePostResponseAsync(container);
           should.not.exist(profile);
-        } catch (err) {
-          err!.message!.should.eql("InResponseTo is missing from response");
+        } catch (err: any) {
+          err.message!.should.eql("InResponseTo is missing from response");
         }
       });
 
