@@ -1,6 +1,8 @@
 # Passport-SAML
 
-[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status) [![GitHub version](https://badge.fury.io/gh/node-saml%2Fpassport-saml.svg)](https://badge.fury.io/gh/node-saml%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status) [![GitHub version](https://badge.fury.io/gh/node-saml%2Fpassport-saml.svg)](https://badge.fury.io/gh/node-saml%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
+[![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/)
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
@@ -11,8 +13,6 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 ## Installation
 
     $ npm install passport-saml
-
-/
 
 ## Usage
 
@@ -26,21 +26,34 @@ The SAML identity provider will redirect you to the URL provided by the `path` c
 const SamlStrategy = require('passport-saml').Strategy;
 [...]
 
-passport.use(new SamlStrategy(
-  {
-    path: '/login/callback',
-    entryPoint: 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
-    issuer: 'passport-saml',
-    cert: 'fake cert', // cert must be provided
-  },
-  function(profile, done) {
-    findByEmail(profile.email, function(err, user) {
-      if (err) {
-        return done(err);
-      }
-      return done(null, user);
-    });
-  })
+passport.use(
+  new SamlStrategy(
+    {
+      path: "/login/callback",
+      entryPoint:
+        "https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php",
+      issuer: "passport-saml",
+      cert: "fake cert", // cert must be provided
+    },
+    function (profile, done) {
+      // for signon
+      findByEmail(profile.email, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
+      });
+    },
+    function (profile, done) {
+      // for logout
+      findByNameID(profile.nameID, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
+      });
+    }
+  )
 );
 ```
 
@@ -52,26 +65,38 @@ You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be c
 const { MultiSamlStrategy } = require('passport-saml');
 [...]
 
-passport.use(new MultiSamlStrategy(
-  {
-    passReqToCallback: true, // makes req available in callback
-    getSamlOptions: function(request, done) {
-      findProvider(request, function(err, provider) {
+passport.use(
+  new MultiSamlStrategy(
+    {
+      passReqToCallback: true, // makes req available in callback
+      getSamlOptions: function (request, done) {
+        findProvider(request, function (err, provider) {
+          if (err) {
+            return done(err);
+          }
+          return done(null, provider.configuration);
+        });
+      },
+    },
+    function (req, profile, done) {
+      // for signon
+      findByEmail(profile.email, function (err, user) {
         if (err) {
           return done(err);
         }
-        return done(null, provider.configuration);
+        return done(null, user);
+      });
+    },
+    function (req, profile, done) {
+      // for logout
+      findByNameID(profile.nameID, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
       });
     }
-  },
-  function(req, profile, done) {
-    findByEmail(profile.email, function(err, user) {
-      if (err) {
-        return done(err);
-      }
-      return done(null, user);
-    });
-  })
+  )
 );
 ```
 
@@ -88,22 +113,22 @@ Using multiple providers supports `validateInResponseTo`, but all the `InRespons
 The profile object referenced above contains the following:
 
 ```typescript
-type Profile = {
-  issuer?: string;
+export interface Profile {
+  issuer: string;
   sessionIndex?: string;
-  nameID?: string;
-  nameIDFormat?: string;
+  nameID: string;
+  nameIDFormat: string;
   nameQualifier?: string;
   spNameQualifier?: string;
+  ID?: string;
   mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
   email?: string; // `mail` if not present in the assertion
-  getAssertionXml(): string; // get the raw assertion XML
-  getAssertion(): object; // get the assertion XML parsed as a JavaScript object
-  getSamlResponseXml(): string; // get the raw SAML response XML
-  ID?: string;
-} & {
+  ["urn:oid:0.9.2342.19200300.100.1.3"]?: string;
+  getAssertionXml?(): string; // get the raw assertion XML
+  getAssertion?(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
+  getSamlResponseXml?(): string; // get the raw SAML response XML
   [attributeName: string]: unknown; // arbitrary `AttributeValue`s
-};
+}
 ```
 
 #### Config parameter details:
@@ -147,17 +172,17 @@ type Profile = {
     {
       entries: [ // required
         {
-          providerId: 'yourProviderId', // required for each entry
-          name: 'yourName', // optional
-          loc: 'yourLoc', // optional
-        }
+          providerId: "yourProviderId", // required for each entry
+          name: "yourName", // optional
+          loc: "yourLoc", // optional
+        },
       ],
-      getComplete: 'URI to your complete IDP list', // optional
+      getComplete: "URI to your complete IDP list", // optional
     },
   ],
   proxyCount: 2, // optional
-  requesterId: 'requesterId', // optional
-}
+  requesterId: "requesterId", // optional
+};
 ```
 
 - **InResponseTo Validation**
@@ -188,7 +213,10 @@ const bodyParser = require("body-parser");
 app.post(
   "/login/callback",
   bodyParser.urlencoded({ extended: false }),
-  passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
+  passport.authenticate("saml", {
+    failureRedirect: "/",
+    failureFlash: true,
+  }),
   function (req, res) {
     res.redirect("/");
   }
@@ -311,14 +339,14 @@ The `cert` configuration key can also be a function that receives a callback as 
 Here is a configuration that has been proven to work with ADFS:
 
 ```javascript
-  {
-    entryPoint: 'https://ad.example.net/adfs/ls/',
-    issuer: 'https://your-app.example.net/login/callback',
-    callbackUrl: 'https://your-app.example.net/login/callback',
-    cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
-    authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows',
-    identifierFormat: null
-  }
+{
+  entryPoint: 'https://ad.example.net/adfs/ls/',
+  issuer: 'https://your-app.example.net/login/callback',
+  callbackUrl: 'https://your-app.example.net/login/callback',
+  cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
+  authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows',
+  identifierFormat: null
+}
 ```
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.
@@ -359,17 +387,17 @@ To support this scenario you can provide an implementation for a cache provider 
 
 ```javascript
 {
-    saveAsync: async function(key, value) {
-      // saves the key with the optional value, returns the saved value
-    },
-    getAsync: async function(key) {
-      // returns the value if found, null otherwise
-    },
-    removeAsync: async function(key) {
-      // removes the key from the cache, returns the
-      // key removed, null if no key is removed
-    }
-}
+  saveAsync: async function (key, value) {
+    // saves the key with the optional value, returns the saved value
+  },
+  getAsync: async function (key) {
+    // returns the value if found, null otherwise
+  },
+  removeAsync: async function (key) {
+    // removes the key from the cache, returns the
+    // key removed, null if no key is removed
+  },
+};
 ```
 
 Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.

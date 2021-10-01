@@ -79,14 +79,21 @@ describe("strategy#authorize", function () {
   });
 
   it("determines that logout was unsuccessful where user doesn't match", function (done) {
-    const strategy = new SamlStrategy({ cert: FAKE_CERT }, function (
-      _profile: Profile | null,
-      done: VerifiedCallback
-    ) {
-      if (_profile) {
-        done(null, { name: _profile.nameID });
+    const strategy = new SamlStrategy(
+      { cert: FAKE_CERT },
+      function (_profile: Profile | null, done: VerifiedCallback) {
+        // for signon
+        if (_profile) {
+          done(null, { name: _profile.nameID });
+        }
+      },
+      function (_profile: Profile | null, done: VerifiedCallback) {
+        // for logout
+        if (_profile) {
+          done(null, { name: _profile.nameID });
+        }
       }
-    });
+    );
 
     validatePostResponseAsync.resolves({
       profile: {
@@ -122,14 +129,21 @@ describe("strategy#authorize", function () {
   });
 
   it("determines that logout was successful where user matches", function (done) {
-    const strategy = new SamlStrategy({ cert: FAKE_CERT }, function (
-      _profile: Profile | null,
-      done: VerifiedCallback
-    ) {
-      if (_profile) {
-        done(null, { name: _profile.nameID });
+    const strategy = new SamlStrategy(
+      { cert: FAKE_CERT },
+      function (_profile: Profile | null, done: VerifiedCallback) {
+        // for signon
+        if (_profile) {
+          done(null, { name: _profile.nameID });
+        }
+      },
+      function (_profile: Profile | null, done: VerifiedCallback) {
+        // for logout
+        if (_profile) {
+          done(null, { name: _profile.nameID });
+        }
       }
-    });
+    );
 
     validatePostResponseAsync.resolves({
       profile: {

@@ -7,15 +7,23 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { SAML, SamlConfig } from ".";
+import { SAML, SamlConfig } from "node-saml";
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
   _options: SamlConfig & MultiStrategyConfig;
 
-  constructor(options: MultiStrategyConfig, verify: VerifyWithRequest);
-  constructor(options: MultiStrategyConfig, verify: VerifyWithoutRequest);
-  constructor(options: MultiStrategyConfig, verify: never) {
+  constructor(
+    options: MultiStrategyConfig,
+    signonVerify: VerifyWithRequest,
+    logoutVerify: VerifyWithRequest
+  );
+  constructor(
+    options: MultiStrategyConfig,
+    signonVerify: VerifyWithoutRequest,
+    logoutVerify: VerifyWithoutRequest
+  );
+  constructor(options: MultiStrategyConfig, signonVerify: never, logoutVerify: never) {
     if (!options || typeof options.getSamlOptions !== "function") {
       throw new Error("Please provide a getSamlOptions function");
     }
@@ -27,7 +35,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
       ...options,
     } as SamlConfig & MultiStrategyConfig;
 
-    super(samlConfig, verify);
+    super(samlConfig, signonVerify, logoutVerify);
     this._options = samlConfig;
   }
 
@@ -47,7 +55,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
   logout(
     req: RequestWithUser,
     callback: (err: Error | null, url?: string | null | undefined) => void
-  ) {
+  ): void {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return callback(err);
@@ -65,7 +73,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
     decryptionCert: string | null,
     signingCert: string | null,
     callback: (err: Error | null, metadata?: string) => void
-  ) {
+  ): void {
     if (typeof callback !== "function") {
       throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
     }

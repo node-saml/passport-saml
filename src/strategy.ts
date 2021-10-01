@@ -1,7 +1,7 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { strict as assert } from "assert";
 import * as url from "url";
-import { Profile, SAML, SamlConfig } from ".";
+import { Profile, SAML, SamlConfig, VerifiedCallback } from ".";
 import {
   AuthenticateOptions,
   RequestWithUser,
@@ -14,19 +14,28 @@ export abstract class AbstractStrategy extends PassportStrategy {
   static readonly newSamlProviderOnConstruct: boolean;
 
   name: string;
-  _verify: VerifyWithRequest | VerifyWithoutRequest;
+  _signonVerify: VerifyWithRequest | VerifyWithoutRequest;
+  _logoutVerify: VerifyWithRequest | VerifyWithoutRequest;
   _saml: SAML | undefined;
   _passReqToCallback?: boolean;
 
-  constructor(options: SamlConfig, verify: VerifyWithRequest);
-  constructor(options: SamlConfig, verify: VerifyWithoutRequest);
-  constructor(options: SamlConfig, verify: never) {
+  constructor(
+    options: SamlConfig,
+    signonVerify: VerifyWithRequest,
+    logoutVerify: VerifyWithRequest
+  );
+  constructor(
+    options: SamlConfig,
+    signonVerify: VerifyWithoutRequest,
+    logoutVerify: VerifyWithoutRequest
+  );
+  constructor(options: SamlConfig, signonVerify: never, logoutVerify: never) {
     super();
     if (typeof options === "function") {
       throw new Error("Mandatory SAML options missing");
     }
 
-    if (!verify || typeof verify != "function") {
+    if (!signonVerify || typeof signonVerify != "function") {
       throw new Error("SAML authentication strategy requires a verify function");
     }
 
@@ -38,7 +47,8 @@ export abstract class AbstractStrategy extends PassportStrategy {
       this.name = "saml";
     }
 
-    this._verify = verify;
+    this._signonVerify = signonVerify;
+    this._logoutVerify = logoutVerify;
     if ((this.constructor as typeof Strategy).newSamlProviderOnConstruct) {
       this._saml = new SAML(options);
     }
@@ -63,20 +73,15 @@ export abstract class AbstractStrategy extends PassportStrategy {
           // When logging out a user, use the consumer's `validate` function to check that
           // the `profile` associated with the logout request resolves to the same user
           // as the `profile` associated with the current session.
-          const verified = (err: Error | null, logoutUser?: User, info?: unknown) => {
+          const verified: VerifiedCallback = (err: Error | null, logoutUser?: User) => {
             if (err) {
               return this.error(err);
-            }
-
-            if (!logoutUser) {
-              return this.fail(info, 401);
             }
 
             let userMatch = true;
             try {
               // Check to see if we are logging out the user that is currently logged in to craft a proper IdP response
-
-              // TODO: This may be a problem if there are any timestamps in here, should we do a `strictEqual` instead?
+              // It is up to the caller to return the same `User` as we have currently recorded as logged in for a successful logout
 
               assert.deepStrictEqual(req.user, logoutUser);
             } catch (err) {
@@ -103,9 +108,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
           };
 
           if (this._passReqToCallback) {
-            (this._verify as VerifyWithRequest)(req, profile, verified);
+            (this._logoutVerify as VerifyWithRequest)(req, profile, verified);
           } else {
-            (this._verify as VerifyWithoutRequest)(profile, verified);
+            (this._logoutVerify as VerifyWithoutRequest)(profile, verified);
           }
         } else {
           // If the `profile` object was null, this is just a logout acknowledgment, so we take no action
@@ -125,9 +130,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
         };
 
         if (this._passReqToCallback) {
-          (this._verify as VerifyWithRequest)(req, profile, verified);
+          (this._signonVerify as VerifyWithRequest)(req, profile, verified);
         } else {
-          (this._verify as VerifyWithoutRequest)(profile, verified);
+          (this._signonVerify as VerifyWithoutRequest)(profile, verified);
         }
       }
     };

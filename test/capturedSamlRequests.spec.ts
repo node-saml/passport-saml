@@ -1029,15 +1029,23 @@ describe("captured SAML requests /", function () {
       config.callbackUrl = "http://localhost:3033/login";
       config.entryPoint = "https://wwwexampleIdp.com/saml";
       let profile: Profile;
-      const strategy = new SamlStrategy(config, function (
-        _profile: Profile | null,
-        done: VerifiedCallback
-      ) {
-        if (_profile) {
-          profile = _profile;
-          done(null, profile);
+      const strategy = new SamlStrategy(
+        config,
+        function (_profile: Profile | null, done: VerifiedCallback) {
+          // for singon
+          if (_profile) {
+            profile = _profile;
+            done(null, profile);
+          }
+        },
+        function (_profile: Profile | null, done: VerifiedCallback) {
+          // for logout
+          if (_profile) {
+            profile = _profile;
+            done(null, profile);
+          }
         }
-      });
+      );
 
       passport.use(strategy);
 
