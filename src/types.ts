@@ -38,7 +38,11 @@ export type VerifyWithoutRequest = (
   done: VerifiedCallback
 ) => void;
 
-export type StrategyOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
+export type StrategyOptionsCallback = (
+  err: Error | null,
+  samlOptions?: SamlConfig,
+  abort?: Boolean | false
+) => void;
 
 interface BaseMultiStrategyConfig {
   getSamlOptions(req: express.Request, callback: StrategyOptionsCallback): void;
