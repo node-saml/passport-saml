@@ -60,6 +60,9 @@ passport.use(new MultiSamlStrategy(
         if (err) {
           return done(err);
         }
+        if (!provider) {
+          return done(null, {}, true)
+        }
         return done(null, provider.configuration);
       });
     }
