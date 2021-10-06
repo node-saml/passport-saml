@@ -32,7 +32,11 @@ export class MultiSamlStrategy extends AbstractStrategy {
   }
 
   authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
-    this._options.getSamlOptions(req, (err, samlOptions) => {
+    this._options.getSamlOptions(req, (err, samlOptions, abort) => {
+      if (abort) {
+        return null;
+      }
+
       if (err) {
         return this.error(err);
       }
@@ -48,7 +52,11 @@ export class MultiSamlStrategy extends AbstractStrategy {
     req: RequestWithUser,
     callback: (err: Error | null, url?: string | null | undefined) => void
   ) {
-    this._options.getSamlOptions(req, (err, samlOptions) => {
+    this._options.getSamlOptions(req, (err, samlOptions, abort) => {
+      if (abort) {
+        return null;
+      }
+
       if (err) {
         return callback(err);
       }
@@ -70,7 +78,11 @@ export class MultiSamlStrategy extends AbstractStrategy {
       throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
     }
 
-    return this._options.getSamlOptions(req, (err, samlOptions) => {
+    return this._options.getSamlOptions(req, (err, samlOptions, abort) => {
+      if (abort) {
+        return null;
+      }
+
       if (err) {
         return callback(err);
       }
