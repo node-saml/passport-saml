@@ -224,7 +224,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
 
   protected _generateServiceProviderMetadata(
     decryptionCert: string | null,
-    signingCert?: string | null
+    signingCert?: string | string[] | null
   ): string {
     if (this._saml == null) {
       throw new Error("Can't generate service provider metadata without a SAML provider defined.");
@@ -247,7 +247,7 @@ export class Strategy extends AbstractStrategy {
 
   generateServiceProviderMetadata(
     decryptionCert: string | null,
-    signingCert?: string | null
+    signingCert?: string | string[] | null
   ): string {
     return this._generateServiceProviderMetadata(decryptionCert, signingCert);
   }
