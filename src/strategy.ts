@@ -183,7 +183,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
               this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
             }
           } catch (err) {
-            this.error(err);
+            this.error(err as Error);
           }
         },
         "logout-request": async () => {
@@ -198,7 +198,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
               await this._saml.getLogoutUrlAsync(req.user as Profile, RelayState, options)
             );
           } catch (err) {
-            this.error(err);
+            this.error(err as Error);
           }
         },
       }[options.samlFallback];
