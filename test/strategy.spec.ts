@@ -51,6 +51,7 @@ describe("strategy#authorize", function () {
         authnRequestBinding: "HTTP-POST",
         cert: FAKE_CERT,
       },
+      noop,
       noop
     );
 
@@ -65,7 +66,7 @@ describe("strategy#authorize", function () {
   });
 
   it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function (done) {
-    const strategy = new SamlStrategy({ cert: FAKE_CERT }, noop);
+    const strategy = new SamlStrategy({ cert: FAKE_CERT }, noop, noop);
 
     // This returns immediately, but calls async functions; need to turn event loop
     strategy.authenticate(requestWithUser, {});
