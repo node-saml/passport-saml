@@ -316,7 +316,7 @@ Here is a configuration that has been proven to work with ADFS:
     issuer: 'https://your-app.example.net/login/callback',
     callbackUrl: 'https://your-app.example.net/login/callback',
     cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
-    authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows',
+    authnContext: ['http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows'],
     identifierFormat: null
   }
 ```
