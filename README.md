@@ -351,15 +351,14 @@ cert: function(callback) { callback(null,polledCertificates); }
 Here is a configuration that has been proven to work with ADFS:
 
 ```javascript
-{
-  entryPoint: "https://ad.example.net/adfs/ls/",
-  issuer: "https://your-app.example.net/login/callback",
-  callbackUrl: "https://your-app.example.net/login/callback",
-  cert: "MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==",
-  authnContext:
-    "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows",
-  identifierFormat: null,
-}
+  {
+    entryPoint: 'https://ad.example.net/adfs/ls/',
+    issuer: 'https://your-app.example.net/login/callback',
+    callbackUrl: 'https://your-app.example.net/login/callback',
+    cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
+    authnContext: ['http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows'],
+    identifierFormat: null
+  }
 ```
 
 Please note that ADFS needs to have a trust established to your service in order for this to work.

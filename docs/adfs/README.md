@@ -48,8 +48,9 @@ passport.use(
       privateKey: fs.readFileSync("/path/to/acme_tools_com.key", "utf-8"),
       cert: fs.readFileSync("/path/to/adfs.acme_tools.com.crt", "utf-8"),
       // other authn contexts are available e.g. windows single sign-on
-      authnContext:
+      authnContext: [
         "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
+      ],
       // not sure if this is necessary?
       acceptedClockSkewMs: -1,
       identifierFormat: null,
