@@ -47,7 +47,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
   logout(
     req: RequestWithUser,
     callback: (err: Error | null, url?: string | null | undefined) => void
-  ) {
+  ): void {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return callback(err);
@@ -65,7 +65,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
     decryptionCert: string | null,
     signingCert: string | null,
     callback: (err: Error | null, metadata?: string) => void
-  ) {
+  ): void {
     if (typeof callback !== "function") {
       throw new Error("Metadata can't be provided synchronously for MultiSamlStrategy.");
     }

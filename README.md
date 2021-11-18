@@ -1,6 +1,8 @@
 # Passport-SAML
 
-[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status) [![GitHub version](https://badge.fury.io/gh/node-saml%2Fpassport-saml.svg)](https://badge.fury.io/gh/node-saml%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status) [![GitHub version](https://badge.fury.io/gh/node-saml%2Fpassport-saml.svg)](https://badge.fury.io/gh/node-saml%2Fpassport-saml) [![npm version](https://badge.fury.io/js/passport-saml.svg)](http://badge.fury.io/js/passport-saml) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
+[![NPM](https://nodei.co/npm/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/passport-saml/)
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
@@ -10,9 +12,9 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 
 ## Installation
 
-    $ npm install passport-saml
-
-/
+```shell
+npm install passport-saml
+```
 
 ## Usage
 
@@ -88,27 +90,28 @@ Using multiple providers supports `validateInResponseTo`, but all the `InRespons
 The profile object referenced above contains the following:
 
 ```typescript
-type Profile = {
-  issuer?: string;
+export interface Profile {
+  issuer: string;
   sessionIndex?: string;
-  nameID?: string;
-  nameIDFormat?: string;
+  nameID: string;
+  nameIDFormat: string;
   nameQualifier?: string;
   spNameQualifier?: string;
+  ID?: string;
   mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
   email?: string; // `mail` if not present in the assertion
-  getAssertionXml(): string; // get the raw assertion XML
-  getAssertion(): object; // get the assertion XML parsed as a JavaScript object
-  getSamlResponseXml(): string; // get the raw SAML response XML
-  ID?: string;
-} & {
+  ["urn:oid:0.9.2342.19200300.100.1.3"]?: string;
+  getAssertionXml?(): string; // get the raw assertion XML
+  getAssertion?(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
+  getSamlResponseXml?(): string; // get the raw SAML response XML
   [attributeName: string]: unknown; // arbitrary `AttributeValue`s
-};
+}
 ```
 
 #### Config parameter details:
 
-- **Core**
+**Core**
+
 - `callbackUrl`: full callbackUrl (overrides path/protocol if supplied)
 - `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
 - `protocol`: protocol for callback; will be combined with path and server host information to construct callback url if `callbackUrl` is not specified (default: `http://`)
@@ -122,7 +125,9 @@ type Profile = {
 - `signatureAlgorithm`: optionally set the signature algorithm for signing requests, valid values are 'sha1' (default), 'sha256', or 'sha512'
 - `digestAlgorithm`: optionally set the digest algorithm used to provide a digest for the signed data object, valid values are 'sha1' (default), 'sha256', or 'sha512'
 - `xmlSignatureTransforms`: optionally set an array of signature transforms to be used in HTTP-POST signatures. By default this is `[ 'http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/2001/10/xml-exc-c14n#' ]`
-- **Additional SAML behaviors**
+
+**Additional SAML behaviors**
+
 - `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
 - `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
 - `identifierFormat`: optional name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
@@ -147,31 +152,38 @@ type Profile = {
     {
       entries: [ // required
         {
-          providerId: 'yourProviderId', // required for each entry
-          name: 'yourName', // optional
-          loc: 'yourLoc', // optional
-        }
+          providerId: "yourProviderId", // required for each entry
+          name: "yourName", // optional
+          loc: "yourLoc", // optional
+        },
       ],
-      getComplete: 'URI to your complete IDP list', // optional
+      getComplete: "URI to your complete IDP list", // optional
     },
   ],
   proxyCount: 2, // optional
-  requesterId: 'requesterId', // optional
-}
+  requesterId: "requesterId", // optional
+};
 ```
 
-- **InResponseTo Validation**
+**InResponseTo Validation**
+
 - `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
 - `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field. Default is 8 hours.
 - `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation. Default is a built-in in-memory cache provider. For details see the 'Cache Provider' section.
-- **Issuer Validation**
+
+**Issuer Validation**
+
 - `idpIssuer`: if provided, then the IdP issuer will be validated for incoming Logout Requests/Responses. For ADFS this looks like `https://acme_tools.windows.net/deadbeef`
-- **Passport**
+
+**Passport**
+
 - `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
 - `name`: Optionally, provide a custom name. (default: `saml`). Useful If you want to instantiate the strategy multiple times with different configurations,
   allowing users to authenticate against multiple different SAML targets from the same site. You'll need to use a unique set of URLs
   for each target, and use this custom name when calling `passport.authenticate()` as well.
-- **Logout**
+
+**Logout**
+
 - `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
 - `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
 - `logoutCallbackUrl`: The value with which to populate the `Location` attribute in the `SingleLogoutService` elements in the generated service provider metadata.
@@ -188,7 +200,10 @@ const bodyParser = require("body-parser");
 app.post(
   "/login/callback",
   bodyParser.urlencoded({ extended: false }),
-  passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
+  passport.authenticate("saml", {
+    failureRedirect: "/",
+    failureFlash: true,
+  }),
   function (req, res) {
     res.redirect("/");
   }
@@ -241,11 +256,11 @@ Authentication requests sent by Passport-SAML can be signed using RSA signature 
 
 To select hashing algorithm, use:
 
-```js
+```javascript
 ...
-  signatureAlgorithm: 'sha1' // (default, but not recommended anymore these days)
-  signatureAlgorithm: 'sha256', // (preferred - your IDP should support it, otherwise think about upgrading it)
-  signatureAlgorithm: 'sha512' // (most secure - check if your IDP supports it)
+  signatureAlgorithm: "sha1" // (default, but not recommended anymore these days)
+  signatureAlgorithm: "sha256" // (preferred - your IDP should support it, otherwise think about upgrading it)
+  signatureAlgorithm: "sha512" // (most secure - check if your IDP supports it)
 ...
 ```
 
@@ -255,14 +270,14 @@ Formats supported for `privateKey` field are,
 
 1. Well formatted PEM:
 
-```
+```text
 -----BEGIN PRIVATE KEY-----
 <private key contents here delimited at 64 characters per row>
 -----END PRIVATE KEY-----
 
 ```
 
-```
+```text
 -----BEGIN RSA PRIVATE KEY-----
 <private key contents here delimited at 64 characters per row>
 -----END RSA PRIVATE KEY-----
@@ -290,8 +305,8 @@ cert: "MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==";
 
 If you have a certificate in the binary DER encoding, you can convert it to the necessary PEM encoding like this:
 
-```bash
-     openssl x509 -inform der -in my_certificate.cer -out my_certificate.pem
+```shell
+openssl x509 -inform der -in my_certificate.cer -out my_certificate.pem
 ```
 
 If the Identity Provider has multiple signing certificates that are valid (such as during the rolling from an old key to a new key and responses signed with either key are valid) then the `cert` configuration key can be an array:
@@ -359,17 +374,17 @@ To support this scenario you can provide an implementation for a cache provider 
 
 ```javascript
 {
-    saveAsync: async function(key, value) {
-      // saves the key with the optional value, returns the saved value
-    },
-    getAsync: async function(key) {
-      // returns the value if found, null otherwise
-    },
-    removeAsync: async function(key) {
-      // removes the key from the cache, returns the
-      // key removed, null if no key is removed
-    }
-}
+  saveAsync: async function (key, value) {
+    // saves the key with the optional value, returns the saved value
+  },
+  getAsync: async function (key) {
+    // returns the value if found, null otherwise
+  },
+  removeAsync: async function (key) {
+    // removes the key from the cache, returns the
+    // key removed, null if no key is removed
+  },
+};
 ```
 
 Provide an instance of an object which has these functions passed to the `cacheProvider` config option when using Passport-SAML.

@@ -1,6 +1,6 @@
 import type * as express from "express";
 import * as passport from "passport";
-import { Profile, SamlConfig } from ".";
+import { Profile, SamlConfig } from "node-saml";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
@@ -16,9 +16,11 @@ export interface StrategyOptions {
   passReqToCallback?: boolean;
 }
 
+export type User = Record<string, unknown>;
+
 export interface RequestWithUser extends express.Request {
-  samlLogoutRequest: any;
-  user?: Profile;
+  samlLogoutRequest: Profile;
+  user: User;
 }
 
 export type VerifiedCallback = (
