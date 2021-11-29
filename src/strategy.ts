@@ -101,18 +101,18 @@ export abstract class AbstractStrategy extends PassportStrategy {
       }
     };
 
-    if (req.query && (req.query.SAMLResponse || req.query.SAMLRequest)) {
-      const originalQuery = url.parse(req.url).query;
+    if (req.query?.SAMLResponse || req.query?.SAMLRequest) {
+      const originalQuery = url.parse(req.url).query ?? "";
       this._saml
         .validateRedirectAsync(req.query, originalQuery)
         .then(validateCallback)
         .catch((err) => this.error(err));
-    } else if (req.body && req.body.SAMLResponse) {
+    } else if (req.body?.SAMLResponse) {
       this._saml
         .validatePostResponseAsync(req.body)
         .then(validateCallback)
         .catch((err) => this.error(err));
-    } else if (req.body && req.body.SAMLRequest) {
+    } else if (req.body?.SAMLRequest) {
       this._saml
         .validatePostRequestAsync(req.body)
         .then(validateCallback)
@@ -130,8 +130,8 @@ export abstract class AbstractStrategy extends PassportStrategy {
             const host = req.headers && req.headers.host;
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
               const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
-              const res = req.res!;
-              res.send(data);
+              const res = req.res;
+              res?.send(data);
             } else {
               // Defaults to HTTP-Redirect
               this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
@@ -190,6 +190,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
   // This is reduntant, but helps with testing
   error(err: Error): void {
     super.error(err);
+  }
+  redirect(url: string, status?: number): void {
+    super.redirect(url, status);
   }
 }
 
