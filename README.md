@@ -28,21 +28,34 @@ The SAML identity provider will redirect you to the URL provided by the `path` c
 const SamlStrategy = require('passport-saml').Strategy;
 [...]
 
-passport.use(new SamlStrategy(
-  {
-    path: '/login/callback',
-    entryPoint: 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php',
-    issuer: 'passport-saml',
-    cert: 'fake cert', // cert must be provided
-  },
-  function(profile, done) {
-    findByEmail(profile.email, function(err, user) {
-      if (err) {
-        return done(err);
-      }
-      return done(null, user);
-    });
-  })
+passport.use(
+  new SamlStrategy(
+    {
+      path: "/login/callback",
+      entryPoint:
+        "https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php",
+      issuer: "passport-saml",
+      cert: "fake cert", // cert must be provided
+    },
+    function (profile, done) {
+      // for signon
+      findByEmail(profile.email, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
+      });
+    },
+    function (profile, done) {
+      // for logout
+      findByNameID(profile.nameID, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
+      });
+    }
+  )
 );
 ```
 
@@ -54,26 +67,38 @@ You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be c
 const { MultiSamlStrategy } = require('passport-saml');
 [...]
 
-passport.use(new MultiSamlStrategy(
-  {
-    passReqToCallback: true, // makes req available in callback
-    getSamlOptions: function(request, done) {
-      findProvider(request, function(err, provider) {
+passport.use(
+  new MultiSamlStrategy(
+    {
+      passReqToCallback: true, // makes req available in callback
+      getSamlOptions: function (request, done) {
+        findProvider(request, function (err, provider) {
+          if (err) {
+            return done(err);
+          }
+          return done(null, provider.configuration);
+        });
+      },
+    },
+    function (req, profile, done) {
+      // for signon
+      findByEmail(profile.email, function (err, user) {
         if (err) {
           return done(err);
         }
-        return done(null, provider.configuration);
+        return done(null, user);
+      });
+    },
+    function (req, profile, done) {
+      // for logout
+      findByNameID(profile.nameID, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        return done(null, user);
       });
     }
-  },
-  function(req, profile, done) {
-    findByEmail(profile.email, function(err, user) {
-      if (err) {
-        return done(err);
-      }
-      return done(null, user);
-    });
-  })
+  )
 );
 ```
 
@@ -318,7 +343,7 @@ cert: ["MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==", "MIIEOTCCAyGgAwIBAgIJAKZgJdK
 The `cert` configuration key can also be a function that receives a callback as argument calls back a possible error and a certificate or array of certificates. This allows the Identity Provider to be polled for valid certificates and the new certificate can be used if it is changed:
 
 ```javascript
-    cert: function(callback) { callback(null,polledCertificates); }
+cert: function(callback) { callback(null,polledCertificates); }
 ```
 
 ## Usage with Active Directory Federation Services

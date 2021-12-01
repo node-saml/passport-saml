@@ -1,9 +1,11 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
+import { strict as assert } from "assert";
 import * as url from "url";
-import { Profile, SAML, SamlConfig } from ".";
+import { Profile, SAML, SamlConfig, VerifiedCallback } from ".";
 import {
   AuthenticateOptions,
   RequestWithUser,
+  User,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
@@ -12,19 +14,28 @@ export abstract class AbstractStrategy extends PassportStrategy {
   static readonly newSamlProviderOnConstruct: boolean;
 
   name: string;
-  _verify: VerifyWithRequest | VerifyWithoutRequest;
+  _signonVerify: VerifyWithRequest | VerifyWithoutRequest;
+  _logoutVerify: VerifyWithRequest | VerifyWithoutRequest;
   _saml: SAML | undefined;
   _passReqToCallback?: boolean;
 
-  constructor(options: SamlConfig, verify: VerifyWithRequest);
-  constructor(options: SamlConfig, verify: VerifyWithoutRequest);
-  constructor(options: SamlConfig, verify: never) {
+  constructor(
+    options: SamlConfig,
+    signonVerify: VerifyWithRequest,
+    logoutVerify: VerifyWithRequest
+  );
+  constructor(
+    options: SamlConfig,
+    signonVerify: VerifyWithoutRequest,
+    logoutVerify: VerifyWithoutRequest
+  );
+  constructor(options: SamlConfig, signonVerify: never, logoutVerify: never) {
     super();
     if (typeof options === "function") {
       throw new Error("Mandatory SAML options missing");
     }
 
-    if (!verify) {
+    if (!signonVerify || typeof signonVerify != "function") {
       throw new Error("SAML authentication strategy requires a verify function");
     }
 
@@ -36,7 +47,8 @@ export abstract class AbstractStrategy extends PassportStrategy {
       this.name = "saml";
     }
 
-    this._verify = verify;
+    this._signonVerify = signonVerify;
+    this._logoutVerify = logoutVerify;
     if ((this.constructor as typeof Strategy).newSamlProviderOnConstruct) {
       this._saml = new SAML(options);
     }
@@ -53,51 +65,85 @@ export abstract class AbstractStrategy extends PassportStrategy {
       profile,
       loggedOut,
     }: {
-      profile?: Profile | null;
-      loggedOut?: boolean;
+      profile: Profile | null;
+      loggedOut: boolean;
     }) => {
       if (loggedOut) {
-        req.logout();
-        if (profile) {
-          if (this._saml == null) {
-            throw new Error("Can't get logout response URL without a SAML provider defined.");
+        if (profile != null) {
+          // When logging out a user, use the consumer's `validate` function to check that
+          // the `profile` associated with the logout request resolves to the same user
+          // as the `profile` associated with the current session.
+          const verified: VerifiedCallback = (err: Error | null, logoutUser?: User) => {
+            if (err) {
+              return this.error(err);
+            }
+
+            let userMatch = true;
+            try {
+              // Check to see if we are logging out the user that is currently logged in to craft a proper IdP response
+              // It is up to the caller to return the same `User` as we have currently recorded as logged in for a successful logout
+
+              assert.deepStrictEqual(req.user, logoutUser);
+            } catch (err) {
+              userMatch = false;
+            }
+
+            const RelayState = req.query?.RelayState || req.body?.RelayState;
+            if (this._saml == null) {
+              return this.error(
+                new Error("Can't get logout response URL without a SAML provider defined.")
+              );
+            } else {
+              this._saml.getLogoutResponseUrl(
+                profile,
+                RelayState,
+                options,
+                userMatch,
+                redirectIfSuccess
+              );
+            }
+
+            // Log out the current user no matter if we can verify the logged in user === logout requested user
+            req.logout();
+          };
+
+          if (this._passReqToCallback) {
+            (this._logoutVerify as VerifyWithRequest)(req, profile, verified);
+          } else {
+            (this._logoutVerify as VerifyWithoutRequest)(profile, verified);
+          }
+        } else {
+          // If the `profile` object was null, this is just a logout acknowledgment, so we take no action
+          return this.pass();
+        }
+      } else {
+        const verified = (err: Error | null, user?: User, info?: unknown) => {
+          if (err) {
+            return this.error(err);
           }
 
-          const RelayState =
-            (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-          return this._saml.getLogoutResponseUrl(profile, RelayState, options, redirectIfSuccess);
+          if (!user) {
+            return this.fail(info, 401);
+          }
+
+          this.success(user, info);
+        };
+
+        if (this._passReqToCallback) {
+          (this._signonVerify as VerifyWithRequest)(req, profile, verified);
+        } else {
+          (this._signonVerify as VerifyWithoutRequest)(profile, verified);
         }
-        return this.pass();
-      }
-
-      const verified = (
-        err: Error | null,
-        user?: Record<string, unknown>,
-        info?: Record<string, unknown>
-      ) => {
-        if (err) {
-          return this.error(err);
-        }
-
-        if (!user) {
-          return this.fail(info, 401);
-        }
-
-        this.success(user, info);
-      };
-
-      if (this._passReqToCallback) {
-        (this._verify as VerifyWithRequest)(req, profile, verified);
-      } else {
-        (this._verify as VerifyWithoutRequest)(profile, verified);
       }
     };
 
-    const redirectIfSuccess = (err: Error | null, url?: string | null) => {
+    const redirectIfSuccess = (err: Error | null, url?: string) => {
       if (err) {
         this.error(err);
+      } else if (url == null) {
+        this.error(new Error("Invalid logout redirect URL."));
       } else {
-        this.redirect(url!);
+        this.redirect(url);
       }
     };
 

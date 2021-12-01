@@ -7,15 +7,23 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { SAML, SamlConfig } from ".";
+import { SAML, SamlConfig } from "node-saml";
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
   _options: SamlConfig & MultiStrategyConfig;
 
-  constructor(options: MultiStrategyConfig, verify: VerifyWithRequest);
-  constructor(options: MultiStrategyConfig, verify: VerifyWithoutRequest);
-  constructor(options: MultiStrategyConfig, verify: never) {
+  constructor(
+    options: MultiStrategyConfig,
+    signonVerify: VerifyWithRequest,
+    logoutVerify: VerifyWithRequest
+  );
+  constructor(
+    options: MultiStrategyConfig,
+    signonVerify: VerifyWithoutRequest,
+    logoutVerify: VerifyWithoutRequest
+  );
+  constructor(options: MultiStrategyConfig, signonVerify: never, logoutVerify: never) {
     if (!options || typeof options.getSamlOptions !== "function") {
       throw new Error("Please provide a getSamlOptions function");
     }
@@ -27,7 +35,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
       ...options,
     } as SamlConfig & MultiStrategyConfig;
 
-    super(samlConfig, verify);
+    super(samlConfig, signonVerify, logoutVerify);
     this._options = samlConfig;
   }
 

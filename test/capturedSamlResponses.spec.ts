@@ -110,15 +110,21 @@ describe("captured saml responses /", function () {
       config.callbackUrl = "http://localhost:3033/login";
       let profile: Profile;
       pp.use(
-        new SamlStrategy(config, function (
-          _profile: Profile | null | undefined,
-          done: VerifiedCallback
-        ): void {
-          if (_profile) {
-            profile = _profile;
-            done(null, { id: profile.nameID });
+        new SamlStrategy(
+          config,
+          function (_profile: Profile | null, done: VerifiedCallback): void {
+            if (_profile) {
+              profile = _profile;
+              done(null, { id: profile.nameID });
+            }
+          },
+          function (_profile: Profile | null, done: VerifiedCallback): void {
+            if (_profile) {
+              profile = _profile;
+              done(null, { id: profile.nameID });
+            }
           }
-        })
+        )
       );
 
       let userSerialized = false;
@@ -178,16 +184,21 @@ describe("captured saml responses /", function () {
       config.passReqToCallback = true;
       let passedRequest: express.Request | null = null;
       pp.use(
-        new SamlStrategy(config, function (
-          req: express.Request,
-          _profile: Profile | null | undefined,
-          done: VerifiedCallback
-        ) {
-          if (_profile) {
-            passedRequest = req;
-            done(null, { id: _profile!.nameID });
+        new SamlStrategy(
+          config,
+          function (req: express.Request, _profile: Profile | null, done: VerifiedCallback) {
+            if (_profile) {
+              passedRequest = req;
+              done(null, { id: _profile!.nameID });
+            }
+          },
+          function (req: express.Request, _profile: Profile | null, done: VerifiedCallback) {
+            if (_profile) {
+              passedRequest = req;
+              done(null, { id: _profile!.nameID });
+            }
           }
-        })
+        )
       );
       pp.serializeUser(function (user, done) {
         done(null, user);

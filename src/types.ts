@@ -31,14 +31,11 @@ export type VerifiedCallback = (
 
 export type VerifyWithRequest = (
   req: express.Request,
-  profile: Profile | null | undefined,
+  profile: Profile | null,
   done: VerifiedCallback
 ) => void;
 
-export type VerifyWithoutRequest = (
-  profile: Profile | null | undefined,
-  done: VerifiedCallback
-) => void;
+export type VerifyWithoutRequest = (profile: Profile | null, done: VerifiedCallback) => void;
 
 export type StrategyOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
 
