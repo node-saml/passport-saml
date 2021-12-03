@@ -71,7 +71,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
   generateServiceProviderMetadata(
     req: Request,
     decryptionCert: string | null,
-    signingCert: string | null,
+    signingCert: string | string[] | null,
     callback: (err: Error | null, metadata?: string) => void
   ): void {
     if (typeof callback !== "function") {

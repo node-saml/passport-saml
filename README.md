@@ -269,7 +269,7 @@ As a convenience, the strategy object exposes a `generateServiceProviderMetadata
 
 The `decryptionCert` argument should be a public certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
 
-The `signingCert` argument should be a public certificate matching the `privateKey` and is required if the strategy is configured with a `privateKey`.
+The `signingCert` argument should be a public certificate matching the `privateKey` and is required if the strategy is configured with a `privateKey`. An array of certificates can be provided to support certificate rotation. When supplying an array of certificates, the first entry in the array should match the current `privateKey`. Additional entries in the array can be used to publish upcoming certificates to IdPs before changing the `privateKey`.
 
 The `generateServiceProviderMetadata` method is also available on the `MultiSamlStrategy`, but needs an extra request and a callback argument (`generateServiceProviderMetadata( req, decryptionCert, signingCert, next )`), which are passed to the `getSamlOptions` to retrieve the correct configuration.
 
