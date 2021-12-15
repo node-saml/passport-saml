@@ -165,6 +165,7 @@ export interface Profile {
 - `racComparison`: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
 
 - `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
+- `passive`: if set to true, the initial SAML request from the service provider specifies that the IdP should prevent visible user interaction if possible.
 - `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
 - `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
 - `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
