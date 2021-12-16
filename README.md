@@ -165,7 +165,7 @@ export interface Profile {
 - `racComparison`: Requested Authentication Context comparison type. Possible values are 'exact','minimum','maximum','better'. Default is 'exact'.
 
 - `forceAuthn`: if set to true, the initial SAML request from the service provider specifies that the IdP should force re-authentication of the user, even if they possess a valid session.
-- `passive`: if set to true, the initial SAML request from the service provider specifies that the IdP should prevent visible user interaction. The IdP recognizes the parameter and returns to the SP. This is useful for validating a user session. 
+- `passive`: if set to true, the initial SAML request from the service provider specifies that the IdP should prevent visible user interaction. This is useful for validating a user session without prompting for a login when there is no active session. The IdP recognizes the parameter and returns to the SP. 
   - An error if the IdP must interact with the user but cannot because of this parameter.
   - A Federation Assertion that indicates whether the user has a valid session. 
 - `providerName`: optional human-readable name of the requester for use by the presenter's user agent or the identity provider
