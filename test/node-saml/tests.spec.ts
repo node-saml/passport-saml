@@ -2021,7 +2021,7 @@ describe("node-saml /", function () {
       ),
     };
     await assert.rejects(samlObj.validatePostRequestAsync(body), {
-      message: "Invalid RSAES-OAEP padding.",
+      message: "error:04099079:rsa routines:RSA_padding_check_PKCS1_OAEP_mgf1:oaep decoding error",
     });
   });
 
