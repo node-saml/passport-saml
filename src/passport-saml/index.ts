@@ -4,6 +4,7 @@ import { Strategy, AbstractStrategy } from "./strategy";
 import { MultiSamlStrategy } from "./multiSamlStrategy";
 
 import type {
+  AuthenticateOptions,
   Profile,
   SamlConfig,
   VerifiedCallback,
@@ -18,6 +19,7 @@ export {
   MultiSamlStrategy,
   CacheItem,
   CacheProvider,
+  AuthenticateOptions,
   Profile,
   SamlConfig,
   VerifiedCallback,
