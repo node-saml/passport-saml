@@ -83,7 +83,7 @@
     "passport": "^0.4.1",
     "prettier": "^2.4.1",
     "prettier-plugin-packagejson": "^2.2.12",
-    "release-it": "^14.11.5",
+    "release-it": "^14.12.3",
     "request": "^2.83.0",
     "should": "^13.2.3",
     "sinon": "^10.0.0",
