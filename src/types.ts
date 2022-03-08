@@ -19,7 +19,7 @@ export interface StrategyOptions {
 export type User = Record<string, unknown>;
 
 export interface RequestWithUser extends express.Request {
-  samlLogoutRequest: Profile;
+  samlLogoutRequest?: Profile;
   user: User;
 }
 
