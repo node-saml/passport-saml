@@ -9,7 +9,7 @@ import * as querystring from "querystring";
 import { parseString } from "xml2js";
 import * as fs from "fs";
 import { AuthenticateOptions, VerifiedCallback } from "../src/types";
-import * as should from "should";
+import { expect } from "chai";
 import { Server } from "http";
 import { CapturedCheck, FAKE_CERT, SamlCheck } from "./types";
 
@@ -982,13 +982,13 @@ describe("captured SAML requests /", function () {
 
         function helper(err: Error | null, samlRequest: Buffer) {
           try {
-            should.not.exist(err);
+            expect(err).to.not.exist;
             parseString(samlRequest.toString(), function (err, doc) {
               try {
-                should.not.exist(err);
+                expect(err).to.not.exist;
                 delete doc["samlp:AuthnRequest"]["$"]["ID"];
                 delete doc["samlp:AuthnRequest"]["$"]["IssueInstant"];
-                doc.should.eql(check.result);
+                expect(doc).to.eql(check.result);
                 done();
               } catch (err2) {
                 done(err2);
@@ -1002,15 +1002,15 @@ describe("captured SAML requests /", function () {
         // TODO remove usage of request module
         request(requestOpts, function (err: Error | null, response: any, body: any) {
           try {
-            should.not.exist(err);
+            expect(err).to.not.exist;
 
             let encodedSamlRequest;
             if (check.config.authnRequestBinding === "HTTP-POST") {
-              response.statusCode.should.equal(200);
-              body.should.match(/<!DOCTYPE html>[^]*<input.*name="SAMLRequest"[^]*<\/html>/);
+              expect(response.statusCode).to.equal(200);
+              expect(body).to.match(/<!DOCTYPE html>[^]*<input.*name="SAMLRequest"[^]*<\/html>/);
               encodedSamlRequest = body.match(/<input.*name="SAMLRequest" value="([^"]*)"/)[1];
             } else {
-              response.statusCode.should.equal(302);
+              expect(response.statusCode).to.equal(302);
               const query = response.headers.location.match(/^[^?]*\?(.*)$/)[1];
               encodedSamlRequest = querystring.parse(query).SAMLRequest;
             }
@@ -1080,13 +1080,13 @@ describe("captured SAML requests /", function () {
 
         function helper(err: Error | null, samlResponse: any) {
           try {
-            should.not.exist(err);
+            expect(err).to.not.exist;
             parseString(samlResponse.toString(), function (err, doc) {
               try {
-                should.not.exist(err);
+                expect(err).to.not.exist;
                 delete doc["samlp:LogoutResponse"]["$"]["ID"];
                 delete doc["samlp:LogoutResponse"]["$"]["IssueInstant"];
-                doc.should.eql(check.result);
+                expect(doc).to.deep.equal(check.result);
                 done();
               } catch (err2) {
                 done(err2);

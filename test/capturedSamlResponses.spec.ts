@@ -7,7 +7,7 @@ import request = require("request");
 import * as fs from "fs";
 import * as sinon from "sinon";
 import { StrategyOptions, VerifiedCallback } from "../src/types";
-import * as should from "should";
+import { expect } from "chai";
 import { Server } from "http";
 import { CapturedCheck, TEST_CERT } from "./types";
 
@@ -157,12 +157,12 @@ describe("captured saml responses /", function () {
         // TODO remove usage of request module
         request(requestOpts, function (err: Error | null, response: any, body: any) {
           try {
-            should.not.exist(err);
-            response.statusCode.should.equal(check.expectedStatusCode, body);
+            expect(err).to.not.exist;
+            expect(response.statusCode).to.equal(check.expectedStatusCode, body);
             if (response.statusCode == 200) {
-              userSerialized.should.be.true;
+              expect(userSerialized).to.be.true;
               if (check.expectedNameIDStartsWith)
-                profile!.nameID!.should.startWith(check.expectedNameIDStartsWith);
+                expect(profile!.nameID!.startsWith(check.expectedNameIDStartsWith)).to.be.true;
             }
             done();
           } catch (err2) {
@@ -225,15 +225,15 @@ describe("captured saml responses /", function () {
         // TODO remove usage of request module
         request(requestOpts, function (err: any, response: any, body: any) {
           try {
-            should.not.exist(err);
-            response.statusCode.should.equal(check.expectedStatusCode);
+            expect(err).to.not.exist;
+            expect(response.statusCode).to.equal(check.expectedStatusCode);
             if (response.statusCode == 200) {
-              should.exist(passedRequest);
-              passedRequest!.url!.should.eql("/login");
-              passedRequest!.method!.should.eql("POST");
-              should(passedRequest!.body).match(check.samlResponse);
+              expect(passedRequest).to.exist;
+              expect(passedRequest!.url!).to.equal("/login");
+              expect(passedRequest!.method!).to.equal("POST");
+              expect(passedRequest!.body).to.deep.equal(check.samlResponse);
             } else {
-              should.not.exist(passedRequest);
+              expect(passedRequest).to.not.exist;
             }
             done();
           } catch (err2) {
