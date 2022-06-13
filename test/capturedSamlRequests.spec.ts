@@ -1038,7 +1038,7 @@ describe("captured SAML requests /", function () {
       const strategy = new SamlStrategy(
         config,
         function (_profile: Profile | null, done: VerifiedCallback) {
-          // for singon
+          // for signon
           if (_profile) {
             profile = _profile;
             done(null, profile);
