@@ -104,7 +104,11 @@ export abstract class AbstractStrategy extends PassportStrategy {
             }
 
             // Log out the current user no matter if we can verify the logged in user === logout requested user
-            req.logout();
+            req.logout((err) => {
+              if (err) {
+                return this.error(err);
+              }
+            });
           };
 
           if (this._passReqToCallback) {
@@ -233,7 +237,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     return this._saml.generateServiceProviderMetadata(decryptionCert, signingCert);
   }
 
-  // This is reduntant, but helps with testing
+  // This is redundant, but helps with testing
   error(err: Error): void {
     super.error(err);
   }

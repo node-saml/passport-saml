@@ -3,6 +3,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as passport from "passport";
 import { Profile, Strategy as SamlStrategy } from "../src";
+import * as session from "express-session";
 import request = require("request");
 import * as zlib from "zlib";
 import * as querystring from "querystring";
@@ -919,6 +920,7 @@ describe("captured SAML requests /", function () {
       const app = express();
       try {
         app.use(bodyParser.urlencoded({ extended: false }));
+        app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
         app.use(passport.initialize());
         const config = check.config;
         config.callbackUrl = "http://localhost:3033/login";
@@ -1030,6 +1032,7 @@ describe("captured SAML requests /", function () {
     return function (done: Mocha.Done) {
       const app = express();
       app.use(bodyParser.urlencoded({ extended: false }));
+      app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
       app.use(passport.initialize());
       const config = check.config;
       config.callbackUrl = "http://localhost:3033/login";
