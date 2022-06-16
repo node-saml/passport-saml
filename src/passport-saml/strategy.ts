@@ -51,7 +51,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }
 
     options.samlFallback = options.samlFallback || "login-request";
-    const validateCallback = ({
+    const validateCallback = async ({
       profile,
       loggedOut,
     }: {
@@ -59,7 +59,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
       loggedOut?: boolean;
     }) => {
       if (loggedOut) {
-        req.logout();
+        await new Promise((resolve, reject) => {
+          req.logout((err) => (err ? reject(err) : resolve(undefined)));
+        });
         if (profile) {
           if (this._saml == null) {
             throw new Error("Can't get logout response URL without a SAML provider defined.");

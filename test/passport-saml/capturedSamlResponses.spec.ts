@@ -2,6 +2,7 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as passport from "passport";
+import * as session from "express-session";
 import { Strategy as SamlStrategy } from "../../src/passport-saml";
 import request = require("request");
 import * as fs from "fs";
@@ -110,6 +111,7 @@ describe("captured saml responses /", function () {
       const pp = new passport.Authenticator();
       const app = express();
       app.use(bodyParser.urlencoded({ extended: false }));
+      app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
       app.use(pp.initialize());
       const config = check.config;
       config.callbackUrl = "http://localhost:3033/login";
@@ -177,6 +179,7 @@ describe("captured saml responses /", function () {
       const pp = new passport.Authenticator();
       const app = express();
       app.use(bodyParser.urlencoded({ extended: false }));
+      app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
       app.use(pp.initialize());
       const config: SamlConfig & StrategyOptions = { ...check.config };
       config.callbackUrl = "http://localhost:3033/login";

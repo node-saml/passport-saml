@@ -50,6 +50,7 @@
     "watch": "concurrently --kill-others \"npm:*-watch\""
   },
   "dependencies": {
+    "@types/passport": "^1.0.9",
     "@xmldom/xmldom": "^0.7.5",
     "debug": "^4.3.2",
     "passport-strategy": "^1.0.0",
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",
+    "@types/express-session": "^1.17.4",
     "@types/mocha": "^8.2.3",
     "@types/node": "^14.17.17",
     "@types/passport-strategy": "^0.2.35",
@@ -77,10 +79,11 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.1",
     "express": "^4.17.1",
+    "express-session": "^1.17.3",
     "github-release-notes": "^0.17.3",
     "mocha": "^8.4.0",
     "onchange": "^7.1.0",
-    "passport": "^0.4.1",
+    "passport": "^0.6.0",
     "prettier": "^2.4.1",
     "prettier-plugin-packagejson": "^2.2.12",
     "release-it": "^14.12.3",
