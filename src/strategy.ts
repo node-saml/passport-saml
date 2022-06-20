@@ -111,8 +111,8 @@ export abstract class AbstractStrategy extends PassportStrategy {
           };
 
           let logoutUser: User | undefined;
-          if (this._passReqToCallback) {
-            try {
+          try {
+            if (this._passReqToCallback) {
               logoutUser = await new Promise((resolve, reject) => {
                 (this._logoutVerify as VerifyWithRequest)(
                   req,
@@ -125,12 +125,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
                   }
                 );
               });
-            } catch (err) {
-              return this.error(err as Error);
-            }
-            await verified(logoutUser);
-          } else {
-            try {
+            } else {
               logoutUser = await new Promise((resolve, reject) => {
                 (this._logoutVerify as VerifyWithoutRequest)(
                   profile,
@@ -142,11 +137,11 @@ export abstract class AbstractStrategy extends PassportStrategy {
                   }
                 );
               });
-            } catch (err) {
-              return this.error(err as Error);
             }
-            await verified(logoutUser);
+          } catch (err) {
+            return this.error(err as Error);
           }
+          await verified(logoutUser);
         } else {
           // If the `profile` object was null, this is just a logout acknowledgment, so we take no action
           return this.pass();
