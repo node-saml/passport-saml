@@ -6,6 +6,7 @@ import {
   AuthenticateOptions,
   RequestWithUser,
   User,
+  VerifiedCallback,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
@@ -112,32 +113,20 @@ export abstract class AbstractStrategy extends PassportStrategy {
 
           let logoutUser: User | undefined;
           try {
-            if (this._passReqToCallback) {
-              logoutUser = await new Promise((resolve, reject) => {
-                (this._logoutVerify as VerifyWithRequest)(
-                  req,
-                  profile,
-                  (err: Error | null, logoutUser?: User) => {
-                    if (err) {
-                      return reject(err);
-                    }
-                    resolve(logoutUser);
-                  }
-                );
-              });
-            } else {
-              logoutUser = await new Promise((resolve, reject) => {
-                (this._logoutVerify as VerifyWithoutRequest)(
-                  profile,
-                  (err: Error | null, logoutUser?: User) => {
-                    if (err) {
-                      return reject(err);
-                    }
-                    resolve(logoutUser);
-                  }
-                );
-              });
-            }
+            logoutUser = await new Promise((resolve, reject) => {
+              const verifedCallback: VerifiedCallback = (err: Error | null, logoutUser?: User) => {
+                if (err) {
+                  return reject(err);
+                }
+                resolve(logoutUser);
+              };
+
+              if (this._passReqToCallback) {
+                (this._logoutVerify as VerifyWithRequest)(req, profile, verifedCallback);
+              } else {
+                (this._logoutVerify as VerifyWithoutRequest)(profile, verifedCallback);
+              }
+            });
           } catch (err) {
             return this.error(err as Error);
           }
