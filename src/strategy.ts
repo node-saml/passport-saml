@@ -1,11 +1,12 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { strict as assert } from "assert";
 import * as url from "url";
-import { Profile, SAML, SamlConfig, VerifiedCallback } from ".";
+import { Profile, SAML, SamlConfig } from ".";
 import {
   AuthenticateOptions,
   RequestWithUser,
   User,
+  VerifiedCallback,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
@@ -61,7 +62,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }
 
     options.samlFallback = options.samlFallback || "login-request";
-    const validateCallback = ({
+    const validateCallback = async ({
       profile,
       loggedOut,
     }: {
@@ -73,11 +74,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
           // When logging out a user, use the consumer's `validate` function to check that
           // the `profile` associated with the logout request resolves to the same user
           // as the `profile` associated with the current session.
-          const verified: VerifiedCallback = (err: Error | null, logoutUser?: User) => {
-            if (err) {
-              return this.error(err);
-            }
-
+          const verified = async (logoutUser?: User) => {
             let userMatch = true;
             try {
               // Check to see if we are logging out the user that is currently logged in to craft a proper IdP response
@@ -104,14 +101,36 @@ export abstract class AbstractStrategy extends PassportStrategy {
             }
 
             // Log out the current user no matter if we can verify the logged in user === logout requested user
-            req.logout();
+            await new Promise((resolve, reject) => {
+              req.logout((err) => {
+                if (err) {
+                  return reject(err);
+                }
+                resolve(undefined);
+              });
+            });
           };
 
-          if (this._passReqToCallback) {
-            (this._logoutVerify as VerifyWithRequest)(req, profile, verified);
-          } else {
-            (this._logoutVerify as VerifyWithoutRequest)(profile, verified);
+          let logoutUser: User | undefined;
+          try {
+            logoutUser = await new Promise((resolve, reject) => {
+              const verifedCallback: VerifiedCallback = (err: Error | null, logoutUser?: User) => {
+                if (err) {
+                  return reject(err);
+                }
+                resolve(logoutUser);
+              };
+
+              if (this._passReqToCallback) {
+                (this._logoutVerify as VerifyWithRequest)(req, profile, verifedCallback);
+              } else {
+                (this._logoutVerify as VerifyWithoutRequest)(profile, verifedCallback);
+              }
+            });
+          } catch (err) {
+            return this.error(err as Error);
           }
+          await verified(logoutUser);
         } else {
           // If the `profile` object was null, this is just a logout acknowledgment, so we take no action
           return this.pass();
@@ -233,7 +252,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     return this._saml.generateServiceProviderMetadata(decryptionCert, signingCert);
   }
 
-  // This is reduntant, but helps with testing
+  // This is redundant, but helps with testing
   error(err: Error): void {
     super.error(err);
   }

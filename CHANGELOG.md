@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Support passport 0.6.x (see [passport changelog](https://github.com/jaredhanson/passport/blob/1e8f112bd233dbffb1904d4dd2051780d81b0a22/CHANGELOG.md#060---2022-05-20))
+
 ## v3.0.0 (2021-05-14)
 
 #### 💣 Major Changes:
