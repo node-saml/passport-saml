@@ -4,3 +4,5 @@ lib
 package-lock.json
 .eslintcache
 .prettierignore
+.nyc_output
+coverage
