@@ -18,5 +18,13 @@
   ],
   "rules": {
     "no-console": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": "off"
+      }
+    }
+  ]
 }
