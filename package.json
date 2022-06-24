@@ -1,5 +1,5 @@
 {
-  "name": "passport-saml",
+  "name": "@node-saml/passport-saml",
   "version": "3.0.0",
   "description": "SAML 2.0 authentication strategy for Passport",
   "keywords": [
@@ -93,5 +93,8 @@
   },
   "engines": {
     "node": ">= 14"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
