@@ -55,7 +55,7 @@ passport.use(
       // this is configured under the Advanced tab in AD FS relying party
       signatureAlgorithm: "sha256",
       racComparison: "exact", // default to exact RequestedAuthnContext Comparison Type
-      // From the metadata document, should be configured for enhanced security
+      // From the metadata document
       audience: "https://adfs.acme_tools.com/FederationMetadata/2007-06/FederationMetadata.xml",
     },
     function (profile, done) {
