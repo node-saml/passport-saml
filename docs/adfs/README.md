@@ -51,12 +51,12 @@ passport.use(
       authnContext: [
         "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
       ],
-      // not sure if this is necessary?
-      acceptedClockSkewMs: -1,
       identifierFormat: null,
       // this is configured under the Advanced tab in AD FS relying party
       signatureAlgorithm: "sha256",
       racComparison: "exact", // default to exact RequestedAuthnContext Comparison Type
+      // From the metadata document, should be configured for enhanced security
+      audience: "https://adfs.acme_tools.com/FederationMetadata/2007-06/FederationMetadata.xml",
     },
     function (profile, done) {
       return done(null, {
