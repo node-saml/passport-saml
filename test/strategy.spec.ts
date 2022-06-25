@@ -98,6 +98,7 @@ describe("Strategy()", function () {
         {
           authnRequestBinding: "HTTP-POST",
           cert: FAKE_CERT,
+          issuer: "onesaml_login",
         },
         noop,
         noop
@@ -117,6 +118,7 @@ describe("Strategy()", function () {
       const strategy = new SamlStrategy(
         {
           cert: FAKE_CERT,
+          issuer: "onesaml_login",
         },
         noop,
         noop
@@ -133,7 +135,7 @@ describe("Strategy()", function () {
     });
 
     it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST for login-request", function (done) {
-      const strategy = new SamlStrategy({ cert: FAKE_CERT }, noop, noop);
+      const strategy = new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop);
 
       // This returns immediately, but calls async functions; need to turn event loop
       strategy.authenticate(requestWithUser, {});
@@ -148,7 +150,7 @@ describe("Strategy()", function () {
 
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
-        { cert: FAKE_CERT, passReqToCallback: true },
+        { cert: FAKE_CERT, passReqToCallback: true, issuer: "onesaml_login" },
         function (req: express.Request, _profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -198,7 +200,7 @@ describe("Strategy()", function () {
 
     it("determines that logout was successful where user matches, GET", function (done) {
       const strategy = new SamlStrategy(
-        { cert: FAKE_CERT },
+        { cert: FAKE_CERT, issuer: "onesaml_login" },
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -251,7 +253,7 @@ describe("Strategy()", function () {
 
     it("determines that signon was successful where user matches, POST", function (done) {
       const strategy = new SamlStrategy(
-        { cert: FAKE_CERT },
+        { cert: FAKE_CERT, issuer: "onesaml_login" },
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           if (_profile) {
@@ -303,7 +305,9 @@ describe("Strategy()", function () {
 
     it("should call through to get logout URL", function () {
       // @ts-ignore
-      new SamlStrategy({ cert: FAKE_CERT }, noop, noop).logout({ query: "" });
+      new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop).logout({
+        query: "",
+      });
       sinon.assert.calledOnce(getLogoutUrlAsyncStub);
     });
   });
@@ -323,7 +327,7 @@ describe("Strategy()", function () {
     });
 
     it("should call through to generate metadata", function () {
-      const samlConfig: SamlConfig = { cert: FAKE_CERT };
+      const samlConfig: SamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
       const signonVerify: VerifyWithoutRequest = function (
         _profile: Profile | null,
         cb: VerifiedCallback
