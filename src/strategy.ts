@@ -213,6 +213,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
           try {
             const RelayState =
               (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
+            // Defaults to HTTP-Redirect
             this.redirect(
               await this._saml.getLogoutUrlAsync(req.user as Profile, RelayState, options)
             );
@@ -221,10 +222,6 @@ export abstract class AbstractStrategy extends PassportStrategy {
           }
         },
       }[options.samlFallback];
-
-      if (typeof requestHandler !== "function") {
-        return this.fail(401);
-      }
 
       requestHandler();
     }
@@ -258,6 +255,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
   }
   redirect(url: string, status?: number): void {
     super.redirect(url, status);
+  }
+  success(user: any, info?: any): void {
+    super.success(user, info);
   }
 }
 
