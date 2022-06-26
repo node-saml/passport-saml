@@ -6,8 +6,6 @@
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for [Passport](http://passportjs.org/), the Node.js authentication library.
 
-The code was originally based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library.
-
 Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSAMLphp](http://simplesamlphp.org/) based Identity Providers, and with [Active Directory Federation Services](http://en.wikipedia.org/wiki/Active_Directory_Federation_Services).
 
 ## Installation
@@ -447,3 +445,13 @@ It's possible this package will work correctly on newer versions of Node. It may
 As each Node LTS version reaches its end-of-life we will remove that version from the `node` `engines` property of our package's `package.json` file. Removing a Node version is considered a breaking change and will entail the publishing of a new major version of this package. We will not accept any requests to support an end-of-life version of Node. Any merge requests or issues supporting an end-of-life version of Node will be closed.
 
 We will accept code that allows this package to run on newer, non-LTS, versions of Node.
+
+
+## Project History
+
+The project was started by @bergie in 2012 based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library. From 2014 - 2016, @ploer served as primary maintainer.
+@markstos served the primary maintainer from 2017 till 2020 when he created the node-saml organization. With a goal to create a team of maintainers, invitations were sent to major contributors and fork authors to work together to maintain all the improvements in one place.
+
+Since 2020, @cjbath emerged as the primary maintainer, with major contributions from @gugu and @zoellner. Major updates from the team included rewriting the project in TypeScript and splitting off a `node-saml` module which can be used without Passport. Almost 100 other developers have contributed improvements to the project.
+
+The project continues to be maintained by volunteers. Contributions small and large are welcome.
