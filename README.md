@@ -446,7 +446,6 @@ As each Node LTS version reaches its end-of-life we will remove that version fro
 
 We will accept code that allows this package to run on newer, non-LTS, versions of Node.
 
-
 ## Project History
 
 The project was started by @bergie in 2012 based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library. From 2014 - 2016, @ploer served as primary maintainer.
