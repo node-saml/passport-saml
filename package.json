@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "changelog": "gren changelog --override --generate",
+    "changelog": "gren changelog --override --generate --head master",
     "lint": "eslint --ext .ts \"**/*.ts\" --cache",
     "lint-watch": "onchange -k -p 100 \"**/*.ts\" -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
@@ -58,7 +58,7 @@
     "passport-strategy": "^1.0.0"
   },
   "devDependencies": {
-    "@cjbarth/github-release-notes": "^1.0.1",
+    "@cjbarth/github-release-notes": "^2.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
