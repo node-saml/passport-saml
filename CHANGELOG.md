@@ -38,13 +38,10 @@
 
 #### ⚙️ Technical Tasks:
 
+- Have dependabot update package.json too [#724](https://github.com/node-saml/passport-saml/pull/724)
 - Reduce dependabot update frequency [#765](https://github.com/node-saml/passport-saml/pull/765)
 - Have dependabot update package.json too [#764](https://github.com/node-saml/passport-saml/pull/764)
 - Add dependabot config file [#711](https://github.com/node-saml/passport-saml/pull/711)
-
-#### 🙈 Other:
-
-- Have dependabot update package.json too [#724](https://github.com/node-saml/passport-saml/pull/724)
 
 ---
 
@@ -52,9 +49,9 @@
 
 #### 💣 Major Changes:
 
-- Update passport to 0.6.x [#698](https://github.com/node-saml/passport-saml/pull/698)
 - Update packages; set minimum Node to 14 [#685](https://github.com/node-saml/passport-saml/pull/685)
 - [**security**] Check user matches logout request before reporting logout success [#619](https://github.com/node-saml/passport-saml/pull/619)
+- Update passport to 0.6.x [#698](https://github.com/node-saml/passport-saml/pull/698)
 
 #### 🚀 Minor Changes:
 
@@ -62,39 +59,36 @@
 
 #### 🔗 Dependencies:
 
-- Move TypeScript-required types to dependencies from devDependencies [#686](https://github.com/node-saml/passport-saml/pull/686)
-- Update dependencies [#696](https://github.com/node-saml/passport-saml/pull/696)
 - Bump follow-redirects from 1.14.4 to 1.15.1 [#695](https://github.com/node-saml/passport-saml/pull/695)
 - Bump npm from 8.6.0 to 8.12.0 [#694](https://github.com/node-saml/passport-saml/pull/694)
 - [**security**] Bump ansi-regex from 4.1.0 to 4.1.1 [#688](https://github.com/node-saml/passport-saml/pull/688)
 - Code cleanup in preparation for logout validation [#658](https://github.com/node-saml/passport-saml/pull/658)
+- Remove `node-saml` code and use an import instead [#612](https://github.com/node-saml/passport-saml/pull/612)
+- Update packages [#641](https://github.com/node-saml/passport-saml/pull/641)
+- Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
+- Move TypeScript-required types to dependencies from devDependencies [#686](https://github.com/node-saml/passport-saml/pull/686)
+- Update dependencies [#696](https://github.com/node-saml/passport-saml/pull/696)
 
 #### 🐛 Bug Fixes:
 
-- 🎨  add MultiStrategyConfig type export [#675](https://github.com/node-saml/passport-saml/pull/675)
+- 🎨 add MultiStrategyConfig type export [#675](https://github.com/node-saml/passport-saml/pull/675)
 
 #### 📚 Documentation:
 
-- Update README to remove an insecure suggestion [#704](https://github.com/node-saml/passport-saml/pull/704)
 - Document passive option [#660](https://github.com/node-saml/passport-saml/pull/660)
+- Read me update for authnContext example for ADFS [#647](https://github.com/node-saml/passport-saml/pull/647)
+- Update README to remove an insecure suggestion [#704](https://github.com/node-saml/passport-saml/pull/704)
 
 #### ⚙️ Technical Tasks:
 
+- Migrate from "should" to "chai" [#687](https://github.com/node-saml/passport-saml/pull/687)
+- Fix main path in package.json [#623](https://github.com/node-saml/passport-saml/pull/623)
 - Update issue templates [#652](https://github.com/node-saml/passport-saml/pull/652)
 - Move to NPM organization [#705](https://github.com/node-saml/passport-saml/pull/705)
 - Add code coverage workflow [#706](https://github.com/node-saml/passport-saml/pull/706)
 - Replace integration tests with unit tests [#702](https://github.com/node-saml/passport-saml/pull/702)
 - Add code coverage [#701](https://github.com/node-saml/passport-saml/pull/701)
 - Adjust .mochars.json [#699](https://github.com/node-saml/passport-saml/pull/699)
-- Migrate from "should" to "chai" [#687](https://github.com/node-saml/passport-saml/pull/687)
-- Fix main path in package.json [#623](https://github.com/node-saml/passport-saml/pull/623)
-
-#### 🙈 Other:
-
-- Remove `node-saml` code and use an import instead [#612](https://github.com/node-saml/passport-saml/pull/612)
-- Update packages [#641](https://github.com/node-saml/passport-saml/pull/641)
-- Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
-- Read me update for authnContext example for ADFS [#647](https://github.com/node-saml/passport-saml/pull/647)
 
 ---
 
@@ -112,7 +106,7 @@
 
 ## v3.2.0 (2021-09-25)
 
-#### 🙈 Other:
+#### 🔗 Dependencies:
 
 - Update dependencies [#640](https://github.com/node-saml/passport-saml/pull/640)
 
@@ -138,17 +132,14 @@
 
 #### 🐛 Bug Fixes:
 
+- Fix: Conflicting profile properties between profile and attributes [#593](https://github.com/node-saml/passport-saml/pull/593)
 - [**security**] Limit transforms for signed nodes [#595](https://github.com/node-saml/passport-saml/pull/595)
 - Fix validateInResponseTo null check [#596](https://github.com/node-saml/passport-saml/pull/596)
-- Fix: Conflicting profile properties between profile and attributes [#593](https://github.com/node-saml/passport-saml/pull/593)
 
 #### 📚 Documentation:
 
 - Rebuild changelog for 3.0.0 [#605](https://github.com/node-saml/passport-saml/pull/605)
 - Fix typo OnBefore -> NotBefore [#611](https://github.com/node-saml/passport-saml/pull/611)
-
-#### 🙈 Other:
-
 - Update README with new Cache Provider interface [#608](https://github.com/node-saml/passport-saml/pull/608)
 
 ---
@@ -157,30 +148,31 @@
 
 #### 💣 Major Changes:
 
+- Require cert for every strategy [#548](https://github.com/node-saml/passport-saml/pull/548)
+- Remove support for deprecated `privateCert` [#569](https://github.com/node-saml/passport-saml/pull/569)
 - Node saml separation [#574](https://github.com/node-saml/passport-saml/pull/574)
 - Enforce more secure XML encryption [#584](https://github.com/node-saml/passport-saml/pull/584)
 - Add Node 16 support; drop Node 10 [#589](https://github.com/node-saml/passport-saml/pull/589)
 - Update all dependencies to latest [#590](https://github.com/node-saml/passport-saml/pull/590)
-- Require cert for every strategy [#548](https://github.com/node-saml/passport-saml/pull/548)
-- Remove support for deprecated `privateCert` [#569](https://github.com/node-saml/passport-saml/pull/569)
 
 #### 🚀 Minor Changes:
 
-- Update xml-crypto to v2.1.1 [#558](https://github.com/node-saml/passport-saml/pull/558)
-- Allow for authnRequestBinding in SAML options [#529](https://github.com/node-saml/passport-saml/pull/529)
 - Add optional setting to set a ceiling on how old a SAML response is allowed to be [#577](https://github.com/node-saml/passport-saml/pull/577)
 - Move XML functions to utility module [#571](https://github.com/node-saml/passport-saml/pull/571)
 - Improve the typing of the Strategy class hierarchy. [#554](https://github.com/node-saml/passport-saml/pull/554)
 - Resolve XML-encoded carriage returns during signature validation [#576](https://github.com/node-saml/passport-saml/pull/576)
 - Make sure CI builds test latest versions of dependencies [#570](https://github.com/node-saml/passport-saml/pull/570)
 - Add WantAssertionsSigned [#536](https://github.com/node-saml/passport-saml/pull/536)
+- Update xml-crypto to v2.1.1 [#558](https://github.com/node-saml/passport-saml/pull/558)
+- Allow for authnRequestBinding in SAML options [#529](https://github.com/node-saml/passport-saml/pull/529)
 
 #### 🔗 Dependencies:
 
+- bump xmldom to 0.5.x since all lower versions have security issue [#551](https://github.com/node-saml/passport-saml/pull/551)
 - Update xml-encryption to v1.2.3 [#560](https://github.com/node-saml/passport-saml/pull/560)
 - Update xml-encryption to v1.2.3 [#567](https://github.com/node-saml/passport-saml/pull/567)
 - Update all packages to latest semver-minor [#588](https://github.com/node-saml/passport-saml/pull/588)
-- bump xmldom to 0.5.x since all lower versions have security issue [#551](https://github.com/node-saml/passport-saml/pull/551)
+- Revert "Update xml-encryption to v1.2.3" [#564](https://github.com/node-saml/passport-saml/pull/564)
 
 #### 🐛 Bug Fixes:
 
@@ -188,11 +180,11 @@
 
 #### 📚 Documentation:
 
+- Update readme on using multiSamlStrategy [#531](https://github.com/node-saml/passport-saml/pull/531)
 - Add support for more tags in the changelog [#592](https://github.com/node-saml/passport-saml/pull/592)
 - Remove deprecated field `privateCert` from README, tests [#591](https://github.com/node-saml/passport-saml/pull/591)
 - Create of Code of Conduct [#573](https://github.com/node-saml/passport-saml/pull/573)
 - Changelog [#587](https://github.com/node-saml/passport-saml/pull/587)
-- Update readme on using multiSamlStrategy [#531](https://github.com/node-saml/passport-saml/pull/531)
 
 #### ⚙️ Technical Tasks:
 
@@ -202,10 +194,6 @@
 - Tests use typescript [#534](https://github.com/node-saml/passport-saml/pull/534)
 - async / await in cache interface [#532](https://github.com/node-saml/passport-saml/pull/532)
 - Fix lint npm script to match all files including in src/ [#555](https://github.com/node-saml/passport-saml/pull/555)
-
-#### 🙈 Other:
-
-- Revert "Update xml-encryption to v1.2.3" [#564](https://github.com/node-saml/passport-saml/pull/564)
 
 ---
 
@@ -230,9 +218,6 @@
 #### 🔗 Dependencies:
 
 - Update xml-encryption to v1.2.3 [#562](https://github.com/node-saml/passport-saml/pull/562)
-
-#### 🙈 Other:
-
 - Revert "Update xml-encryption to v1.2.3" [#565](https://github.com/node-saml/passport-saml/pull/565)
 - Update xml-encryption to v1.2.3 (branch 2.x) [#566](https://github.com/node-saml/passport-saml/pull/566)
 
@@ -281,15 +266,15 @@
 - fix: derive SamlConfig from SAMLOptions [#515](https://github.com/node-saml/passport-saml/pull/515)
 - fix(typing): multi saml stratey export [#503](https://github.com/node-saml/passport-saml/pull/503)
 - normalize signature line endings before loading signature block to xml-crypto [#512](https://github.com/node-saml/passport-saml/pull/512)
+- fix(typing): Export Multi SAML types [#505](https://github.com/node-saml/passport-saml/pull/505)
 
 #### 📚 Documentation:
 
 - docs(scoping): fix for example [#504](https://github.com/node-saml/passport-saml/pull/504)
 - minor - fix typo in README [#506](https://github.com/node-saml/passport-saml/pull/506)
 
-#### 🙈 Other:
+#### ⚙️ Technical Tasks:
 
-- fix(typing): Export Multi SAML types [#505](https://github.com/node-saml/passport-saml/pull/505)
 - Prettier + ESLint + onchange = Happiness [#493](https://github.com/node-saml/passport-saml/pull/493)
 
 ---
@@ -304,7 +289,7 @@
 
 ## v2.0.1 (2020-11-03)
 
-#### 🙈 Other:
+#### 🐛 Bug Fixes:
 
 - Add deprecation notice for privateCert; fix bug [#492](https://github.com/node-saml/passport-saml/pull/492)
 
@@ -318,17 +303,17 @@
 
 #### 🚀 Minor Changes:
 
-- Allow for use of privateKey instead of privateCert [#488](https://github.com/node-saml/passport-saml/pull/488)
 - feat(authorize-request): idp scoping provider [#428](https://github.com/node-saml/passport-saml/pull/428)
+- Allow for use of privateKey instead of privateCert [#488](https://github.com/node-saml/passport-saml/pull/488)
 
 #### 🐛 Bug Fixes:
 
 - update version of xml2js to 0.4.23, fixes #479 [#486](https://github.com/node-saml/passport-saml/pull/486)
+- fix: disable esmoduleInterop setting [#483](https://github.com/node-saml/passport-saml/pull/483)
 
-#### 🙈 Other:
+#### ⚙️ Technical Tasks:
 
 - inlineSources option for better source maps [#487](https://github.com/node-saml/passport-saml/pull/487)
-- fix: disable esmoduleInterop setting [#483](https://github.com/node-saml/passport-saml/pull/483)
 
 ---
 
@@ -337,15 +322,15 @@
 #### 🚀 Minor Changes:
 
 - validateSignature: Support XML docs that contain multiple signed nodes [#455](https://github.com/node-saml/passport-saml/pull/455)
+- validateSignature: Support XML docs that contain multiple signed node… [#481](https://github.com/node-saml/passport-saml/pull/481)
+
+#### 🐛 Bug Fixes:
+
+- Revert "validateSignature: Support XML docs that contain multiple signed nodes" [#480](https://github.com/node-saml/passport-saml/pull/480)
 
 #### ⚙️ Technical Tasks:
 
 - outdated Q library was removed [#478](https://github.com/node-saml/passport-saml/pull/478)
-
-#### 🙈 Other:
-
-- validateSignature: Support XML docs that contain multiple signed node… [#481](https://github.com/node-saml/passport-saml/pull/481)
-- Revert "validateSignature: Support XML docs that contain multiple signed nodes" [#480](https://github.com/node-saml/passport-saml/pull/480)
 
 ---
 
@@ -359,7 +344,7 @@
 
 ## v1.4.1 (2020-10-29)
 
-#### 🙈 Other:
+#### ⚙️ Technical Tasks:
 
 - compatibility with @types/passport-saml, fixes #475 [#476](https://github.com/node-saml/passport-saml/pull/476)
 
@@ -367,45 +352,57 @@
 
 ## v1.4.0 (2020-10-28)
 
+#### 💣 Major Changes:
+
+- Drop support for Node 8 [#462](https://github.com/node-saml/passport-saml/pull/462)
+
+#### 🚀 Minor Changes:
+
+- try to use curl when wget is not available [#468](https://github.com/node-saml/passport-saml/pull/468)
+
+#### 🔗 Dependencies:
+
+- Upgrade xml-crypto dependancy [#465](https://github.com/node-saml/passport-saml/pull/465)
+- bumped xml-crypto from 1.5.3 to 2.0.0 [#470](https://github.com/node-saml/passport-saml/pull/470)
+
 #### 🐛 Bug Fixes:
 
 - Only make an attribute an object if it has child elements [#464](https://github.com/node-saml/passport-saml/pull/464)
+- fix: add catch block to NameID decryption [#461](https://github.com/node-saml/passport-saml/pull/461)
+
+#### 📚 Documentation:
+
+- Fix typo [#434](https://github.com/node-saml/passport-saml/pull/434)
+- Add PR template [#473](https://github.com/node-saml/passport-saml/pull/473)
 
 #### ⚙️ Technical Tasks:
 
 - support typescript compilation [#469](https://github.com/node-saml/passport-saml/pull/469)
-
-#### 🙈 Other:
-
-- try to use curl when wget is not available [#468](https://github.com/node-saml/passport-saml/pull/468)
-- Ts secondary files [#474](https://github.com/node-saml/passport-saml/pull/474)
-- bumped xml-crypto from 1.5.3 to 2.0.0 [#470](https://github.com/node-saml/passport-saml/pull/470)
-- Add PR template [#473](https://github.com/node-saml/passport-saml/pull/473)
-- Drop support for Node 8 [#462](https://github.com/node-saml/passport-saml/pull/462)
-- Fix typo [#434](https://github.com/node-saml/passport-saml/pull/434)
-- Upgrade xml-crypto dependancy [#465](https://github.com/node-saml/passport-saml/pull/465)
 - Add GitHub Actions as Continuos Integration provider [#463](https://github.com/node-saml/passport-saml/pull/463)
-- fix: add catch block to NameID decryption [#461](https://github.com/node-saml/passport-saml/pull/461)
+- Ts secondary files [#474](https://github.com/node-saml/passport-saml/pull/474)
 
 ---
 
 ## v1.3.5 (2020-09-16)
+
+#### 🚀 Minor Changes:
+
+- Return object for XML-valued AttributeValues [#447](https://github.com/node-saml/passport-saml/pull/447)
 
 #### 🔗 Dependencies:
 
 - Bump lodash from 4.17.15 to 4.17.20 [#449](https://github.com/node-saml/passport-saml/pull/449)
 - Bump acorn from 7.1.0 to 7.4.0 [#448](https://github.com/node-saml/passport-saml/pull/448)
 
-#### 🙈 Other:
+#### 📚 Documentation:
 
-- Return object for XML-valued AttributeValues [#447](https://github.com/node-saml/passport-saml/pull/447)
 - Revert "doc: announce site move." [#446](https://github.com/node-saml/passport-saml/pull/446)
 
 ---
 
 ## v1.3.4 (2020-07-21)
 
-#### 🙈 Other:
+#### 🐛 Bug Fixes:
 
 - Fix multi saml strategy race conditions [#426](https://github.com/node-saml/passport-saml/pull/426)
 
