@@ -758,9 +758,14 @@ class SAML {
         await this.validateInResponseTo(inResponseTo);
       }
       const certs = await this.certsToCheck();
-      // Check if this document has a valid top-level signature
+      // Check if this document has a valid top-level signature which applies to the entire XML document
       let validSignature = false;
-      if (this.validateSignature(xml, doc.documentElement, certs)) {
+      if (
+        this.validateSignature(xml, doc.documentElement, certs) &&
+        Array.from(doc.childNodes as NodeListOf<Element>).filter(
+          (n) => n.tagName != null && n.childNodes != null
+        ).length === 1
+      ) {
         validSignature = true;
       }
 
