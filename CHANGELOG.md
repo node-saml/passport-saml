@@ -1,8 +1,10 @@
 # Changelog
 
-## 3.x (2022-10-12)
+## 3.x (2022-10-13)
 
-_No changelog for this release._
+#### 📚 Documentation:
+
+- Update changelog and related tools [#791](https://github.com/node-saml/passport-saml/pull/791)
 
 ---
 
@@ -10,7 +12,7 @@ _No changelog for this release._
 
 #### 🐛 Bug Fixes:
 
- - [**security**] Fix CVE-2022-39299 [GHSA-m974-647v-whv7](https://github.com/node-saml/passport-saml/security/advisories/GHSA-m974-647v-whv7)
+- [**security**] Fix CVE-2022-39299 [GHSA-m974-647v-whv7](https://github.com/node-saml/passport-saml/security/advisories/GHSA-m974-647v-whv7)
 
 ---
 
@@ -90,10 +92,10 @@ _No changelog for this release._
 
 #### 🔗 Dependencies:
 
+- Update all packages to latest semver-minor [#588](https://github.com/node-saml/passport-saml/pull/588)
 - bump xmldom to 0.5.x since all lower versions have security issue [#551](https://github.com/node-saml/passport-saml/pull/551)
 - Update xml-encryption to v1.2.3 [#560](https://github.com/node-saml/passport-saml/pull/560)
 - Update xml-encryption to v1.2.3 [#567](https://github.com/node-saml/passport-saml/pull/567)
-- Update all packages to latest semver-minor [#588](https://github.com/node-saml/passport-saml/pull/588)
 - Revert "Update xml-encryption to v1.2.3" [#564](https://github.com/node-saml/passport-saml/pull/564)
 
 #### 🐛 Bug Fixes:
@@ -360,6 +362,7 @@ _No changelog for this release._
 
 #### 🙈 Other:
 
+- Set explicitChar: true to make XML parsing consistent. Fixes issue #283 and #187 [#361](https://github.com/node-saml/passport-saml/pull/361)
 - update xml crypto to 1.1.4 [#352](https://github.com/node-saml/passport-saml/pull/352)
 - Upgrade xml-crypto to 1.1.2 [#344](https://github.com/node-saml/passport-saml/pull/344)
 - Add SamlResponseXML method to profile object [#330](https://github.com/node-saml/passport-saml/pull/330)
@@ -370,7 +373,6 @@ _No changelog for this release._
 - Support InResponseTo validations in MultiSaml [#350](https://github.com/node-saml/passport-saml/pull/350)
 - Fix broken tests [#367](https://github.com/node-saml/passport-saml/pull/367)
 - Update README.md [#363](https://github.com/node-saml/passport-saml/pull/363)
-- Set explicitChar: true to make XML parsing consistent. Fixes issue #283 and #187 [#361](https://github.com/node-saml/passport-saml/pull/361)
 - InResponseTo support for logout [#356](https://github.com/node-saml/passport-saml/pull/356)
 - Create a way to get provider metadata when using the MultiSamlStrategy [#323](https://github.com/node-saml/passport-saml/pull/323)
 
