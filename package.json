@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "changelog": "gren changelog --override --generate",
+    "changelog": "gren changelog --override --generate --head 3.x",
     "lint": "eslint --ext .ts \"**/*.ts\" --cache",
     "lint-watch": "onchange -k -p 100 \"**/*.ts\" -- eslint {{file}}",
     "lint:fix": "eslint --ext .ts --fix src",
@@ -42,6 +42,7 @@
     "prettier-check": "prettier --config .prettierrc.json --check .",
     "prettier-format": "prettier --config .prettierrc.json --write .",
     "prettier-watch": "onchange -k -p 100 \".\" -- prettier --config .prettierrc.json --write {{file}}",
+    "prerelease": "git clean -xfd && npm ci && npm test && npm run build",
     "release": "release-it",
     "test": "npm run prettier-check && npm run lint && npm run tsc && mocha",
     "test-watch": "mocha --watch",
@@ -59,6 +60,7 @@
     "xmlbuilder": "^15.1.1"
   },
   "devDependencies": {
+    "@cjbarth/github-release-notes": "^2.1.0",
     "@types/debug": "^4.1.7",
     "@types/mocha": "^8.2.3",
     "@types/node": "^14.17.17",
@@ -78,7 +80,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.1",
     "express": "^4.17.1",
-    "github-release-notes": "^0.17.3",
     "mocha": "^8.4.0",
     "onchange": "^7.1.0",
     "passport": "^0.4.1",
