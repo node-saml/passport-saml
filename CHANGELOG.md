@@ -1,6 +1,14 @@
 # Changelog
 
-## 3.x (2022-10-13)
+## v3.2.4 (2022-10-21)
+
+#### 🔗 Dependencies:
+
+- Update @xlmdom/xmldom to v0.7.6 [#795](https://github.com/node-saml/passport-saml/pull/795)
+
+---
+
+## v3.2.3 (2022-10-13)
 
 #### 📚 Documentation:
 
@@ -72,12 +80,12 @@
 
 #### 💣 Major Changes:
 
+- Enforce more secure XML encryption [#584](https://github.com/node-saml/passport-saml/pull/584)
 - Add Node 16 support; drop Node 10 [#589](https://github.com/node-saml/passport-saml/pull/589)
 - Update all dependencies to latest [#590](https://github.com/node-saml/passport-saml/pull/590)
 - Require cert for every strategy [#548](https://github.com/node-saml/passport-saml/pull/548)
 - Remove support for deprecated `privateCert` [#569](https://github.com/node-saml/passport-saml/pull/569)
 - Node saml separation [#574](https://github.com/node-saml/passport-saml/pull/574)
-- Enforce more secure XML encryption [#584](https://github.com/node-saml/passport-saml/pull/584)
 
 #### 🚀 Minor Changes:
 
@@ -104,11 +112,11 @@
 
 #### 📚 Documentation:
 
+- Create of Code of Conduct [#573](https://github.com/node-saml/passport-saml/pull/573)
+- Changelog [#587](https://github.com/node-saml/passport-saml/pull/587)
 - Update readme on using multiSamlStrategy [#531](https://github.com/node-saml/passport-saml/pull/531)
 - Add support for more tags in the changelog [#592](https://github.com/node-saml/passport-saml/pull/592)
 - Remove deprecated field `privateCert` from README, tests [#591](https://github.com/node-saml/passport-saml/pull/591)
-- Create of Code of Conduct [#573](https://github.com/node-saml/passport-saml/pull/573)
-- Changelog [#587](https://github.com/node-saml/passport-saml/pull/587)
 
 #### ⚙️ Technical Tasks:
 
@@ -362,6 +370,7 @@
 
 #### 🙈 Other:
 
+- Update README.md [#363](https://github.com/node-saml/passport-saml/pull/363)
 - Set explicitChar: true to make XML parsing consistent. Fixes issue #283 and #187 [#361](https://github.com/node-saml/passport-saml/pull/361)
 - update xml crypto to 1.1.4 [#352](https://github.com/node-saml/passport-saml/pull/352)
 - Upgrade xml-crypto to 1.1.2 [#344](https://github.com/node-saml/passport-saml/pull/344)
@@ -372,7 +381,6 @@
 - Fix for failing test [#347](https://github.com/node-saml/passport-saml/pull/347)
 - Support InResponseTo validations in MultiSaml [#350](https://github.com/node-saml/passport-saml/pull/350)
 - Fix broken tests [#367](https://github.com/node-saml/passport-saml/pull/367)
-- Update README.md [#363](https://github.com/node-saml/passport-saml/pull/363)
 - InResponseTo support for logout [#356](https://github.com/node-saml/passport-saml/pull/356)
 - Create a way to get provider metadata when using the MultiSamlStrategy [#323](https://github.com/node-saml/passport-saml/pull/323)
 
@@ -391,6 +399,7 @@
 
 #### 🙈 Other:
 
+- Extend and document the profile object [#301](https://github.com/node-saml/passport-saml/pull/301)
 - Update xml-crypto to 1.0.2 [#321](https://github.com/node-saml/passport-saml/pull/321)
 - Validate issuer on logout requests/responses if configured [#314](https://github.com/node-saml/passport-saml/pull/314)
 - feat(logout): handle null and undefined on nameQualifier [#311](https://github.com/node-saml/passport-saml/pull/311)
@@ -398,7 +407,6 @@
 - Include support for run-time params to be included in the generated URLs [#136](https://github.com/node-saml/passport-saml/pull/136)
 - support multiple authnContext [#298](https://github.com/node-saml/passport-saml/pull/298)
 - Handle case of missing InResponseTo when validation is on [#302](https://github.com/node-saml/passport-saml/pull/302)
-- Extend and document the profile object [#301](https://github.com/node-saml/passport-saml/pull/301)
 
 ---
 
