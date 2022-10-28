@@ -2,7 +2,9 @@
 
 ## v4.0.1 (2022-10-28)
 
-_No changelog for this release._
+#### 📚 Documentation:
+
+- Update changelog [#797](https://github.com/node-saml/passport-saml/pull/797)
 
 ---
 
@@ -177,10 +179,10 @@ _No changelog for this release._
 
 #### 🔗 Dependencies:
 
+- Update xml-encryption to v1.2.3 [#560](https://github.com/node-saml/passport-saml/pull/560)
 - Update xml-encryption to v1.2.3 [#567](https://github.com/node-saml/passport-saml/pull/567)
 - Update all packages to latest semver-minor [#588](https://github.com/node-saml/passport-saml/pull/588)
 - bump xmldom to 0.5.x since all lower versions have security issue [#551](https://github.com/node-saml/passport-saml/pull/551)
-- Update xml-encryption to v1.2.3 [#560](https://github.com/node-saml/passport-saml/pull/560)
 - Revert "Update xml-encryption to v1.2.3" [#564](https://github.com/node-saml/passport-saml/pull/564)
 
 #### 🐛 Bug Fixes:
@@ -447,6 +449,7 @@ _No changelog for this release._
 
 #### 🙈 Other:
 
+- Fix broken tests [#367](https://github.com/node-saml/passport-saml/pull/367)
 - Update README.md [#363](https://github.com/node-saml/passport-saml/pull/363)
 - Set explicitChar: true to make XML parsing consistent. Fixes issue #283 and #187 [#361](https://github.com/node-saml/passport-saml/pull/361)
 - update xml crypto to 1.1.4 [#352](https://github.com/node-saml/passport-saml/pull/352)
@@ -457,7 +460,6 @@ _No changelog for this release._
 - Update Node version in package.json to >=6 [#340](https://github.com/node-saml/passport-saml/pull/340)
 - Fix for failing test [#347](https://github.com/node-saml/passport-saml/pull/347)
 - Support InResponseTo validations in MultiSaml [#350](https://github.com/node-saml/passport-saml/pull/350)
-- Fix broken tests [#367](https://github.com/node-saml/passport-saml/pull/367)
 - InResponseTo support for logout [#356](https://github.com/node-saml/passport-saml/pull/356)
 - Create a way to get provider metadata when using the MultiSamlStrategy [#323](https://github.com/node-saml/passport-saml/pull/323)
 
