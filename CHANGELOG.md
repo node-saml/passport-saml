@@ -1,6 +1,12 @@
 # Changelog
 
-## master (2022-10-28)
+## v4.0.1 (2022-10-28)
+
+_No changelog for this release._
+
+---
+
+## v4.0.0 (2022-10-28)
 
 #### 🔗 Dependencies:
 
@@ -110,7 +116,7 @@
 
 #### 🐛 Bug Fixes:
 
-- 🎨  add MultiStrategyConfig type export [#675](https://github.com/node-saml/passport-saml/pull/675)
+- add MultiStrategyConfig type export [#675](https://github.com/node-saml/passport-saml/pull/675)
 
 #### 📚 Documentation:
 
