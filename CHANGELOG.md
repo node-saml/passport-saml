@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.0.1 (2022-10-28)
+
+_No changelog for this release._
+
+---
+
+## v4.0.0 (2022-10-28)
+
+#### 🔗 Dependencies:
+
+- Update dependencies [#796](https://github.com/node-saml/passport-saml/pull/796)
+- [**javascript**] Bump @xmldom/xmldom from 0.7.5 to 0.7.6 [#794](https://github.com/node-saml/passport-saml/pull/794)
+
+---
+
 ## v4.0.0-beta.4 (2022-10-13)
 
 #### ⚙️ Technical Tasks:
@@ -33,6 +48,9 @@
 
 #### 🔗 Dependencies:
 
+- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.29.0 to 5.30.3 [#716](https://github.com/node-saml/passport-saml/pull/716)
+- [**javascript**] Bump @types/sinon from 10.0.11 to 10.0.12 [#717](https://github.com/node-saml/passport-saml/pull/717)
+- [**javascript**] Bump @typescript-eslint/parser from 5.29.0 to 5.30.3 [#718](https://github.com/node-saml/passport-saml/pull/718)
 - [**github_actions**] Bump actions/checkout from 2 to 3 [#713](https://github.com/node-saml/passport-saml/pull/713)
 - [**github_actions**] Bump github/codeql-action from 1 to 2 [#712](https://github.com/node-saml/passport-saml/pull/712)
 - [**javascript**] Bump concurrently from 7.3.0 to 7.4.0 [#773](https://github.com/node-saml/passport-saml/pull/773)
@@ -55,9 +73,6 @@
 - [**javascript**] Bump eslint from 8.18.0 to 8.19.0 [#719](https://github.com/node-saml/passport-saml/pull/719)
 - [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.30.3 to 5.30.5 [#725](https://github.com/node-saml/passport-saml/pull/725)
 - [**javascript**] Bump ts-node from 10.8.0 to 10.8.2 [#723](https://github.com/node-saml/passport-saml/pull/723)
-- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.29.0 to 5.30.3 [#716](https://github.com/node-saml/passport-saml/pull/716)
-- [**javascript**] Bump @types/sinon from 10.0.11 to 10.0.12 [#717](https://github.com/node-saml/passport-saml/pull/717)
-- [**javascript**] Bump @typescript-eslint/parser from 5.29.0 to 5.30.3 [#718](https://github.com/node-saml/passport-saml/pull/718)
 
 #### 📚 Documentation:
 
@@ -101,7 +116,7 @@
 
 #### 🐛 Bug Fixes:
 
-- 🎨 add MultiStrategyConfig type export [#675](https://github.com/node-saml/passport-saml/pull/675)
+- add MultiStrategyConfig type export [#675](https://github.com/node-saml/passport-saml/pull/675)
 
 #### 📚 Documentation:
 
@@ -162,10 +177,10 @@
 
 #### 🔗 Dependencies:
 
+- Update xml-encryption to v1.2.3 [#567](https://github.com/node-saml/passport-saml/pull/567)
 - Update all packages to latest semver-minor [#588](https://github.com/node-saml/passport-saml/pull/588)
 - bump xmldom to 0.5.x since all lower versions have security issue [#551](https://github.com/node-saml/passport-saml/pull/551)
 - Update xml-encryption to v1.2.3 [#560](https://github.com/node-saml/passport-saml/pull/560)
-- Update xml-encryption to v1.2.3 [#567](https://github.com/node-saml/passport-saml/pull/567)
 - Revert "Update xml-encryption to v1.2.3" [#564](https://github.com/node-saml/passport-saml/pull/564)
 
 #### 🐛 Bug Fixes:
@@ -174,11 +189,11 @@
 
 #### 📚 Documentation:
 
+- Create of Code of Conduct [#573](https://github.com/node-saml/passport-saml/pull/573)
 - Changelog [#587](https://github.com/node-saml/passport-saml/pull/587)
 - Update readme on using multiSamlStrategy [#531](https://github.com/node-saml/passport-saml/pull/531)
 - Add support for more tags in the changelog [#592](https://github.com/node-saml/passport-saml/pull/592)
 - Remove deprecated field `privateCert` from README, tests [#591](https://github.com/node-saml/passport-saml/pull/591)
-- Create of Code of Conduct [#573](https://github.com/node-saml/passport-saml/pull/573)
 
 #### ⚙️ Technical Tasks:
 
@@ -461,6 +476,7 @@
 
 #### 🙈 Other:
 
+- Extend and document the profile object [#301](https://github.com/node-saml/passport-saml/pull/301)
 - Update xml-crypto to 1.0.2 [#321](https://github.com/node-saml/passport-saml/pull/321)
 - Validate issuer on logout requests/responses if configured [#314](https://github.com/node-saml/passport-saml/pull/314)
 - feat(logout): handle null and undefined on nameQualifier [#311](https://github.com/node-saml/passport-saml/pull/311)
@@ -468,7 +484,6 @@
 - Include support for run-time params to be included in the generated URLs [#136](https://github.com/node-saml/passport-saml/pull/136)
 - support multiple authnContext [#298](https://github.com/node-saml/passport-saml/pull/298)
 - Handle case of missing InResponseTo when validation is on [#302](https://github.com/node-saml/passport-saml/pull/302)
-- Extend and document the profile object [#301](https://github.com/node-saml/passport-saml/pull/301)
 
 ---
 
