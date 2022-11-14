@@ -41,21 +41,19 @@ passport.use(
     },
     function (profile, done) {
       // for signon
-      findByEmail(profile.email, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
+      // ...
+      if (err) {
+        return done(err);
+      }
+      return done(null, user);
     },
     function (profile, done) {
       // for logout
-      findByNameID(profile.nameID, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
+      // ...
+      if (err) {
+        return done(err);
+      }
+      return done(null, user);
     }
   )
 );
@@ -84,21 +82,19 @@ passport.use(
     },
     function (req, profile, done) {
       // for signon
-      findByEmail(profile.email, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
+      // ...
+      if (err) {
+        return done(err);
+      }
+      return done(null, user);
     },
     function (req, profile, done) {
       // for logout
-      findByNameID(profile.nameID, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
+      // ...
+      if (err) {
+        return done(err);
+      }
+      return done(null, user);
     }
   )
 );
