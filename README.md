@@ -15,7 +15,7 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth, [SimpleSA
 ## Installation
 
 ```shell
-npm install passport-saml
+npm install @node-saml/passport-saml
 ```
 
 ## Usage
