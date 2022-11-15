@@ -104,15 +104,13 @@ passport.use(
 );
 ```
 
-The options passed when the `MultiSamlStrategy` is initialized are also passed as default values to each provider.
-e.g. If you provide an `issuer` on `MultiSamlStrategy`, this will be also a default value for every provider.
-You can override these defaults by passing a new value through the `getSamlOptions` function.
+The options passed when the `MultiSamlStrategy` is initialized are also passed as default values to each provider. e.g. If you provide an `issuer` on `MultiSamlStrategy`, this will be also a default value for every provider. You can override these defaults by passing a new value through the `getSamlOptions` function.
 
 Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](!https://github.com/node-saml/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
 
-> :warning: **There's a race condition [bug](https://github.com/node-saml/passport-saml/issues/425) in versions < 1.3.3 which makes it vulnerable to DOS attacks**: Please use > 1.3.3 if you want to use this issue
+Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are an examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
 
-#### The profile object:
+#### The profile object
 
 The profile object referenced above contains the following:
 
@@ -135,9 +133,9 @@ export interface Profile {
 }
 ```
 
-#### Config parameter details:
+#### Config parameter details
 
-**Core**
+##### **Core**
 
 - `callbackUrl`: full callbackUrl (overrides path/protocol if supplied)
 - `path`: path to callback; will be combined with protocol and server host information to construct callback url if `callbackUrl` is not specified (default: `/saml/consume`)
@@ -153,7 +151,7 @@ export interface Profile {
 - `digestAlgorithm`: optionally set the digest algorithm used to provide a digest for the signed data object, valid values are 'sha1' (default), 'sha256', or 'sha512'
 - `xmlSignatureTransforms`: optionally set an array of signature transforms to be used in HTTP-POST signatures. By default this is `[ 'http://www.w3.org/2000/09/xmldsig#enveloped-signature', 'http://www.w3.org/2001/10/xml-exc-c14n#' ]`
 
-**Additional SAML behaviors**
+##### **Additional SAML behaviors**
 
 - `additionalParams`: dictionary of additional query params to add to all requests; if an object with this key is passed to `authenticate`, the dictionary of additional query params will be appended to those present on the returned URL, overriding any specified by initialization options' additional parameters (`additionalParams`, `additionalAuthorizeParams`, and `additionalLogoutParams`)
 - `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
@@ -174,7 +172,7 @@ export interface Profile {
 - `skipRequestCompression`: if set to true, the SAML request from the service provider won't be compressed.
 - `authnRequestBinding`: if set to `HTTP-POST`, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP Redirect
 - `disableRequestAcsUrl`: if truthy, SAML AuthnRequest from the service provider will not include the optional AssertionConsumerServiceURL. Default is falsy so it is automatically included.
-- `scoping`: An optional configuration which implements the functionality [explained in the SAML spec paragraph "3.4.1.2 Element <Scoping>"](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf). The config object is structured as following:
+- `scoping`: An optional configuration which implements the functionality [explained in the SAML spec paragraph "3.4.1.2 Element \<Scoping\>"](https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf). The config object is structured as following:
 
 ```javascript
 {
@@ -195,24 +193,24 @@ export interface Profile {
 };
 ```
 
-**InResponseTo Validation**
+##### **InResponseTo Validation**
 
 - `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
 - `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field. Default is 8 hours.
 - `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation. Default is a built-in in-memory cache provider. For details see the 'Cache Provider' section.
 
-**Issuer Validation**
+##### **Issuer Validation**
 
 - `idpIssuer`: if provided, then the IdP issuer will be validated for incoming Logout Requests/Responses. For ADFS this looks like `https://acme_tools.windows.net/deadbeef`
 
-**Passport**
+##### **Passport**
 
 - `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback (default: `false`)
 - `name`: Optionally, provide a custom name. (default: `saml`). Useful If you want to instantiate the strategy multiple times with different configurations,
   allowing users to authenticate against multiple different SAML targets from the same site. You'll need to use a unique set of URLs
   for each target, and use this custom name when calling `passport.authenticate()` as well.
 
-**Logout**
+##### **Logout**
 
 - `logoutUrl`: base address to call with logout requests (default: `entryPoint`)
 - `additionalLogoutParams`: dictionary of additional query params to add to 'logout' requests
@@ -300,26 +298,26 @@ Formats supported for `privateKey` field are,
 
 1. Well formatted PEM:
 
-```text
------BEGIN PRIVATE KEY-----
-<private key contents here delimited at 64 characters per row>
------END PRIVATE KEY-----
+   ```text
+   -----BEGIN PRIVATE KEY-----
+   <private key contents here delimited at 64 characters per row>
+   -----END PRIVATE KEY-----
 
-```
+   ```
 
-```text
------BEGIN RSA PRIVATE KEY-----
-<private key contents here delimited at 64 characters per row>
------END RSA PRIVATE KEY-----
+   ```text
+   -----BEGIN RSA PRIVATE KEY-----
+   <private key contents here delimited at 64 characters per row>
+   -----END RSA PRIVATE KEY-----
 
-```
+   ```
 
-(both versions work)
-See example from tests of the first version of [well formatted private key](test/static/acme_tools_com.key).
+   (both versions work)
+   See example from tests of the first version of [well formatted private key](test/static/acme_tools_com.key).
 
-2. Alternativelly a single line private key without start/end lines where all rows are joined into single line:
+1. Alternativelly a single line private key without start/end lines where all rows are joined into single line:
 
-See example from tests of [singleline private key](test/static/singleline_acme_tools_com.key).
+   See example from tests of [singleline private key](test/static/singleline_acme_tools_com.key).
 
 Add it to strategy options like this:
 
@@ -372,33 +370,23 @@ For more detailed instructions, see [ADFS documentation](docs/adfs/README.md).
 
 ## SAML Response Validation - NotBefore and NotOnOrAfter
 
-If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML response, Passport-SAML will validate them
-against the current time +/- a configurable clock skew value. The default for the skew is 0s. This is to account for
-differences between the clock time on the client (Node server with Passport-SAML) and the server (Identity provider).
+If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML response, Passport-SAML will validate them against the current time +/- a configurable clock skew value. The default for the skew is 0s. This is to account for differences between the clock time on the client (Node server with Passport-SAML) and the server (Identity provider).
 
-`NotBefore` and `NotOnOrAfter` can be part of either the `SubjectConfirmation` element, or within in the `Assertion/Conditions` element
-in the SAML response.
+`NotBefore` and `NotOnOrAfter` can be part of either the `SubjectConfirmation` element, or within in the `Assertion/Conditions` element in the SAML response.
 
 ## Subject confirmation validation
 
-When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated.
-Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
+When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated. Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
 
-Also note that `InResponseTo` is validated as an attribute of the top level `Response` element in the SAML response, as well
-as part of the `SubjectConfirmation` element.
+Also note that `InResponseTo` is validated as an attribute of the top level `Response` element in the SAML response, as well as part of the `SubjectConfirmation` element.
 
-Previous request id's generated for SAML requests will eventually expire. This is controlled with the `requestIdExpirationPeriodMs` option
-passed into the Passport-SAML config. The default is 28,800,000 ms (8 hours). Once expired, a subsequent SAML response
-received with an `InResponseTo` equal to the expired id will not validate and an error will be returned.
+Previous request id's generated for SAML requests will eventually expire. This is controlled with the `requestIdExpirationPeriodMs` option passed into the Passport-SAML config. The default is 28,800,000 ms (8 hours). Once expired, a subsequent SAML response received with an `InResponseTo` equal to the expired id will not validate and an error will be returned.
 
 ## Cache Provider
 
-When `InResponseTo` validation is turned on, Passport-SAML will store generated request ids used in SAML requests to the IdP. The implementation
-of how things are stored, checked to see if they exist, and eventually removed is from the Cache Provider used by Passport-SAML.
+When `InResponseTo` validation is turned on, Passport-SAML will store generated request ids used in SAML requests to the IdP. The implementation of how things are stored, checked to see if they exist, and eventually removed is from the Cache Provider used by Passport-SAML.
 
-The default implementation is a simple in-memory cache provider. For multiple server/process scenarios, this will not be sufficient as
-the server/process that generated the request id and stored in memory could be different than the server/process handling the
-SAML response. The `InResponseTo` could fail in this case erroneously.
+The default implementation is a simple in-memory cache provider. For multiple server/process scenarios, this will not be sufficient as the server/process that generated the request id and stored in memory could be different than the server/process handling the SAML response. The `InResponseTo` could fail in this case erroneously.
 
 To support this scenario you can provide an implementation for a cache provider by providing an object with following functions:
 
@@ -436,7 +424,7 @@ See [Releases](https://github.com/node-saml/passport-saml/releases) to find the 
 
 ### Is there an example I can look at?
 
-Gerard Braad has provided an example app at https://github.com/gbraad/passport-saml-example/
+Gerard Braad has provided an example app at <https://github.com/gbraad/passport-saml-example/>
 
 ## Node Support Policy
 
@@ -452,9 +440,12 @@ We will accept code that allows this package to run on newer, non-LTS, versions 
 
 ## Project History
 
-The project was started by @bergie in 2012 based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library. From 2014 - 2016, @ploer served as primary maintainer.
-@markstos served the primary maintainer from 2017 till 2020 when he created the node-saml organization. With a goal to create a team of maintainers, invitations were sent to major contributors and fork authors to work together to maintain all the improvements in one place.
+The project was started by @bergie in 2012 based on Michael Bosworth's [express-saml](https://github.com/bozzltron/express-saml) library. From 2014 - 2016, @ploer served as primary maintainer. @markstos served the primary maintainer from 2017 till 2020 when he created the node-saml organization. With a goal to create a team of maintainers, invitations were sent to major contributors and fork authors to work together to maintain all the improvements in one place.
 
 Since 2020, @cjbath emerged as the primary maintainer, with major contributions from @gugu and @zoellner. Major updates from the team included rewriting the project in TypeScript and splitting off a `node-saml` module which can be used without Passport. Almost 100 other developers have contributed improvements to the project.
 
 The project continues to be maintained by volunteers. Contributions small and large are welcome.
+
+## Copyright Notices
+
+“[OASIS](http://www.oasis-open.org/)”, “SAML”, and “Security Assertion Markup Language” are trademarks of OASIS, the open standards consortium where the SAML specification is owned and developed. SAML is a copyrighted © work of OASIS Open. All rights reserved.
