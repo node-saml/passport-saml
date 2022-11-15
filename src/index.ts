@@ -8,7 +8,7 @@ import type {
   MultiStrategyConfig,
 } from "./types";
 
-export * from "@node-saml/node-saml";
+export { Profile, SAML, SamlConfig } from "@node-saml/node-saml";
 
 export {
   AbstractStrategy,

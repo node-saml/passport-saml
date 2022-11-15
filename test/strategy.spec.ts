@@ -304,10 +304,13 @@ describe("Strategy()", function () {
     });
 
     it("should call through to get logout URL", function () {
-      // @ts-ignore
-      new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop).logout({
-        query: "",
-      });
+      new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop).logout(
+        {
+          // @ts-expect-error
+          query: "",
+        },
+        noop
+      );
       sinon.assert.calledOnce(getLogoutUrlAsyncStub);
     });
   });
@@ -328,17 +331,11 @@ describe("Strategy()", function () {
 
     it("should call through to generate metadata", function () {
       const samlConfig: SamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
-      const signonVerify: VerifyWithoutRequest = function (
-        _profile: Profile | null,
-        cb: VerifiedCallback
-      ): void {
+      const signonVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
 
-      const logoutVerify: VerifyWithoutRequest = function (
-        _profile: Profile | null,
-        cb: VerifiedCallback
-      ): void {
+      const logoutVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
       new SamlStrategy(samlConfig, signonVerify, logoutVerify).generateServiceProviderMetadata("");

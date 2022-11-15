@@ -1,6 +1,6 @@
 import type * as express from "express";
 import * as passport from "passport";
-import { Profile, SamlConfig } from "@node-saml/node-saml";
+import { Profile, SamlConfig } from ".";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
