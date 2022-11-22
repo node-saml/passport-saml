@@ -6,7 +6,7 @@ import type {
   VerifyWithRequest,
   VerifyWithoutRequest,
   MultiStrategyConfig,
-  SamlConfig,
+  PassportSamlConfig,
 } from "./types";
 
 export * from "@node-saml/node-saml";
@@ -19,5 +19,5 @@ export {
   VerifyWithRequest,
   VerifyWithoutRequest,
   MultiStrategyConfig,
-  SamlConfig,
+  PassportSamlConfig,
 };

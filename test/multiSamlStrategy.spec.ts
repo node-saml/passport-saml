@@ -8,16 +8,16 @@ import {
   MultiStrategyConfig,
   RequestWithUser,
   StrategyOptionsCallback,
-  SamlConfig,
+  PassportSamlConfig,
 } from "../src/types";
-import assert = require("assert");
+import * as assert from "assert";
 import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
 
 describe("MultiSamlStrategy()", function () {
   it("extends passport Strategy", function () {
-    function getSamlOptions(): SamlConfig {
+    function getSamlOptions(): PassportSamlConfig {
       return { cert: FAKE_CERT, issuer: "onesaml_login" };
     }
     const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
@@ -85,7 +85,7 @@ describe("MultiSamlStrategy()", function () {
 
     it("uses given options to setup internal saml provider", function (done) {
       const superAuthenticateStub = this.superAuthenticateStub;
-      const samlOptions: SamlConfig = {
+      const samlOptions: PassportSamlConfig = {
         issuer: "http://foo.issuer",
         callbackUrl: "http://foo.callback",
         cert: "deadbeef",
@@ -206,7 +206,7 @@ describe("MultiSamlStrategy()", function () {
 
     it("uses given options to setup internal saml provider", function (done) {
       const superLogoutMock = this.superLogoutMock;
-      const samlOptions: SamlConfig = {
+      const samlOptions: PassportSamlConfig = {
         issuer: "http://foo.issuer",
         callbackUrl: "http://foo.callback",
         authnRequestBinding: "HTTP-POST",

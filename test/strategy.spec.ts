@@ -4,7 +4,12 @@ import type * as express from "express";
 import { expect } from "chai";
 import * as sinon from "sinon";
 import { Profile, SAML, Strategy as SamlStrategy } from "../src";
-import { RequestWithUser, VerifiedCallback, VerifyWithoutRequest, SamlConfig } from "../src/types";
+import {
+  RequestWithUser,
+  VerifiedCallback,
+  VerifyWithoutRequest,
+  PassportSamlConfig,
+} from "../src/types";
 import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
@@ -330,7 +335,7 @@ describe("Strategy()", function () {
     });
 
     it("should call through to generate metadata", function () {
-      const samlConfig: SamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
+      const samlConfig: PassportSamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
       const signonVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };

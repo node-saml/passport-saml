@@ -2,7 +2,7 @@ import { Strategy as PassportStrategy } from "passport-strategy";
 import { strict as assert } from "assert";
 import * as url from "url";
 import { Profile, SAML } from ".";
-import { SamlConfig } from "./types";
+import { PassportSamlConfig } from "./types";
 import {
   AuthenticateOptions,
   RequestWithUser,
@@ -22,16 +22,16 @@ export abstract class AbstractStrategy extends PassportStrategy {
   _passReqToCallback?: boolean;
 
   constructor(
-    options: SamlConfig,
+    options: PassportSamlConfig,
     signonVerify: VerifyWithRequest,
     logoutVerify: VerifyWithRequest
   );
   constructor(
-    options: SamlConfig,
+    options: PassportSamlConfig,
     signonVerify: VerifyWithoutRequest,
     logoutVerify: VerifyWithoutRequest
   );
-  constructor(options: SamlConfig, signonVerify: never, logoutVerify: never) {
+  constructor(options: PassportSamlConfig, signonVerify: never, logoutVerify: never) {
     super();
     if (typeof options === "function") {
       throw new Error("Mandatory SAML options missing");

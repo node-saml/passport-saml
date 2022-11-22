@@ -1,7 +1,6 @@
 import type * as express from "express";
 import * as passport from "passport";
-import { Profile } from ".";
-import { SamlConfig as NodeSamlConfig } from "@node-saml/node-saml";
+import { Profile, SamlConfig } from ".";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
@@ -38,15 +37,17 @@ export type VerifyWithRequest = (
 
 export type VerifyWithoutRequest = (profile: Profile | null, done: VerifiedCallback) => void;
 
-export type SamlConfig = NodeSamlConfig & StrategyOptions;
+export type PassportSamlConfig = SamlConfig & StrategyOptions;
 
-export type StrategyOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
+export type StrategyOptionsCallback = (err: Error | null, samlOptions?: PassportSamlConfig) => void;
 
 interface BaseMultiStrategyConfig {
   getSamlOptions(req: express.Request, callback: StrategyOptionsCallback): void;
 }
 
-export type MultiStrategyConfig = Partial<SamlConfig> & StrategyOptions & BaseMultiStrategyConfig;
+export type MultiStrategyConfig = Partial<PassportSamlConfig> &
+  StrategyOptions &
+  BaseMultiStrategyConfig;
 
 export class ErrorWithXmlStatus extends Error {
   constructor(message: string, public readonly xmlStatus: string) {
