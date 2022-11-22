@@ -1,6 +1,7 @@
 import type * as express from "express";
 import * as passport from "passport";
-import { Profile, SamlConfig } from ".";
+import { Profile } from ".";
+import { SamlConfig as NodeSamlConfig } from "@node-saml/node-saml";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
@@ -36,6 +37,8 @@ export type VerifyWithRequest = (
 ) => void;
 
 export type VerifyWithoutRequest = (profile: Profile | null, done: VerifiedCallback) => void;
+
+export type SamlConfig = NodeSamlConfig & StrategyOptions;
 
 export type StrategyOptionsCallback = (err: Error | null, samlOptions?: SamlConfig) => void;
 

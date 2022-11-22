@@ -3,8 +3,8 @@
 import type * as express from "express";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { Profile, SAML, SamlConfig, Strategy as SamlStrategy } from "../src";
-import { RequestWithUser, VerifiedCallback, VerifyWithoutRequest } from "../src/types";
+import { Profile, SAML, Strategy as SamlStrategy } from "../src";
+import { RequestWithUser, VerifiedCallback, VerifyWithoutRequest, SamlConfig } from "../src/types";
 import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;

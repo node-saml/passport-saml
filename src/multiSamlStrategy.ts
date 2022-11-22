@@ -4,10 +4,11 @@ import {
   AuthenticateOptions,
   MultiStrategyConfig,
   RequestWithUser,
+  SamlConfig,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { SAML, SamlConfig } from ".";
+import { SAML } from ".";
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;

@@ -3,9 +3,14 @@ import * as express from "express";
 import { Strategy } from "passport-strategy";
 import * as sinon from "sinon";
 import { expect } from "chai";
-import { MultiSamlStrategy, SAML, AbstractStrategy, SamlConfig } from "../src";
-import { MultiStrategyConfig, RequestWithUser, StrategyOptionsCallback } from "../src/types";
-import * as assert from "assert";
+import { MultiSamlStrategy, SAML, AbstractStrategy } from "../src";
+import {
+  MultiStrategyConfig,
+  RequestWithUser,
+  StrategyOptionsCallback,
+  SamlConfig,
+} from "../src/types";
+import assert = require("assert");
 import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
