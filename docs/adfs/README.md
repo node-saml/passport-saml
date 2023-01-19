@@ -24,6 +24,11 @@ Copy the `acme_tools_com.xml` to your AD FS server. Use the AD FS management rel
 
 This example assumes you will pass in the UPN.
 
+## Set AD FS Relying Party to sign the message and the assertion
+```powershell 
+Set-AdfsRelyingPartyTrust -TargetIdentifier "acme_tools_com" -SamlResponseSignature "MessageAndAssertion"
+```
+
 # Create a Passport framework
 
 Create a separate file for passport configuration (assumed to be config/passport.js).
@@ -58,8 +63,6 @@ passport.use(
       racComparison: "exact", // default to exact RequestedAuthnContext Comparison Type
       // From the metadata document
       audience: "https://adfs.acme_tools.com/FederationMetadata/2007-06/FederationMetadata.xml",
-      // otherwise it will thow because of invalid document signature
-      wantAuthnResponseSigned: false,
     },
     function (profile, done) {
       return done(null, {
