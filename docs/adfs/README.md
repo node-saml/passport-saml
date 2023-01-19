@@ -48,6 +48,7 @@ passport.use(
       privateKey: fs.readFileSync("/path/to/acme_tools_com.key", "utf-8"),
       cert: fs.readFileSync("/path/to/adfs.acme_tools.com.crt", "utf-8"),
       // other authn contexts are available e.g. windows single sign-on
+      // see: https://learn.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.authenticationmethods?view=netframework-4.8#fields
       authnContext: [
         "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password",
       ],
@@ -57,6 +58,8 @@ passport.use(
       racComparison: "exact", // default to exact RequestedAuthnContext Comparison Type
       // From the metadata document
       audience: "https://adfs.acme_tools.com/FederationMetadata/2007-06/FederationMetadata.xml",
+      // otherwise it will thow because of invalid document signature
+      wantAuthnResponseSigned: false,
     },
     function (profile, done) {
       return done(null, {
