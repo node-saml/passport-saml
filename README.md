@@ -63,7 +63,7 @@ passport.use(
 
 ### Configure strategy for multiple providers
 
-You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
+You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuration is appropriate.
 
 ```javascript
 const { MultiSamlStrategy } = require('passport-saml');
@@ -108,7 +108,7 @@ The options passed when the `MultiSamlStrategy` is initialized are also passed a
 
 Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](https://github.com/node-saml/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
 
-Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are an examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
+Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
 
 ### The profile object
 
