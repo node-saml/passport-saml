@@ -14,6 +14,7 @@ export interface AuthorizeOptions extends AuthenticateOptions {
 export interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
+  log?: any;
 }
 
 export type User = Record<string, unknown>;
