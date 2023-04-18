@@ -45,6 +45,10 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return this.error(err);
       }
 
+      if (!samlOptions) {
+        return this.fail(401);
+      }
+
       const samlService = new SAML({ ...this._options, ...samlOptions });
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
@@ -93,8 +97,13 @@ export class MultiSamlStrategy extends AbstractStrategy {
     });
   }
 
-  // This is reduntant, but helps with testing
+  // This is redundant, but helps with testing
   error(err: Error): void {
     super.error(err);
+  }
+
+  // This is redundant, but helps with testing
+  fail(status: number): void {
+    super.fail(status);
   }
 }

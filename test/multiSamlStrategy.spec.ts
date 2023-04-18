@@ -28,12 +28,16 @@ describe("MultiSamlStrategy()", function () {
   });
 
   describe("authenticate", function () {
+    let failStub: sinon.SinonStub;
+
     beforeEach(function () {
       this.superAuthenticateStub = sinon.stub(AbstractStrategy.prototype, "authenticate");
+      failStub = sinon.stub(MultiSamlStrategy.prototype, "fail");
     });
 
     afterEach(function () {
       this.superAuthenticateStub.restore();
+      failStub.restore();
     });
 
     it("calls super with request and auth options", function (done) {
@@ -65,6 +69,24 @@ describe("MultiSamlStrategy()", function () {
           try {
             fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
             expect(strategy._passReqToCallback!).to.equal(true);
+            done();
+          } catch (err2) {
+            done(err2);
+          }
+        },
+      };
+
+      const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
+      strategy.authenticate("random" as any, "random" as any);
+    });
+
+    it("getting empty saml config", function (done) {
+      const passportOptions = {
+        passReqToCallback: true,
+        getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
+          try {
+            fn(null, undefined);
+            sinon.assert.calledOnce(failStub);
             done();
           } catch (err2) {
             done(err2);
