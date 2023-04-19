@@ -138,6 +138,7 @@ Please see the [type specification](https://github.com/node-saml/node-saml/blob/
 - `additionalAuthorizeParams`: dictionary of additional query params to add to 'authorize' requests
 - `identifierFormat`: optional name identifier format to request from identity provider (default: `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`)
 - `wantAssertionsSigned`: if truthy, add `WantAssertionsSigned="true"` to the metadata, to specify that the IdP should always sign the assertions.
+- `wantAuthnResponseSigned` (default: true): if true, require that all incoming authentication response messages be signed at the top level, not just at the assertions. It is on by default. Note: either the response or the assertion must be signed even if both are turned off.
 - `acceptedClockSkewMs`: Time in milliseconds of skew that is acceptable between client and server when checking `NotBefore` and `NotOnOrAfter` assertion condition validity timestamps. Setting to `-1` will disable checking these conditions entirely. Default is `0`.
 - `maxAssertionAgeMs`: Amount of time after which the framework should consider an assertion expired. If the limit imposed by this variable is stricter than the limit imposed by `NotOnOrAfter`, this limit will be used when determining if an assertion is expired.
 - `attributeConsumingServiceIndex`: optional `AttributeConsumingServiceIndex` attribute to add to AuthnRequest to instruct the IDP which attribute set to attach to the response ([link](http://blog.aniljohn.com/2014/01/data-minimization-front-channel-saml-attribute-requests.html))
@@ -398,6 +399,21 @@ Passport-SAML has built in support for SLO including
 See [Releases](https://github.com/node-saml/passport-saml/releases) to find the changes that go into each release.
 
 ## FAQ
+
+### How do i migrate from `passport-saml`
+
+The original `passport-saml` is now deprecated. To migrate to this version of `passport-saml` you'll need to use the following options which have a new default behaviour.
+
+```js
+passport.use(
+  new SamlStrategy(
+    {
+       // ...
+       wantAuthnResponseSigned: false,
+			 wantAssertionsSigned: false,
+    },
+    ...
+```
 
 ### Is there an example I can look at?
 
