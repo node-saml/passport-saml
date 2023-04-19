@@ -410,7 +410,7 @@ passport.use(
     {
        // ...
        wantAuthnResponseSigned: false,
-			 wantAssertionsSigned: false,
+       wantAssertionsSigned: false,
     },
     ...
 ```
