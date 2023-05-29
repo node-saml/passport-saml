@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.3 (2023-04-11)
+
+#### 🔗 Dependencies:
+
+- [**security**] Use secure version of node-saml [#855](https://github.com/node-saml/passport-saml/pull/855)
+
+#### 📚 Documentation:
+
+- Fix minor typos [#853](https://github.com/node-saml/passport-saml/pull/853)
+
+---
+
 ## v4.0.2 (2022-12-13)
 
 #### 🔗 Dependencies:
