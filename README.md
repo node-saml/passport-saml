@@ -63,7 +63,7 @@ passport.use(
 
 ### Configure strategy for multiple providers
 
-You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
+You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuration is appropriate.
 
 ```javascript
 const { MultiSamlStrategy } = require('passport-saml');
@@ -106,32 +106,13 @@ passport.use(
 
 The options passed when the `MultiSamlStrategy` is initialized are also passed as default values to each provider. e.g. If you provide an `issuer` on `MultiSamlStrategy`, this will be also a default value for every provider. You can override these defaults by passing a new value through the `getSamlOptions` function.
 
-Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](!https://github.com/node-saml/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
+Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](https://github.com/node-saml/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
 
-Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are an examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
+Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
 
-#### The profile object
+### The profile object
 
-The profile object referenced above contains the following:
-
-```typescript
-export interface Profile {
-  issuer: string;
-  sessionIndex?: string;
-  nameID: string;
-  nameIDFormat: string;
-  nameQualifier?: string;
-  spNameQualifier?: string;
-  ID?: string;
-  mail?: string; // InCommon Attribute urn:oid:0.9.2342.19200300.100.1.3
-  email?: string; // `mail` if not present in the assertion
-  ["urn:oid:0.9.2342.19200300.100.1.3"]?: string;
-  getAssertionXml?(): string; // get the raw assertion XML
-  getAssertion?(): Record<string, unknown>; // get the assertion XML parsed as a JavaScript object
-  getSamlResponseXml?(): string; // get the raw SAML response XML
-  [attributeName: string]: unknown; // arbitrary `AttributeValue`s
-}
-```
+Please see the [type specification](https://github.com/node-saml/node-saml/blob/master/src/types.ts#:~:text=export%20interface%20profile) in `node-saml` for information about this type.
 
 #### Config parameter details
 
@@ -268,11 +249,7 @@ app.get(
 
 ### generateServiceProviderMetadata( decryptionCert, signingCert )
 
-As a convenience, the strategy object exposes a `generateServiceProviderMetadata` method which will generate a service provider metadata document suitable for supplying to an identity provider. This method will only work on strategies which are configured with a `callbackUrl` (since the relative path for the callback is not sufficient information to generate a complete metadata document).
-
-The `decryptionCert` argument should be a public certificate matching the `decryptionPvk` and is required if the strategy is configured with a `decryptionPvk`.
-
-The `signingCert` argument should be a public certificate matching the `privateKey` and is required if the strategy is configured with a `privateKey`. An array of certificates can be provided to support certificate rotation. When supplying an array of certificates, the first entry in the array should match the current `privateKey`. Additional entries in the array can be used to publish upcoming certificates to IdPs before changing the `privateKey`.
+For details about this method, please see the [documentation](https://github.com/node-saml/node-saml#generateserviceprovidermetadata-decryptioncert-signingcert-) at `node-saml`.
 
 The `generateServiceProviderMetadata` method is also available on the `MultiSamlStrategy`, but needs an extra request and a callback argument (`generateServiceProviderMetadata( req, decryptionCert, signingCert, next )`), which are passed to the `getSamlOptions` to retrieve the correct configuration.
 

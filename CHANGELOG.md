@@ -1,5 +1,36 @@
 # Changelog
 
+## v4.0.3 (2023-04-11)
+
+#### 🔗 Dependencies:
+
+- [**security**] Use secure version of node-saml [#855](https://github.com/node-saml/passport-saml/pull/855)
+
+#### 📚 Documentation:
+
+- Fix minor typos [#853](https://github.com/node-saml/passport-saml/pull/853)
+
+---
+
+## v4.0.2 (2022-12-13)
+
+#### 🔗 Dependencies:
+
+- [**javascript**] Bump eslint from 8.26.0 to 8.29.0 [#827](https://github.com/node-saml/passport-saml/pull/827)
+- [**javascript**] Bump @typescript-eslint/parser from 5.41.0 to 5.46.1 [#826](https://github.com/node-saml/passport-saml/pull/826)
+- [**javascript**] Bump @xmldom/xmldom from 0.8.3 to 0.8.6 [#825](https://github.com/node-saml/passport-saml/pull/825)
+- [**javascript**] Bump prettier from 2.7.1 to 2.8.0 [#821](https://github.com/node-saml/passport-saml/pull/821)
+- [**javascript**] Bump @types/node from 14.18.33 to 14.18.34 [#819](https://github.com/node-saml/passport-saml/pull/819)
+- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.41.0 to 5.45.0 [#818](https://github.com/node-saml/passport-saml/pull/818)
+
+#### 📚 Documentation:
+
+- Reference `node-saml` documentation from README [#815](https://github.com/node-saml/passport-saml/pull/815)
+- Update README formatting and to provide clearer explanation of examples [#812](https://github.com/node-saml/passport-saml/pull/812)
+- Update README.md [#810](https://github.com/node-saml/passport-saml/pull/810)
+
+---
+
 ## v4.0.1 (2022-10-28)
 
 #### 📚 Documentation:
@@ -50,6 +81,15 @@
 
 #### 🔗 Dependencies:
 
+- [**javascript**] Bump @types/sinon from 10.0.12 to 10.0.13 [#738](https://github.com/node-saml/passport-saml/pull/738)
+- [**javascript**] Bump ts-node from 10.8.2 to 10.9.1 [#732](https://github.com/node-saml/passport-saml/pull/732)
+- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.30.5 to 5.30.7 [#739](https://github.com/node-saml/passport-saml/pull/739)
+- [**javascript**] Bump parse-url from 6.0.0 to 6.0.2 [#730](https://github.com/node-saml/passport-saml/pull/730)
+- [**javascript**] Bump @typescript-eslint/parser from 5.30.3 to 5.30.5 [#726](https://github.com/node-saml/passport-saml/pull/726)
+- [**javascript**] Bump eslint-plugin-prettier from 4.0.0 to 4.2.1 [#722](https://github.com/node-saml/passport-saml/pull/722)
+- [**javascript**] Bump eslint from 8.18.0 to 8.19.0 [#719](https://github.com/node-saml/passport-saml/pull/719)
+- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.30.3 to 5.30.5 [#725](https://github.com/node-saml/passport-saml/pull/725)
+- [**javascript**] Bump ts-node from 10.8.0 to 10.8.2 [#723](https://github.com/node-saml/passport-saml/pull/723)
 - [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.29.0 to 5.30.3 [#716](https://github.com/node-saml/passport-saml/pull/716)
 - [**javascript**] Bump @types/sinon from 10.0.11 to 10.0.12 [#717](https://github.com/node-saml/passport-saml/pull/717)
 - [**javascript**] Bump @typescript-eslint/parser from 5.29.0 to 5.30.3 [#718](https://github.com/node-saml/passport-saml/pull/718)
@@ -66,15 +106,6 @@
 - [**javascript**] Bump @types/node from 14.18.21 to 14.18.22 [#740](https://github.com/node-saml/passport-saml/pull/740)
 - [**javascript**] Bump @typescript-eslint/parser from 5.30.5 to 5.30.7 [#737](https://github.com/node-saml/passport-saml/pull/737)
 - [**javascript**] Bump eslint from 8.19.0 to 8.20.0 [#736](https://github.com/node-saml/passport-saml/pull/736)
-- [**javascript**] Bump @types/sinon from 10.0.12 to 10.0.13 [#738](https://github.com/node-saml/passport-saml/pull/738)
-- [**javascript**] Bump ts-node from 10.8.2 to 10.9.1 [#732](https://github.com/node-saml/passport-saml/pull/732)
-- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.30.5 to 5.30.7 [#739](https://github.com/node-saml/passport-saml/pull/739)
-- [**javascript**] Bump parse-url from 6.0.0 to 6.0.2 [#730](https://github.com/node-saml/passport-saml/pull/730)
-- [**javascript**] Bump @typescript-eslint/parser from 5.30.3 to 5.30.5 [#726](https://github.com/node-saml/passport-saml/pull/726)
-- [**javascript**] Bump eslint-plugin-prettier from 4.0.0 to 4.2.1 [#722](https://github.com/node-saml/passport-saml/pull/722)
-- [**javascript**] Bump eslint from 8.18.0 to 8.19.0 [#719](https://github.com/node-saml/passport-saml/pull/719)
-- [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.30.3 to 5.30.5 [#725](https://github.com/node-saml/passport-saml/pull/725)
-- [**javascript**] Bump ts-node from 10.8.0 to 10.8.2 [#723](https://github.com/node-saml/passport-saml/pull/723)
 
 #### 📚 Documentation:
 
@@ -168,14 +199,14 @@
 
 #### 🚀 Minor Changes:
 
+- Update xml-crypto to v2.1.1 [#558](https://github.com/node-saml/passport-saml/pull/558)
+- Allow for authnRequestBinding in SAML options [#529](https://github.com/node-saml/passport-saml/pull/529)
 - Add optional setting to set a ceiling on how old a SAML response is allowed to be [#577](https://github.com/node-saml/passport-saml/pull/577)
 - Move XML functions to utility module [#571](https://github.com/node-saml/passport-saml/pull/571)
 - Improve the typing of the Strategy class hierarchy. [#554](https://github.com/node-saml/passport-saml/pull/554)
 - Resolve XML-encoded carriage returns during signature validation [#576](https://github.com/node-saml/passport-saml/pull/576)
 - Make sure CI builds test latest versions of dependencies [#570](https://github.com/node-saml/passport-saml/pull/570)
 - Add WantAssertionsSigned [#536](https://github.com/node-saml/passport-saml/pull/536)
-- Update xml-crypto to v2.1.1 [#558](https://github.com/node-saml/passport-saml/pull/558)
-- Allow for authnRequestBinding in SAML options [#529](https://github.com/node-saml/passport-saml/pull/529)
 
 #### 🔗 Dependencies:
 
@@ -199,12 +230,12 @@
 
 #### ⚙️ Technical Tasks:
 
-- remove old callback functions, tests use async/await [#545](https://github.com/node-saml/passport-saml/pull/545)
 - async/await for saml.ts [#496](https://github.com/node-saml/passport-saml/pull/496)
 - Format code and enforce code style on PR [#527](https://github.com/node-saml/passport-saml/pull/527)
 - Tests use typescript [#534](https://github.com/node-saml/passport-saml/pull/534)
 - async / await in cache interface [#532](https://github.com/node-saml/passport-saml/pull/532)
 - Fix lint npm script to match all files including in src/ [#555](https://github.com/node-saml/passport-saml/pull/555)
+- remove old callback functions, tests use async/await [#545](https://github.com/node-saml/passport-saml/pull/545)
 
 ---
 
@@ -419,14 +450,14 @@
 
 #### 🙈 Other:
 
-- Add tests to check for correct logout [#418](https://github.com/node-saml/passport-saml/pull/418)
-- added passReqToCallback to docs [#417](https://github.com/node-saml/passport-saml/pull/417)
-- Fix an issue readme formatting [#416](https://github.com/node-saml/passport-saml/pull/416)
-- attributeConsumingServiceIndex can be zero [#414](https://github.com/node-saml/passport-saml/pull/414)
 - fix #393 adding 'inResponseTo' in the profile [#404](https://github.com/node-saml/passport-saml/pull/404)
 - Fix #355 missing parts: tests. [#402](https://github.com/node-saml/passport-saml/pull/402)
 - Fix minimum version of Node.js in Travis [#399](https://github.com/node-saml/passport-saml/pull/399)
 - Add .editorconfig as suggested in #373 [#398](https://github.com/node-saml/passport-saml/pull/398)
+- Add tests to check for correct logout [#418](https://github.com/node-saml/passport-saml/pull/418)
+- added passReqToCallback to docs [#417](https://github.com/node-saml/passport-saml/pull/417)
+- Fix an issue readme formatting [#416](https://github.com/node-saml/passport-saml/pull/416)
+- attributeConsumingServiceIndex can be zero [#414](https://github.com/node-saml/passport-saml/pull/414)
 - Bring-up xml-crypto to 1.4.0 [#400](https://github.com/node-saml/passport-saml/pull/400)
 
 ---
@@ -478,6 +509,7 @@
 
 #### 🙈 Other:
 
+- Handle case of missing InResponseTo when validation is on [#302](https://github.com/node-saml/passport-saml/pull/302)
 - Extend and document the profile object [#301](https://github.com/node-saml/passport-saml/pull/301)
 - Update xml-crypto to 1.0.2 [#321](https://github.com/node-saml/passport-saml/pull/321)
 - Validate issuer on logout requests/responses if configured [#314](https://github.com/node-saml/passport-saml/pull/314)
@@ -485,7 +517,6 @@
 - entryPoint is compulsory for signed requests [#299](https://github.com/node-saml/passport-saml/pull/299)
 - Include support for run-time params to be included in the generated URLs [#136](https://github.com/node-saml/passport-saml/pull/136)
 - support multiple authnContext [#298](https://github.com/node-saml/passport-saml/pull/298)
-- Handle case of missing InResponseTo when validation is on [#302](https://github.com/node-saml/passport-saml/pull/302)
 
 ---
 
@@ -513,8 +544,8 @@ _No changelog for this release._
 
 #### 🙈 Other:
 
-- Audience validation [#253](https://github.com/node-saml/passport-saml/pull/253)
 - README: fix typo `s/ADSF/ADFS/` [#251](https://github.com/node-saml/passport-saml/pull/251)
+- Audience validation [#253](https://github.com/node-saml/passport-saml/pull/253)
 
 ---
 
