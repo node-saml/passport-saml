@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.4 (2023-05-30)
+
+#### 🐛 Bug Fixes:
+
+- Revised AbstractStrategy for authenticate method to match PassportStrategy expectation [#861](https://github.com/node-saml/passport-saml/pull/861)
+
+#### 📚 Documentation:
+
+- Update docs/adfs/README.md and move to wiki [#840](https://github.com/node-saml/passport-saml/pull/840)
+
+---
+
 ## v4.0.3 (2023-04-11)
 
 #### 🔗 Dependencies:
@@ -81,6 +93,9 @@
 
 #### 🔗 Dependencies:
 
+- [**javascript**] Bump @types/node from 14.18.21 to 14.18.22 [#740](https://github.com/node-saml/passport-saml/pull/740)
+- [**javascript**] Bump @typescript-eslint/parser from 5.30.5 to 5.30.7 [#737](https://github.com/node-saml/passport-saml/pull/737)
+- [**javascript**] Bump eslint from 8.19.0 to 8.20.0 [#736](https://github.com/node-saml/passport-saml/pull/736)
 - [**javascript**] Bump @types/sinon from 10.0.12 to 10.0.13 [#738](https://github.com/node-saml/passport-saml/pull/738)
 - [**javascript**] Bump ts-node from 10.8.2 to 10.9.1 [#732](https://github.com/node-saml/passport-saml/pull/732)
 - [**javascript**] Bump @typescript-eslint/eslint-plugin from 5.30.5 to 5.30.7 [#739](https://github.com/node-saml/passport-saml/pull/739)
@@ -103,9 +118,6 @@
 - [**javascript**] Bump concurrently from 7.2.2 to 7.3.0 [#741](https://github.com/node-saml/passport-saml/pull/741)
 - [**javascript**] Bump @typescript-eslint/parser from 5.30.7 to 5.36.2 [#767](https://github.com/node-saml/passport-saml/pull/767)
 - Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
-- [**javascript**] Bump @types/node from 14.18.21 to 14.18.22 [#740](https://github.com/node-saml/passport-saml/pull/740)
-- [**javascript**] Bump @typescript-eslint/parser from 5.30.5 to 5.30.7 [#737](https://github.com/node-saml/passport-saml/pull/737)
-- [**javascript**] Bump eslint from 8.19.0 to 8.20.0 [#736](https://github.com/node-saml/passport-saml/pull/736)
 
 #### 📚 Documentation:
 
@@ -230,12 +242,12 @@
 
 #### ⚙️ Technical Tasks:
 
+- remove old callback functions, tests use async/await [#545](https://github.com/node-saml/passport-saml/pull/545)
 - async/await for saml.ts [#496](https://github.com/node-saml/passport-saml/pull/496)
 - Format code and enforce code style on PR [#527](https://github.com/node-saml/passport-saml/pull/527)
 - Tests use typescript [#534](https://github.com/node-saml/passport-saml/pull/534)
 - async / await in cache interface [#532](https://github.com/node-saml/passport-saml/pull/532)
 - Fix lint npm script to match all files including in src/ [#555](https://github.com/node-saml/passport-saml/pull/555)
-- remove old callback functions, tests use async/await [#545](https://github.com/node-saml/passport-saml/pull/545)
 
 ---
 
@@ -268,12 +280,12 @@
 
 #### 🐛 Bug Fixes:
 
+- normalize signature line endings before loading signature block to xml-crypto [#512](https://github.com/node-saml/passport-saml/pull/512)
 - support windows line breaks in keys [#500](https://github.com/node-saml/passport-saml/pull/500)
 - add ts-ignore to generated type definitions for multisaml strategy [#508](https://github.com/node-saml/passport-saml/pull/508)
 - Reexport SamlConfig type to solve a regression in consumer packages [#516](https://github.com/node-saml/passport-saml/pull/516)
 - fix: derive SamlConfig from SAMLOptions [#515](https://github.com/node-saml/passport-saml/pull/515)
 - fix(typing): multi saml stratey export [#503](https://github.com/node-saml/passport-saml/pull/503)
-- normalize signature line endings before loading signature block to xml-crypto [#512](https://github.com/node-saml/passport-saml/pull/512)
 - fix(typing): Export Multi SAML types [#505](https://github.com/node-saml/passport-saml/pull/505)
 
 #### 📚 Documentation:
@@ -450,14 +462,14 @@
 
 #### 🙈 Other:
 
-- fix #393 adding 'inResponseTo' in the profile [#404](https://github.com/node-saml/passport-saml/pull/404)
-- Fix #355 missing parts: tests. [#402](https://github.com/node-saml/passport-saml/pull/402)
-- Fix minimum version of Node.js in Travis [#399](https://github.com/node-saml/passport-saml/pull/399)
-- Add .editorconfig as suggested in #373 [#398](https://github.com/node-saml/passport-saml/pull/398)
 - Add tests to check for correct logout [#418](https://github.com/node-saml/passport-saml/pull/418)
 - added passReqToCallback to docs [#417](https://github.com/node-saml/passport-saml/pull/417)
 - Fix an issue readme formatting [#416](https://github.com/node-saml/passport-saml/pull/416)
 - attributeConsumingServiceIndex can be zero [#414](https://github.com/node-saml/passport-saml/pull/414)
+- fix #393 adding 'inResponseTo' in the profile [#404](https://github.com/node-saml/passport-saml/pull/404)
+- Fix #355 missing parts: tests. [#402](https://github.com/node-saml/passport-saml/pull/402)
+- Fix minimum version of Node.js in Travis [#399](https://github.com/node-saml/passport-saml/pull/399)
+- Add .editorconfig as suggested in #373 [#398](https://github.com/node-saml/passport-saml/pull/398)
 - Bring-up xml-crypto to 1.4.0 [#400](https://github.com/node-saml/passport-saml/pull/400)
 
 ---
