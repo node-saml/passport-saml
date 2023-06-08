@@ -53,43 +53,20 @@
 
 ## v4.0.0 (2022-10-28)
 
-#### 🔗 Dependencies:
+#### 💣 Major Changes:
 
-- Update dependencies [#796](https://github.com/node-saml/passport-saml/pull/796)
-- [**javascript**] Bump @xmldom/xmldom from 0.7.5 to 0.7.6 [#794](https://github.com/node-saml/passport-saml/pull/794)
-
----
-
-## v4.0.0-beta.4 (2022-10-13)
-
-#### ⚙️ Technical Tasks:
-
-- Clean working folder before doing a release build [#793](https://github.com/node-saml/passport-saml/pull/793)
-- Update changelog build tools [#792](https://github.com/node-saml/passport-saml/pull/792)
-
----
-
-## v4.0.0-beta.3 (2022-10-11)
-
-#### 🔗 Dependencies:
-
-- [**javascript**] Bump @types/mocha from 9.1.1 to 10.0.0 [#781](https://github.com/node-saml/passport-saml/pull/781)
-- [**javascript**] Bump @types/express from 4.17.13 to 4.17.14 [#785](https://github.com/node-saml/passport-saml/pull/785)
-- [**javascript**] Bump @types/chai from 4.3.1 to 4.3.3 [#787](https://github.com/node-saml/passport-saml/pull/787)
-- [**javascript**] Bump @typescript-eslint/parser from 5.36.2 to 5.40.0 [#786](https://github.com/node-saml/passport-saml/pull/786)
-- [**javascript**] Bump eslint from 8.23.0 to 8.25.0 [#784](https://github.com/node-saml/passport-saml/pull/784)
-- [**github_actions**] Bump codecov/codecov-action from 3.1.0 to 3.1.1 [#782](https://github.com/node-saml/passport-saml/pull/782)
-- [**javascript**] Bump @types/passport from 1.0.10 to 1.0.11 [#778](https://github.com/node-saml/passport-saml/pull/778)
-- [**javascript**] Bump vm2 from 3.9.9 to 3.9.11 [#777](https://github.com/node-saml/passport-saml/pull/777)
+- Update passport to 0.6.x [#698](https://github.com/node-saml/passport-saml/pull/698)
+- Update packages; set minimum Node to 14 [#685](https://github.com/node-saml/passport-saml/pull/685)
+- [**security**] Check user matches logout request before reporting logout success [#619](https://github.com/node-saml/passport-saml/pull/619)
 - Update node-saml to beta 5 [#783](https://github.com/node-saml/passport-saml/pull/783)
+- Remove `node-saml` code and use an import instead [#612](https://github.com/node-saml/passport-saml/pull/612)
+- Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
+- Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
+- Update dependencies [#796](https://github.com/node-saml/passport-saml/pull/796)
 
-#### ⚙️ Technical Tasks:
+#### 🚀 Minor Changes:
 
-- Add prerelease script [#775](https://github.com/node-saml/passport-saml/pull/775)
-
----
-
-## v4.0.0-beta.2 (2022-09-10)
+- Add support for multiple signing certs in metadata [#655](https://github.com/node-saml/passport-saml/pull/655)
 
 #### 🔗 Dependencies:
 
@@ -110,6 +87,22 @@
 - [**javascript**] Bump @typescript-eslint/parser from 5.29.0 to 5.30.3 [#718](https://github.com/node-saml/passport-saml/pull/718)
 - [**github_actions**] Bump actions/checkout from 2 to 3 [#713](https://github.com/node-saml/passport-saml/pull/713)
 - [**github_actions**] Bump github/codeql-action from 1 to 2 [#712](https://github.com/node-saml/passport-saml/pull/712)
+- Move TypeScript-required types to dependencies from devDependencies [#686](https://github.com/node-saml/passport-saml/pull/686)
+- Update dependencies [#696](https://github.com/node-saml/passport-saml/pull/696)
+- Bump follow-redirects from 1.14.4 to 1.15.1 [#695](https://github.com/node-saml/passport-saml/pull/695)
+- Bump npm from 8.6.0 to 8.12.0 [#694](https://github.com/node-saml/passport-saml/pull/694)
+- [**security**] Bump ansi-regex from 4.1.0 to 4.1.1 [#688](https://github.com/node-saml/passport-saml/pull/688)
+- Code cleanup in preparation for logout validation [#658](https://github.com/node-saml/passport-saml/pull/658)
+- [**javascript**] Bump @xmldom/xmldom from 0.7.5 to 0.7.6 [#794](https://github.com/node-saml/passport-saml/pull/794)
+- [**javascript**] Bump @types/mocha from 9.1.1 to 10.0.0 [#781](https://github.com/node-saml/passport-saml/pull/781)
+- [**javascript**] Bump @types/express from 4.17.13 to 4.17.14 [#785](https://github.com/node-saml/passport-saml/pull/785)
+- [**javascript**] Bump @types/chai from 4.3.1 to 4.3.3 [#787](https://github.com/node-saml/passport-saml/pull/787)
+- [**javascript**] Bump @typescript-eslint/parser from 5.36.2 to 5.40.0 [#786](https://github.com/node-saml/passport-saml/pull/786)
+- [**javascript**] Bump eslint from 8.23.0 to 8.25.0 [#784](https://github.com/node-saml/passport-saml/pull/784)
+- [**github_actions**] Bump codecov/codecov-action from 3.1.0 to 3.1.1 [#782](https://github.com/node-saml/passport-saml/pull/782)
+- [**javascript**] Bump @types/passport from 1.0.10 to 1.0.11 [#778](https://github.com/node-saml/passport-saml/pull/778)
+- [**javascript**] Bump vm2 from 3.9.9 to 3.9.11 [#777](https://github.com/node-saml/passport-saml/pull/777)
+- Update packages [#641](https://github.com/node-saml/passport-saml/pull/641)
 - [**javascript**] Bump concurrently from 7.3.0 to 7.4.0 [#773](https://github.com/node-saml/passport-saml/pull/773)
 - [**javascript**] Bump @types/node from 14.18.22 to 14.18.28 [#772](https://github.com/node-saml/passport-saml/pull/772)
 - [**javascript**] Bump @types/passport from 1.0.9 to 1.0.10 [#771](https://github.com/node-saml/passport-saml/pull/771)
@@ -117,47 +110,6 @@
 - [**javascript**] Bump eslint from 8.20.0 to 8.23.0 [#759](https://github.com/node-saml/passport-saml/pull/759)
 - [**javascript**] Bump concurrently from 7.2.2 to 7.3.0 [#741](https://github.com/node-saml/passport-saml/pull/741)
 - [**javascript**] Bump @typescript-eslint/parser from 5.30.7 to 5.36.2 [#767](https://github.com/node-saml/passport-saml/pull/767)
-- Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
-
-#### 📚 Documentation:
-
-- Update badges for scoped package [#710](https://github.com/node-saml/passport-saml/pull/710)
-- Update badges for scoped package [#709](https://github.com/node-saml/passport-saml/pull/709)
-- docs: move history note to the bottom and expand it. [#708](https://github.com/node-saml/passport-saml/pull/708)
-- Update changelog and changelog building tools [#774](https://github.com/node-saml/passport-saml/pull/774)
-
-#### ⚙️ Technical Tasks:
-
-- Add dependabot config file [#711](https://github.com/node-saml/passport-saml/pull/711)
-- Have dependabot update package.json too [#724](https://github.com/node-saml/passport-saml/pull/724)
-- Reduce dependabot update frequency [#765](https://github.com/node-saml/passport-saml/pull/765)
-- Have dependabot update package.json too [#764](https://github.com/node-saml/passport-saml/pull/764)
-
----
-
-## v4.0.0-beta.1 (2022-06-25)
-
-#### 💣 Major Changes:
-
-- Update passport to 0.6.x [#698](https://github.com/node-saml/passport-saml/pull/698)
-- Update packages; set minimum Node to 14 [#685](https://github.com/node-saml/passport-saml/pull/685)
-- [**security**] Check user matches logout request before reporting logout success [#619](https://github.com/node-saml/passport-saml/pull/619)
-
-#### 🚀 Minor Changes:
-
-- Add support for multiple signing certs in metadata [#655](https://github.com/node-saml/passport-saml/pull/655)
-
-#### 🔗 Dependencies:
-
-- Move TypeScript-required types to dependencies from devDependencies [#686](https://github.com/node-saml/passport-saml/pull/686)
-- Update dependencies [#696](https://github.com/node-saml/passport-saml/pull/696)
-- Bump follow-redirects from 1.14.4 to 1.15.1 [#695](https://github.com/node-saml/passport-saml/pull/695)
-- Bump npm from 8.6.0 to 8.12.0 [#694](https://github.com/node-saml/passport-saml/pull/694)
-- [**security**] Bump ansi-regex from 4.1.0 to 4.1.1 [#688](https://github.com/node-saml/passport-saml/pull/688)
-- Code cleanup in preparation for logout validation [#658](https://github.com/node-saml/passport-saml/pull/658)
-- Remove `node-saml` code and use an import instead [#612](https://github.com/node-saml/passport-saml/pull/612)
-- Update packages [#641](https://github.com/node-saml/passport-saml/pull/641)
-- Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
 
 #### 🐛 Bug Fixes:
 
@@ -165,12 +117,17 @@
 
 #### 📚 Documentation:
 
+- Update badges for scoped package [#710](https://github.com/node-saml/passport-saml/pull/710)
+- Update badges for scoped package [#709](https://github.com/node-saml/passport-saml/pull/709)
+- docs: move history note to the bottom and expand it. [#708](https://github.com/node-saml/passport-saml/pull/708)
 - Document passive option [#660](https://github.com/node-saml/passport-saml/pull/660)
+- Update changelog and changelog building tools [#774](https://github.com/node-saml/passport-saml/pull/774)
 - Read me update for authnContext example for ADFS [#647](https://github.com/node-saml/passport-saml/pull/647)
 - Update README to remove an insecure suggestion [#704](https://github.com/node-saml/passport-saml/pull/704)
 
 #### ⚙️ Technical Tasks:
 
+- Add dependabot config file [#711](https://github.com/node-saml/passport-saml/pull/711)
 - Move to NPM organization [#705](https://github.com/node-saml/passport-saml/pull/705)
 - Add code coverage workflow [#706](https://github.com/node-saml/passport-saml/pull/706)
 - Replace integration tests with unit tests [#702](https://github.com/node-saml/passport-saml/pull/702)
@@ -178,7 +135,13 @@
 - Adjust .mochars.json [#699](https://github.com/node-saml/passport-saml/pull/699)
 - Migrate from "should" to "chai" [#687](https://github.com/node-saml/passport-saml/pull/687)
 - Fix main path in package.json [#623](https://github.com/node-saml/passport-saml/pull/623)
+- Clean working folder before doing a release build [#793](https://github.com/node-saml/passport-saml/pull/793)
+- Update changelog build tools [#792](https://github.com/node-saml/passport-saml/pull/792)
+- Add prerelease script [#775](https://github.com/node-saml/passport-saml/pull/775)
+- Have dependabot update package.json too [#724](https://github.com/node-saml/passport-saml/pull/724)
 - Update issue templates [#652](https://github.com/node-saml/passport-saml/pull/652)
+- Reduce dependabot update frequency [#765](https://github.com/node-saml/passport-saml/pull/765)
+- Have dependabot update package.json too [#764](https://github.com/node-saml/passport-saml/pull/764)
 
 ---
 
@@ -285,7 +248,7 @@
 - add ts-ignore to generated type definitions for multisaml strategy [#508](https://github.com/node-saml/passport-saml/pull/508)
 - Reexport SamlConfig type to solve a regression in consumer packages [#516](https://github.com/node-saml/passport-saml/pull/516)
 - fix: derive SamlConfig from SAMLOptions [#515](https://github.com/node-saml/passport-saml/pull/515)
-- fix(typing): multi saml stratey export [#503](https://github.com/node-saml/passport-saml/pull/503)
+- fix(typing): multi saml strategy export [#503](https://github.com/node-saml/passport-saml/pull/503)
 - fix(typing): Export Multi SAML types [#505](https://github.com/node-saml/passport-saml/pull/505)
 
 #### 📚 Documentation:
@@ -382,7 +345,7 @@
 
 #### 🔗 Dependencies:
 
-- Upgrade xml-crypto dependancy [#465](https://github.com/node-saml/passport-saml/pull/465)
+- Upgrade xml-crypto dependency [#465](https://github.com/node-saml/passport-saml/pull/465)
 - bumped xml-crypto from 1.5.3 to 2.0.0 [#470](https://github.com/node-saml/passport-saml/pull/470)
 
 #### 🐛 Bug Fixes:
@@ -499,12 +462,12 @@
 - Upgrade xml-crypto to 1.1.2 [#344](https://github.com/node-saml/passport-saml/pull/344)
 - Add SamlResponseXML method to profile object [#330](https://github.com/node-saml/passport-saml/pull/330)
 - Fix Node Buffer deprecation warning: update 'new Buffer' to 'Buffer.from()' [#342](https://github.com/node-saml/passport-saml/pull/342)
-- Fix #128 documentation for body-parser dependancy [#326](https://github.com/node-saml/passport-saml/pull/326)
 - Update Node version in package.json to >=6 [#340](https://github.com/node-saml/passport-saml/pull/340)
 - Fix for failing test [#347](https://github.com/node-saml/passport-saml/pull/347)
 - Support InResponseTo validations in MultiSaml [#350](https://github.com/node-saml/passport-saml/pull/350)
 - InResponseTo support for logout [#356](https://github.com/node-saml/passport-saml/pull/356)
 - Create a way to get provider metadata when using the MultiSamlStrategy [#323](https://github.com/node-saml/passport-saml/pull/323)
+- Fix #128 documentation for body-parser dependency [#326](https://github.com/node-saml/passport-saml/pull/326)
 
 ---
 
@@ -554,6 +517,12 @@ _No changelog for this release._
 
 ## v0.32.1 (2018-01-03)
 
+_No changelog for this release._
+
+---
+
+## v0.32.0 (2018-01-03)
+
 #### 🙈 Other:
 
 - README: fix typo `s/ADSF/ADFS/` [#251](https://github.com/node-saml/passport-saml/pull/251)
@@ -577,8 +546,8 @@ _No changelog for this release._
 
 #### 🐛 Bug Fixes:
 
-- [**security**] Use crypto.randomBytes for ID generation [#235](https://github.com/node-saml/passport-saml/pull/235)
 - Fix: "TypeError: Cannot read property 'documentElement' of null" [#239](https://github.com/node-saml/passport-saml/pull/239)
+- [**security**] Use crypto.randomBytes for ID generation [#235](https://github.com/node-saml/passport-saml/pull/235)
 
 ---
 

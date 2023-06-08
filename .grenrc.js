@@ -2,7 +2,7 @@ module.exports = {
   dataSource: "prs",
   prefix: "",
   onlyMilestones: false,
-  ignoreTagsWith: ["v0.32.0", "0.0.3"],
+  ignoreTagsWith: ["beta"],
   ignoreLabels: [
     "semver-major",
     "semver-minor",
