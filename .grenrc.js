@@ -37,21 +37,17 @@ module.exports = {
         placeholders.name,
         `[${placeholders.text}](${placeholders.url})`,
       ];
-      return parts.filter((_) => _).join(" ");
+      return parts
+        .filter((_) => _)
+        .join(" ")
+        .replace("  ", " ");
     },
     release: function (placeholders) {
-      let dateParts = placeholders.date.split("/");
-      let placeholdersDate = new Date(
-        Number(dateParts[2]),
-        Number(dateParts[1]) - 1,
-        Number(dateParts[0])
-      );
-      let isoDateString = placeholdersDate.toISOString().split("T")[0];
       placeholders.body = placeholders.body.replace(
         "*No changelog for this release.*",
         "\n_No changelog for this release._"
       );
-      return `## ${placeholders.release} (${isoDateString})\n${placeholders.body}`;
+      return `## ${placeholders.release} (${placeholders.date})\n${placeholders.body}`;
     },
     group: function (placeholders) {
       const iconMap = {
@@ -64,7 +60,7 @@ module.exports = {
         Dependencies: "🔗",
       };
       const icon = iconMap[placeholders.heading] || "🙈";
-      return "\n#### " + icon + " " + placeholders.heading + ":\n";
+      return "\n#### " + icon + " " + placeholders.heading + "\n";
     },
   },
 };
