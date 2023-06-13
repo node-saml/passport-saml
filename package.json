@@ -59,7 +59,7 @@
     "passport-strategy": "^1.0.0"
   },
   "devDependencies": {
-    "@cjbarth/github-release-notes": "^3.0.0",
+    "@cjbarth/github-release-notes": "^4.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.3",
     "@types/mocha": "^10.0.0",
