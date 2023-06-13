@@ -3,8 +3,13 @@
 import type * as express from "express";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { Profile, SAML, SamlConfig, Strategy as SamlStrategy } from "../src";
-import { RequestWithUser, VerifiedCallback, VerifyWithoutRequest } from "../src/types";
+import { Profile, SAML, Strategy as SamlStrategy } from "../src";
+import {
+  RequestWithUser,
+  VerifiedCallback,
+  VerifyWithoutRequest,
+  PassportSamlConfig,
+} from "../src/types";
 import { FAKE_CERT } from "./types";
 
 const noop = () => undefined;
@@ -304,10 +309,13 @@ describe("Strategy()", function () {
     });
 
     it("should call through to get logout URL", function () {
-      // @ts-ignore
-      new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop).logout({
-        query: "",
-      });
+      new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop).logout(
+        {
+          // @ts-expect-error
+          query: "",
+        },
+        noop
+      );
       sinon.assert.calledOnce(getLogoutUrlAsyncStub);
     });
   });
@@ -327,18 +335,12 @@ describe("Strategy()", function () {
     });
 
     it("should call through to generate metadata", function () {
-      const samlConfig: SamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
-      const signonVerify: VerifyWithoutRequest = function (
-        _profile: Profile | null,
-        cb: VerifiedCallback
-      ): void {
+      const samlConfig: PassportSamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
+      const signonVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
 
-      const logoutVerify: VerifyWithoutRequest = function (
-        _profile: Profile | null,
-        cb: VerifiedCallback
-      ): void {
+      const logoutVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
       new SamlStrategy(samlConfig, signonVerify, logoutVerify).generateServiceProviderMetadata("");
