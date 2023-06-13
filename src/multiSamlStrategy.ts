@@ -40,7 +40,7 @@ export class MultiSamlStrategy extends AbstractStrategy {
     this._options = samlConfig;
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
+  authenticate(req: Request, options: AuthenticateOptions): void {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return this.error(err);

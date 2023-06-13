@@ -11,6 +11,7 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
+import { Request } from "express";
 
 export abstract class AbstractStrategy extends PassportStrategy {
   static readonly newSamlProviderOnConstruct: boolean;
@@ -57,7 +58,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     this._passReqToCallback = !!options.passReqToCallback;
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
+  authenticate(req: Request, options: AuthenticateOptions): void {
     if (this._saml == null) {
       throw new Error("Can't get authenticate without a SAML provider defined.");
     }
