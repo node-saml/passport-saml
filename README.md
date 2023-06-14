@@ -393,9 +393,11 @@ Passport-SAML has built in support for SLO including
 - Decryption of encrypted name identifiers in IdP initiated logout
 - `Redirect` and `POST` SAML Protocol Bindings
 
+Note: Fully functional IdP initiated SLO support is not provided out of the box. You have to inspect your use cases / implementation / deployment scenarios (location of IdP in respect to SP) and consider things / cases listed e.g. at issue(s) [#221](https://github.com/node-saml/passport-saml/issues/221) and [#419](https://github.com/node-saml/passport-saml/issues/419). Library provides you a mechanism to veto "Success" result but it does not provide hooks/interfaces to implement support for IdP initiated SLO which would work under all circumstances. You have to do it yourself.
+
 ## ChangeLog
 
-See [Releases](https://github.com/node-saml/passport-saml/releases) to find the changes that go into each release.
+See [Releases](https://github.com/node-saml/passport-saml/releases) to find the changes that go into each release. Additionally, see the [CHANGELOG](./CHANGELOG.md).
 
 ## FAQ
 
