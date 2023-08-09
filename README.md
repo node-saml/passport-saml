@@ -176,7 +176,7 @@ Please see the [type specification](https://github.com/node-saml/node-saml/blob/
 
 ##### **InResponseTo Validation**
 
-- `validateInResponseTo`: if truthy, then InResponseTo will be validated from incoming SAML responses
+- `validateInResponseTo`: if set to `always` or `ifPresent`, then InResponseTo will be validated from incoming SAML responses. The default setting is `never`, so this setting needs to be set if you want to validate incoming SAML responses.
 - `requestIdExpirationPeriodMs`: Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML response in the `InResponseTo` field. Default is 8 hours.
 - `cacheProvider`: Defines the implementation for a cache provider used to store request Ids generated in SAML requests as part of `InResponseTo` validation. Default is a built-in in-memory cache provider. For details see the 'Cache Provider' section.
 
@@ -353,7 +353,7 @@ If the `NotBefore` or the `NotOnOrAfter` attributes are returned in the SAML res
 
 ## Subject confirmation validation
 
-When configured (turn `validateInResponseTo` to `true` in the Passport-SAML config), the `InResponseTo` attribute will be validated. Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
+When configured (turn `validateInResponseTo` to `always` or `ifPresent` in the Passport-SAML config), the `InResponseTo` attribute will be validated. Validation will succeed if Passport-SAML previously generated a SAML request with an id that matches the value of `InResponseTo`.
 
 Also note that `InResponseTo` is validated as an attribute of the top level `Response` element in the SAML response, as well as part of the `SubjectConfirmation` element.
 
