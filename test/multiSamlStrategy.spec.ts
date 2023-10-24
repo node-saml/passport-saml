@@ -25,6 +25,18 @@ describe("MultiSamlStrategy()", function () {
     expect(strategy).to.be.an.instanceOf(Strategy);
   });
 
+  it("does not require issuer in the SamlOptionsCallback", function () {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const getSamlOptions: StrategyOptionsCallback = (
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      err: Error | null,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      samlOptions?: Partial<PassportSamlConfig>
+    ) => {
+      // do nothing; the return type is void
+    };
+  });
+
   it("throws if wrong finder is provided", function () {
     function createStrategy() {
       return new MultiSamlStrategy({} as MultiStrategyConfig, noop, noop);
