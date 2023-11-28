@@ -63,6 +63,7 @@
 - Update packages; set minimum Node to 14 [#685](https://github.com/node-saml/passport-saml/pull/685)
 - [**security**] Check user matches logout request before reporting logout success [#619](https://github.com/node-saml/passport-saml/pull/619)
 - Remove `node-saml` code and use an import instead [#612](https://github.com/node-saml/passport-saml/pull/612)
+- Changed `wantAssertionsSigned` default value to `true`. If your IdP does not sign assertions, you should specify it explicitly to `false` in strategy configuration
 
 #### 🚀 Minor Changes
 
