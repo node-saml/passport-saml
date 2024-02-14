@@ -27,7 +27,7 @@ The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
 ```javascript
-const SamlStrategy = require('passport-saml').Strategy;
+const SamlStrategy = require('@node-saml/passport-saml').Strategy;
 [...]
 
 passport.use(
@@ -66,7 +66,7 @@ passport.use(
 You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuration is appropriate.
 
 ```javascript
-const { MultiSamlStrategy } = require('passport-saml');
+const { MultiSamlStrategy } = require('@node-saml/passport-saml');
 [...]
 
 passport.use(
