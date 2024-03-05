@@ -1,7 +1,8 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { strict as assert } from "assert";
 import * as url from "url";
-import { Profile, SAML, SamlConfig } from ".";
+import { Profile, SAML } from ".";
+import { PassportSamlConfig } from "./types";
 import {
   AuthenticateOptions,
   RequestWithUser,
@@ -10,6 +11,7 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
+import { Request } from "express";
 
 export abstract class AbstractStrategy extends PassportStrategy {
   static readonly newSamlProviderOnConstruct: boolean;
@@ -21,16 +23,16 @@ export abstract class AbstractStrategy extends PassportStrategy {
   _passReqToCallback?: boolean;
 
   constructor(
-    options: SamlConfig,
+    options: PassportSamlConfig,
     signonVerify: VerifyWithRequest,
     logoutVerify: VerifyWithRequest
   );
   constructor(
-    options: SamlConfig,
+    options: PassportSamlConfig,
     signonVerify: VerifyWithoutRequest,
     logoutVerify: VerifyWithoutRequest
   );
-  constructor(options: SamlConfig, signonVerify: never, logoutVerify: never) {
+  constructor(options: PassportSamlConfig, signonVerify: never, logoutVerify: never) {
     super();
     if (typeof options === "function") {
       throw new Error("Mandatory SAML options missing");
@@ -56,7 +58,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     this._passReqToCallback = !!options.passReqToCallback;
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
+  authenticate(req: Request, options: AuthenticateOptions): void {
     if (this._saml == null) {
       throw new Error("Can't get authenticate without a SAML provider defined.");
     }
@@ -256,7 +258,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
   redirect(url: string, status?: number): void {
     super.redirect(url, status);
   }
-  success(user: any, info?: any): void {
+  success(user: unknown, info?: unknown): void {
     super.success(user, info);
   }
 }

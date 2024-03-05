@@ -4,14 +4,15 @@ import {
   AuthenticateOptions,
   MultiStrategyConfig,
   RequestWithUser,
+  PassportSamlConfig,
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { SAML, SamlConfig } from "@node-saml/node-saml";
+import { SAML } from ".";
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
-  _options: SamlConfig & MultiStrategyConfig;
+  _options: PassportSamlConfig & MultiStrategyConfig;
 
   constructor(
     options: MultiStrategyConfig,
@@ -33,13 +34,13 @@ export class MultiSamlStrategy extends AbstractStrategy {
     // and there are defaults for all `strategy`-required options.
     const samlConfig = {
       ...options,
-    } as SamlConfig & MultiStrategyConfig;
+    } as PassportSamlConfig & MultiStrategyConfig;
 
     super(samlConfig, signonVerify, logoutVerify);
     this._options = samlConfig;
   }
 
-  authenticate(req: RequestWithUser, options: AuthenticateOptions): void {
+  authenticate(req: Request, options: AuthenticateOptions): void {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return this.error(err);

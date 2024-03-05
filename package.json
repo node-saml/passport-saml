@@ -1,6 +1,6 @@
 {
   "name": "@node-saml/passport-saml",
-  "version": "4.0.2",
+  "version": "4.0.4",
   "description": "SAML 2.0 authentication strategy for Passport",
   "keywords": [
     "saml",
@@ -51,7 +51,7 @@
     "watch": "concurrently --kill-others \"npm:*-watch\""
   },
   "dependencies": {
-    "@node-saml/node-saml": "^4.0.0",
+    "@node-saml/node-saml": "^4.0.4",
     "@types/express": "^4.17.14",
     "@types/passport": "^1.0.11",
     "@types/passport-strategy": "^0.2.35",
@@ -59,7 +59,7 @@
     "passport-strategy": "^1.0.0"
   },
   "devDependencies": {
-    "@cjbarth/github-release-notes": "^3.0.0",
+    "@cjbarth/github-release-notes": "^4.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.3",
     "@types/mocha": "^10.0.0",

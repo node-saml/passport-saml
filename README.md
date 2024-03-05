@@ -63,7 +63,7 @@ passport.use(
 
 ### Configure strategy for multiple providers
 
-You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuation is appropriate.
+You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the SAML flows. Passport-SAML will pass in the request object so you can decide which configuration is appropriate.
 
 ```javascript
 const { MultiSamlStrategy } = require('passport-saml');
@@ -108,7 +108,7 @@ The options passed when the `MultiSamlStrategy` is initialized are also passed a
 
 Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have access to it and a provider might get its response validated against another's request. [Issue Report](https://github.com/node-saml/passport-saml/issues/334). To amend this you should provide a different cache provider per SAML provider, through the `getSamlOptions` function.
 
-Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are an examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
+Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are examples of functions you need to implement yourself. These are just examples. You can implement this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in `done()` being called with a proper SAML Configuration (see the TypeScript typings for more information) and the `done()` callbacks for the second and third arguments should be called with an object that represents the user.
 
 ### The profile object
 
@@ -393,9 +393,11 @@ Passport-SAML has built in support for SLO including
 - Decryption of encrypted name identifiers in IdP initiated logout
 - `Redirect` and `POST` SAML Protocol Bindings
 
+Note: Fully functional IdP initiated SLO support is not provided out of the box. You have to inspect your use cases / implementation / deployment scenarios (location of IdP in respect to SP) and consider things / cases listed e.g. at issue(s) [#221](https://github.com/node-saml/passport-saml/issues/221) and [#419](https://github.com/node-saml/passport-saml/issues/419). Library provides you a mechanism to veto "Success" result but it does not provide hooks/interfaces to implement support for IdP initiated SLO which would work under all circumstances. You have to do it yourself.
+
 ## ChangeLog
 
-See [Releases](https://github.com/node-saml/passport-saml/releases) to find the changes that go into each release.
+See [Releases](https://github.com/node-saml/passport-saml/releases) to find the changes that go into each release. Additionally, see the [CHANGELOG](./CHANGELOG.md).
 
 ## FAQ
 
