@@ -4,6 +4,7 @@ import { Profile, SamlConfig } from ".";
 
 export interface AuthenticateOptions extends passport.AuthenticateOptions {
   samlFallback?: "login-request" | "logout-request";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   additionalParams?: Record<string, any>;
 }
 
