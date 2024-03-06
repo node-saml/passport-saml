@@ -30,16 +30,15 @@ provider.
 
 ### Configure strategy
 
-**Most of the configuration options for the Strategy constructor are simply passed through to the
+Most of the configuration options for the Strategy constructor are passed through to the
 underlying `node-saml` library. For more details on the configuration options and how the underlying
-SAML flows work, please see the
-[node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)**
+SAML flows work, see the
+[node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
 
 #### Config parameter details
 
-These are only the additional configuration parameters related to `passport-saml`. For the full list
-of parameters, please see the
-[node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
+These are the Strategy parameters related directly to `passport-saml`. For the full list
+of parameters, see the [node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
 
 - `additionalParams`: dictionary of additional query params to add to all requests; if an object
   with this key is passed to `authenticate`, the dictionary of additional query params will be
