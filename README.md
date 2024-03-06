@@ -57,7 +57,7 @@ of parameters, see the [node-saml documentation](https://github.com/node-saml/no
 The SAML identity provider will redirect you to the URL provided by the `path` configuration.
 
 ```javascript
-const SamlStrategy = require('passport-saml').Strategy;
+const SamlStrategy = require('@node-saml/passport-saml').Strategy;
 [...]
 
 passport.use(
@@ -98,7 +98,7 @@ SAML flows. Passport-SAML will pass in the request object so you can decide whic
 appropriate.
 
 ```javascript
-const { MultiSamlStrategy } = require('passport-saml');
+const { MultiSamlStrategy } = require('@node-saml/passport-saml');
 [...]
 
 passport.use(
