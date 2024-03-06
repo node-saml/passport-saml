@@ -20,7 +20,8 @@ Identity Providers, and with [Active Directory Federation Services](http://en.wi
 npm install @node-saml/passport-saml
 ```
 
-Please note that most of the configuration options for this are simply passed through to the underlying `node-saml` library. For more details on the configuration options and how the underlying SAML flows work, please see the [node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
+Please note that most of the configuration options for this are simply passed through to the underlying `node-saml`
+library. For more details on the configuration options and how the underlying SAML flows work, please see the [node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
 
 ## Usage
 
