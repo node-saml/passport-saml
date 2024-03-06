@@ -8,7 +8,7 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import {SAML} from "@node-saml/node-saml";
+import { SAML } from "@node-saml/node-saml";
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
