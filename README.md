@@ -192,6 +192,8 @@ app.get(
 );
 ```
 
+In addition to passing the `additionalParams` option to `passport.authenticate`, you can also pass `samlFallback`, either as "login-request" or "logout-request". By default, this is set to "login-request". However, in the case of the `req.query` and the `req.body` not containing a `SAMLRequest` or `SAMLResponse`, this can be used to dictate which request handler is used in cases where it can not be determined by these standard properties.
+
 ### generateServiceProviderMetadata( decryptionCert, signingCert )
 
 For details about this method, please see the [documentation](https://github.com/node-saml/node-saml#generateserviceprovidermetadata-decryptioncert-signingcert-)
