@@ -7,10 +7,6 @@ export interface AuthenticateOptions extends passport.AuthenticateOptions {
   additionalParams?: Record<string, any>;
 }
 
-export interface AuthorizeOptions extends AuthenticateOptions {
-  samlFallback?: "login-request" | "logout-request";
-}
-
 export interface StrategyOptions {
   name?: string;
   passReqToCallback?: boolean;
