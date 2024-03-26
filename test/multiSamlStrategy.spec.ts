@@ -3,7 +3,8 @@ import * as express from "express";
 import { Strategy } from "passport-strategy";
 import * as sinon from "sinon";
 import { expect } from "chai";
-import { MultiSamlStrategy, SAML, AbstractStrategy } from "../src";
+import { MultiSamlStrategy, AbstractStrategy } from "../src";
+import { SAML } from "@node-saml/node-saml";
 import {
   MultiStrategyConfig,
   RequestWithUser,

@@ -3,7 +3,8 @@
 import type * as express from "express";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { Profile, SAML, Strategy as SamlStrategy } from "../src";
+import { Strategy as SamlStrategy } from "../src";
+import { SAML, Profile } from "@node-saml/node-saml";
 import {
   RequestWithUser,
   VerifiedCallback,
