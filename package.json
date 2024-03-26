@@ -71,7 +71,7 @@
     "@typescript-eslint/parser": "^5.62.0",
     "chai": "^4.4.1",
     "choma": "^1.2.1",
-    "concurrently": "^7.6.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-prettier": "^4.2.1",
