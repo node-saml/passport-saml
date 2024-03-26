@@ -25,6 +25,15 @@ describe("MultiSamlStrategy()", function () {
     expect(strategy).to.be.an.instanceOf(Strategy);
   });
 
+  it("does not require any properties in the SamlOptionsCallback", function () {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const getSamlOptions: StrategyOptionsCallback = (err, samlOptions) => {
+      // do nothing; the return type is void
+    };
+
+    getSamlOptions(null, {});
+  });
+
   it("throws if wrong finder is provided", function () {
     function createStrategy() {
       return new MultiSamlStrategy({} as MultiStrategyConfig, noop, noop);
