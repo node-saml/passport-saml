@@ -103,8 +103,9 @@ describe("Strategy()", function () {
       const strategy = new SamlStrategy(
         {
           authnRequestBinding: "HTTP-POST",
-          cert: FAKE_CERT,
+          idpCert: FAKE_CERT,
           issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
         },
         noop,
         noop
@@ -123,8 +124,9 @@ describe("Strategy()", function () {
     it("calls getAuthorizeForm when authnRequestBinding is not HTTP-POST for logout-request", function (done) {
       const strategy = new SamlStrategy(
         {
-          cert: FAKE_CERT,
+          idpCert: FAKE_CERT,
           issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
         },
         noop,
         noop
@@ -141,7 +143,11 @@ describe("Strategy()", function () {
     });
 
     it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST for login-request", function (done) {
-      const strategy = new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop);
+      const strategy = new SamlStrategy(
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        noop,
+        noop
+      );
 
       // This returns immediately, but calls async functions; need to turn event loop
       strategy.authenticate(requestWithUser, {});
@@ -156,7 +162,12 @@ describe("Strategy()", function () {
 
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
-        { cert: FAKE_CERT, passReqToCallback: true, issuer: "onesaml_login" },
+        {
+          idpCert: FAKE_CERT,
+          passReqToCallback: true,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        },
         function (req: express.Request, _profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -206,7 +217,7 @@ describe("Strategy()", function () {
 
     it("determines that logout was successful where user matches, GET", function (done) {
       const strategy = new SamlStrategy(
-        { cert: FAKE_CERT, issuer: "onesaml_login" },
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -259,7 +270,7 @@ describe("Strategy()", function () {
 
     it("determines that signon was successful where user matches, POST", function (done) {
       const strategy = new SamlStrategy(
-        { cert: FAKE_CERT, issuer: "onesaml_login" },
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           if (_profile) {
@@ -310,7 +321,11 @@ describe("Strategy()", function () {
     });
 
     it("should call through to get logout URL", function () {
-      new SamlStrategy({ cert: FAKE_CERT, issuer: "onesaml_login" }, noop, noop).logout(
+      new SamlStrategy(
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        noop,
+        noop
+      ).logout(
         {
           // @ts-expect-error
           query: "",
@@ -336,7 +351,11 @@ describe("Strategy()", function () {
     });
 
     it("should call through to generate metadata", function () {
-      const samlConfig: PassportSamlConfig = { cert: FAKE_CERT, issuer: "onesaml_login" };
+      const samlConfig: PassportSamlConfig = {
+        idpCert: FAKE_CERT,
+        issuer: "onesaml_login",
+        callbackUrl: "https://www.example.com",
+      };
       const signonVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
