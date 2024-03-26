@@ -18,8 +18,8 @@ const noop = () => undefined;
 
 describe("MultiSamlStrategy()", function () {
   it("extends passport Strategy", function () {
-    function getSamlOptions(): PassportSamlConfig {
-      return { cert: FAKE_CERT, issuer: "onesaml_login" };
+    function getSamlOptions() {
+      return {};
     }
     const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
     expect(strategy).to.be.an.instanceOf(AbstractStrategy);
@@ -55,7 +55,11 @@ describe("MultiSamlStrategy()", function () {
       const superAuthenticateStub = this.superAuthenticateStub;
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
         try {
-          fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
           sinon.assert.calledOnce(superAuthenticateStub);
           done();
         } catch (err2) {
@@ -79,7 +83,11 @@ describe("MultiSamlStrategy()", function () {
         passReqToCallback: true,
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
           try {
-            fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+            fn(null, {
+              idpCert: FAKE_CERT,
+              issuer: "onesaml_login",
+              callbackUrl: "https://www.example.com",
+            });
             expect(strategy._passReqToCallback).to.equal(true);
             done();
           } catch (err2) {
@@ -98,11 +106,11 @@ describe("MultiSamlStrategy()", function () {
       const samlOptions: PassportSamlConfig = {
         issuer: "http://foo.issuer",
         callbackUrl: "http://foo.callback",
-        cert: "deadbeef",
-        host: "lvh",
+        idpCert: "deadbeef",
+        logoutCallbackUrl: "http://lvh/saml/callback",
+
         acceptedClockSkewMs: -1,
         identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        path: "/saml/callback",
         logoutUrl: "http://foo.slo",
         signatureAlgorithm: "sha256",
       };
@@ -150,7 +158,12 @@ describe("MultiSamlStrategy()", function () {
 
     it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST", function () {
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        fn(null, { authnRequestBinding: "HTTP-POST", cert: FAKE_CERT, issuer: "onesaml_login" });
+        fn(null, {
+          authnRequestBinding: "HTTP-POST",
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        });
       }
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
       strategy.authenticate({} as RequestWithUser, {});
@@ -160,7 +173,11 @@ describe("MultiSamlStrategy()", function () {
 
     it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST", function () {
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+        fn(null, {
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        });
       }
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
       strategy.authenticate({} as RequestWithUser, {});
@@ -182,7 +199,11 @@ describe("MultiSamlStrategy()", function () {
       const superLogoutMock = this.superLogoutMock;
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
         try {
-          fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
           sinon.assert.calledOnce(superLogoutMock);
           done();
         } catch (err2) {
@@ -200,7 +221,11 @@ describe("MultiSamlStrategy()", function () {
         passReqToCallback: true,
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
           try {
-            fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+            fn(null, {
+              idpCert: FAKE_CERT,
+              issuer: "onesaml_login",
+              callbackUrl: "https://www.example.com",
+            });
             expect(strategy._passReqToCallback).to.equal(true);
             done();
           } catch (err2) {
@@ -220,11 +245,10 @@ describe("MultiSamlStrategy()", function () {
         issuer: "http://foo.issuer",
         callbackUrl: "http://foo.callback",
         authnRequestBinding: "HTTP-POST",
-        cert: "deadbeef",
-        host: "lvh",
+        idpCert: "deadbeef",
+        logoutCallbackUrl: "http://lvh/saml/callback",
         acceptedClockSkewMs: -1,
         identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        path: "/saml/callback",
         logoutUrl: "http://foo.slo",
         signatureAlgorithm: "sha256",
       };
@@ -261,7 +285,11 @@ describe("MultiSamlStrategy()", function () {
       const superGenerateServiceProviderMetadata = this.superGenerateServiceProviderMetadata;
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
         try {
-          fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
           sinon.assert.calledOnce(superGenerateServiceProviderMetadata);
           superGenerateServiceProviderMetadata.calledWith("bar", "baz");
           expect(req).to.equal("foo");
@@ -282,7 +310,11 @@ describe("MultiSamlStrategy()", function () {
 
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
           try {
-            fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+            fn(null, {
+              idpCert: FAKE_CERT,
+              issuer: "onesaml_login",
+              callbackUrl: "https://www.example.com",
+            });
             expect(strategy._passReqToCallback).to.equal(true);
             done();
           } catch (err2) {
@@ -318,7 +350,11 @@ describe("MultiSamlStrategy()", function () {
     it("should pass result to callback function", function (done) {
       const passportOptions = {
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
-          fn(null, { cert: FAKE_CERT, issuer: "onesaml_login" });
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
         },
       };
 
