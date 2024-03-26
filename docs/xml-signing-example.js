@@ -42,6 +42,6 @@ console.log(
       verified: verified,
     },
     null,
-    2
-  )
+    2,
+  ),
 );

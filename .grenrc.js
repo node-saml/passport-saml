@@ -45,7 +45,7 @@ module.exports = {
     release: function (placeholders) {
       placeholders.body = placeholders.body.replace(
         "*No changelog for this release.*",
-        "\n_No changelog for this release._"
+        "\n_No changelog for this release._",
       );
       return `## ${placeholders.release} (${placeholders.date})\n${placeholders.body}`;
     },

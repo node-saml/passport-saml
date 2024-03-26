@@ -72,7 +72,7 @@ describe("MultiSamlStrategy()", function () {
           getSamlOptions,
         },
         noop,
-        noop
+        noop,
       );
       // @ts-expect-error
       strategy.authenticate("random", "random");
@@ -120,7 +120,7 @@ describe("MultiSamlStrategy()", function () {
           fn(null, samlOptions);
           sinon.assert.calledOnce(superAuthenticateStub);
           superAuthenticateStub.calledWith(
-            Object.assign({}, { cacheProvider: "mock cache provider" }, samlOptions)
+            Object.assign({}, { cacheProvider: "mock cache provider" }, samlOptions),
           );
           done();
         } catch (err2) {
@@ -132,7 +132,7 @@ describe("MultiSamlStrategy()", function () {
         // @ts-expect-error
         { getSamlOptions, cacheProvider: "mock cache provider" },
         noop,
-        noop
+        noop,
       );
       // @ts-expect-error
       strategy.authenticate("random", "random");
@@ -371,7 +371,7 @@ describe("MultiSamlStrategy()", function () {
           } catch (err2) {
             done(err2);
           }
-        }
+        },
       );
     });
   });

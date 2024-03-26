@@ -24,7 +24,7 @@ describe("Strategy()", function () {
   it("should require that `signonVerify` be a function", function () {
     // @ts-ignore
     expect(() => new SamlStrategy({}, {})).to.throw(
-      "SAML authentication strategy requires a verify function"
+      "SAML authentication strategy requires a verify function",
     );
   });
 
@@ -108,7 +108,7 @@ describe("Strategy()", function () {
           callbackUrl: "https://www.example.com",
         },
         noop,
-        noop
+        noop,
       );
 
       // This returns immediately, but calls async functions; need to turn event loop
@@ -129,7 +129,7 @@ describe("Strategy()", function () {
           callbackUrl: "https://www.example.com",
         },
         noop,
-        noop
+        noop,
       );
 
       // This returns immediately, but calls async functions; need to turn event loop
@@ -146,7 +146,7 @@ describe("Strategy()", function () {
       const strategy = new SamlStrategy(
         { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
         noop,
-        noop
+        noop,
       );
 
       // This returns immediately, but calls async functions; need to turn event loop
@@ -177,7 +177,7 @@ describe("Strategy()", function () {
           if (_profile) {
             cb(null, { name: _profile.nameID });
           }
-        }
+        },
       );
 
       validatePostResponseAsyncStub.resolves({
@@ -207,7 +207,7 @@ describe("Strategy()", function () {
           sinon.match.any,
           sinon.match.any,
           false,
-          sinon.match.func
+          sinon.match.func,
         );
         sinon.assert.calledOnce(getLogoutResponseUrlStub);
         sinon.assert.calledOnce(logoutSpy);
@@ -227,7 +227,7 @@ describe("Strategy()", function () {
           if (_profile) {
             cb(null, { name: _profile.nameID });
           }
-        }
+        },
       );
 
       validateRedirectAsyncStub.resolves({
@@ -259,7 +259,7 @@ describe("Strategy()", function () {
           sinon.match.any,
           sinon.match.any,
           true,
-          sinon.match.func
+          sinon.match.func,
         );
         sinon.assert.calledOnce(getLogoutResponseUrlStub);
         sinon.assert.calledOnceWithMatch(redirectStub, requestWithUserGetResponse.url);
@@ -280,7 +280,7 @@ describe("Strategy()", function () {
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for logout
           cb(new Error("Signon shouldn't call logout."));
-        }
+        },
       );
 
       validatePostRequestAsyncStub.resolves({
@@ -324,13 +324,13 @@ describe("Strategy()", function () {
       new SamlStrategy(
         { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
         noop,
-        noop
+        noop,
       ).logout(
         {
           // @ts-expect-error
           query: "",
         },
-        noop
+        noop,
       );
       sinon.assert.calledOnce(getLogoutUrlAsyncStub);
     });
@@ -342,7 +342,7 @@ describe("Strategy()", function () {
     beforeEach(function () {
       generateServiceProviderMetadataStub = sinon.stub(
         SAML.prototype,
-        "generateServiceProviderMetadata"
+        "generateServiceProviderMetadata",
       );
     });
 
