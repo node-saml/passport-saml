@@ -65,13 +65,13 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.3.14",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^14.18.63",
-    "@types/sinon": "^10.0.20",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@types/node": "^18.19.26",
+    "@types/sinon": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
     "chai": "^4.4.1",
     "choma": "^1.2.1",
-    "concurrently": "^7.6.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -80,10 +80,10 @@
     "onchange": "^7.1.0",
     "prettier": "^2.8.8",
     "prettier-plugin-packagejson": "^2.4.12",
-    "release-it": "^15.11.0",
-    "sinon": "^14.0.1",
+    "release-it": "^17.1.1",
+    "sinon": "^17.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.3"
   },
   "engines": {
     "node": ">= 18"
