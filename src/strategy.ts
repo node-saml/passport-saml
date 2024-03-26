@@ -1,7 +1,7 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { strict as assert } from "assert";
 import * as url from "url";
-import { SAML, Profile } from "@node-saml/node-saml";
+import { Profile, SAML } from "@node-saml/node-saml";
 import { PassportSamlConfig } from "./types";
 import {
   AuthenticateOptions,
