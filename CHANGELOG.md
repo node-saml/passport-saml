@@ -1,5 +1,44 @@
 # Changelog
 
+## 5.0.0 (2024-03-27)
+
+#### 💣 Major Changes
+
+- Update major versions of dependencies [#896](https://github.com/node-saml/passport-saml/pull/896)
+- Update to @node-saml/node-saml v5 [#894](https://github.com/node-saml/passport-saml/pull/894)
+- Update to Node 18 [#893](https://github.com/node-saml/passport-saml/pull/893)
+- Clean up types [#813](https://github.com/node-saml/passport-saml/pull/813)
+
+#### 🚀 Minor Changes
+
+- Update minor dependencies [#895](https://github.com/node-saml/passport-saml/pull/895)
+
+#### 🔗 Dependencies
+
+- Update nested dependencies [#898](https://github.com/node-saml/passport-saml/pull/898)
+- Update prettier [#897](https://github.com/node-saml/passport-saml/pull/897)
+
+#### 🐛 Bug Fixes
+
+- Fix circular references #879 [#880](https://github.com/node-saml/passport-saml/pull/880)
+- [**needs-review**] StrategyOptionsCallback shouldn't have to pass all SAML options [#838](https://github.com/node-saml/passport-saml/pull/838)
+
+#### 📚 Documentation
+
+- Fix README to require correct module name [#884](https://github.com/node-saml/passport-saml/pull/884)
+- Update README to point to `node-saml` documentation [#886](https://github.com/node-saml/passport-saml/pull/886)
+- Clarify SLO support in `passport-saml` [#862](https://github.com/node-saml/passport-saml/pull/862)
+- Roll-up changelog entries for beta releases [#867](https://github.com/node-saml/passport-saml/pull/867)
+
+#### ⚙️ Technical Tasks
+
+- Adjust type enforcement to remove warnings [#889](https://github.com/node-saml/passport-saml/pull/889)
+- Update `package.json` script to mirror `node-saml` [#888](https://github.com/node-saml/passport-saml/pull/888)
+- Remove unused `AuthorizeOptions` type [#887](https://github.com/node-saml/passport-saml/pull/887)
+- Add bot to close stale issues [#864](https://github.com/node-saml/passport-saml/pull/864)
+
+---
+
 ## v4.0.4 (2023-05-30)
 
 #### 🐛 Bug Fixes
@@ -55,7 +94,7 @@
 
 #### 💣 Major Changes
 
-- Update dependencies [#796](https://github.com/node-saml/passport-saml/pull/796)
+- deps: use node-saml v4.  See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
 - Update node-saml to beta 5 -- See node-saml changelog for breaking changes [#783](https://github.com/node-saml/passport-saml/pull/783)
 - Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
 - Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)

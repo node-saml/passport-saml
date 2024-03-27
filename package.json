@@ -1,6 +1,6 @@
 {
   "name": "@node-saml/passport-saml",
-  "version": "4.0.4",
+  "version": "5.0.0",
   "description": "SAML 2.0 authentication strategy for Passport",
   "keywords": [
     "saml",
