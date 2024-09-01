@@ -79,7 +79,7 @@
     "nyc": "^15.1.0",
     "onchange": "^7.1.0",
     "prettier": "^3.2.5",
-    "prettier-plugin-packagejson": "^2.4.12",
+    "prettier-plugin-packagejson": "^2.5.2",
     "release-it": "^17.1.1",
     "sinon": "^17.0.1",
     "ts-node": "^10.9.2",
