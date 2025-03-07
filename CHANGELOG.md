@@ -94,7 +94,7 @@
 
 #### 💣 Major Changes
 
-- deps: use node-saml v4.  See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
+- deps: use node-saml v4. See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
 - Update node-saml to beta 5 -- See node-saml changelog for breaking changes [#783](https://github.com/node-saml/passport-saml/pull/783)
 - Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
 - Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
