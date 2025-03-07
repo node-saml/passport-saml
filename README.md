@@ -63,11 +63,11 @@ const SamlStrategy = require('@node-saml/passport-saml').Strategy;
 passport.use(
   new SamlStrategy(
     {
-      callbackURL: "/login/callback",
+      path: "/login/callback",
       entryPoint:
         "https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php",
       issuer: "passport-saml",
-      idpCert: "fake cert", // cert must be provided
+      cert: "fake cert", // cert must be provided
     },
     function (profile, done) {
       // for signon
