@@ -1,6 +1,22 @@
 # Changelog
 
-## 5.0.0 (2024-03-27)
+## 5.0.1 (2025-03-14)
+
+#### 🔗 Dependencies
+
+- [**github_actions**] Bump github/codeql-action from 2 to 3 [#902](https://github.com/node-saml/passport-saml/pull/902)
+
+#### 🐛 Bug Fixes
+
+- [**security**] Update node-saml/xml-crypto to address CVE [#953](https://github.com/node-saml/passport-saml/pull/953)
+
+#### 📚 Documentation
+
+- Update README.md to reflect updated node-saml [#945](https://github.com/node-saml/passport-saml/pull/945)
+
+---
+
+## v5.0.0 (2024-03-27)
 
 #### 💣 Major Changes
 
@@ -94,7 +110,7 @@
 
 #### 💣 Major Changes
 
-- deps: use node-saml v4. See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
+- deps: use node-saml v4.  See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
 - Update node-saml to beta 5 -- See node-saml changelog for breaking changes [#783](https://github.com/node-saml/passport-saml/pull/783)
 - Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
 - Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
