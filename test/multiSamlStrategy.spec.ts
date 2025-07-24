@@ -74,7 +74,7 @@ describe("MultiSamlStrategy()", function () {
         noop,
         noop,
       );
-      // @ts-expect-error
+      // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
     });
 
@@ -97,7 +97,7 @@ describe("MultiSamlStrategy()", function () {
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
     });
 
@@ -129,12 +129,12 @@ describe("MultiSamlStrategy()", function () {
       }
 
       const strategy = new MultiSamlStrategy(
-        // @ts-expect-error
+        // @ts-expect-error `cacheProvider` expects a `CacheProvider` object
         { getSamlOptions, cacheProvider: "mock cache provider" },
         noop,
         noop,
       );
-      // @ts-expect-error
+      // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
     });
   });
@@ -212,7 +212,7 @@ describe("MultiSamlStrategy()", function () {
       }
 
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `logout` expects a request object
       strategy.logout("random", "random");
     });
 
@@ -235,7 +235,7 @@ describe("MultiSamlStrategy()", function () {
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `logout` expects a request object
       strategy.logout("random", "random");
     });
 
@@ -265,7 +265,7 @@ describe("MultiSamlStrategy()", function () {
       }
 
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `logout` expects a request object
       strategy.logout("random", sinon.spy());
     });
   });
@@ -300,7 +300,7 @@ describe("MultiSamlStrategy()", function () {
       }
 
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `generateServiceProviderMetadata` expects a request object
       strategy.generateServiceProviderMetadata("foo", "bar", "baz", noop);
     });
 
@@ -324,7 +324,7 @@ describe("MultiSamlStrategy()", function () {
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `generateServiceProviderMetadata` expects a request object
       strategy.generateServiceProviderMetadata("foo", "bar", "baz", noop);
     });
 
@@ -336,7 +336,7 @@ describe("MultiSamlStrategy()", function () {
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
-      // @ts-expect-error
+      // @ts-expect-error `generateServiceProviderMetadata` expects a request object
       strategy.generateServiceProviderMetadata("foo", "bar", "baz", function (error) {
         try {
           expect(error?.message).to.equal("My error");
@@ -360,7 +360,7 @@ describe("MultiSamlStrategy()", function () {
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
       strategy.generateServiceProviderMetadata(
-        // @ts-expect-error
+        // @ts-expect-error `generateServiceProviderMetadata` expects a request object
         "foo",
         "bar",
         "baz",

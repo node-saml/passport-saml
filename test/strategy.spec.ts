@@ -17,12 +17,12 @@ const noop = () => undefined;
 
 describe("Strategy()", function () {
   it("should require ctor `options` argument", function () {
-    // @ts-ignore
+    // @ts-expect-error `noop` is not a valid options object
     expect(() => new SamlStrategy(noop)).to.throw("Mandatory SAML options missing");
   });
 
   it("should require that `signonVerify` be a function", function () {
-    // @ts-ignore
+    // @ts-expect-error `{}` is not a valid options object
     expect(() => new SamlStrategy({}, {})).to.throw(
       "SAML authentication strategy requires a verify function",
     );
@@ -327,7 +327,7 @@ describe("Strategy()", function () {
         noop,
       ).logout(
         {
-          // @ts-expect-error
+          // @ts-expect-error `string` isn't valid for `query`
           query: "",
         },
         noop,

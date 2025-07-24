@@ -83,7 +83,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
               // It is up to the caller to return the same `User` as we have currently recorded as logged in for a successful logout
 
               assert.deepStrictEqual(req.user, logoutUser);
-            } catch (err) {
+            } catch {
               userMatch = false;
             }
 
