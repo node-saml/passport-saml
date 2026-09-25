@@ -1,12 +1,12 @@
 # Passport-SAML
 
-[![Build Status](https://github.com/node-saml/passport-saml/workflows/Build%20Status/badge.svg)](https://github.com/node-saml/passport-saml/actions?query=workflow%3ABuild%Status)
+[![Build Status](https://github.com/node-saml/passport-saml/actions/workflows/workflow.yml/badge.svg?branch=master)](https://github.com/node-saml/passport-saml/actions/workflows/workflow.yml)
 [![npm version](https://badge.fury.io/js/@node-saml%2Fpassport-saml.svg)](https://badge.fury.io/js/@node-saml%2Fpassport-saml)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![codecov](https://codecov.io/gh/node-saml/passport-saml/branch/master/graph/badge.svg?token=2JJrPZN29A)](https://codecov.io/gh/node-saml/passport-saml)
-[![DeepScan grade](https://deepscan.io/api/teams/17569/projects/20921/branches/586237/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=17569&pid=20921&bid=586237)
+[![DeepScan grade](https://deepscan.io/api/teams/17569/projects/20922/branches/586238/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=17569&pid=20922&bid=586238)
 
-[![NPM](https://nodei.co/npm/@node-saml/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/@node-saml/passport-saml)
+[![NPM](https://nodei.co/npm/@node-saml/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/@node-saml/passport-saml)
 
 This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for
 [Passport](http://passportjs.org/), the Node.js authentication library.
@@ -17,23 +17,7 @@ Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth,
 
 ## Sponsors
 
-We gratefully acknowledge support from our sponsors:
-
-<div align="center">
-  <a href="https://stytch.com">
-    <picture>
-      <source width="200px" media="(prefers-color-scheme: dark)" srcset="./sponsor/stytch-light.svg">
-      <source width="200px" media="(prefers-color-scheme: light)" srcset="./sponsor/stytch-dark.svg">
-      <img width="200px" src="./sponsor/stytch-dark.svg" />
-    </picture>
-  </a>
-   <p align="center">
-      <a href="https://stytch.com/?utm_source=oss-sponsorship&utm_medium=paid_sponsorship&utm_campaign=passportsaml">
-        <b>The identity platform for humans & AI agents</b><br/>
-        One integration for authentication, authorization, and security
-      </a>
-   </p>
-</div>
+![workos](https://github.com/workos.png?size=30) [workos](https://github.com/workos)
 
 ## Installation
 
@@ -409,6 +393,10 @@ off a `node-saml` module which can be used without Passport. Almost 100 other de
 contributed improvements to the project.
 
 The project continues to be maintained by volunteers. Contributions small and large are welcome.
+
+## Past sponsors
+
+![stytchauth](https://github.com/stytchauth.png?size=30) [stytchauth](https://github.com/stytchauth)
 
 ## Copyright Notices
 
