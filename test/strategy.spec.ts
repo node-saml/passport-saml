@@ -160,6 +160,88 @@ describe("Strategy()", function () {
       });
     });
 
+    it("passes RelayState from the query string to getAuthorizeUrl for login-request", function (done) {
+      const strategy = new SamlStrategy(
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        noop,
+        noop,
+      );
+      requestWithUser.query = { RelayState: "/reports/42" };
+
+      // This returns immediately, but calls async functions; need to turn event loop
+      strategy.authenticate(requestWithUser, {});
+
+      setImmediate(() => {
+        sinon.assert.notCalled(errorStub);
+        sinon.assert.calledOnceWithMatch(getAuthorizeUrlStub, "/reports/42");
+        done();
+      });
+    });
+
+    it("passes RelayState from the body to getAuthorizeForm when authnRequestBinding is HTTP-POST", function (done) {
+      const strategy = new SamlStrategy(
+        {
+          authnRequestBinding: "HTTP-POST",
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        },
+        noop,
+        noop,
+      );
+      requestWithUser.body = { RelayState: "/reports/42" };
+
+      // This returns immediately, but calls async functions; need to turn event loop
+      strategy.authenticate(requestWithUser, {});
+
+      setImmediate(() => {
+        sinon.assert.notCalled(errorStub);
+        sinon.assert.calledOnceWithMatch(getAuthorizeFormStub, "/reports/42");
+        done();
+      });
+    });
+
+    it("returns the IdP's RelayState in the LogoutResponse to an IdP-initiated logout", function (done) {
+      const strategy = new SamlStrategy(
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        function (_profile: Profile | null, cb: VerifiedCallback) {
+          // for signon
+          cb(new Error("Logout shouldn't call signon."));
+        },
+        function (_profile: Profile | null, cb: VerifiedCallback) {
+          // for logout
+          if (_profile) {
+            cb(null, { name: _profile.nameID });
+          }
+        },
+      );
+
+      validatePostRequestAsyncStub.resolves({
+        profile: {
+          ID: "ID",
+          issuer: "issuer",
+          nameID: "some user",
+          nameIDFormat: "nameIDFormat",
+        },
+        loggedOut: true,
+      });
+      requestWithUserPostRequest.user = { name: "some user" };
+      requestWithUserPostRequest.body.RelayState = "idp-relay-state";
+
+      // This returns immediately, but calls async functions; need to turn event loop
+      strategy.authenticate(requestWithUserPostRequest, {});
+
+      setImmediate(() => {
+        sinon.assert.notCalled(errorStub);
+        sinon.assert.calledOnceWithMatch(
+          getLogoutResponseUrlStub,
+          sinon.match.any,
+          "idp-relay-state",
+        );
+        done();
+      });
+    });
+
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
         {
@@ -333,6 +415,15 @@ describe("Strategy()", function () {
         noop,
       );
       sinon.assert.calledOnce(getLogoutUrlAsyncStub);
+    });
+
+    it("should pass RelayState through to get logout URL", function () {
+      new SamlStrategy(
+        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        noop,
+        noop,
+      ).logout({ query: { RelayState: "/goodbye" } } as unknown as RequestWithUser, noop);
+      sinon.assert.calledOnceWithMatch(getLogoutUrlAsyncStub, sinon.match.any, "/goodbye");
     });
   });
 
