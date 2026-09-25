@@ -68,7 +68,7 @@
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.130",
-    "@types/sinon": "^21.0.1",
+    "@types/sinon": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.70.1",
     "@typescript-eslint/parser": "^8.70.1",
     "chai": "^4.5.0",
@@ -85,7 +85,7 @@
     "prettier": "^3.9.9",
     "prettier-plugin-packagejson": "^3.0.2",
     "release-it": "^21.1.0",
-    "sinon": "^21.1.2",
+    "sinon": "^22.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.1"
