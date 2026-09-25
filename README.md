@@ -260,8 +260,9 @@ with the IdP's response. Use it to send users back to the page they asked for be
 log in.
 
 To send one, put `RelayState` in the query string or form body of the request that starts the
-login. Passport-SAML adds it to the `AuthnRequest`, whichever binding you use. The `/login` route
-above needs no changes:
+login. Passport-SAML sends it to the IdP alongside the `AuthnRequest`: as a query parameter with the
+HTTP-Redirect binding, or as a hidden form field with HTTP-POST. The `/login` route above needs no
+changes:
 
 ```javascript
 // When a page needs a logged-in user, send them to log in and remember where they were going
