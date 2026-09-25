@@ -32,8 +32,8 @@ npm install @node-saml/passport-saml
 ## Usage
 
 Passport-SAML is the service provider (SP) side of a SAML login: it sends users to your identity
-provider (IdP) to log in, and validates the response the IdP sends back. Register your site with
-the IdP first; most IdPs accept the
+provider (IdP) to log in, and validates the response the IdP sends back. Register your site with the
+IdP first; most IdPs accept the
 [metadata](#generateserviceprovidermetadata-decryptioncert-signingcert-) that Passport-SAML
 generates. From the IdP you need its single sign-on URL, for `entryPoint`, and its signing
 certificate, for `idpCert`.
@@ -43,15 +43,16 @@ use `https://sp.example.com` for your site and `https://idp.example.com` for the
 
 ### Configure strategy
 
-Most of the configuration options for the Strategy constructor are passed through to the
-underlying `node-saml` library. For more details on the configuration options and how the underlying
-SAML flows work, see the
+Most of the configuration options for the Strategy constructor are passed through to the underlying
+`node-saml` library. For more details on the configuration options and how the underlying SAML flows
+work, see the
 [node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
 
 #### Config parameter details
 
-These are the Strategy parameters related directly to `passport-saml`. For the full list
-of parameters, see the [node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
+These are the Strategy parameters related directly to `passport-saml`. For the full list of
+parameters, see the
+[node-saml documentation](https://github.com/node-saml/node-saml/blob/master/README.md)
 
 - `additionalParams`: dictionary of additional query params to add to all requests; if an object
   with this key is passed to `authenticate`, the dictionary of additional query params will be
@@ -103,9 +104,9 @@ const samlStrategy = new SamlStrategy(
 passport.use(samlStrategy);
 ```
 
-`findUserByEmail()` and `findUserByNameID()` stand in for your own user lookups. `profile` holds
-the SAML assertion's `nameID` and attributes; `profile.email` comes from an `email` or `mail`
-attribute, if the IdP sends one.
+`findUserByEmail()` and `findUserByNameID()` stand in for your own user lookups. `profile` holds the
+SAML assertion's `nameID` and attributes; `profile.email` comes from an `email` or `mail` attribute,
+if the IdP sends one.
 
 - **Sign-on:** call `done(null, user)` to log the user in. A missing user (`null`, `undefined` or
   `false`) fails the login, and `done(err)` reports an error.
@@ -115,8 +116,8 @@ attribute, if the IdP sends one.
 
 ### Configure strategy for multiple providers
 
-To choose the SAML configuration per request, use `MultiSamlStrategy` and pass it a
-`getSamlOptions` function:
+To choose the SAML configuration per request, use `MultiSamlStrategy` and pass it a `getSamlOptions`
+function:
 
 ```javascript
 import passport from "passport";
@@ -223,11 +224,11 @@ where it can not be determined by these standard properties.
 ### Return users to where they started with `RelayState`
 
 `RelayState` is a short value that goes to the IdP with a SAML request and comes back, unchanged,
-with the IdP's response. Use it to send users back to the page they asked for before they had to
-log in.
+with the IdP's response. Use it to send users back to the page they asked for before they had to log
+in.
 
-To send one, put `RelayState` in the query string or form body of the request that starts the
-login. Passport-SAML sends it to the IdP alongside the `AuthnRequest`: as a query parameter with the
+To send one, put `RelayState` in the query string or form body of the request that starts the login.
+Passport-SAML sends it to the IdP alongside the `AuthnRequest`: as a query parameter with the
 HTTP-Redirect binding, or as a hidden form field with HTTP-POST. The `/login` route above needs no
 changes:
 
