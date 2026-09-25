@@ -12,12 +12,12 @@
 
 [![NPM](https://nodei.co/npm/@node-saml/passport-saml.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/@node-saml/passport-saml)
 
-This is a [SAML 2.0](http://en.wikipedia.org/wiki/SAML_2.0) authentication provider for
-[Passport](http://passportjs.org/), the Node.js authentication library.
+This is a [SAML 2.0](https://en.wikipedia.org/wiki/SAML_2.0) authentication provider for
+[Passport](https://www.passportjs.org/), the Node.js authentication library.
 
-Passport-SAML has been tested to work with Onelogin, Okta, Shibboleth,
-[SimpleSAMLphp](http://simplesamlphp.org/) based Identity Providers, and with
-[Active Directory Federation Services](http://en.wikipedia.org/wiki/Active_Directory_Federation_Services).
+Passport-SAML has been tested to work with OneLogin, Okta, Shibboleth,
+[SimpleSAMLphp](https://simplesamlphp.org/) based Identity Providers, and with
+[Active Directory Federation Services](https://en.wikipedia.org/wiki/Active_Directory_Federation_Services).
 
 ## Sponsors
 
@@ -31,10 +31,15 @@ npm install @node-saml/passport-saml
 
 ## Usage
 
-The examples utilize the [Feide OpenIdp identity provider](https://openidp.feide.no/). You need an
-account there to log in with this. You also need to
-[register your site](https://openidp.feide.no/simplesaml/module.php/metaedit/index.php) as a service
-provider.
+Passport-SAML is the service provider (SP) side of a SAML login: it sends users to your identity
+provider (IdP) to log in, and validates the response the IdP sends back. Register your site with
+the IdP first; most IdPs accept the
+[metadata](#generateserviceprovidermetadata-decryptioncert-signingcert-) that Passport-SAML
+generates. From the IdP you need its single sign-on URL, for `entryPoint`, and its signing
+certificate, for `idpCert`.
+
+The examples use ES modules, which Node 18 supports; with CommonJS, `require()` the same names. They
+use `https://sp.example.com` for your site and `https://idp.example.com` for the IdP.
 
 ### Configure strategy
 
@@ -55,153 +60,134 @@ of parameters, see the [node-saml documentation](https://github.com/node-saml/no
   `additionalLogoutParams`)
 - `passReqToCallback`: if truthy, `req` will be passed as the first argument to the verify callback
   (default: `false`)
-- `name`: Optionally, provide a custom name. (default: `saml`). Useful If you want to instantiate
+- `name`: Optionally, provide a custom name. (default: `saml`). Useful if you want to instantiate
   the strategy multiple times with different configurations, allowing users to authenticate against
   multiple different SAML targets from the same site. You'll need to use a unique set of URLs for
   each target, and use this custom name when calling `passport.authenticate()` as well.
 
 #### Examples
 
-The SAML identity provider will redirect you to the URL provided by the `path` configuration.
+The IdP sends its response to `callbackUrl`;
+[Provide the authentication callback](#provide-the-authentication-callback) adds the route for it.
 
 ```javascript
-const SamlStrategy = require('@node-saml/passport-saml').Strategy;
-[...]
+import { readFileSync } from "node:fs";
+import passport from "passport";
+import { Strategy as SamlStrategy } from "@node-saml/passport-saml";
 
-passport.use(
-  new SamlStrategy(
-    {
-      callbackURL: "/login/callback",
-      entryPoint:
-        "https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php",
-      issuer: "passport-saml",
-      idpCert: "fake cert", // cert must be provided
-    },
-    function (profile, done) {
-      // for signon
-      findByEmail(profile.email, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
-    },
-    function (profile, done) {
-      // for logout
-      findByNameID(profile.nameID, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
+const samlStrategy = new SamlStrategy(
+  {
+    callbackUrl: "https://sp.example.com/login/callback",
+    entryPoint: "https://idp.example.com/sso",
+    issuer: "https://sp.example.com/metadata",
+    idpCert: readFileSync("./idp-signing-cert.pem", "utf-8"),
+  },
+  // Sign-on: return the user the IdP authenticated
+  async (profile, done) => {
+    try {
+      done(null, await findUserByEmail(profile.email));
+    } catch (err) {
+      done(err);
     }
-  )
+  },
+  // Logout: return the user the IdP is logging out
+  async (profile, done) => {
+    try {
+      done(null, await findUserByNameID(profile.nameID));
+    } catch (err) {
+      done(err);
+    }
+  },
 );
+
+passport.use(samlStrategy);
 ```
+
+`findUserByEmail()` and `findUserByNameID()` stand in for your own user lookups. `profile` holds
+the SAML assertion's `nameID` and attributes; `profile.email` comes from an `email` or `mail`
+attribute, if the IdP sends one.
+
+- **Sign-on:** call `done(null, user)` to log the user in. A missing user (`null`, `undefined` or
+  `false`) fails the login, and `done(err)` reports an error.
+- **Logout:** runs when the IdP sends a `LogoutRequest`. Passport-SAML compares the user you return
+  with `req.user`, using `assert.deepStrictEqual`, and tells the IdP the logout succeeded only if
+  they match. It logs out the current session either way.
 
 ### Configure strategy for multiple providers
 
-You can pass a `getSamlOptions` parameter to `MultiSamlStrategy` which will be called before the
-SAML flows. Passport-SAML will pass in the request object so you can decide which configuration is
-appropriate.
+To choose the SAML configuration per request, use `MultiSamlStrategy` and pass it a
+`getSamlOptions` function:
 
 ```javascript
-const { MultiSamlStrategy } = require('@node-saml/passport-saml');
-[...]
+import passport from "passport";
+import { MultiSamlStrategy } from "@node-saml/passport-saml";
 
 passport.use(
   new MultiSamlStrategy(
     {
-      passReqToCallback: true, // makes req available in callback
-      getSamlOptions: function (request, done) {
-        findProvider(request, function (err, provider) {
-          if (err) {
-            return done(err);
-          }
-          return done(null, provider.configuration);
-        });
+      passReqToCallback: true, // pass `req` to the sign-on and logout functions below
+      getSamlOptions: async (req, done) => {
+        try {
+          const provider = await findProvider(req);
+          done(null, provider.samlOptions);
+        } catch (err) {
+          done(err);
+        }
       },
     },
-    function (req, profile, done) {
-      // for signon
-      findByEmail(profile.email, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
+    // Sign-on
+    async (req, profile, done) => {
+      try {
+        done(null, await findUserByEmail(profile.email));
+      } catch (err) {
+        done(err);
+      }
     },
-    function (req, profile, done) {
-      // for logout
-      findByNameID(profile.nameID, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        return done(null, user);
-      });
-    }
-  )
+    // Logout
+    async (req, profile, done) => {
+      try {
+        done(null, await findUserByNameID(profile.nameID));
+      } catch (err) {
+        done(err);
+      }
+    },
+  ),
 );
 ```
 
-The options passed when the `MultiSamlStrategy` is initialized are also passed as default values to
-each provider. e.g. If you provide an `issuer` on `MultiSamlStrategy`, this will be also a default
-value for every provider. You can override these defaults by passing a new value through the
-`getSamlOptions` function.
+`getSamlOptions` runs on every request that reaches the strategy. `findProvider()` stands in for
+your own lookup. Call `done(null, options)` with that provider's configuration, or `done(err)`. The
+options are merged over the ones passed to `MultiSamlStrategy`, so settings shared by every provider
+can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set after the merge.
 
-Using multiple providers supports `validateInResponseTo`, but all the `InResponse` values are stored
-on the same Cache. This means, if you're using the default `InMemoryCache`, that all providers have
-access to it and a provider might get its response validated against another's request.
-[Issue Report](https://github.com/node-saml/passport-saml/issues/334). To amend this you should
-provide a different cache provider per SAML provider, through the `getSamlOptions` function.
+`MultiSamlStrategy` builds a new `node-saml` `SAML` instance from the merged options for each
+request. If those options have no `cacheProvider`, each instance starts with its own empty in-memory
+cache, so with `validateInResponseTo` set to `"always"` or `"ifPresent"`, every response to a login
+request is rejected: the cache that recorded the request is gone. Return a `cacheProvider` from
+`getSamlOptions`, the same one for a provider on every call, so a response finds the cache its
+request was recorded in. One `cacheProvider` passed to the `MultiSamlStrategy` constructor also
+works, but all providers share it, so a response to one provider's request passes this check at
+another provider's callback.
 
-Please note that in the above examples, `findProvider()`, `findByNameId()`, and `findByEmail()` are
-examples of functions you need to implement yourself. These are just examples. You can implement
-this functionality any way you see fit. Please note that calling `getSamlOptions()` should result in
-`done()` being called with a proper SAML Configuration (see the TypeScript typings for more
-information) and the `done()` callbacks for the second and third arguments should be called with an
-object that represents the user.
+A `cacheProvider` is an object with `saveAsync(key, value)`, `getAsync(key)` and `removeAsync(key)`
+methods, described by the `CacheProvider` TypeScript type. Back it with a store that every process
+handling your logins can reach, such as Redis or your database. `node-saml` removes a request ID
+only when a response to it arrives, so have the store expire entries after
+`requestIdExpirationPeriodMs` (8 hours by default); otherwise the IDs of abandoned logins stay
+forever.
 
 ### Provide the authentication callback
 
-You need to provide a route corresponding to the `path` configuration parameter given to the
-strategy:
-
-#### Express v4.x
-
-The authentication callback must be invoked after the `body-parser` middleware.
+The IdP posts its response to `callbackUrl` as a form. Add a route for that path that parses the
+form body before `passport.authenticate()`. `express.urlencoded()` is built into Express 4.16 and
+later, including Express 5.
 
 ```javascript
-// Express v4
-const bodyParser = require("body-parser");
-
-app.post(
-  "/login/callback",
-  bodyParser.urlencoded({ extended: false }),
-  passport.authenticate("saml", {
-    failureRedirect: "/",
-    failureFlash: true,
-  }),
-  function (req, res) {
-    res.redirect("/");
-  },
-);
-```
-
-#### Express v5.x
-
-The authentication callback must be invoked after the `express.urlencoded({ extended: false })` middleware.
-
-```javascript
-// Express v5
 app.post(
   "/login/callback",
   express.urlencoded({ extended: false }),
-  passport.authenticate("saml", {
-    failureRedirect: "/",
-    failureFlash: true,
-  }),
-  function (req, res) {
+  passport.authenticate("saml", { failureRedirect: "/" }),
+  (req, res) => {
     res.redirect("/");
   },
 );
@@ -209,16 +195,11 @@ app.post(
 
 ### Authenticate requests
 
-Use `passport.authenticate()`, specifying `saml` as the strategy:
+Use `passport.authenticate()`, specifying `saml` as the strategy, on the route that starts a login.
+It sends the browser to the IdP's `entryPoint`:
 
 ```javascript
-app.get(
-  "/login",
-  passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
-  function (req, res) {
-    res.redirect("/");
-  },
-);
+app.get("/login", passport.authenticate("saml"));
 ```
 
 ...or, if you wish to add or override query string parameters:
@@ -226,14 +207,12 @@ app.get(
 ```javascript
 app.get(
   "/login",
-  passport.authenticate("saml", {
-    additionalParams: { username: "user@domain.com" },
-  }),
-  function (req, res) {
-    res.redirect("/");
-  },
+  passport.authenticate("saml", { additionalParams: { username: "user@example.com" } }),
 );
 ```
+
+These parameters go on the redirect URL, so a login with `authnRequestBinding: "HTTP-POST"` does not
+send them.
 
 In addition to passing the `additionalParams` option to `passport.authenticate`, you can also pass
 `samlFallback`, either as "login-request" or "logout-request". By default, this is set to
@@ -254,7 +233,7 @@ changes:
 
 ```javascript
 // When a page needs a logged-in user, send them to log in and remember where they were going
-res.redirect("/login?RelayState=" + encodeURIComponent(req.originalUrl));
+res.redirect(`/login?RelayState=${encodeURIComponent(req.originalUrl)}`);
 ```
 
 The IdP posts it back to your callback URL along with the `SAMLResponse`, where it is available as
@@ -270,8 +249,8 @@ For example, follow it only when it is a path on your own site:
 app.post(
   "/login/callback",
   express.urlencoded({ extended: false }),
-  passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
-  function (req, res) {
+  passport.authenticate("saml", { failureRedirect: "/" }),
+  (req, res) => {
     res.redirect(localPathOr(req.body.RelayState, "/"));
   },
 );
@@ -311,31 +290,51 @@ anything.
 
 ### generateServiceProviderMetadata( decryptionCert, signingCert )
 
-For details about this method, please see the
-[documentation](https://github.com/node-saml/node-saml#generateserviceprovidermetadata-decryptioncert-signingcert-)
-at `node-saml`.
+Generates your SP's metadata, which you can give to the IdP when you register your site. Serve it
+from a route:
+
+```javascript
+app.get("/metadata", (req, res) => {
+  res.type("application/xml").send(samlStrategy.generateServiceProviderMetadata(null));
+});
+```
+
+Pass `decryptionCert` when you configure `decryptionPvk`, and `signingCert` when you configure
+`privateKey`; otherwise pass `null` for `decryptionCert` and leave out `signingCert`. For details,
+see [Service provider metadata](https://github.com/node-saml/node-saml#service-provider-metadata) in
+the `node-saml` documentation.
 
 The `generateServiceProviderMetadata` method is also available on the `MultiSamlStrategy`, but needs
 an extra request and a callback argument
-(`generateServiceProviderMetadata( req, decryptionCert, signingCert, next )`), which are passed to
-the `getSamlOptions` to retrieve the correct configuration.
+(`generateServiceProviderMetadata(req, decryptionCert, signingCert, callback)`). It passes `req` to
+`getSamlOptions` to retrieve the correct configuration, then calls `callback(err, metadata)`.
 
 ## Usage with Active Directory Federation Services
 
-Here is a configuration that has been proven to work with ADFS:
+Here is a configuration for ADFS:
 
 ```javascript
-  {
-    entryPoint: 'https://ad.example.net/adfs/ls/',
-    issuer: 'https://your-app.example.net/login/callback',
-    callbackUrl: 'https://your-app.example.net/login/callback',
-    idpCert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
-    authnContext: ['http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows'],
-    identifierFormat: null
-  }
+const adfsOptions = {
+  entryPoint: "https://adfs.example.com/adfs/ls/",
+  issuer: "https://sp.example.com/login/callback",
+  callbackUrl: "https://sp.example.com/login/callback",
+  idpCert: "MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==",
+  authnContext: ["http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows"],
+  identifierFormat: null,
+};
 ```
 
-Please note that ADFS needs to have a trust established to your service in order for this to work.
+ADFS needs a relying party trust for your service, with `issuer` as its identifier.
+
+By default, ADFS signs only the assertion in its response, and Passport-SAML rejects a response
+whose outer `Response` element is not signed. Have ADFS sign both:
+
+```powershell
+Set-AdfsRelyingPartyTrust -TargetName "<relying party name>" -SamlResponseSignature MessageAndAssertion
+```
+
+If you can't change the relying party trust, set `wantAuthnResponseSigned: false` instead. The
+assertion's signature is still required.
 
 For more detailed instructions, see
 [ADFS documentation](https://github.com/node-saml/passport-saml/wiki/How-to-use-with-ADFS).
@@ -361,7 +360,9 @@ each release. Additionally, see the [CHANGELOG](./CHANGELOG.md).
 
 ### Is there an example I can look at?
 
-Gerard Braad has provided an example app at <https://github.com/gbraad/passport-saml-example/>
+Gerard Braad has provided an example app at <https://github.com/gbraad/passport-saml-example/>. It
+was written for passport-saml 1.x, so some of its option names have changed since; for example,
+`cert` is now `idpCert`. Use this README for the current options.
 
 ## Node Support Policy
 
