@@ -253,6 +253,73 @@ In addition to passing the `additionalParams` option to `passport.authenticate`,
 `SAMLRequest` or `SAMLResponse`, this can be used to dictate which request handler is used in cases
 where it can not be determined by these standard properties.
 
+### Return users to where they started with `RelayState`
+
+`RelayState` is a short value that goes to the IdP with a SAML request and comes back, unchanged,
+with the IdP's response. Use it to send users back to the page they asked for before they had to
+log in.
+
+To send one, put `RelayState` in the query string or form body of the request that starts the
+login. Passport-SAML adds it to the `AuthnRequest`, whichever binding you use. The `/login` route
+above needs no changes:
+
+```javascript
+// When a page needs a logged-in user, send them to log in and remember where they were going
+res.redirect("/login?RelayState=" + encodeURIComponent(req.originalUrl));
+```
+
+The IdP posts it back to your callback URL along with the `SAMLResponse`, where it is available as
+`req.body.RelayState`. Passport-SAML passes it through without acting on it.
+
+`RelayState` is not part of the signed SAML response: the IdP posts it as a separate form field, so
+anyone can change it on its way back to you. Treat it as untrusted input. Redirecting to it without
+checking it turns your callback into an
+[open redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html).
+For example, follow it only when it is a path on your own site:
+
+```javascript
+app.post(
+  "/login/callback",
+  express.urlencoded({ extended: false }),
+  passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
+  function (req, res) {
+    res.redirect(localPathOr(req.body.RelayState, "/"));
+  },
+);
+
+// Returns `value` if it is a path on this site; otherwise `fallback`.
+function localPathOr(value, fallback) {
+  if (typeof value !== "string") return fallback;
+  const base = "https://sp.invalid"; // placeholder origin, used only to parse `value`
+  try {
+    const url = new URL(value, base);
+    if (url.origin === base) return url.pathname + url.search + url.hash;
+  } catch {
+    // not a valid URL
+  }
+  return fallback;
+}
+```
+
+The SAML 2.0 bindings specification
+([sections 3.4.3 and 3.5.3](https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf))
+limits `RelayState` to 80 bytes, so an IdP may reject a longer value. It also recommends protecting
+the value from tampering "by using a checksum, a pseudo-random value, or similar means". If your
+paths can be longer than 80 bytes, or you want that protection, store the destination on the server
+under a short random key and send the key as `RelayState` instead.
+
+Logout works the same way. `RelayState` on the request that starts a logout, through
+`strategy.logout(req, callback)` or `samlFallback: "logout-request"`, is sent with the
+`LogoutRequest` and comes back with the IdP's `LogoutResponse`, in `req.query.RelayState` or
+`req.body.RelayState` depending on the binding. When the IdP starts the logout, Passport-SAML
+returns the IdP's `RelayState` in its `LogoutResponse`, as the specification requires.
+
+`RelayState` only comes back if the IdP received your request. If `entryPoint` is a link that starts
+an IdP-initiated login, rather than the IdP's single sign-on service URL (the `SingleSignOnService`
+location in its metadata), the IdP ignores the `AuthnRequest` and the `RelayState` along with it. In
+an IdP-initiated login, `req.body.RelayState` holds whatever the IdP is configured to send, if
+anything.
+
 ### generateServiceProviderMetadata( decryptionCert, signingCert )
 
 For details about this method, please see the
