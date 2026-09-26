@@ -390,11 +390,12 @@ We will accept code that allows this package to run on newer, non-LTS, versions 
 
 The project was started by @bergie in 2012 based on Michael Bosworth's
 [express-saml](https://github.com/bozzltron/express-saml) library. From 2014 - 2016, @ploer served
-as primary maintainer. @markstos served the primary maintainer from 2017 till 2020 when he created
-the node-saml organization. With a goal to create a team of maintainers, invitations were sent to
-major contributors and fork authors to work together to maintain all the improvements in one place.
+as primary maintainer. @markstos served as the primary maintainer from 2017 till 2020 when he
+created the node-saml organization. With a goal to create a team of maintainers, invitations were
+sent to major contributors and fork authors to work together to maintain all the improvements in one
+place.
 
-Since 2020, @cjbath emerged as the primary maintainer, with major contributions from @gugu and
+Since 2020, @cjbarth emerged as the primary maintainer, with major contributions from @gugu and
 @zoellner. Major updates from the team included rewriting the project in TypeScript and splitting
 off a `node-saml` module which can be used without Passport. Almost 100 other developers have
 contributed improvements to the project.
