@@ -263,7 +263,10 @@ function localPathOr(value, fallback) {
   const base = "https://sp.invalid"; // placeholder origin, used only to parse `value`
   try {
     const url = new URL(value, base);
-    if (url.origin === base) return url.pathname + url.search + url.hash;
+    // A browser reads a path that starts with "//" as the address of another site
+    if (url.origin === base && !url.pathname.startsWith("//")) {
+      return url.pathname + url.search + url.hash;
+    }
   } catch {
     // not a valid URL
   }
