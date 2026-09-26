@@ -163,8 +163,9 @@ can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set aft
 
 `MultiSamlStrategy` builds a new `node-saml` `SAML` instance from the merged options for each
 request. If those options have no `cacheProvider`, each instance starts with its own empty in-memory
-cache, so with `validateInResponseTo` set to `"always"` or `"ifPresent"`, every response to a login
-request is rejected: the cache that recorded the request is gone. Return a `cacheProvider` from
+cache, and the callback never finds the request ID recorded when the login started. With
+`validateInResponseTo: "always"`, every login is then rejected, and with `"ifPresent"`, every
+response whose `Response` element carries `InResponseTo`. Return a `cacheProvider` from
 `getSamlOptions`, the same one for a provider on every call, so a response finds the cache its
 request was recorded in. One `cacheProvider` passed to the `MultiSamlStrategy` constructor also
 works, but all providers share it, so a response to one provider's request passes this check at
