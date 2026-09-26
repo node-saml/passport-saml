@@ -38,8 +38,9 @@ IdP first; most IdPs accept the
 generates. From the IdP you need its single sign-on URL, for `entryPoint`, and its signing
 certificate, for `idpCert`.
 
-The examples use ES modules, which Node 18 supports; with CommonJS, `require()` the same names. They
-use `https://sp.example.com` for your site and `https://idp.example.com` for the IdP.
+The examples use ES modules: save them as `.mjs` files, or set `"type": "module"` in `package.json`.
+With CommonJS, `require()` the same names. The examples use `https://sp.example.com` for your site
+and `https://idp.example.com` for the IdP.
 
 ### Configure strategy
 
