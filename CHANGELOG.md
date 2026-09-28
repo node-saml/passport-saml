@@ -1,6 +1,26 @@
 # Changelog
 
-## 5.1.0 (2025-07-24)
+## 5.1.1 (2026-09-28)
+
+#### 🔗 Dependencies
+
+- [**github_actions**] Update CI actions and test on current Node LTS versions [#989](https://github.com/node-saml/passport-saml/pull/989)
+- Update dependencies within their current majors [#987](https://github.com/node-saml/passport-saml/pull/987)
+- [**github_actions**] [**stale**] Bump actions/checkout from 3 to 4 [#903](https://github.com/node-saml/passport-saml/pull/903)
+
+#### 📚 Documentation
+
+- Modernize and correct the README examples [#992](https://github.com/node-saml/passport-saml/pull/992)
+- Update README sponsors and badges [#990](https://github.com/node-saml/passport-saml/pull/990)
+- Document how RelayState flows through login and logout [#986](https://github.com/node-saml/passport-saml/pull/986)
+
+#### 🙈 Other
+
+- Update documentation for Express v5 [#967](https://github.com/node-saml/passport-saml/pull/967)
+
+---
+
+## v5.1.0 (2025-07-24)
 
 #### 🔗 Dependencies
 
@@ -127,7 +147,7 @@
 
 #### 💣 Major Changes
 
-- deps: use node-saml v4. See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
+- deps: use node-saml v4.  See node-saml changelog for breaking changes: https://github.com/node-saml/node-saml/blob/master/CHANGELOG.md#v400-2022-10-28 [#796](https://github.com/node-saml/passport-saml/pull/796)
 - Update node-saml to beta 5 -- See node-saml changelog for breaking changes [#783](https://github.com/node-saml/passport-saml/pull/783)
 - Update node-saml dependency [#770](https://github.com/node-saml/passport-saml/pull/770)
 - Update to support node-saml@4.0.0-beta.3 [#707](https://github.com/node-saml/passport-saml/pull/707)
@@ -217,6 +237,64 @@
 
 ---
 
+## v3.2.4 (2022-10-22)
+
+#### 🔗 Dependencies
+
+- Update @xlmdom/xmldom to v0.7.6 [#795](https://github.com/node-saml/passport-saml/pull/795)
+
+---
+
+## v3.2.3 (2022-10-13)
+
+#### 📚 Documentation
+
+- Update changelog and related tools [#791](https://github.com/node-saml/passport-saml/pull/791)
+
+---
+
+## v3.2.2 (2022-10-11)
+
+_No changelog for this release._
+
+---
+
+## v3.2.1 (2022-01-21)
+
+#### 🚀 Minor Changes
+
+- Simplify typings [#657](https://github.com/node-saml/passport-saml/pull/657)
+
+#### 🔗 Dependencies
+
+- Update xml-encryption to get rid of vulnerable node-forge [#667](https://github.com/node-saml/passport-saml/pull/667)
+
+---
+
+## v3.2.0 (2021-09-25)
+
+#### 🔗 Dependencies
+
+- Update dependencies [#640](https://github.com/node-saml/passport-saml/pull/640)
+
+---
+
+## v3.1.2 (2021-08-26)
+
+#### 🔗 Dependencies
+
+- Update xmldom to 0.7.2 - branch 3.x [#633](https://github.com/node-saml/passport-saml/pull/633)
+
+---
+
+## v3.1.1 (2021-07-28)
+
+#### 🐛 Bug Fixes
+
+- Patch algorithm definitions [#625](https://github.com/node-saml/passport-saml/pull/625)
+
+---
+
 ## v3.1.0 (2021-06-17)
 
 #### 🐛 Bug Fixes
@@ -283,6 +361,40 @@
 - async / await in cache interface [#532](https://github.com/node-saml/passport-saml/pull/532)
 - Format code and enforce code style on PR [#527](https://github.com/node-saml/passport-saml/pull/527)
 - async/await for saml.ts [#496](https://github.com/node-saml/passport-saml/pull/496)
+
+---
+
+## v2.2.0 (2021-04-23)
+
+#### 🚀 Minor Changes
+
+- Add deprecation notices for renamed variables [#568](https://github.com/node-saml/passport-saml/pull/568)
+
+#### 🐛 Bug Fixes
+
+- Resolve XML-encoded carriage returns during signature validation (2.x) [#578](https://github.com/node-saml/passport-saml/pull/578)
+
+---
+
+## v2.1.0 (2021-03-19)
+
+#### 🚀 Minor Changes
+
+- Update xml-crypto to v2.1.1 [#557](https://github.com/node-saml/passport-saml/pull/557)
+
+#### 🔗 Dependencies
+
+- Update xml-encryption to v1.2.3 (branch 2.x) [#566](https://github.com/node-saml/passport-saml/pull/566)
+- Revert "Update xml-encryption to v1.2.3" [#565](https://github.com/node-saml/passport-saml/pull/565)
+- Update xml-encryption to v1.2.3 [#562](https://github.com/node-saml/passport-saml/pull/562)
+
+---
+
+## v2.0.6 (2021-03-15)
+
+#### 🔗 Dependencies
+
+- bump xmldom to 0.5.x since all lower versions have security issue (#551) [#553](https://github.com/node-saml/passport-saml/pull/553)
 
 ---
 
@@ -672,49 +784,75 @@ _No changelog for this release._
 
 ## v0.15.0 (2015-12-30)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Fix Subject dereference bug [#131](https://github.com/node-saml/passport-saml/pull/131)
+- Adds HTTP-POST binding support for the SAML <AuthnRequest> [#129](https://github.com/node-saml/passport-saml/pull/129)
+- Add NameQualifier and SPNameQualifier to nameID [#124](https://github.com/node-saml/passport-saml/pull/124)
+- Do not sign custom query string parameters [#123](https://github.com/node-saml/passport-saml/pull/123)
 
 ---
 
 ## v0.14.0 (2015-11-02)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Document the skipRequestCompression [#121](https://github.com/node-saml/passport-saml/pull/121)
+- Specify SingleLogoutService callback url [#122](https://github.com/node-saml/passport-saml/pull/122)
 
 ---
 
 ## v0.13.0 (2015-10-09)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Ignore attribute with no attributeValue child [#111](https://github.com/node-saml/passport-saml/pull/111)
+- xml-crypto: update to 0.8 [#116](https://github.com/node-saml/passport-saml/pull/116)
+- Process all attribute statements instead of only first [#113](https://github.com/node-saml/passport-saml/pull/113)
+- travis: remove node-0.8 and add node-4.0 [#114](https://github.com/node-saml/passport-saml/pull/114)
 
 ---
 
 ## v0.12.0 (2015-08-19)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Support SHA256 signatures [#107](https://github.com/node-saml/passport-saml/pull/107)
 
 ---
 
 ## v0.11.1 (2015-08-18)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Fixed broken validatePostRequest method; Added support for parsing se… [#106](https://github.com/node-saml/passport-saml/pull/106)
 
 ---
 
 ## v0.11.0 (2015-08-10)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- generateServiceProviderMetadata: remove callbackUrl dependency [#103](https://github.com/node-saml/passport-saml/pull/103)
+- Fixed an obscure bug in which certificates may not be found. [#104](https://github.com/node-saml/passport-saml/pull/104)
+- skip KeyDescriptor if decryptionPvk is not provided [#102](https://github.com/node-saml/passport-saml/pull/102)
 
 ---
 
 ## v0.10.0 (2015-06-08)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- SessionIndex / WSO2 logout [#93](https://github.com/node-saml/passport-saml/pull/93)
+- Fix issue where query strings in entry points mess up entryPoint URLs [#92](https://github.com/node-saml/passport-saml/pull/92)
 
 ---
 
 ## v0.9.2 (2015-04-26)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Add Destination attribute to LogoutResponse [#87](https://github.com/node-saml/passport-saml/pull/87)
 
 ---
 
@@ -726,19 +864,25 @@ _No changelog for this release._
 
 ## v0.9.0 (2015-02-05)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Add parameter @ForceAuthn to SAML AuthnRequest. [#73](https://github.com/node-saml/passport-saml/pull/73)
 
 ---
 
 ## v0.8.0 (2015-01-23)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Use logoutUrl for generateLogoutRequest [#72](https://github.com/node-saml/passport-saml/pull/72)
 
 ---
 
 ## v0.7.0 (2015-01-13)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- add `passReqToCallback` option to be compatible with other strategies [#71](https://github.com/node-saml/passport-saml/pull/71)
 
 ---
 
@@ -750,25 +894,34 @@ _No changelog for this release._
 
 ## v0.6.1 (2014-12-18)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- feat: allow the auth context to be configured [#67](https://github.com/node-saml/passport-saml/pull/67)
 
 ---
 
 ## v0.6.0 (2014-11-14)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Ability to add additional query parameters in authorize, logout or all requests. This PR fixes #57. [#63](https://github.com/node-saml/passport-saml/pull/63)
+- Updated SamlStrategy example in README.md [#59](https://github.com/node-saml/passport-saml/pull/59)
 
 ---
 
 ## v0.5.3 (2014-09-11)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Issue with accented caracters in xml [#58](https://github.com/node-saml/passport-saml/pull/58)
 
 ---
 
 ## v0.5.2 (2014-07-02)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Improve error handling from Express [#51](https://github.com/node-saml/passport-saml/pull/51)
 
 ---
 
@@ -780,19 +933,29 @@ _No changelog for this release._
 
 ## v0.5.0 (2014-07-01)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Make CacheProvider async with callback argument [#46](https://github.com/node-saml/passport-saml/pull/46)
+- Support for node id attribute variations (e.g. "ID", "Id", etc.) [#49](https://github.com/node-saml/passport-saml/pull/49)
+- Support adding AttributeConsumingServiceIndex attribute in AuthnRequest [#44](https://github.com/node-saml/passport-saml/pull/44)
+- don't add begin, end certificate to document that already have them [#48](https://github.com/node-saml/passport-saml/pull/48)
+- Support NameID without Format attribute [#45](https://github.com/node-saml/passport-saml/pull/45)
 
 ---
 
 ## v0.4.0 (2014-06-20)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Detect protocol if not provided, fixes #42 [#43](https://github.com/node-saml/passport-saml/pull/43)
 
 ---
 
 ## v0.3.0 (2014-06-09)
 
-_No changelog for this release._
+#### 🙈 Other
+
+- Notbefore notonorafter add'l support [#38](https://github.com/node-saml/passport-saml/pull/38)
 
 ---
 
@@ -809,5 +972,17 @@ _No changelog for this release._
 ---
 
 ## v0.1.0 (2014-05-31)
+
+#### 🙈 Other
+
+- Many changes [#31](https://github.com/node-saml/passport-saml/pull/31)
+- Build issues caused by zlib [#9](https://github.com/node-saml/passport-saml/pull/9)
+- the hour in the time stamp is 2 hours ahead [#8](https://github.com/node-saml/passport-saml/pull/8)
+- add NameID to profile, 2 bug fixes [#3](https://github.com/node-saml/passport-saml/pull/3)
+- improve ADFS compatibility [#2](https://github.com/node-saml/passport-saml/pull/2)
+
+---
+
+## v0.0.3 (2012-07-06)
 
 _No changelog for this release._
