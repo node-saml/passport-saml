@@ -71,7 +71,7 @@
     "@types/sinon": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.70.1",
     "@typescript-eslint/parser": "^8.70.1",
-    "chai": "^4.5.0",
+    "chai": "^6.2.2",
     "choma": "^1.2.1",
     "concurrently": "^10.0.5",
     "eslint": "^9.39.5",
