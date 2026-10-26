@@ -46,7 +46,22 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return this.error(err);
       }
 
-      const samlService = new SAML({ ...this._options, ...samlOptions });
+      const mergedOptions = { ...this._options, ...samlOptions };
+      const isIncomingMessage =
+        !!(req.query?.SAMLResponse || req.query?.SAMLRequest || req.body?.SAMLResponse || req.body?.SAMLRequest);
+      const isLoginStart = !isIncomingMessage && (options?.samlFallback ?? "login-request") === "login-request";
+      if (isLoginStart && mergedOptions.validateInResponseTo === "always" && !mergedOptions.cacheProvider) {
+        return this.error(
+          new Error(
+            'MultiSamlStrategy requires a shared cacheProvider when validateInResponseTo is "always". ' +
+              "Each request creates a new SAML instance with its own cache. " +
+              "For a single-process deployment, create an InMemoryCacheProvider once per identity provider " +
+              "and return the same instance from getSamlOptions on every request.",
+          ),
+        );
+      }
+
+      const samlService = new SAML(mergedOptions);
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.authenticate.call(strategy, req, options);
