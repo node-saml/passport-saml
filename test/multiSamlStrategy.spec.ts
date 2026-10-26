@@ -139,6 +139,58 @@ describe("MultiSamlStrategy()", function () {
     });
   });
 
+  describe("missing shared cacheProvider (#991)", function () {
+    const config = { idpCert: FAKE_CERT, issuer: "test-issuer", callbackUrl: "https://example.com/callback" };
+
+    it("rejects login initiation under always without a cache before redirect", function () {
+      const strategy = new MultiSamlStrategy({ getSamlOptions: (_req, cb) => cb(null, { ...config, validateInResponseTo: "always" }) }, noop, noop);
+      const error = sinon.stub(strategy, "error");
+      const redirect = sinon.stub(strategy, "redirect");
+      strategy.authenticate({ query: {}, body: {} } as RequestWithUser, {});
+      sinon.assert.calledOnce(error);
+      expect(error.firstCall.args[0].message).to.contain("cacheProvider");
+      sinon.assert.notCalled(redirect);
+    });
+
+    it("allows login initiation with a shared cache in the constructor", function () {
+      const cacheProvider = { saveAsync: sinon.stub().resolves(), getAsync: sinon.stub().resolves(null), removeAsync: sinon.stub().resolves(null) };
+      const strategy = new MultiSamlStrategy({ getSamlOptions: (_req, cb) => cb(null, config), validateInResponseTo: "always", cacheProvider }, noop, noop);
+      const error = sinon.stub(strategy, "error");
+      const authorize = sinon.stub(SAML.prototype, "getAuthorizeUrlAsync").resolves("https://example.com/login");
+      try {
+        strategy.authenticate({ query: {}, body: {} } as RequestWithUser, {});
+        sinon.assert.notCalled(error);
+        sinon.assert.calledOnce(authorize);
+      } finally { authorize.restore(); }
+    });
+
+    it("allows login initiation with a shared cache returned by getSamlOptions", function () {
+      const cacheProvider = { saveAsync: sinon.stub().resolves(), getAsync: sinon.stub().resolves(null), removeAsync: sinon.stub().resolves(null) };
+      const strategy = new MultiSamlStrategy({ getSamlOptions: (_req, cb) => cb(null, { ...config, validateInResponseTo: "always", cacheProvider }) }, noop, noop);
+      const error = sinon.stub(strategy, "error");
+      const authorize = sinon.stub(SAML.prototype, "getAuthorizeUrlAsync").resolves("https://example.com/login");
+      try {
+        strategy.authenticate({ query: {}, body: {} } as RequestWithUser, {});
+        sinon.assert.notCalled(error);
+        sinon.assert.calledOnce(authorize);
+      } finally { authorize.restore(); }
+    });
+
+    it("does not reject incoming messages or logout fallback", function () {
+      const strategy = new MultiSamlStrategy({ getSamlOptions: (_req, cb) => cb(null, { ...config, validateInResponseTo: "always" }) }, noop, noop);
+      const error = sinon.stub(strategy, "error");
+      const validate = sinon.stub(SAML.prototype, "validatePostResponseAsync").resolves({ profile: null, loggedOut: true });
+      const logout = sinon.stub(SAML.prototype, "getLogoutUrlAsync").resolves("https://example.com/logout");
+      try {
+        strategy.authenticate({ query: {}, body: { SAMLResponse: "dummy" } } as RequestWithUser, {});
+        strategy.authenticate({ query: {}, body: {} } as RequestWithUser, { samlFallback: "logout-request" });
+        sinon.assert.notCalled(error);
+        sinon.assert.calledOnce(validate);
+        sinon.assert.calledOnce(logout);
+      } finally { validate.restore(); logout.restore(); }
+    });
+  });
+
   describe("authorize", function () {
     let getAuthorizeFormStub: sinon.SinonStub;
     let getAuthorizeUrlStub: sinon.SinonStub;
