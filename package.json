@@ -54,7 +54,7 @@
     "watch": "concurrently --kill-others \"npm:*-watch\""
   },
   "dependencies": {
-    "@node-saml/node-saml": "^5.1.0",
+    "@node-saml/node-saml": "^5.2.0",
     "@types/express": "^4.17.25",
     "@types/passport": "^1.0.17",
     "@types/passport-strategy": "^0.2.38",
