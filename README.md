@@ -172,7 +172,7 @@ request was recorded in. One `cacheProvider` passed to the `MultiSamlStrategy` c
 works, but all providers share it, so a response to one provider's request passes this check at
 another provider's callback.
 
-A `cacheProvider` is an object with `saveAsync(key, value)`, `getAsync(key)` and `removeAsync(key)`
+When `validateInResponseTo: "always"` is set, `MultiSamlStrategy` fails at login initiation if no shared `cacheProvider` is configured. For a single-process deployment, `InMemoryCacheProvider` is exported by `@node-saml/node-saml` 5.2.0; create one instance per identity provider and reuse it across requests. Multiple processes require a shared external cache.\n\nA `cacheProvider` is an object with `saveAsync(key, value)`, `getAsync(key)` and `removeAsync(key)`
 methods, described by the `CacheProvider` TypeScript type. Back it with a store that every process
 handling your logins can reach, such as Redis or your database. `node-saml` removes a request ID
 only when a response to it arrives, so have the store expire entries after
