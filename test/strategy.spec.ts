@@ -309,6 +309,49 @@ describe("Strategy()", function () {
       });
     });
 
+    it("answers a POST-binding logout request after a verifier given the request clears its body", function (done) {
+      const strategy = new SamlStrategy(
+        {
+          idpCert: FAKE_CERT,
+          passReqToCallback: true,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        },
+        function (req: express.Request, _profile: Profile | null, cb: VerifiedCallback) {
+          // for signon
+          cb(new Error("Logout shouldn't call signon."));
+        },
+        function (req: express.Request, _profile: Profile | null, cb: VerifiedCallback) {
+          // for logout
+          req.body = undefined;
+          if (_profile) {
+            cb(null, { name: _profile.nameID });
+          }
+        },
+      );
+
+      validatePostRequestAsyncStub.resolves({
+        profile: {
+          ID: "ID",
+          issuer: "issuer",
+          nameID: "some user",
+          nameIDFormat: "nameIDFormat",
+        },
+        loggedOut: true,
+      });
+      requestWithUserPostRequest.user = { name: "some user" };
+
+      // This returns immediately, but calls async functions; need to turn event loop
+      strategy.authenticate(requestWithUserPostRequest, {});
+
+      setImmediate(() => {
+        sinon.assert.notCalled(errorStub);
+        sinon.assert.calledOnceWithMatch(getLogoutResponseUrlStub, sinon.match.any, undefined);
+        sinon.assert.calledOnce(logoutSpy);
+        done();
+      });
+    });
+
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
         {
