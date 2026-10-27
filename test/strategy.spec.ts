@@ -10,6 +10,12 @@ import { SAML_CONFIG } from "./types";
 
 const noop = () => undefined;
 
+// How a signed Redirect-binding query string ends, as it arrives and as Express parses it.
+const sigAlg = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+const signatureParameters = `SigAlg=${encodeURIComponent(sigAlg)}&Signature=c2lnbmF0dXJl`;
+const parsedSignatureParameters = { SigAlg: sigAlg, Signature: "c2lnbmF0dXJl" };
+const idpLogoutResponseUrl = "https://idp.example/slo?SAMLResponse=response";
+
 describe("Strategy()", function () {
   it("should require ctor `options` argument", function () {
     // @ts-expect-error `noop` is not a valid options object
@@ -62,19 +68,22 @@ describe("Strategy()", function () {
         res: { send: noop },
       } as unknown as RequestWithUser;
       requestWithUserGetResponse = {
-        query: { SAMLResponse: {} },
-        url: "https://www.example.com/?key=value",
+        query: { SAMLResponse: "response", ...parsedSignatureParameters },
+        url: `/logout/callback?SAMLResponse=response&${signatureParameters}`,
         logout: logoutSpy,
         res: { send: noop },
       } as unknown as RequestWithUser;
       requestWithUserPostResponse = {
-        body: { SAMLResponse: {} },
+        body: { SAMLResponse: "response" },
+        query: {},
+        url: "/login/callback",
         logout: logoutSpy,
         res: { send: noop },
       } as unknown as RequestWithUser;
       requestWithUserPostRequest = {
-        body: { SAMLRequest: {} },
-        url: "https://www.example.com/?key=value",
+        body: { SAMLRequest: "request" },
+        query: {},
+        url: "/logout/callback",
         logout: logoutSpy,
         res: { send: noop },
       } as unknown as RequestWithUser;
@@ -141,13 +150,14 @@ describe("Strategy()", function () {
     it("passes RelayState from the query string to getAuthorizeUrl for login-request", function (done) {
       const strategy = new SamlStrategy(SAML_CONFIG, noop, noop);
       requestWithUser.query = { RelayState: "/reports/42" };
+      const options = {};
 
       // This returns immediately, but calls async functions; need to turn event loop
-      strategy.authenticate(requestWithUser, {});
+      strategy.authenticate(requestWithUser, options);
 
       setImmediate(() => {
         sinon.assert.notCalled(errorStub);
-        sinon.assert.calledOnceWithMatch(getAuthorizeUrlStub, "/reports/42");
+        sinon.assert.calledOnceWithExactly(getAuthorizeUrlStub, "/reports/42", options);
         done();
       });
     });
@@ -165,7 +175,7 @@ describe("Strategy()", function () {
 
       setImmediate(() => {
         sinon.assert.notCalled(errorStub);
-        sinon.assert.calledOnceWithMatch(getAuthorizeFormStub, "/reports/42");
+        sinon.assert.calledOnceWithExactly(getAuthorizeFormStub, "/reports/42");
         done();
       });
     });
@@ -212,6 +222,13 @@ describe("Strategy()", function () {
     });
 
     describe("Redirect-binding logout request", function () {
+      const logoutRequestProfile = {
+        ID: "ID",
+        issuer: "issuer",
+        nameID: "some user",
+        nameIDFormat: "nameIDFormat",
+      };
+      const queryString = `SAMLRequest=request&RelayState=idp-relay-state&${signatureParameters}`;
       let strategy: SamlStrategy;
       let redirectLogoutRequest: RequestWithUser;
 
@@ -225,38 +242,39 @@ describe("Strategy()", function () {
             cb(null, { name: profile?.nameID });
           },
         );
-        validateRedirectAsyncStub.resolves({
-          profile: {
-            ID: "ID",
-            issuer: "issuer",
-            nameID: "some user",
-            nameIDFormat: "nameIDFormat",
-          },
-          loggedOut: true,
-        });
+        validateRedirectAsyncStub.resolves({ profile: logoutRequestProfile, loggedOut: true });
+        getLogoutResponseUrlStub.yields(null, idpLogoutResponseUrl);
         redirectLogoutRequest = {
-          query: { SAMLRequest: "request" },
-          url: "https://www.example.com/?SAMLRequest=request",
+          query: {
+            SAMLRequest: "request",
+            RelayState: "idp-relay-state",
+            ...parsedSignatureParameters,
+          },
+          url: `/logout/callback?${queryString}`,
           user: { name: "some user" },
           logout: logoutSpy,
           res: { send: noop },
         } as unknown as RequestWithUser;
       });
 
-      it("returns the RelayState from the query string in the LogoutResponse", function (done) {
-        redirectLogoutRequest.query.RelayState = "idp-relay-state";
-        redirectLogoutRequest.url =
-          "https://www.example.com/?SAMLRequest=request&RelayState=idp-relay-state";
-
+      it("hands only validateRedirectAsync the parsed query and the query string as it arrived, then redirects to the IdP", function (done) {
         strategy.authenticate(redirectLogoutRequest, {});
 
         setImmediate(() => {
+          sinon.assert.calledOnceWithExactly(
+            validateRedirectAsyncStub,
+            redirectLogoutRequest.query,
+            queryString,
+          );
+          sinon.assert.notCalled(validatePostRequestAsyncStub);
+          sinon.assert.notCalled(validatePostResponseAsyncStub);
           sinon.assert.notCalled(errorStub);
           sinon.assert.calledOnceWithMatch(
             getLogoutResponseUrlStub,
-            sinon.match.any,
+            logoutRequestProfile,
             "idp-relay-state",
           );
+          sinon.assert.calledOnceWithExactly(redirectStub, idpLogoutResponseUrl);
           done();
         });
       });
@@ -268,7 +286,11 @@ describe("Strategy()", function () {
 
         setImmediate(() => {
           sinon.assert.notCalled(errorStub);
-          sinon.assert.calledOnceWithMatch(getLogoutResponseUrlStub, sinon.match.any, undefined);
+          sinon.assert.calledOnceWithMatch(
+            getLogoutResponseUrlStub,
+            sinon.match.any,
+            "idp-relay-state",
+          );
           done();
         });
       });
@@ -289,6 +311,33 @@ describe("Strategy()", function () {
         requestWithUserPostRequest.body.RelayState = "idp-relay-state";
       });
 
+      it("hands only validatePostRequestAsync the body, then redirects to the IdP", function (done) {
+        const strategy = new SamlStrategy(
+          SAML_CONFIG,
+          function signonVerify(_profile: Profile | null, cb: VerifiedCallback) {
+            cb(new Error("Logout shouldn't call signon."));
+          },
+          function logoutVerify(profile: Profile | null, cb: VerifiedCallback) {
+            cb(null, { name: profile?.nameID });
+          },
+        );
+        getLogoutResponseUrlStub.yields(null, idpLogoutResponseUrl);
+
+        strategy.authenticate(requestWithUserPostRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.calledOnceWithExactly(
+            validatePostRequestAsyncStub,
+            requestWithUserPostRequest.body,
+          );
+          sinon.assert.notCalled(validateRedirectAsyncStub);
+          sinon.assert.notCalled(validatePostResponseAsyncStub);
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithExactly(redirectStub, idpLogoutResponseUrl);
+          done();
+        });
+      });
+
       it("returns the body's RelayState, where the POST binding carries it, not the query string's", function (done) {
         const strategy = new SamlStrategy(
           SAML_CONFIG,
@@ -300,8 +349,7 @@ describe("Strategy()", function () {
           },
         );
         requestWithUserPostRequest.query = { RelayState: "https://evil.example" };
-        requestWithUserPostRequest.url =
-          "https://www.example.com/?RelayState=https%3A%2F%2Fevil.example";
+        requestWithUserPostRequest.url = "/logout/callback?RelayState=https%3A%2F%2Fevil.example";
 
         strategy.authenticate(requestWithUserPostRequest, {});
 
@@ -348,6 +396,36 @@ describe("Strategy()", function () {
           sinon.assert.calledOnce(logoutSpy);
           done();
         });
+      });
+    });
+
+    it("hands only validatePostResponseAsync the body of a POST-binding SAMLResponse, then succeeds", function (done) {
+      const strategy = new SamlStrategy(
+        SAML_CONFIG,
+        function signonVerify(profile: Profile | null, cb: VerifiedCallback) {
+          cb(null, { name: profile?.nameID });
+        },
+        function logoutVerify(_profile: Profile | null, cb: VerifiedCallback) {
+          cb(new Error("Signon shouldn't call logout."));
+        },
+      );
+      validatePostResponseAsyncStub.resolves({
+        profile: { ID: "ID", issuer: "issuer", nameID: "some user", nameIDFormat: "nameIDFormat" },
+        loggedOut: false,
+      });
+
+      strategy.authenticate(requestWithUserPostResponse, {});
+
+      setImmediate(() => {
+        sinon.assert.calledOnceWithExactly(
+          validatePostResponseAsyncStub,
+          requestWithUserPostResponse.body,
+        );
+        sinon.assert.notCalled(validateRedirectAsyncStub);
+        sinon.assert.notCalled(validatePostRequestAsyncStub);
+        sinon.assert.notCalled(errorStub);
+        sinon.assert.calledOnceWithExactly(successStub, { name: "some user" }, undefined);
+        done();
       });
     });
 
