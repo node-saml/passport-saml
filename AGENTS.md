@@ -41,8 +41,8 @@ rather than widening the change; don't let cleanup swallow the fix you were aske
   `SAML` instance at construction.
 - `src/multiSamlStrategy.ts` — `MultiSamlStrategy`, which builds a `SAML` instance per
   request from `getSamlOptions` and then runs `AbstractStrategy`'s code.
-- `src/types.ts` — public types: `PassportSamlConfig`, `MultiStrategyConfig`, the verify
-  function signatures, and `AuthenticateOptions`.
+- `src/types.ts` — types. Of these, `src/index.ts` exports `PassportSamlConfig`,
+  `MultiStrategyConfig`, and the verify function types; the rest are internal.
 - `test/*.spec.ts` — Mocha specs. `test/types.ts` is a shared fixture helper, not a spec.
 - `test/static/` and `docs/xml-signing-example.js` — left from before the SAML code moved
   to node-saml. No spec reads them; signed-XML fixtures belong in node-saml.
