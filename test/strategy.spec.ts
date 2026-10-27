@@ -242,6 +242,73 @@ describe("Strategy()", function () {
       });
     });
 
+    describe("Redirect-binding logout request", function () {
+      let strategy: SamlStrategy;
+      let redirectLogoutRequest: RequestWithUser;
+
+      beforeEach(function () {
+        strategy = new SamlStrategy(
+          { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+          function (_profile: Profile | null, cb: VerifiedCallback) {
+            // for signon
+            cb(new Error("Logout shouldn't call signon."));
+          },
+          function (_profile: Profile | null, cb: VerifiedCallback) {
+            // for logout
+            if (_profile) {
+              cb(null, { name: _profile.nameID });
+            }
+          },
+        );
+        validateRedirectAsyncStub.resolves({
+          profile: {
+            ID: "ID",
+            issuer: "issuer",
+            nameID: "some user",
+            nameIDFormat: "nameIDFormat",
+          },
+          loggedOut: true,
+        });
+        redirectLogoutRequest = {
+          query: { SAMLRequest: "request" },
+          url: "https://www.example.com/?SAMLRequest=request",
+          user: { name: "some user" },
+          logout: logoutSpy,
+          res: { send: noop },
+        } as unknown as RequestWithUser;
+      });
+
+      it("returns the RelayState from the query string in the LogoutResponse", function (done) {
+        redirectLogoutRequest.query.RelayState = "idp-relay-state";
+
+        // This returns immediately, but calls async functions; need to turn event loop
+        strategy.authenticate(redirectLogoutRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(
+            getLogoutResponseUrlStub,
+            sinon.match.any,
+            "idp-relay-state",
+          );
+          done();
+        });
+      });
+
+      it("ignores a RelayState in the body, which the query string's signature does not cover", function (done) {
+        redirectLogoutRequest.body = { RelayState: "https://evil.example" };
+
+        // This returns immediately, but calls async functions; need to turn event loop
+        strategy.authenticate(redirectLogoutRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(getLogoutResponseUrlStub, sinon.match.any, undefined);
+          done();
+        });
+      });
+    });
+
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
         {

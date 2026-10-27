@@ -64,6 +64,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }
 
     options.samlFallback = options.samlFallback || "login-request";
+    const isRedirectBinding = Boolean(req.query?.SAMLResponse || req.query?.SAMLRequest);
     const validateCallback = async ({
       profile,
       loggedOut,
@@ -87,7 +88,11 @@ export abstract class AbstractStrategy extends PassportStrategy {
               userMatch = false;
             }
 
-            const RelayState = req.query?.RelayState || req.body?.RelayState;
+            // node-saml checks a Redirect-binding RelayState in the query string against the
+            // signature, but never sees the body, so one there must not stand in for it.
+            const RelayState = isRedirectBinding
+              ? req.query?.RelayState
+              : req.query?.RelayState || req.body?.RelayState;
             if (this._saml == null) {
               return this.error(
                 new Error("Can't get logout response URL without a SAML provider defined."),
@@ -168,7 +173,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
       }
     };
 
-    if (req.query?.SAMLResponse || req.query?.SAMLRequest) {
+    if (isRedirectBinding) {
       const originalQuery = url.parse(req.url).query ?? "";
       this._saml
         .validateRedirectAsync(req.query, originalQuery)
