@@ -391,9 +391,9 @@ describe("MultiSamlStrategy()", function () {
       query: {},
       body: { SAMLRequest: "request" },
     } as unknown as RequestWithUser;
+    // A GET, which an application may route without parsing a body.
     const redirectedResponse = {
       query: { SAMLResponse: "response" },
-      body: {},
     } as unknown as RequestWithUser;
     let superAuthenticateStub: sinon.SinonStub;
 

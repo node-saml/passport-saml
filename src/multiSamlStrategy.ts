@@ -29,7 +29,7 @@ function missingSharedCacheError(
     req.body?.SAMLRequest,
   );
   const isLoginStart =
-    !isIncomingMessage && (options?.samlFallback ?? "login-request") === "login-request";
+    !isIncomingMessage && (options.samlFallback ?? "login-request") === "login-request";
 
   let setting: string;
   if (isLoginStart && samlOptions.validateInResponseTo === ValidateInResponseTo.always) {
