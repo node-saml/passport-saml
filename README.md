@@ -214,8 +214,8 @@ app.get(
 );
 ```
 
-These parameters go on the redirect URL, so a login with `authnRequestBinding: "HTTP-POST"` does not
-send them.
+With `authnRequestBinding: "HTTP-POST"`, these parameters go in the form posted to the IdP instead,
+as hidden fields.
 
 In addition to passing the `additionalParams` option to `passport.authenticate`, you can also pass
 `samlFallback`, either as "login-request" or "logout-request". By default, this is set to

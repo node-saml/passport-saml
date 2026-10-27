@@ -196,7 +196,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
               (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
             const host = req.headers && req.headers.host;
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
-              const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
+              const data = await this._saml.getAuthorizeFormAsync(RelayState, host, options);
               const res = req.res;
               res?.send(data);
             } else {
