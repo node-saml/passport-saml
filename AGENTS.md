@@ -41,11 +41,8 @@ rather than widening the change; don't let cleanup swallow the fix you were aske
   `SAML` instance at construction.
 - `src/multiSamlStrategy.ts` — `MultiSamlStrategy`, which builds a `SAML` instance per
   request from `getSamlOptions` and then runs `AbstractStrategy`'s code.
-- `src/types.ts` — types. Of these, `src/index.ts` exports `PassportSamlConfig`,
-  `MultiStrategyConfig`, and the verify function types; the rest are internal.
+- `src/types.ts` — types. Only those `src/index.ts` exports are public.
 - `test/*.spec.ts` — Mocha specs. `test/types.ts` is a shared fixture helper, not a spec.
-- `test/static/` and `docs/xml-signing-example.js` — left from before the SAML code moved
-  to node-saml. No spec reads them; signed-XML fixtures belong in node-saml.
 - `lib/` — build output. Generated and git-ignored; never edit.
 
 ## Commands
@@ -80,9 +77,10 @@ Production dependencies have to honor the floor. Development tooling has to inst
 run on every version in the CI matrix; a devDependency whose own `engines` asks for a newer
 Node is acceptable when every CI job passes.
 
-`tsconfig.json` targets ES2018 with `lib: ["es2018"]`, and `@types/node` is pinned to the
-v18 line. Anything newer than that is unavailable in `src/` even when it runs fine on your
-local Node.
+`tsconfig.json` targets ES2018 with `lib: ["es2018"]`, so newer language features and
+built-ins don't compile in `src/`, whatever your local Node runs. Node's own APIs have no
+such guard, since `@types/node` can describe a newer Node than the floor: a Node API that
+`src/` calls has to exist on the oldest supported version.
 
 ### The public API is semver-bound
 
@@ -158,8 +156,9 @@ on the caller's behalf is a footgun: the caller lives with the consequence witho
 having made the choice, and — worse — never learns the choice existed.
 
 - SAML options, their defaults, and their validation belong to node-saml, which checks
-  them when `new SAML()` runs. Don't add defaults or checks for them here, where they would
-  drift from node-saml's.
+  them when `new SAML()` runs. Don't repeat its defaults or checks here, where they would
+  drift from node-saml's. Check an option here only when this library is what makes it
+  wrong, such as `MultiSamlStrategy` building a new `SAML` instance for every request.
 - Don't add a default for anything security-relevant. That includes state shared across
   requests: don't give `MultiSamlStrategy` a shared default `cacheProvider`. One cache
   shared by every provider lets a response to one provider's request pass the
@@ -190,30 +189,34 @@ issue tracking it says why.
 
 ## Tests
 
-Tests protect durable, observable behavior, not implementation details. For a strategy,
-that means the Passport action `authenticate` takes and its arguments, what the verify
-functions receive, and the URL or form sent to the IdP. Security regressions matter most:
-a test should ensure that a request cannot reach `success`, or put a value into a response
-to the IdP, without passing node-saml's checks.
+Tests protect durable, observable behavior, not implementation details. This library has
+two boundaries, and what crosses either one is observable. Toward the application: the
+Passport action `authenticate` takes and its arguments, and what the verify functions
+receive. Toward node-saml: which validator a request reaches, what that validator is
+handed, and what the calls that build a request or response for the IdP are handed. Calls
+that stay inside this library are implementation details. Security regressions matter most: a test
+should ensure that a request cannot reach `success`, or put a value into a response to the
+IdP, without passing node-saml's checks.
 
 - The specs stub `SAML.prototype` with sinon, so they test this library's dispatch and its
-  Passport contract, not SAML validation. A stub accepts anything, so build request
-  fixtures a real request could be, such as a `req.url` whose query string matches
-  `req.query`. Where the behavior under test is node-saml's, test it in node-saml.
+  Passport contract, not SAML validation. Where the behavior under test is node-saml's,
+  test it in node-saml.
+- A stub accepts anything. So build request fixtures a real request could be, such as a
+  `req.url` whose query string matches `req.query`. And don't rely on the Passport outcome
+  alone, which stays the same when the wrong data reaches node-saml: when a change touches
+  dispatch, assert that the validator for the binding ran and no other did, what it was
+  handed (for the Redirect binding, including the original query string), and the Passport
+  action that followed.
 - `authenticate` returns before its promises settle. The specs wait with `setImmediate`,
   which works because the stubs resolve at once.
-- Assert what the application or the IdP would see. With node-saml stubbed, the arguments
-  to the call that builds the response to the IdP stand in for that response. How a
-  message is handed to a node-saml validator is an implementation detail that changes with
-  node-saml's API.
 - When a claim depends on what node-saml checks, read the installed code in
   `node_modules/@node-saml/node-saml/lib/`. node-saml's README can lag the release that is
   installed.
-- Coverage is reported, not enforced: `check-coverage` is `false` in `.nycrc.json`, and
-  Codecov's checks don't block a merge. Uncovered code indicates either inadequately tested
-  behavior or code that may be unnecessary; determine which rather than adding tests merely
-  to increase coverage. Don't delete a guard to make a branch disappear unless you have
-  shown that nothing can reach it.
+- Coverage is reported, not enforced: `check-coverage` is `false` in `.nycrc.json`.
+  Uncovered code indicates either inadequately tested behavior or code that may be
+  unnecessary; determine which rather than adding tests merely to increase coverage.
+  Don't delete a guard to make a branch disappear unless you have shown that nothing can
+  reach it.
 - Add a test when a change alters what the strategy accepts, rejects, dispatches, or sends.
 - For a bug fix, observe the regression test failing for the reported reason before
   applying the fix. "For the reported reason" is the operative part — a test that fails for
