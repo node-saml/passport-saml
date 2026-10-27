@@ -64,6 +64,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }
 
     options.samlFallback = options.samlFallback || "login-request";
+    const isRedirectBinding = Boolean(req.query?.SAMLResponse || req.query?.SAMLRequest);
     const validateCallback = async ({
       profile,
       loggedOut,
@@ -73,6 +74,11 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }) => {
       if (loggedOut) {
         if (profile != null) {
+          // Echo the RelayState from where its binding carries it, before a verifier given `req`
+          // can change it. SAML 2.0 Bindings, sections 3.4.3 and 3.5.3.
+          // https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
+          const RelayState = isRedirectBinding ? req.query.RelayState : req.body.RelayState;
+
           // When logging out a user, use the consumer's `validate` function to check that
           // the `profile` associated with the logout request resolves to the same user
           // as the `profile` associated with the current session.
@@ -87,7 +93,6 @@ export abstract class AbstractStrategy extends PassportStrategy {
               userMatch = false;
             }
 
-            const RelayState = req.query?.RelayState || req.body?.RelayState;
             if (this._saml == null) {
               return this.error(
                 new Error("Can't get logout response URL without a SAML provider defined."),
@@ -168,7 +173,7 @@ export abstract class AbstractStrategy extends PassportStrategy {
       }
     };
 
-    if (req.query?.SAMLResponse || req.query?.SAMLRequest) {
+    if (isRedirectBinding) {
       const originalQuery = url.parse(req.url).query ?? "";
       this._saml
         .validateRedirectAsync(req.query, originalQuery)
