@@ -194,9 +194,9 @@ two boundaries, and what crosses either one is observable. Toward the applicatio
 Passport action `authenticate` takes and its arguments, and what the verify functions
 receive. Toward node-saml: which validator a request reaches, what that validator is
 handed, and what the calls that build a request or response for the IdP are handed. Calls
-that stay inside this library are implementation details. Security regressions matter most: a test
-should ensure that a request cannot reach `success`, or put a value into a response to the
-IdP, without passing node-saml's checks.
+that stay inside this library are implementation details. Security regressions matter
+most: a test should ensure that a request cannot reach `success`, or put a value into a
+response to the IdP, without passing node-saml's checks.
 
 - The specs stub `SAML.prototype` with sinon, so they test this library's dispatch and its
   Passport contract, not SAML validation. Where the behavior under test is node-saml's,
