@@ -77,10 +77,12 @@ Production dependencies have to honor the floor. Development tooling has to inst
 run on every version in the CI matrix; a devDependency whose own `engines` asks for a newer
 Node is acceptable when every CI job passes.
 
-`tsconfig.json` targets ES2018 with `lib: ["es2018"]`, so newer language features and
-built-ins don't compile in `src/`, whatever your local Node runs. Node's own APIs have no
-such guard, since `@types/node` can describe a newer Node than the floor: a Node API that
-`src/` calls has to exist on the oldest supported version.
+`tsconfig.json` sets `target: "es2018"` and `lib: ["es2018"]`. TypeScript compiles newer
+syntax, such as `?.`, down to ES2018, but `lib` has no declarations for newer built-ins,
+such as `Object.fromEntries`, so `src/` can't use them whatever your local Node runs; one
+would need the runtime to provide it or a polyfill. Node's own APIs have no such guard,
+since `@types/node` can describe a newer Node than the floor: a Node API that `src/` calls
+has to exist on the oldest supported version.
 
 ### The public API is semver-bound
 
