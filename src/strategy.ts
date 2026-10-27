@@ -89,10 +89,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
             }
 
             // node-saml checks a Redirect-binding RelayState in the query string against the
-            // signature, but never sees the body, so one there must not stand in for it.
-            const RelayState = isRedirectBinding
-              ? req.query?.RelayState
-              : req.query?.RelayState || req.body?.RelayState;
+            // signature, but never sees the body, so only a POST-binding one may come from there.
+            const RelayState =
+              req.query?.RelayState || (isRedirectBinding ? undefined : req.body.RelayState);
             if (this._saml == null) {
               return this.error(
                 new Error("Can't get logout response URL without a SAML provider defined."),
