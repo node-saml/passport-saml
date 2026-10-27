@@ -8,7 +8,49 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { SAML } from "@node-saml/node-saml";
+import { SAML, ValidateInResponseTo } from "@node-saml/node-saml";
+
+// `MultiSamlStrategy` builds a new `SAML` instance for each request, and an instance with no
+// `cacheProvider` starts with an empty one of its own, so nothing one request records is there for
+// the next. Report the settings that can never work that way, at the first request they affect.
+function missingSharedCacheError(
+  req: Request,
+  options: AuthenticateOptions,
+  samlOptions: Partial<PassportSamlConfig>,
+): Error | undefined {
+  if (samlOptions.cacheProvider != null) {
+    return undefined;
+  }
+
+  const isIncomingMessage = Boolean(
+    req.query?.SAMLResponse ||
+    req.query?.SAMLRequest ||
+    req.body?.SAMLResponse ||
+    req.body?.SAMLRequest,
+  );
+  const isLoginStart =
+    !isIncomingMessage && (options.samlFallback ?? "login-request") === "login-request";
+
+  let setting: string;
+  if (isLoginStart && samlOptions.validateInResponseTo === ValidateInResponseTo.always) {
+    // The callback could never find the request ID recorded here.
+    setting = 'validateInResponseTo: "always"';
+  } else if ((isLoginStart || req.body?.SAMLResponse) && samlOptions.rejectReplayedAssertions) {
+    // An assertion presented again could never be found among those already accepted, and a
+    // replayed one arrives at the callback, so a check only at login start would not stop it.
+    setting = "rejectReplayedAssertions: true";
+  } else {
+    return undefined;
+  }
+
+  return new Error(
+    `MultiSamlStrategy needs a cacheProvider shared across requests for ${setting}. ` +
+      "It builds a new SAML instance for each request, and one without a cacheProvider starts " +
+      "with an empty cache. Return the same cacheProvider for an identity provider from " +
+      "getSamlOptions on every call; within one process, that can be one InMemoryCacheProvider " +
+      "from @node-saml/node-saml for each identity provider.",
+  );
+}
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
@@ -44,6 +86,14 @@ export class MultiSamlStrategy extends AbstractStrategy {
     this._options.getSamlOptions(req, (err, samlOptions) => {
       if (err) {
         return this.error(err);
+      }
+
+      const cacheError = missingSharedCacheError(req, options, {
+        ...this._options,
+        ...samlOptions,
+      });
+      if (cacheError != null) {
+        return this.error(cacheError);
       }
 
       const samlService = new SAML({ ...this._options, ...samlOptions });

@@ -4,7 +4,7 @@ import { Strategy } from "passport-strategy";
 import * as sinon from "sinon";
 import { expect } from "chai";
 import { MultiSamlStrategy, AbstractStrategy } from "../src";
-import { SAML } from "@node-saml/node-saml";
+import { InMemoryCacheProvider, SAML, ValidateInResponseTo } from "@node-saml/node-saml";
 import {
   MultiStrategyConfig,
   RequestWithUser,
@@ -373,6 +373,157 @@ describe("MultiSamlStrategy()", function () {
           }
         },
       );
+    });
+  });
+
+  describe("shared cacheProvider", function () {
+    const samlOptions = {
+      idpCert: FAKE_CERT,
+      issuer: "onesaml_login",
+      callbackUrl: "https://www.example.com",
+    };
+    const loginStart = { query: {}, body: {} } as unknown as RequestWithUser;
+    const postedResponse = {
+      query: {},
+      body: { SAMLResponse: "response" },
+    } as unknown as RequestWithUser;
+    const postedRequest = {
+      query: {},
+      body: { SAMLRequest: "request" },
+    } as unknown as RequestWithUser;
+    // A GET, which an application may route without parsing a body.
+    const redirectedResponse = {
+      query: { SAMLResponse: "response" },
+    } as unknown as RequestWithUser;
+    let superAuthenticateStub: sinon.SinonStub;
+
+    beforeEach(function () {
+      superAuthenticateStub = sinon.stub(AbstractStrategy.prototype, "authenticate");
+    });
+
+    afterEach(function () {
+      superAuthenticateStub.restore();
+    });
+
+    function createStrategy(
+      constructorOptions: Partial<PassportSamlConfig>,
+      providerOptions: Partial<PassportSamlConfig>,
+    ) {
+      const strategy = new MultiSamlStrategy(
+        {
+          ...constructorOptions,
+          getSamlOptions: (req: express.Request, fn: StrategyOptionsCallback) =>
+            fn(null, { ...samlOptions, ...providerOptions }),
+        },
+        noop,
+        noop,
+      );
+      const errorStub = sinon.stub(strategy, "error");
+      return { strategy, errorStub };
+    }
+
+    it('reports an error instead of starting a login under validateInResponseTo: "always" without one', function () {
+      const { strategy, errorStub } = createStrategy(
+        {},
+        { validateInResponseTo: ValidateInResponseTo.always },
+      );
+
+      strategy.authenticate(loginStart, {});
+
+      sinon.assert.calledOnce(errorStub);
+      expect(errorStub.firstCall.args[0].message)
+        .to.contain('for validateInResponseTo: "always"')
+        .and.to.contain("InMemoryCacheProvider");
+      sinon.assert.notCalled(superAuthenticateStub);
+    });
+
+    it('starts a login under validateInResponseTo: "always" with one from getSamlOptions', function () {
+      const { strategy, errorStub } = createStrategy(
+        {},
+        {
+          validateInResponseTo: ValidateInResponseTo.always,
+          cacheProvider: new InMemoryCacheProvider(),
+        },
+      );
+
+      strategy.authenticate(loginStart, {});
+
+      sinon.assert.notCalled(errorStub);
+      sinon.assert.calledOnce(superAuthenticateStub);
+    });
+
+    it('starts a login under validateInResponseTo: "always" with one passed to the constructor', function () {
+      const { strategy, errorStub } = createStrategy(
+        { cacheProvider: new InMemoryCacheProvider() },
+        { validateInResponseTo: ValidateInResponseTo.always },
+      );
+
+      strategy.authenticate(loginStart, {});
+
+      sinon.assert.notCalled(errorStub);
+      sinon.assert.calledOnce(superAuthenticateStub);
+    });
+
+    it('leaves incoming messages and logout starts alone under validateInResponseTo: "always"', function () {
+      const { strategy, errorStub } = createStrategy(
+        {},
+        { validateInResponseTo: ValidateInResponseTo.always },
+      );
+
+      strategy.authenticate(postedResponse, {});
+      strategy.authenticate(postedRequest, {});
+      strategy.authenticate(redirectedResponse, {});
+      strategy.authenticate(loginStart, { samlFallback: "logout-request" });
+
+      sinon.assert.notCalled(errorStub);
+      sinon.assert.callCount(superAuthenticateStub, 4);
+    });
+
+    it('starts a login under validateInResponseTo: "ifPresent" without one', function () {
+      const { strategy, errorStub } = createStrategy(
+        {},
+        { validateInResponseTo: ValidateInResponseTo.ifPresent },
+      );
+
+      strategy.authenticate(loginStart, {});
+
+      sinon.assert.notCalled(errorStub);
+      sinon.assert.calledOnce(superAuthenticateStub);
+    });
+
+    it("reports an error for a login start or a posted SAMLResponse under rejectReplayedAssertions without one", function () {
+      const { strategy, errorStub } = createStrategy({}, { rejectReplayedAssertions: true });
+
+      strategy.authenticate(loginStart, {});
+      strategy.authenticate(postedResponse, {});
+
+      sinon.assert.calledTwice(errorStub);
+      expect(errorStub.firstCall.args[0].message).to.contain("for rejectReplayedAssertions: true");
+      expect(errorStub.secondCall.args[0].message).to.contain("for rejectReplayedAssertions: true");
+      sinon.assert.notCalled(superAuthenticateStub);
+    });
+
+    it("leaves logout messages and logout starts alone under rejectReplayedAssertions without one", function () {
+      const { strategy, errorStub } = createStrategy({}, { rejectReplayedAssertions: true });
+
+      strategy.authenticate(postedRequest, {});
+      strategy.authenticate(redirectedResponse, {});
+      strategy.authenticate(loginStart, { samlFallback: "logout-request" });
+
+      sinon.assert.notCalled(errorStub);
+      sinon.assert.calledThrice(superAuthenticateStub);
+    });
+
+    it("accepts a posted SAMLResponse under rejectReplayedAssertions with one", function () {
+      const { strategy, errorStub } = createStrategy(
+        {},
+        { rejectReplayedAssertions: true, cacheProvider: new InMemoryCacheProvider() },
+      );
+
+      strategy.authenticate(postedResponse, {});
+
+      sinon.assert.notCalled(errorStub);
+      sinon.assert.calledOnce(superAuthenticateStub);
     });
   });
 });
