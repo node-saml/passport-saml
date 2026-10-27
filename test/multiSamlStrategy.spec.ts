@@ -51,20 +51,13 @@ describe("MultiSamlStrategy()", function () {
       this.superAuthenticateStub.restore();
     });
 
-    it("calls super with request and auth options", function (done) {
-      const superAuthenticateStub = this.superAuthenticateStub;
+    it("calls super with request and auth options", function () {
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        try {
-          fn(null, {
-            idpCert: FAKE_CERT,
-            issuer: "onesaml_login",
-            callbackUrl: "https://www.example.com",
-          });
-          sinon.assert.calledOnce(superAuthenticateStub);
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+        fn(null, {
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        });
       }
 
       const strategy = new MultiSamlStrategy(
@@ -76,32 +69,29 @@ describe("MultiSamlStrategy()", function () {
       );
       // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
+      sinon.assert.calledOnce(this.superAuthenticateStub);
     });
 
-    it("passes options on to saml strategy", function (done) {
+    it("passes options on to saml strategy", function () {
       const passportOptions = {
         passReqToCallback: true,
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
-          try {
-            fn(null, {
-              idpCert: FAKE_CERT,
-              issuer: "onesaml_login",
-              callbackUrl: "https://www.example.com",
-            });
-            expect(strategy._passReqToCallback).to.equal(true);
-            done();
-          } catch (err2) {
-            done(err2);
-          }
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
         },
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
       // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
+      sinon.assert.calledOnce(this.superAuthenticateStub);
+      expect(strategy._passReqToCallback).to.equal(true);
     });
 
-    it("uses given options to setup internal saml provider", function (done) {
+    it("uses given options to setup internal saml provider", function () {
       const superAuthenticateStub = this.superAuthenticateStub;
       const samlOptions: PassportSamlConfig = {
         issuer: "http://foo.issuer",
@@ -116,16 +106,7 @@ describe("MultiSamlStrategy()", function () {
       };
 
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        try {
-          fn(null, samlOptions);
-          sinon.assert.calledOnce(superAuthenticateStub);
-          superAuthenticateStub.calledWith(
-            Object.assign({}, { cacheProvider: "mock cache provider" }, samlOptions),
-          );
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+        fn(null, samlOptions);
       }
 
       const strategy = new MultiSamlStrategy(
@@ -136,6 +117,10 @@ describe("MultiSamlStrategy()", function () {
       );
       // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
+      sinon.assert.calledOnce(superAuthenticateStub);
+      superAuthenticateStub.calledWith(
+        Object.assign({}, { cacheProvider: "mock cache provider" }, samlOptions),
+      );
     });
   });
 
@@ -195,51 +180,41 @@ describe("MultiSamlStrategy()", function () {
       this.superLogoutMock.restore();
     });
 
-    it("calls super with request and auth options", function (done) {
-      const superLogoutMock = this.superLogoutMock;
+    it("calls super with request and auth options", function () {
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        try {
-          fn(null, {
-            idpCert: FAKE_CERT,
-            issuer: "onesaml_login",
-            callbackUrl: "https://www.example.com",
-          });
-          sinon.assert.calledOnce(superLogoutMock);
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+        fn(null, {
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        });
       }
 
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
       // @ts-expect-error `logout` expects a request object
       strategy.logout("random", "random");
+      sinon.assert.calledOnce(this.superLogoutMock);
     });
 
-    it("passes options on to saml strategy", function (done) {
+    it("passes options on to saml strategy", function () {
       const passportOptions = {
         passReqToCallback: true,
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
-          try {
-            fn(null, {
-              idpCert: FAKE_CERT,
-              issuer: "onesaml_login",
-              callbackUrl: "https://www.example.com",
-            });
-            expect(strategy._passReqToCallback).to.equal(true);
-            done();
-          } catch (err2) {
-            done(err2);
-          }
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
         },
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
       // @ts-expect-error `logout` expects a request object
       strategy.logout("random", "random");
+      sinon.assert.calledOnce(this.superLogoutMock);
+      expect(strategy._passReqToCallback).to.equal(true);
     });
 
-    it("uses given options to setup internal saml provider", function (done) {
+    it("uses given options to setup internal saml provider", function () {
       const superLogoutMock = this.superLogoutMock;
       const samlOptions: PassportSamlConfig = {
         issuer: "http://foo.issuer",
@@ -254,19 +229,14 @@ describe("MultiSamlStrategy()", function () {
       };
 
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        try {
-          fn(null, samlOptions);
-          sinon.assert.calledOnce(superLogoutMock);
-          superLogoutMock.calledWith(Object.assign({}, samlOptions));
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+        fn(null, samlOptions);
       }
 
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
       // @ts-expect-error `logout` expects a request object
       strategy.logout("random", sinon.spy());
+      sinon.assert.calledOnce(superLogoutMock);
+      superLogoutMock.calledWith(Object.assign({}, samlOptions));
     });
   });
 
@@ -281,51 +251,44 @@ describe("MultiSamlStrategy()", function () {
       this.superGenerateServiceProviderMetadata.restore();
     });
 
-    it("calls super with request and generateServiceProviderMetadata options", function (done) {
+    it("calls super with request and generateServiceProviderMetadata options", function () {
       const superGenerateServiceProviderMetadata = this.superGenerateServiceProviderMetadata;
+      let samlOptionsRequest: express.Request | undefined;
       function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
-        try {
-          fn(null, {
-            idpCert: FAKE_CERT,
-            issuer: "onesaml_login",
-            callbackUrl: "https://www.example.com",
-          });
-          sinon.assert.calledOnce(superGenerateServiceProviderMetadata);
-          superGenerateServiceProviderMetadata.calledWith("bar", "baz");
-          expect(req).to.equal("foo");
-          done();
-        } catch (err2) {
-          done(err2);
-        }
+        samlOptionsRequest = req;
+        fn(null, {
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        });
       }
 
       const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
       // @ts-expect-error `generateServiceProviderMetadata` expects a request object
       strategy.generateServiceProviderMetadata("foo", "bar", "baz", noop);
+      sinon.assert.calledOnce(superGenerateServiceProviderMetadata);
+      superGenerateServiceProviderMetadata.calledWith("bar", "baz");
+      expect(samlOptionsRequest).to.equal("foo");
     });
 
-    it("passes options on to saml strategy", function (done) {
+    it("passes options on to saml strategy", function () {
       const passportOptions: MultiStrategyConfig = {
         passReqToCallback: true,
 
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
-          try {
-            fn(null, {
-              idpCert: FAKE_CERT,
-              issuer: "onesaml_login",
-              callbackUrl: "https://www.example.com",
-            });
-            expect(strategy._passReqToCallback).to.equal(true);
-            done();
-          } catch (err2) {
-            done(err2);
-          }
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
         },
       };
 
       const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
       // @ts-expect-error `generateServiceProviderMetadata` expects a request object
       strategy.generateServiceProviderMetadata("foo", "bar", "baz", noop);
+      sinon.assert.calledOnce(this.superGenerateServiceProviderMetadata);
+      expect(strategy._passReqToCallback).to.equal(true);
     });
 
     it("should pass error to callback function", function (done) {
