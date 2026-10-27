@@ -46,7 +46,14 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return this.error(err);
       }
 
-      const samlService = new SAML({ ...this._options, ...samlOptions });
+      // `getSamlOptions` may call back from a callback of its own, where a throw would escape
+      // passport and crash the process, so an invalid configuration is reported instead.
+      let samlService: SAML;
+      try {
+        samlService = new SAML({ ...this._options, ...samlOptions });
+      } catch (error) {
+        return this.error(error as Error);
+      }
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.authenticate.call(strategy, req, options);
@@ -62,7 +69,12 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return callback(err);
       }
 
-      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
+      let samlService: SAML;
+      try {
+        samlService = new SAML(Object.assign({}, this._options, samlOptions));
+      } catch (error) {
+        return callback(error as Error);
+      }
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.logout.call(strategy, req, callback);
@@ -84,13 +96,21 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return callback(err);
       }
 
-      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
-      const strategy = Object.assign({}, this, { _saml: samlService });
-      Object.setPrototypeOf(strategy, this);
-      return callback(
-        null,
-        this._generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert),
-      );
+      // The callback is called outside the `try`, so a throw from it is not reported to it again.
+      let metadata: string;
+      try {
+        const samlService = new SAML(Object.assign({}, this._options, samlOptions));
+        const strategy = Object.assign({}, this, { _saml: samlService });
+        Object.setPrototypeOf(strategy, this);
+        metadata = this._generateServiceProviderMetadata.call(
+          strategy,
+          decryptionCert,
+          signingCert,
+        );
+      } catch (error) {
+        return callback(error as Error);
+      }
+      return callback(null, metadata);
     });
   }
 
