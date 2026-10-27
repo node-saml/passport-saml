@@ -74,6 +74,14 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }) => {
       if (loggedOut) {
         if (profile != null) {
+          // The LogoutResponse must carry the RelayState that came with the request, so read it
+          // before the logout verifier, which may be given `req`, can change it. node-saml checks a
+          // Redirect-binding RelayState in the query string against the signature, but never sees
+          // the body, so only a POST-binding one may come from there. Dispatch checked that a
+          // POST-binding message has a body, and node-saml only reads it.
+          const RelayState =
+            req.query?.RelayState || (isRedirectBinding ? undefined : req.body.RelayState);
+
           // When logging out a user, use the consumer's `validate` function to check that
           // the `profile` associated with the logout request resolves to the same user
           // as the `profile` associated with the current session.
@@ -88,11 +96,6 @@ export abstract class AbstractStrategy extends PassportStrategy {
               userMatch = false;
             }
 
-            // node-saml checks a Redirect-binding RelayState in the query string against the
-            // signature, but never sees the body, so only a POST-binding one may come from there.
-            // A verifier given `req` may have cleared the body by now.
-            const RelayState =
-              req.query?.RelayState || (isRedirectBinding ? undefined : req.body?.RelayState);
             if (this._saml == null) {
               return this.error(
                 new Error("Can't get logout response URL without a SAML provider defined."),

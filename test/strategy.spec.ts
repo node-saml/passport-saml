@@ -280,12 +280,19 @@ describe("Strategy()", function () {
 
       it("returns the RelayState from the query string in the LogoutResponse", function (done) {
         redirectLogoutRequest.query.RelayState = "idp-relay-state";
+        redirectLogoutRequest.url =
+          "https://www.example.com/?SAMLRequest=request&RelayState=idp-relay-state";
 
         // This returns immediately, but calls async functions; need to turn event loop
         strategy.authenticate(redirectLogoutRequest, {});
 
         setImmediate(() => {
           sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithExactly(
+            validateRedirectAsyncStub,
+            redirectLogoutRequest.query,
+            "SAMLRequest=request&RelayState=idp-relay-state",
+          );
           sinon.assert.calledOnceWithMatch(
             getLogoutResponseUrlStub,
             sinon.match.any,
@@ -309,7 +316,7 @@ describe("Strategy()", function () {
       });
     });
 
-    it("answers a POST-binding logout request after a verifier given the request clears its body", function (done) {
+    it("returns a POST-binding RelayState that a verifier given the request clears", function (done) {
       const strategy = new SamlStrategy(
         {
           idpCert: FAKE_CERT,
@@ -340,13 +347,18 @@ describe("Strategy()", function () {
         loggedOut: true,
       });
       requestWithUserPostRequest.user = { name: "some user" };
+      requestWithUserPostRequest.body.RelayState = "idp-relay-state";
 
       // This returns immediately, but calls async functions; need to turn event loop
       strategy.authenticate(requestWithUserPostRequest, {});
 
       setImmediate(() => {
         sinon.assert.notCalled(errorStub);
-        sinon.assert.calledOnceWithMatch(getLogoutResponseUrlStub, sinon.match.any, undefined);
+        sinon.assert.calledOnceWithMatch(
+          getLogoutResponseUrlStub,
+          sinon.match.any,
+          "idp-relay-state",
+        );
         sinon.assert.calledOnce(logoutSpy);
         done();
       });
