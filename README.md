@@ -296,8 +296,11 @@ under a short random key and send the key as `RelayState` instead.
 Logout works the same way. `RelayState` on the request that starts a logout, through
 `strategy.logout(req, callback)` or `samlFallback: "logout-request"`, is sent with the
 `LogoutRequest` and comes back with the IdP's `LogoutResponse`, in `req.query.RelayState` or
-`req.body.RelayState` depending on the binding. When the IdP starts the logout, Passport-SAML
-returns the IdP's `RelayState` in its `LogoutResponse`, as the specification requires.
+`req.body.RelayState` depending on the binding. Treat it as untrusted there too: over HTTP-Redirect
+the IdP's signature covers a `RelayState`, but `req.query.RelayState` is your query parser's reading
+of the query string, which need not be the parameter the signature covers. When the IdP starts the
+logout, Passport-SAML returns the IdP's `RelayState` in its `LogoutResponse`, as the specification
+requires.
 
 `RelayState` only comes back if the IdP received your request. If `entryPoint` is a link that starts
 an IdP-initiated login, rather than the IdP's single sign-on service URL (the `SingleSignOnService`
@@ -359,6 +362,11 @@ For more detailed instructions, see
 ## SLO (single logout)
 
 Passport-SAML has built in support for SLO from Node-SAML.
+
+Over the HTTP-Redirect binding, Passport-SAML accepts a `LogoutRequest` or `LogoutResponse` only if
+the IdP signed it: one with no `Signature` parameter ends in an error. Configure your IdP to sign
+the logout messages it sends that way. That signature also covers the `RelayState`, and the
+`LogoutResponse` that Passport-SAML sends back carries only a `RelayState` the IdP signed.
 
 Note: Fully functional IdP initiated SLO support is not provided out of the box. You have to inspect
 your use cases / implementation / deployment scenarios (location of IdP in respect to SP) and
