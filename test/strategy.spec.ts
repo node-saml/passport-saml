@@ -201,6 +201,34 @@ describe("Strategy()", function () {
       });
     });
 
+    it("sends additionalParams in the form when authnRequestBinding is HTTP-POST", function (done) {
+      getAuthorizeFormStub.callThrough();
+      errorStub.callsFake(done);
+      const strategy = new SamlStrategy(
+        {
+          authnRequestBinding: "HTTP-POST",
+          entryPoint: "https://idp.example.com/sso",
+          idpCert: FAKE_CERT,
+          issuer: "onesaml_login",
+          callbackUrl: "https://www.example.com",
+        },
+        noop,
+        noop,
+      );
+      requestWithUser.res = {
+        send: (form: string) => {
+          try {
+            expect(form).to.contain('<input type="hidden" name="kc_idp_hint" value="corp" />');
+            done();
+          } catch (err2) {
+            done(err2);
+          }
+        },
+      } as unknown as express.Response;
+
+      strategy.authenticate(requestWithUser, { additionalParams: { kc_idp_hint: "corp" } });
+    });
+
     it("returns the IdP's RelayState in the LogoutResponse to an IdP-initiated logout", function (done) {
       const strategy = new SamlStrategy(
         { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
