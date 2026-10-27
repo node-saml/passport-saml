@@ -74,11 +74,10 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }) => {
       if (loggedOut) {
         if (profile != null) {
-          // Echo the RelayState received (SAML 2.0 Bindings, sections 3.4.3, 3.5.3). Read it before
-          // a verifier given `req` can change it, and for Redirect only from the signed query.
+          // Echo the RelayState from where its binding carries it, before a verifier given `req`
+          // can change it. SAML 2.0 Bindings, sections 3.4.3 and 3.5.3.
           // https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
-          const RelayState =
-            req.query?.RelayState || (isRedirectBinding ? undefined : req.body.RelayState);
+          const RelayState = isRedirectBinding ? req.query.RelayState : req.body.RelayState;
 
           // When logging out a user, use the consumer's `validate` function to check that
           // the `profile` associated with the logout request resolves to the same user
