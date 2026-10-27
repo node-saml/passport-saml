@@ -74,11 +74,9 @@ export abstract class AbstractStrategy extends PassportStrategy {
     }) => {
       if (loggedOut) {
         if (profile != null) {
-          // The LogoutResponse must carry the RelayState that came with the request, so read it
-          // before the logout verifier, which may be given `req`, can change it. node-saml checks a
-          // Redirect-binding RelayState in the query string against the signature, but never sees
-          // the body, so only a POST-binding one may come from there. Dispatch checked that a
-          // POST-binding message has a body, and node-saml only reads it.
+          // Echo the RelayState received (SAML 2.0 Bindings, sections 3.4.3, 3.5.3). Read it before
+          // a verifier given `req` can change it, and for Redirect only from the signed query.
+          // https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
           const RelayState =
             req.query?.RelayState || (isRedirectBinding ? undefined : req.body.RelayState);
 

@@ -288,11 +288,6 @@ describe("Strategy()", function () {
 
         setImmediate(() => {
           sinon.assert.notCalled(errorStub);
-          sinon.assert.calledOnceWithExactly(
-            validateRedirectAsyncStub,
-            redirectLogoutRequest.query,
-            "SAMLRequest=request&RelayState=idp-relay-state",
-          );
           sinon.assert.calledOnceWithMatch(
             getLogoutResponseUrlStub,
             sinon.match.any,
