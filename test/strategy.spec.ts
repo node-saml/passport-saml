@@ -5,13 +5,8 @@ import { expect } from "chai";
 import * as sinon from "sinon";
 import { Strategy as SamlStrategy } from "../src";
 import { Profile, SAML } from "@node-saml/node-saml";
-import {
-  RequestWithUser,
-  VerifiedCallback,
-  VerifyWithoutRequest,
-  PassportSamlConfig,
-} from "../src/types";
-import { FAKE_CERT } from "./types";
+import { RequestWithUser, VerifiedCallback, VerifyWithoutRequest } from "../src/types";
+import { SAML_CONFIG } from "./types";
 
 const noop = () => undefined;
 
@@ -101,12 +96,7 @@ describe("Strategy()", function () {
 
     it("calls getAuthorizeForm when authnRequestBinding is HTTP-POST for login-request", function (done) {
       const strategy = new SamlStrategy(
-        {
-          authnRequestBinding: "HTTP-POST",
-          idpCert: FAKE_CERT,
-          issuer: "onesaml_login",
-          callbackUrl: "https://www.example.com",
-        },
+        { ...SAML_CONFIG, authnRequestBinding: "HTTP-POST" },
         noop,
         noop,
       );
@@ -122,15 +112,7 @@ describe("Strategy()", function () {
     });
 
     it("calls getAuthorizeForm when authnRequestBinding is not HTTP-POST for logout-request", function (done) {
-      const strategy = new SamlStrategy(
-        {
-          idpCert: FAKE_CERT,
-          issuer: "onesaml_login",
-          callbackUrl: "https://www.example.com",
-        },
-        noop,
-        noop,
-      );
+      const strategy = new SamlStrategy(SAML_CONFIG, noop, noop);
 
       // This returns immediately, but calls async functions; need to turn event loop
       strategy.authenticate(requestWithUser, { samlFallback: "logout-request" });
@@ -143,11 +125,7 @@ describe("Strategy()", function () {
     });
 
     it("calls getAuthorizeUrl when authnRequestBinding is not HTTP-POST for login-request", function (done) {
-      const strategy = new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
-        noop,
-        noop,
-      );
+      const strategy = new SamlStrategy(SAML_CONFIG, noop, noop);
 
       // This returns immediately, but calls async functions; need to turn event loop
       strategy.authenticate(requestWithUser, {});
@@ -161,11 +139,7 @@ describe("Strategy()", function () {
     });
 
     it("passes RelayState from the query string to getAuthorizeUrl for login-request", function (done) {
-      const strategy = new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
-        noop,
-        noop,
-      );
+      const strategy = new SamlStrategy(SAML_CONFIG, noop, noop);
       requestWithUser.query = { RelayState: "/reports/42" };
 
       // This returns immediately, but calls async functions; need to turn event loop
@@ -180,12 +154,7 @@ describe("Strategy()", function () {
 
     it("passes RelayState from the body to getAuthorizeForm when authnRequestBinding is HTTP-POST", function (done) {
       const strategy = new SamlStrategy(
-        {
-          authnRequestBinding: "HTTP-POST",
-          idpCert: FAKE_CERT,
-          issuer: "onesaml_login",
-          callbackUrl: "https://www.example.com",
-        },
+        { ...SAML_CONFIG, authnRequestBinding: "HTTP-POST" },
         noop,
         noop,
       );
@@ -203,7 +172,7 @@ describe("Strategy()", function () {
 
     it("returns the IdP's RelayState in the LogoutResponse to an IdP-initiated logout", function (done) {
       const strategy = new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        SAML_CONFIG,
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -248,7 +217,7 @@ describe("Strategy()", function () {
 
       beforeEach(function () {
         strategy = new SamlStrategy(
-          { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+          SAML_CONFIG,
           function signonVerify(_profile: Profile | null, cb: VerifiedCallback) {
             cb(new Error("Logout shouldn't call signon."));
           },
@@ -306,12 +275,6 @@ describe("Strategy()", function () {
     });
 
     describe("POST-binding logout request", function () {
-      const config = {
-        idpCert: FAKE_CERT,
-        issuer: "onesaml_login",
-        callbackUrl: "https://www.example.com",
-      };
-
       beforeEach(function () {
         validatePostRequestAsyncStub.resolves({
           profile: {
@@ -328,7 +291,7 @@ describe("Strategy()", function () {
 
       it("returns the body's RelayState, where the POST binding carries it, not the query string's", function (done) {
         const strategy = new SamlStrategy(
-          config,
+          SAML_CONFIG,
           function signonVerify(_profile: Profile | null, cb: VerifiedCallback) {
             cb(new Error("Logout shouldn't call signon."));
           },
@@ -355,7 +318,7 @@ describe("Strategy()", function () {
 
       it("returns the RelayState even if a verifier given the request clears the body", function (done) {
         const strategy = new SamlStrategy(
-          { ...config, passReqToCallback: true },
+          { ...SAML_CONFIG, passReqToCallback: true },
           function signonVerify(
             _req: express.Request,
             _profile: Profile | null,
@@ -390,12 +353,7 @@ describe("Strategy()", function () {
 
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
-        {
-          idpCert: FAKE_CERT,
-          passReqToCallback: true,
-          issuer: "onesaml_login",
-          callbackUrl: "https://www.example.com",
-        },
+        { ...SAML_CONFIG, passReqToCallback: true },
         function (req: express.Request, _profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -445,7 +403,7 @@ describe("Strategy()", function () {
 
     it("determines that logout was successful where user matches, GET", function (done) {
       const strategy = new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        SAML_CONFIG,
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           cb(new Error("Logout shouldn't call signon."));
@@ -498,7 +456,7 @@ describe("Strategy()", function () {
 
     it("determines that signon was successful where user matches, POST", function (done) {
       const strategy = new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+        SAML_CONFIG,
         function (_profile: Profile | null, cb: VerifiedCallback) {
           // for signon
           if (_profile) {
@@ -549,11 +507,7 @@ describe("Strategy()", function () {
     });
 
     it("should call through to get logout URL", function () {
-      new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
-        noop,
-        noop,
-      ).logout(
+      new SamlStrategy(SAML_CONFIG, noop, noop).logout(
         {
           // @ts-expect-error `string` isn't valid for `query`
           query: "",
@@ -564,11 +518,10 @@ describe("Strategy()", function () {
     });
 
     it("should pass RelayState through to get logout URL", function () {
-      new SamlStrategy(
-        { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+      new SamlStrategy(SAML_CONFIG, noop, noop).logout(
+        { query: { RelayState: "/goodbye" } } as unknown as RequestWithUser,
         noop,
-        noop,
-      ).logout({ query: { RelayState: "/goodbye" } } as unknown as RequestWithUser, noop);
+      );
       sinon.assert.calledOnceWithMatch(getLogoutUrlAsyncStub, sinon.match.any, "/goodbye");
     });
   });
@@ -588,11 +541,6 @@ describe("Strategy()", function () {
     });
 
     it("should call through to generate metadata", function () {
-      const samlConfig: PassportSamlConfig = {
-        idpCert: FAKE_CERT,
-        issuer: "onesaml_login",
-        callbackUrl: "https://www.example.com",
-      };
       const signonVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
@@ -600,7 +548,7 @@ describe("Strategy()", function () {
       const logoutVerify: VerifyWithoutRequest = function (): void {
         throw Error("This shouldn't be called to generate metadata");
       };
-      new SamlStrategy(samlConfig, signonVerify, logoutVerify).generateServiceProviderMetadata("");
+      new SamlStrategy(SAML_CONFIG, signonVerify, logoutVerify).generateServiceProviderMetadata("");
       sinon.assert.calledOnce(generateServiceProviderMetadataStub);
     });
   });
