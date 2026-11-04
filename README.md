@@ -165,19 +165,46 @@ can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set aft
 `MultiSamlStrategy` builds a new `node-saml` `SAML` instance from the merged options for each
 request. If those options have no `cacheProvider`, each instance starts with its own empty in-memory
 cache, and the callback never finds the request ID recorded when the login started. With
-`validateInResponseTo: "always"`, every login is then rejected, and with `"ifPresent"`, every
-response whose `Response` element carries `InResponseTo`. Return a `cacheProvider` from
-`getSamlOptions`, the same one for a provider on every call, so a response finds the cache its
-request was recorded in. One `cacheProvider` passed to the `MultiSamlStrategy` constructor also
-works, but all providers share it, so a response to one provider's request passes this check at
-another provider's callback.
+`validateInResponseTo: "always"`, no login could then complete, so `MultiSamlStrategy` reports an
+error when a login starts instead of sending the user to the IdP. With `"ifPresent"`, every response
+whose `Response` element carries `InResponseTo` is rejected. `rejectReplayedAssertions: true` needs
+the cache too, to recognize an assertion presented a second time, so without one `MultiSamlStrategy`
+reports an error when a login starts or a `SAMLResponse` is posted to it.
 
-A `cacheProvider` is an object with `saveAsync(key, value)`, `getAsync(key)` and `removeAsync(key)`
-methods, described by the `CacheProvider` TypeScript type. Back it with a store that every process
-handling your logins can reach, such as Redis or your database. `node-saml` removes a request ID
-only when a response to it arrives, so have the store expire entries after
-`requestIdExpirationPeriodMs` (8 hours by default); otherwise the IDs of abandoned logins stay
-forever.
+Return a `cacheProvider` from `getSamlOptions`, the same one for a provider on every call, so a
+response finds the cache its request was recorded in. Within a single process, that can be an
+`InMemoryCacheProvider` from `@node-saml/node-saml`, one for each provider, created once:
+
+```javascript
+import { InMemoryCacheProvider } from "@node-saml/node-saml";
+
+const cacheProviders = new Map();
+
+async function getSamlOptions(req, done) {
+  try {
+    const provider = await findProvider(req);
+    if (!cacheProviders.has(provider.id)) {
+      cacheProviders.set(provider.id, new InMemoryCacheProvider());
+    }
+    done(null, { ...provider.samlOptions, cacheProvider: cacheProviders.get(provider.id) });
+  } catch (err) {
+    done(err);
+  }
+}
+```
+
+One `cacheProvider` passed to the `MultiSamlStrategy` constructor also works, but all providers
+share it, so a response to one provider's request passes this check at another provider's callback.
+
+When more than one process handles your logins, back the `cacheProvider` with a store they can all
+reach, such as Redis or your database. It is an object with `saveAsync(key, value)`, `getAsync(key)`
+and `removeAsync(key)` methods, described by the `CacheProvider` TypeScript type. Two more methods
+are optional, and each must be one atomic operation in your store: `consumeAsync(key)` removes a key
+and returns its value, so that of two copies of a response arriving together only one is accepted,
+and `saveIfAbsentAsync(key, value, expiresAtMs)` saves a key only if it is absent and resolves to
+whether it did, which `rejectReplayedAssertions` requires. `node-saml` removes a request ID only
+when a response to it arrives, so have the store expire entries after `requestIdExpirationPeriodMs`
+(8 hours by default); otherwise the IDs of abandoned logins stay forever.
 
 ### Provide the authentication callback
 
