@@ -242,7 +242,11 @@ describe("Strategy()", function () {
             cb(null, { name: profile?.nameID });
           },
         );
-        validateRedirectAsyncStub.resolves({ profile: logoutRequestProfile, loggedOut: true });
+        validateRedirectAsyncStub.resolves({
+          profile: logoutRequestProfile,
+          loggedOut: true,
+          relayState: "idp-relay-state",
+        });
         getLogoutResponseUrlStub.yields(null, idpLogoutResponseUrl);
         redirectLogoutRequest = {
           query: {
@@ -257,15 +261,11 @@ describe("Strategy()", function () {
         } as unknown as RequestWithUser;
       });
 
-      it("hands only validateRedirectAsync the parsed query and the query string as it arrived, then redirects to the IdP", function (done) {
+      it("hands only validateRedirectAsync the query string as it arrived, then redirects to the IdP", function (done) {
         strategy.authenticate(redirectLogoutRequest, {});
 
         setImmediate(() => {
-          sinon.assert.calledOnceWithExactly(
-            validateRedirectAsyncStub,
-            redirectLogoutRequest.query,
-            queryString,
-          );
+          sinon.assert.calledOnceWithExactly(validateRedirectAsyncStub, queryString);
           sinon.assert.notCalled(validatePostRequestAsyncStub);
           sinon.assert.notCalled(validatePostResponseAsyncStub);
           sinon.assert.notCalled(errorStub);
@@ -275,6 +275,25 @@ describe("Strategy()", function () {
             "idp-relay-state",
           );
           sinon.assert.calledOnceWithExactly(redirectStub, idpLogoutResponseUrl);
+          done();
+        });
+      });
+
+      it("ignores a RelayState that only the query parser reads, which the signature does not cover", function (done) {
+        // Express 4's `qs` parser reads `[RelayState]` as `RelayState`.
+        redirectLogoutRequest.url = `/logout/callback?SAMLRequest=request&${signatureParameters}&[RelayState]=https%3A%2F%2Fevil.example`;
+        redirectLogoutRequest.query = {
+          SAMLRequest: "request",
+          ...parsedSignatureParameters,
+          RelayState: "https://evil.example",
+        };
+        validateRedirectAsyncStub.resolves({ profile: logoutRequestProfile, loggedOut: true });
+
+        strategy.authenticate(redirectLogoutRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(getLogoutResponseUrlStub, sinon.match.any, undefined);
           done();
         });
       });
