@@ -1,6 +1,5 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { strict as assert } from "assert";
-import * as url from "url";
 import { Profile, SAML } from "@node-saml/node-saml";
 import { PassportSamlConfig } from "./types";
 import {
@@ -174,7 +173,8 @@ export abstract class AbstractStrategy extends PassportStrategy {
     };
 
     if (isRedirectBinding) {
-      const originalQuery = url.parse(req.url).query ?? "";
+      // Sliced, not parsed: a URL parser can re-encode the bytes the signature covers.
+      const originalQuery = req.url.slice(req.url.indexOf("?") + 1);
       this._saml
         .validateRedirectAsync(req.query, originalQuery)
         .then(validateCallback)
@@ -199,14 +199,13 @@ export abstract class AbstractStrategy extends PassportStrategy {
 
             const RelayState =
               (req.query && req.query.RelayState) || (req.body && req.body.RelayState);
-            const host = req.headers && req.headers.host;
             if (this._saml.options.authnRequestBinding === "HTTP-POST") {
-              const data = await this._saml.getAuthorizeFormAsync(RelayState, host);
+              const data = await this._saml.getAuthorizeFormAsync(RelayState);
               const res = req.res;
               res?.send(data);
             } else {
               // Defaults to HTTP-Redirect
-              this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, host, options));
+              this.redirect(await this._saml.getAuthorizeUrlAsync(RelayState, options));
             }
           } catch (err) {
             this.error(err as Error);

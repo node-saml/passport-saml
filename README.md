@@ -83,6 +83,9 @@ const samlStrategy = new SamlStrategy(
     entryPoint: "https://idp.example.com/sso",
     issuer: "https://sp.example.com/metadata",
     idpCert: readFileSync("./idp-signing-cert.pem", "utf-8"),
+    // Accept only responses to logins this app started, and each assertion only once
+    validateInResponseTo: "always",
+    rejectReplayedAssertions: true,
   },
   // Sign-on: return the user the IdP authenticated
   async (profile, done) => {
@@ -114,6 +117,14 @@ if the IdP sends one.
 - **Logout:** runs when the IdP sends a `LogoutRequest`. Passport-SAML compares the user you return
   with `req.user`, using `assert.deepStrictEqual`, and tells the IdP the logout succeeded only if
   they match. It logs out the current session either way.
+
+Choose `validateInResponseTo` and `rejectReplayedAssertions` yourself. `node-saml`'s next major
+version requires both, and leaving either unset logs a warning under `NODE_DEBUG=node-saml`.
+`"always"` rejects a login the IdP starts on its own; `node-saml`'s
+[InResponseTo](https://github.com/node-saml/node-saml/blob/master/README.md#inresponseto) section
+weighs it against `"ifPresent"` and `"never"`. Both options keep IDs in a `cacheProvider`, in the
+process's memory by default, so when more than one process handles your logins, give them a
+[shared one](https://github.com/node-saml/node-saml/blob/master/README.md#cache-provider).
 
 ### Configure strategy for multiple providers
 
@@ -160,7 +171,9 @@ passport.use(
 `getSamlOptions` runs on every request that reaches the strategy. `findProvider()` stands in for
 your own lookup. Call `done(null, options)` with that provider's configuration, or `done(err)`. The
 options are merged over the ones passed to `MultiSamlStrategy`, so settings shared by every provider
-can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set after the merge.
+can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set after the merge. Choose
+`validateInResponseTo` and `rejectReplayedAssertions` too, as for `Strategy`. Turning either on
+needs a `cacheProvider` shared across requests, as described below.
 
 `MultiSamlStrategy` builds a new `node-saml` `SAML` instance from the merged options for each
 request. If those options have no `cacheProvider`, each instance starts with its own empty in-memory
