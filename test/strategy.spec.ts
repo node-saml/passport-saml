@@ -242,6 +242,152 @@ describe("Strategy()", function () {
       });
     });
 
+    describe("Redirect-binding logout request", function () {
+      let strategy: SamlStrategy;
+      let redirectLogoutRequest: RequestWithUser;
+
+      beforeEach(function () {
+        strategy = new SamlStrategy(
+          { idpCert: FAKE_CERT, issuer: "onesaml_login", callbackUrl: "https://www.example.com" },
+          function signonVerify(_profile: Profile | null, cb: VerifiedCallback) {
+            cb(new Error("Logout shouldn't call signon."));
+          },
+          function logoutVerify(profile: Profile | null, cb: VerifiedCallback) {
+            cb(null, { name: profile?.nameID });
+          },
+        );
+        validateRedirectAsyncStub.resolves({
+          profile: {
+            ID: "ID",
+            issuer: "issuer",
+            nameID: "some user",
+            nameIDFormat: "nameIDFormat",
+          },
+          loggedOut: true,
+        });
+        redirectLogoutRequest = {
+          query: { SAMLRequest: "request" },
+          url: "https://www.example.com/?SAMLRequest=request",
+          user: { name: "some user" },
+          logout: logoutSpy,
+          res: { send: noop },
+        } as unknown as RequestWithUser;
+      });
+
+      it("returns the RelayState from the query string in the LogoutResponse", function (done) {
+        redirectLogoutRequest.query.RelayState = "idp-relay-state";
+        redirectLogoutRequest.url =
+          "https://www.example.com/?SAMLRequest=request&RelayState=idp-relay-state";
+
+        strategy.authenticate(redirectLogoutRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(
+            getLogoutResponseUrlStub,
+            sinon.match.any,
+            "idp-relay-state",
+          );
+          done();
+        });
+      });
+
+      it("ignores a RelayState in the body, which the query string's signature does not cover", function (done) {
+        redirectLogoutRequest.body = { RelayState: "https://evil.example" };
+
+        strategy.authenticate(redirectLogoutRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(getLogoutResponseUrlStub, sinon.match.any, undefined);
+          done();
+        });
+      });
+    });
+
+    describe("POST-binding logout request", function () {
+      const config = {
+        idpCert: FAKE_CERT,
+        issuer: "onesaml_login",
+        callbackUrl: "https://www.example.com",
+      };
+
+      beforeEach(function () {
+        validatePostRequestAsyncStub.resolves({
+          profile: {
+            ID: "ID",
+            issuer: "issuer",
+            nameID: "some user",
+            nameIDFormat: "nameIDFormat",
+          },
+          loggedOut: true,
+        });
+        requestWithUserPostRequest.user = { name: "some user" };
+        requestWithUserPostRequest.body.RelayState = "idp-relay-state";
+      });
+
+      it("returns the body's RelayState, where the POST binding carries it, not the query string's", function (done) {
+        const strategy = new SamlStrategy(
+          config,
+          function signonVerify(_profile: Profile | null, cb: VerifiedCallback) {
+            cb(new Error("Logout shouldn't call signon."));
+          },
+          function logoutVerify(profile: Profile | null, cb: VerifiedCallback) {
+            cb(null, { name: profile?.nameID });
+          },
+        );
+        requestWithUserPostRequest.query = { RelayState: "https://evil.example" };
+        requestWithUserPostRequest.url =
+          "https://www.example.com/?RelayState=https%3A%2F%2Fevil.example";
+
+        strategy.authenticate(requestWithUserPostRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(
+            getLogoutResponseUrlStub,
+            sinon.match.any,
+            "idp-relay-state",
+          );
+          done();
+        });
+      });
+
+      it("returns the RelayState even if a verifier given the request clears the body", function (done) {
+        const strategy = new SamlStrategy(
+          { ...config, passReqToCallback: true },
+          function signonVerify(
+            _req: express.Request,
+            _profile: Profile | null,
+            cb: VerifiedCallback,
+          ) {
+            cb(new Error("Logout shouldn't call signon."));
+          },
+          function logoutVerify(
+            req: express.Request,
+            profile: Profile | null,
+            cb: VerifiedCallback,
+          ) {
+            req.body = undefined;
+            cb(null, { name: profile?.nameID });
+          },
+        );
+
+        strategy.authenticate(requestWithUserPostRequest, {});
+
+        setImmediate(() => {
+          sinon.assert.notCalled(errorStub);
+          sinon.assert.calledOnceWithMatch(
+            getLogoutResponseUrlStub,
+            sinon.match.any,
+            "idp-relay-state",
+          );
+          sinon.assert.calledOnce(logoutSpy);
+          done();
+        });
+      });
+    });
+
     it("determines that logout was unsuccessful where user doesn't match, POST", function (done) {
       const strategy = new SamlStrategy(
         {
