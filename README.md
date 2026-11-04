@@ -171,7 +171,9 @@ passport.use(
 `getSamlOptions` runs on every request that reaches the strategy. `findProvider()` stands in for
 your own lookup. Call `done(null, options)` with that provider's configuration, or `done(err)`. The
 options are merged over the ones passed to `MultiSamlStrategy`, so settings shared by every provider
-can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set after the merge.
+can go in the constructor. `callbackUrl`, `issuer` and `idpCert` must be set after the merge. Choose
+`validateInResponseTo` and `rejectReplayedAssertions` too, as for `Strategy`. Turning either on
+needs a `cacheProvider` shared across requests, as described below.
 
 `MultiSamlStrategy` builds a new `node-saml` `SAML` instance from the merged options for each
 request. If those options have no `cacheProvider`, each instance starts with its own empty in-memory
