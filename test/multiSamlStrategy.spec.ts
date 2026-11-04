@@ -470,5 +470,26 @@ describe("MultiSamlStrategy()", function () {
         },
       );
     });
+
+    it("does not call the callback a second time when it throws", function () {
+      const passportOptions = {
+        // Calls back synchronously, so the callback's error propagates to this test
+        getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
+        },
+      };
+      const callback = sinon.stub().throws(new Error("My callback error"));
+
+      const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
+      expect(() =>
+        // @ts-expect-error `generateServiceProviderMetadata` expects a request object
+        strategy.generateServiceProviderMetadata("foo", "bar", "baz", callback),
+      ).to.throw("My callback error");
+      sinon.assert.calledOnceWithExactly(callback, null, "My Metadata Result");
+    });
   });
 });
