@@ -137,6 +137,29 @@ describe("MultiSamlStrategy()", function () {
       // @ts-expect-error `authenticate` expects a request object
       strategy.authenticate("random", "random");
     });
+
+    it("passes an error from the SAML constructor to error() when getSamlOptions calls back later", function (done) {
+      const superAuthenticateStub = this.superAuthenticateStub;
+      function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
+        // Calls back from its own callback, as a database driver would, with no `idpCert`
+        setImmediate(() =>
+          fn(null, { issuer: "onesaml_login", callbackUrl: "https://www.example.com" }),
+        );
+      }
+
+      const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
+      sinon.stub(strategy, "error").callsFake((err: Error) => {
+        try {
+          expect(err.message).to.equal("idpCert is required");
+          sinon.assert.notCalled(superAuthenticateStub);
+          done();
+        } catch (err2) {
+          done(err2);
+        }
+      });
+      // @ts-expect-error `authenticate` expects a request object
+      strategy.authenticate("random", "random");
+    });
   });
 
   describe("authorize", function () {
@@ -268,6 +291,28 @@ describe("MultiSamlStrategy()", function () {
       // @ts-expect-error `logout` expects a request object
       strategy.logout("random", sinon.spy());
     });
+
+    it("passes an error from the SAML constructor to the callback when getSamlOptions calls back later", function (done) {
+      const superLogoutMock = this.superLogoutMock;
+      function getSamlOptions(req: express.Request, fn: StrategyOptionsCallback) {
+        // Calls back from its own callback, as a database driver would, with no `idpCert`
+        setImmediate(() =>
+          fn(null, { issuer: "onesaml_login", callbackUrl: "https://www.example.com" }),
+        );
+      }
+
+      const strategy = new MultiSamlStrategy({ getSamlOptions }, noop, noop);
+      // @ts-expect-error `logout` expects a request object
+      strategy.logout("random", function (error) {
+        try {
+          expect(error?.message).to.equal("idpCert is required");
+          sinon.assert.notCalled(superLogoutMock);
+          done();
+        } catch (err2) {
+          done(err2);
+        }
+      });
+    });
   });
 
   describe("generateServiceProviderMetadata", function () {
@@ -347,6 +392,57 @@ describe("MultiSamlStrategy()", function () {
       });
     });
 
+    it("should pass a SAML constructor error to callback function when getSamlOptions calls back later", function (done) {
+      const superGenerateServiceProviderMetadata = this.superGenerateServiceProviderMetadata;
+      const passportOptions = {
+        getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
+          // Calls back from its own callback, as a database driver would, with no `idpCert`
+          setImmediate(() =>
+            fn(null, { issuer: "onesaml_login", callbackUrl: "https://www.example.com" }),
+          );
+        },
+      };
+
+      const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
+      // @ts-expect-error `generateServiceProviderMetadata` expects a request object
+      strategy.generateServiceProviderMetadata("foo", "bar", "baz", function (error, result) {
+        try {
+          expect(error?.message).to.equal("idpCert is required");
+          expect(result).to.equal(undefined);
+          sinon.assert.notCalled(superGenerateServiceProviderMetadata);
+          done();
+        } catch (err2) {
+          done(err2);
+        }
+      });
+    });
+
+    it("should pass a metadata error to callback function", function (done) {
+      this.superGenerateServiceProviderMetadata.throws(new Error("My metadata error"));
+      const passportOptions = {
+        getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
+          setImmediate(() =>
+            fn(null, {
+              idpCert: FAKE_CERT,
+              issuer: "onesaml_login",
+              callbackUrl: "https://www.example.com",
+            }),
+          );
+        },
+      };
+
+      const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
+      // @ts-expect-error `generateServiceProviderMetadata` expects a request object
+      strategy.generateServiceProviderMetadata("foo", "bar", "baz", function (error) {
+        try {
+          expect(error?.message).to.equal("My metadata error");
+          done();
+        } catch (err2) {
+          done(err2);
+        }
+      });
+    });
+
     it("should pass result to callback function", function (done) {
       const passportOptions = {
         getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
@@ -373,6 +469,27 @@ describe("MultiSamlStrategy()", function () {
           }
         },
       );
+    });
+
+    it("does not call the callback a second time when it throws", function () {
+      const passportOptions = {
+        // Calls back synchronously, so the callback's error propagates to this test
+        getSamlOptions: function (req: express.Request, fn: StrategyOptionsCallback) {
+          fn(null, {
+            idpCert: FAKE_CERT,
+            issuer: "onesaml_login",
+            callbackUrl: "https://www.example.com",
+          });
+        },
+      };
+      const callback = sinon.stub().throws(new Error("My callback error"));
+
+      const strategy = new MultiSamlStrategy(passportOptions, noop, noop);
+      expect(() =>
+        // @ts-expect-error `generateServiceProviderMetadata` expects a request object
+        strategy.generateServiceProviderMetadata("foo", "bar", "baz", callback),
+      ).to.throw("My callback error");
+      sinon.assert.calledOnceWithExactly(callback, null, "My Metadata Result");
     });
   });
 });
