@@ -8,7 +8,49 @@ import {
   VerifyWithoutRequest,
   VerifyWithRequest,
 } from "./types";
-import { SAML } from "@node-saml/node-saml";
+import { SAML, ValidateInResponseTo } from "@node-saml/node-saml";
+
+// `MultiSamlStrategy` builds a new `SAML` instance for each request, and an instance with no
+// `cacheProvider` starts with an empty one of its own, so nothing one request records is there for
+// the next. Report the settings that can never work that way, at the first request they affect.
+function missingSharedCacheError(
+  req: Request,
+  options: AuthenticateOptions,
+  samlOptions: Partial<PassportSamlConfig>,
+): Error | undefined {
+  if (samlOptions.cacheProvider != null) {
+    return undefined;
+  }
+
+  const isIncomingMessage = Boolean(
+    req.query?.SAMLResponse ||
+    req.query?.SAMLRequest ||
+    req.body?.SAMLResponse ||
+    req.body?.SAMLRequest,
+  );
+  const isLoginStart =
+    !isIncomingMessage && (options.samlFallback ?? "login-request") === "login-request";
+
+  let setting: string;
+  if (isLoginStart && samlOptions.validateInResponseTo === ValidateInResponseTo.always) {
+    // The callback could never find the request ID recorded here.
+    setting = 'validateInResponseTo: "always"';
+  } else if ((isLoginStart || req.body?.SAMLResponse) && samlOptions.rejectReplayedAssertions) {
+    // An assertion presented again could never be found among those already accepted, and a
+    // replayed one arrives at the callback, so a check only at login start would not stop it.
+    setting = "rejectReplayedAssertions: true";
+  } else {
+    return undefined;
+  }
+
+  return new Error(
+    `MultiSamlStrategy needs a cacheProvider shared across requests for ${setting}. ` +
+      "It builds a new SAML instance for each request, and one without a cacheProvider starts " +
+      "with an empty cache. Return the same cacheProvider for an identity provider from " +
+      "getSamlOptions on every call; within one process, that can be one InMemoryCacheProvider " +
+      "from @node-saml/node-saml for each identity provider.",
+  );
+}
 
 export class MultiSamlStrategy extends AbstractStrategy {
   static readonly newSamlProviderOnConstruct = false;
@@ -46,7 +88,22 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return this.error(err);
       }
 
-      const samlService = new SAML({ ...this._options, ...samlOptions });
+      const cacheError = missingSharedCacheError(req, options, {
+        ...this._options,
+        ...samlOptions,
+      });
+      if (cacheError != null) {
+        return this.error(cacheError);
+      }
+
+      // `getSamlOptions` may call back from a callback of its own, where a throw would escape
+      // passport and crash the process, so an invalid configuration is reported instead.
+      let samlService: SAML;
+      try {
+        samlService = new SAML({ ...this._options, ...samlOptions });
+      } catch (error) {
+        return this.error(error as Error);
+      }
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.authenticate.call(strategy, req, options);
@@ -62,7 +119,12 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return callback(err);
       }
 
-      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
+      let samlService: SAML;
+      try {
+        samlService = new SAML(Object.assign({}, this._options, samlOptions));
+      } catch (error) {
+        return callback(error as Error);
+      }
       const strategy = Object.assign({}, this, { _saml: samlService });
       Object.setPrototypeOf(strategy, this);
       super.logout.call(strategy, req, callback);
@@ -84,13 +146,21 @@ export class MultiSamlStrategy extends AbstractStrategy {
         return callback(err);
       }
 
-      const samlService = new SAML(Object.assign({}, this._options, samlOptions));
-      const strategy = Object.assign({}, this, { _saml: samlService });
-      Object.setPrototypeOf(strategy, this);
-      return callback(
-        null,
-        this._generateServiceProviderMetadata.call(strategy, decryptionCert, signingCert),
-      );
+      // The callback is called outside the `try`, so a throw from it is not reported to it again.
+      let metadata: string;
+      try {
+        const samlService = new SAML(Object.assign({}, this._options, samlOptions));
+        const strategy = Object.assign({}, this, { _saml: samlService });
+        Object.setPrototypeOf(strategy, this);
+        metadata = this._generateServiceProviderMetadata.call(
+          strategy,
+          decryptionCert,
+          signingCert,
+        );
+      } catch (error) {
+        return callback(error as Error);
+      }
+      return callback(null, metadata);
     });
   }
 
